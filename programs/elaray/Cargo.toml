@@ -1,0 +1,18 @@
+[package]
+name = "elaray"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "elaray"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-lincoeff = { path = "../../crates/oxwave-f-lincoeff" }
+oxwave-lib-tri = { path = "../../crates/oxwave-lib-tri" }
+oxwave-lib-trielas = { path = "../../crates/oxwave-lib-trielas" }

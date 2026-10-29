@@ -1,0 +1,116 @@
+{
+  "scope": "su/main/data_conversion (re-scout batch 2)",
+  "programs": [
+    {
+      "name": "suascii",
+      "path": "su/main/data_conversion/suascii.c",
+      "purpose": "Convert SU traces to ASCII, with options for headers, sample values, columns, and coordinate triples.",
+      "selfdoc_first_line": " SUASCII - print non zero header values and data in various formats    ",
+      "params": [
+        {
+          "name": "bare",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Output mode: 0 prints nonzero headers and data; 1 data only; 2 headers only; 3 CSV columns; 4 tab-delimited columns; 5 x, sample coordinate, and value triples. Takes precedence over option."
+        },
+        {
+          "name": "option",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Alias for bare, read only when bare is absent."
+        },
+        {
+          "name": "index",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "For bare=4, a nonzero value includes a time or depth coordinate column."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "50",
+          "required": false,
+          "description": "Maximum number of traces buffered and printed for bare=3 or bare=4; must be positive even for other modes."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "For bare=5, header keyword supplying the x coordinate; when absent, coordinates use the first trace's f2 and d2."
+        },
+        {
+          "name": "sep",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "For bare=5, an optional line printed after each trace."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "A nonzero value reports trace and sampling information to standard error."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: from the first trace's dt header for seismic data or d1 header for nonseismic data",
+          "required": false,
+          "description": "Sampling interval fallback, read only when the corresponding first-trace header is zero; the program errors if neither supplies a nonzero value."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "err",
+        "gettr",
+        "warn",
+        "getparfloat",
+        "checkpars",
+        "ealloc2float",
+        "printheader",
+        "free2float",
+        "CWP_Exit",
+        "hdtype",
+        "getindex",
+        "gethval",
+        "vtof"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sampling coordinates mix float arithmetic with double constants before assignment to float; formatted output can expose rounding and platform-dependent floating-point formatting. The CSV loop uses the last read trace's ns while its buffer is allocated using the first trace's ns, so varying trace lengths can cause out-of-bounds access or use of uninitialized data.",
+      "c_lines": 319,
+      "difficulty": "medium",
+      "difficulty_reason": "CSV and tab-delimited modes buffer multiple traces and transpose their samples into output columns.",
+      "test_cases": [
+        {
+          "description": "Print headers and samples in the default format.",
+          "command": "suplane nt=16 ntr=3 | suascii bare=0"
+        },
+        {
+          "description": "Print samples only using the option alias.",
+          "command": "suplane nt=16 ntr=3 | suascii option=1"
+        },
+        {
+          "description": "Print a limited number of traces as CSV columns.",
+          "command": "suplane nt=16 ntr=4 | suascii bare=3 ntr=2"
+        },
+        {
+          "description": "Print tab-delimited samples with the time index.",
+          "command": "suplane nt=16 ntr=3 | suascii bare=4 ntr=3 index=1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

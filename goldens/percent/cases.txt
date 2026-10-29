@@ -1,0 +1,80 @@
+# Positional operands, signs, zero, parsing, precision, and ignored extra arguments.
+percent 0 7
+percent -3 8
+percent 3 -8
+percent 3 -0
+percent 1 3
+percent 1e-10 2e10
+percent 12.5junk 2
+percent invalid 5
+percent 9 3 ignored
+[stderr] percent 1
+percent -0 9
+percent 10 4
+percent .125 5e-1
+percent 1e308 1e308
+percent inf 2
+percent nan 2
+percent 1 nan
+percent 5 nonsense
+percent 42 7 verbose=1
+
+# No parameters, defaults, input sizes, or output modes: exactly two positional
+# arguments are used. stdin and every extra argument are ignored.
+[stderr] percent 1 1 verbose=0 unknown=1 output=binary
+[stderr] printf 'ignored stdin\n' | percent 1 1
+[stderr] percent
+[stderr] percent '' 2
+[stderr] percent 2 ''
+[stderr] percent --help 2
+[stderr] percent '  +1.25' '  2.5'
+[stderr] percent 0x1.8p+1 0x1p+3
+[stderr] percent 1e+ 2
+
+# Zero branch must precede arithmetic, including non-finite numerators.
+[stderr] percent 0 0
+[stderr] percent nan 0
+[stderr] percent inf -0
+[stderr] percent -0 -2
+[stderr] percent -inf 2
+[stderr] percent 1 inf
+[stderr] percent inf inf
+
+# Double overflow/underflow is accepted by atof without diagnostics.
+[stderr] percent 1e999 2
+[stderr] percent 1e-999 2
+[stderr] percent 1e-310 1e-308
+[stderr] percent 1 1e-310
+[stderr] percent 1 1e-999
+[stderr] percent 999999 100
+[stderr] percent 1 10000000
+
+# Double precision, %g rounding, and the fixed/scientific notation boundaries.
+[stderr] percent 1.234565 100
+[stderr] percent 1.234575 100
+[stderr] percent 9.999995e5 100
+[stderr] percent 9.999995e-5 100
+[stderr] percent 2.2250738585072014e-308 4.9406564584124654e-324
+
+# atof accepts NaN payloads, leading whitespace, and signed hexadecimal floats.
+[stderr] percent 'nan(payload)' 2
+[stderr] percent '-0x1.8p+1junk' '0x1p+3'
+[stderr] percent $'\t\r\n\v\f 1.25junk' 2.5
+
+# Help flags are operands, and an ignored par= must not open a parameter file.
+[stderr] percent --help
+[stderr] percent 1 2 par=missing.par verbose=1
+
+# Signed results after underflow, infinite denominators, and two negative inputs.
+[stderr] percent -3 -8
+[stderr] percent -1e-999 2
+[stderr] percent 1 -1e999
+[stderr] percent -1 -1e999
+[stderr] percent 4.9406564584124654e-324 1e308
+
+# A zero denominator bypasses the overflowing multiplication of a finite x.
+[stderr] percent 1.7976931348623157e308 0
+
+# Numeric prefixes stop at punctuation; stdin bytes and odd input sizes are ignored.
+[stderr] percent 1,5 2
+[stderr] printf '\001\002\003' | percent 3 8

@@ -1,0 +1,30 @@
+# Both directions and byte-swap switches, with odd trace and sample counts.
+[exact] suspike nt=5 ntr=3 | suswapbytes format=1
+[exact] suspike nt=5 ntr=3 | suswapbytes format=1 swaphdr=0 swapdata=0
+[exact] suspike nt=5 ntr=3 | suswapbytes format=1 swaphdr=1 swapdata=0
+[exact] suspike nt=5 ntr=3 | suswapbytes format=1 swaphdr=0 swapdata=1
+[exact] suspike nt=5 ntr=3 | suswapbytes format=1 | suswapbytes
+[exact] suspike nt=1 ntr=1 | suswapbytes format=1 | suswapbytes format=0 ns=1
+[exact] suspike nt=7 ntr=2 | suswapbytes format=1 swaphdr=1 swapdata=0 | suswapbytes swaphdr=1 swapdata=0
+[exact] suspike nt=7 ntr=2 | suswapbytes format=1 swaphdr=0 swapdata=1 | suswapbytes swaphdr=0 swapdata=1 ns=7
+[exact] suspike nt=3 ntr=1 | suswapbytes format=-1 swaphdr=-1 swapdata=-1
+[exact] suspike nt=3 ntr=1 | suswapbytes swaphdr=0 swapdata=0 ns=3
+[stderr] suspike nt=3 ntr=1 | suswapbytes format=1 | suswapbytes verbose=1
+[stderr] suswapbytes
+[stderr] suswapbytes format=1
+[stderr] suswapbytes ns=0
+[stderr] suswapbytes ns=abc
+[stderr] suswapbytes format=999999999999999999999
+[stderr] suspike nt=1 ntr=1 | suswapbytes swaphdr=0 ns=1 unknown=1
+# Largest supported trace size, including the later-trace copy path.
+[exact] sunull nt=65535 ntr=2 | suswapbytes format=1 | suswapbytes ns=65535
+[exact] sunull nt=65535 ntr=2 | suswapbytes format=1 swaphdr=0 swapdata=0 | suswapbytes swaphdr=0 swapdata=0 ns=65535
+[exact] sunull nt=65535 ntr=2 | suswapbytes format=1 | suswapbytes
+# A short later header retains bytes from the preceding trace, like static C tr.
+[exact] suspike nt=3 ntr=2 | suswapbytes format=1 | head -c 255 | suswapbytes ns=3
+# A short later data block retains the previous trace's swapped data bytes.
+[exact] suspike nt=3 ntr=3 | suswapbytes format=1 | head -c 749 | suswapbytes ns=3
+# Empty ns uses the header; all nonzero swap switch values enable swapping.
+[exact] suspike nt=5 ntr=2 | suswapbytes format=1 | suswapbytes ns= swaphdr=-1 swapdata=-1
+# Native-to-foreign conversion never reads ns or calls checkpars.
+[stderr] suspike nt=1 ntr=1 | suswapbytes format=1 ns=-1 verbose=1

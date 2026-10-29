@@ -1,0 +1,487 @@
+{
+  "scope": "su/main/migration_inversion part 2 of 2",
+  "programs": [
+    {
+      "name": "sumigpreffd",
+      "path": "su/main/migration_inversion/sumigpreffd.c",
+      "purpose": "Performs 2D prestack common-shot Fourier finite-difference depth migration.",
+      "selfdoc_first_line": "SUMIGPREFFD - The 2-D prestack common-shot Fourier finite-difference\t",
+      "params": [
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "10.0",
+          "required": false,
+          "description": "First frequency-window corner; the selfdoc says 5."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "20.0",
+          "required": false,
+          "description": "Second frequency-window corner; the selfdoc says 10."
+        },
+        {
+          "name": "dip",
+          "type": "int",
+          "default": "45",
+          "required": false,
+          "description": "Dip option; omitted from the selfdoc."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "computed: first trace d2, or 1.0 if zero",
+          "required": false,
+          "description": "Horizontal sample interval; the selfdoc lists it as required."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: library calls and test pipelines were not verified.",
+      "c_lines": 761,
+      "difficulty": "hard",
+      "difficulty_reason": "This is a prestack depth migration with Fourier and finite-difference calculations.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigprepspi",
+        "sumigpresp"
+      ]
+    },
+    {
+      "name": "sumigprepspi",
+      "path": "su/main/migration_inversion/sumigprepspi.c",
+      "purpose": "Performs 2D prestack common-shot phase-shift-plus-interpolation depth migration.",
+      "selfdoc_first_line": " SUMIGPREPSPI --- The 2-D PREstack commom-shot Phase-Shift-Plus \t",
+      "params": [
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "10.0",
+          "required": false,
+          "description": "First frequency-window corner; the selfdoc says 5."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "20.0",
+          "required": false,
+          "description": "Second frequency-window corner; the selfdoc says 10."
+        },
+        {
+          "name": "dip",
+          "type": "int",
+          "default": "65",
+          "required": false,
+          "description": "Dip option; omitted from the selfdoc."
+        },
+        {
+          "name": "nflag",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Controls cross-correlation normalization."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "computed: first trace d2, or 1.0 if zero",
+          "required": false,
+          "description": "Horizontal sample interval; the selfdoc lists it as required."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: library calls and test pipelines were not verified.",
+      "c_lines": 745,
+      "difficulty": "hard",
+      "difficulty_reason": "This is a prestack depth migration using phase shifts and velocity interpolation.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigpreffd",
+        "sumigpresp"
+      ]
+    },
+    {
+      "name": "sumigpresp",
+      "path": "su/main/migration_inversion/sumigpresp.c",
+      "purpose": "Performs 2D prestack common-shot split-step Fourier migration.",
+      "selfdoc_first_line": " SUMIGPRESP - The 2-D prestack common-shot split-step Fourier\t\t",
+      "params": [
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "10.0",
+          "required": false,
+          "description": "First frequency-window corner; the selfdoc says 5."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "20.0",
+          "required": false,
+          "description": "Second frequency-window corner; the selfdoc says 10."
+        },
+        {
+          "name": "dip",
+          "type": "int",
+          "default": "65",
+          "required": false,
+          "description": "Dip option; omitted from the selfdoc."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "computed: first trace d2, or 1.0 if zero",
+          "required": false,
+          "description": "Horizontal sample interval; the selfdoc lists it as required."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: library calls and test pipelines were not verified. The program rewinds stdin after reading the first trace, so a non-seekable input pipe may fail.",
+      "c_lines": 619,
+      "difficulty": "hard",
+      "difficulty_reason": "This is a prestack split-step depth migration.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigpreffd",
+        "sumigprepspi"
+      ]
+    },
+    {
+      "name": "sumigps",
+      "path": "su/main/migration_inversion/sumigps.c",
+      "purpose": "Migrates traces by phase shift with turning rays.",
+      "selfdoc_first_line": " SUMIGPS - MIGration by Phase Shift with turning rays\t\t\t",
+      "params": [
+        {
+          "name": "np",
+          "type": "int",
+          "default": "200",
+          "required": false,
+          "description": "Parameter parsed by the code but omitted from the selfdoc."
+        },
+        {
+          "name": "ntflag",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Parameter parsed by the code but omitted from the selfdoc."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 598,
+      "difficulty": "hard",
+      "difficulty_reason": "Phase-shift migration includes turning-ray calculations.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigpsti"
+      ]
+    },
+    {
+      "name": "sumigpspi",
+      "path": "su/main/migration_inversion/sumigpspi.c",
+      "purpose": "Performs zero-offset phase-shift-plus-interpolation depth migration with lateral velocity variation.",
+      "selfdoc_first_line": " SUMIGPSPI - Gazdag's phase-shift plus interpolation depth migration   ",
+      "params": [
+        {
+          "name": "nz",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of depth samples."
+        },
+        {
+          "name": "dz",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Depth sampling interval."
+        },
+        {
+          "name": "vfile",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Binary velocity file."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Diagnostic verbosity; omitted from the selfdoc."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 442,
+      "difficulty": "hard",
+      "difficulty_reason": "Phase-shift depth migration interpolates between reference velocities.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigsplit"
+      ]
+    },
+    {
+      "name": "sumigpsti",
+      "path": "su/main/migration_inversion/sumigpsti.c",
+      "purpose": "Migrates traces by phase shift for transversely isotropic media with turning rays.",
+      "selfdoc_first_line": " SUMIGPSTI - MIGration by Phase Shift for TI media with turning rays\t",
+      "params": [
+        {
+          "name": "np",
+          "type": "int",
+          "default": "200",
+          "required": false,
+          "description": "Parameter parsed by the code but omitted from the selfdoc."
+        },
+        {
+          "name": "ntflag",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Parameter parsed by the code but omitted from the selfdoc."
+        },
+        {
+          "name": "vmig",
+          "type": "float array",
+          "default": "computed: NMO velocity function when its value count differs from tmig",
+          "required": false,
+          "description": "Vertical velocity function; the selfdoc states a 1500.0 default."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 707,
+      "difficulty": "hard",
+      "difficulty_reason": "Anisotropic phase-shift migration includes turning-ray calculations.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigps"
+      ]
+    },
+    {
+      "name": "sumigsplit",
+      "path": "su/main/migration_inversion/sumigsplit.c",
+      "purpose": "Performs split-step Fourier depth migration.",
+      "selfdoc_first_line": " SUMIGSPLIT - Split-Step Fourier migration for zero-offset data\t\t",
+      "params": [
+        {
+          "name": "ft",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First input time."
+        },
+        {
+          "name": "fz",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First output depth."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 313,
+      "difficulty": "hard",
+      "difficulty_reason": "Split-step Fourier migration performs depth continuation through a velocity model.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sumigpspi"
+      ]
+    },
+    {
+      "name": "sumigtk",
+      "path": "su/main/migration_inversion/sumigtk.c",
+      "purpose": "Migrates stacked common-midpoint data in the time-wavenumber domain.",
+      "selfdoc_first_line": " SUMIGTK - MIGration via T-K domain method for common-midpoint stacked data",
+      "params": [
+        {
+          "name": "dxcdp",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Distance between successive CDPs."
+        },
+        {
+          "name": "speed",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Parameter parsed by the code but omitted from the selfdoc."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 351,
+      "difficulty": "hard",
+      "difficulty_reason": "This reverse-time migration combines spatial FFTs with finite differences.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sumigtopo2d",
+      "path": "su/main/migration_inversion/sumigtopo2d.c",
+      "purpose": "Performs 2D Kirchhoff depth migration from a variable-topography recording surface.",
+      "selfdoc_first_line": " SUMIGTOPO2D - Kirchhoff Depth Migration of 2D postack/prestack data\t",
+      "params": [
+        {
+          "name": "offmax",
+          "type": "float",
+          "default": "3000",
+          "required": false,
+          "description": "Maximum absolute offset; the selfdoc says 99999."
+        },
+        {
+          "name": "surf",
+          "type": "string",
+          "default": "0,0;99999,0",
+          "required": false,
+          "description": "Recording surface; the code accepts repeated occurrences."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 1149,
+      "difficulty": "hard",
+      "difficulty_reason": "Kirchhoff depth migration interpolates traveltime tables and accumulates contributions over traces.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sustolt",
+      "path": "su/main/migration_inversion/sustolt.c",
+      "purpose": "Performs Stolt migration for stacked data or common-offset gathers.",
+      "selfdoc_first_line": " SUSTOLT - Stolt migration for stacked data or common-offset gathers\t",
+      "params": [
+        {
+          "name": "cdpmin",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Minimum CDP bin number."
+        },
+        {
+          "name": "cdpmax",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Maximum CDP bin number."
+        },
+        {
+          "name": "dxcdp",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Distance between adjacent CDP bins."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 742,
+      "difficulty": "hard",
+      "difficulty_reason": "Stolt migration combines frequency-wavenumber transforms, interpolation and velocity-dependent stretching.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sutifowler",
+      "path": "su/main/migration_inversion/sutifowler.c",
+      "purpose": "Performs VTI constant-velocity prestack time migration and velocity analysis using Fowler's method.",
+      "selfdoc_first_line": " SUTIFOWLER   VTI constant velocity prestack time migration\t\t",
+      "params": [
+        {
+          "name": "ncdps",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of input CDPs."
+        },
+        {
+          "name": "vsvp",
+          "type": "float",
+          "default": "0.5",
+          "required": false,
+          "description": "Velocity ratio parameter; the selfdoc names it vpvs."
+        },
+        {
+          "name": "ntpad",
+          "type": "int",
+          "default": "computed: 0.1*ntout, converted to int",
+          "required": false,
+          "description": "Time padding; omitted from the selfdoc."
+        },
+        {
+          "name": "dtout",
+          "type": "float",
+          "default": "computed: 1.5*input header dt",
+          "required": false,
+          "description": "Output sample interval; overwritten with input dt when getcvstacks is nonzero."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inventory incomplete: parameters, library calls and test pipelines were not fully verified.",
+      "c_lines": 1060,
+      "difficulty": "hard",
+      "difficulty_reason": "This program combines prestack migration, velocity analysis and temporary multidimensional storage.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

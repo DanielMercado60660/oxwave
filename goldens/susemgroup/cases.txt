@@ -1,0 +1,23 @@
+# Default parameters and group boundaries
+suplane nt=128 ntr=6 | susemgroup
+suplane nt=65 ntr=5 | sushw key=cdp a=1 b=1 | susemgroup groupkey=none lockey=cdp locmaxscan=2 locmaxsum=3 scanmin=-4 scanmax=4 scanstep=1 dipext=0 dipuse=0 maxfold=8 verbose=1
+suplane nt=32 ntr=1 | susemgroup locmaxscan=0 locmaxsum=1
+suplane nt=32 ntr=4 | sushw key=offset a=0 b=1 | susemgroup locmaxscan=0 locmaxsum=2
+suplane nt=64 ntr=4 | sushw key=offset a=0 b=1 | susemgroup outdip=d outpow=p outsem=s dipext=0 > /dev/null && cat d p s
+suplane nt=64 ntr=4 | sushw key=offset a=0 b=1 > in && susemgroup outdip=d dipext=0 < in > /dev/null && susemgroup indip=d locmaxsum=2 < in
+susemgroup lockey=bad
+susemgroup groupkey=bad
+susemgroup locmaxscan=-1
+susemgroup locmaxscan=0
+susemgroup locmaxsum=0
+susemgroup dipuse=2
+susemgroup dipext=-1
+susemgroup scanstep=-1
+susemgroup scanmin=2 scanmax=1
+susemgroup maxfold=1
+susemgroup indip=x scanstep=1
+susemgroup
+suplane nt=64 ntr=4 | susemgroup groupkey=none maxfold=2
+# Scanning nonzero, irregular data and short traces with zero smoothing window
+suplane nt=73 ntr=7 | suaddnoise seed=42 | sushw key=offset a=-3 b=1 | susemgroup groupkey=none locmaxscan=3 scanstep=0.2 scanmin=-0.8 scanmax=1 dipext=4 dipuse=1
+suplane nt=1 ntr=1 | susemgroup dipext=0

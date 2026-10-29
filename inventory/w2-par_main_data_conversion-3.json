@@ -1,0 +1,131 @@
+{
+  "scope": "par/main/data_conversion (wave 2, batch 3)",
+  "programs": [
+    {
+      "name": "utmconv",
+      "path": "par/main/data_conversion/utmconv.c",
+      "purpose": "Convert ASCII longitude and latitude coordinates to UTM coordinates or convert UTM coordinates back to longitude and latitude.",
+      "selfdoc_first_line": " UTMCONV - CONVert longitude and latitude to UTM, and vice versa       ",
+      "params": [
+        {
+          "name": "idx",
+          "type": "int",
+          "default": "23",
+          "required": false,
+          "description": "Reference ellipsoid index, from 0 through 23."
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "default": "%.3f",
+          "required": false,
+          "description": "Printf-style format for each output coordinate; at most 20 characters."
+        },
+        {
+          "name": "a",
+          "type": "double",
+          "default": "computed: semimajor axis of the ellipsoid selected by idx",
+          "required": false,
+          "description": "Positive ellipsoid semimajor axis in meters; overrides the selected ellipsoid's value."
+        },
+        {
+          "name": "f",
+          "type": "double",
+          "default": "computed: flattening of the ellipsoid selected by idx",
+          "required": false,
+          "description": "Nonnegative ellipsoid flattening; overrides the selected ellipsoid's value."
+        },
+        {
+          "name": "letter",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, output or read a zone letter designator instead of a signed zone number."
+        },
+        {
+          "name": "invert",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, convert UTM coordinates to longitude and latitude; otherwise convert longitude and latitude to UTM."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report ellipsoid parameters and the number of converted coordinate pairs."
+        },
+        {
+          "name": "lon0",
+          "type": "double",
+          "default": "computed: central meridian from the UTM zone number",
+          "required": false,
+          "description": "Override the central meridian in degrees; must be between -180 and 180."
+        },
+        {
+          "name": "xoff",
+          "type": "double",
+          "default": "500000.0",
+          "required": false,
+          "description": "False easting."
+        },
+        {
+          "name": "ysoff",
+          "type": "double",
+          "default": "10000000.0",
+          "required": false,
+          "description": "False northing for the southern hemisphere."
+        },
+        {
+          "name": "ynoff",
+          "type": "double",
+          "default": "0.0",
+          "required": false,
+          "description": "False northing for the northern hemisphere."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparint",
+        "getpardouble",
+        "err",
+        "checkpars",
+        "warn",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Projection series use double-precision arithmetic and platform-dependent sin, cos, tan, sqrt, pow, and floor; evaluation order and fused operations can affect rounding. In inverse mode the zone is read as float and converted to short. The user-provided printf format is incorporated into a format string without validating its conversion specifiers, so incompatible formats can cause undefined behavior.",
+      "c_lines": 622,
+      "difficulty": "medium",
+      "difficulty_reason": "The program implements forward and inverse Transverse Mercator series, ellipsoid selection, and UTM zone and hemisphere rules.",
+      "test_cases": [
+        {
+          "description": "Convert northern and southern longitude/latitude pairs with signed zones; ASCII input is needed because the program does not consume SU traces.",
+          "command": "printf '14.125 40.822\\n151.2 -33.8\\n' | utmconv idx=23 format=%.3f letter=0 invert=0"
+        },
+        {
+          "description": "Exercise letter designators and special northern zones.",
+          "command": "printf '6 60\\n15 78\\n' | utmconv letter=1 format=%.0f verbose=1"
+        },
+        {
+          "description": "Convert signed UTM zones back to longitude and latitude with custom offsets and central meridian.",
+          "command": "printf '500000 0 31\\n500000 10000000 -31\\n' | utmconv invert=1 letter=0 lon0=3 xoff=500000 ynoff=0 ysoff=10000000 format=%.6f"
+        },
+        {
+          "description": "Round-trip a southern coordinate using letter designators and a user-specified spherical ellipsoid.",
+          "command": "printf '18 -34\\n' | utmconv idx=0 a=6371000 f=0 letter=1 format=%.6f | utmconv invert=1 idx=0 a=6371000 f=0 letter=1 format=%.6f"
+        }
+      ],
+      "license_note": "The forward and inverse projection routines state that they were adopted from a Perl routine in Geo-Coordinates-UTM-0.06 by G. Crookham; the file also cites NIMA and J. P. Snyder references.",
+      "related_programs": [
+        "suutm"
+      ]
+    }
+  ]
+}

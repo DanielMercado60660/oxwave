@@ -1,0 +1,18 @@
+[package]
+name = "sufxdecon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sufxdecon"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-axb = { path = "../../crates/oxwave-f-axb" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-tempfile = { path = "../../crates/oxwave-tempfile" }

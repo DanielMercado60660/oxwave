@@ -1,0 +1,5 @@
+# t accepts no parameters and reads no input. Exercise timezone and ignored arguments.
+TZ=Pacific/Kiritimati t
+TZ=Pacific/Honolulu t
+TZ=UTC t verbose=1 unknown=3
+printf 'ignored input\n' | TZ=UTC t

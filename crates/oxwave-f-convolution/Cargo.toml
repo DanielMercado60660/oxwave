@@ -1,0 +1,16 @@
+[package]
+name = "oxwave-f-convolution"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-franuni = { path = "../oxwave-f-franuni" }
+oxwave-printer-plot = { path = "../oxwave-printer-plot" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

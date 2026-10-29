@@ -1,0 +1,81 @@
+# Defaults and their explicit equivalents; all four modes also occur in inventory.
+suplane nt=96 ntr=5 | sutaup
+suplane nt=96 ntr=5 | sutaup option=1 dt=0.004 nx=5 dx=1 npoints=71 pmin=0 pmax=0.006 np=5 fmin=3 xmin=0 verbose=0 tmpdir=
+suplane nt=97 ntr=5 | sutaup option=2
+suplane nt=97 ntr=5 | sutaup option=3
+suplane nt=97 ntr=5 | sutaup option=4
+# Nonzero amplitudes, nonstandard spacing, reversed slopes and offset origin.
+suspike nt=65 ntr=5 | sutaup option=2 dt=0.002 dx=12.5 xmin=-25 pmin=-0.001 pmax=0.003
+suspike nt=65 ntr=5 | sutaup option=1 dx=-10 xmin=20 pmin=0.002 pmax=-0.002 fmin=0
+suspike nt=65 ntr=5 | sutaup option=3 dx=10 xmin=-20 pmin=-0.001 pmax=0.003 fmin=12
+suspike nt=65 ntr=5 | sutaup option=4 dx=-10 xmin=20 pmin=0.002 pmax=-0.002 npoints=9
+# Explicit dimensions smaller than input, zero spacing, slopes and trace count.
+suplane nt=65 ntr=5 | sutaup option=2 nx=3 np=3
+suplane nt=65 ntr=5 | sutaup option=2 np=7
+suplane nt=65 ntr=5 | sutaup option=2 nx=0
+suplane nt=65 ntr=5 | sutaup option=2 np=0
+suplane nt=65 ntr=5 | sutaup option=2 dx=0 pmin=0 pmax=0
+suplane nt=65 ntr=5 | sutaup option=2 dt=-0.004
+# Odd and minimal sizes, including np=1 (dp divides by zero in C).
+sunull nt=1 ntr=1 dt=0.004 | sutaup option=2
+suspike nt=3 ntr=1 | sutaup option=2 np=1
+suspike nt=31 ntr=3 | sutaup option=2 np=1
+suspike nt=31 ntr=3 | sutaup option=4 npoints=1
+# Header interval fallback and override.
+suplane nt=65 ntr=3 | sushw key=dt a=2000 | sutaup option=2
+suplane nt=65 ntr=3 | sushw key=dt a=0 | sutaup option=2 dt=0.003
+# Full stderr comparisons include verbose and unknown-parameter diagnostics.
+[stderr] suplane nt=65 ntr=3 | sutaup option=2 verbose=1
+[stderr] suplane nt=65 ntr=3 | sutaup option=2 ntau=20
+[stderr] suplane nt=65 ntr=3 | sutaup option=2 option=0 verbose=1 mystery=7
+# Parameter files and repeated parameters.
+echo 'option=2 dx=7 pmin=-0.001 pmax=0.001' > params; suplane nt=65 ntr=3 | sutaup par=params dx=11
+# Named temporary files and environment fallback; harness cwd is disposable.
+[stderr] mkdir scratch; suplane nt=65 ntr=3 | sutaup option=2 tmpdir=./scratch verbose=1
+[stderr] mkdir scratch; suplane nt=65 ntr=3 | CWP_TMPDIR=./scratch sutaup option=2 verbose=1
+suplane nt=65 ntr=3 | CWP_TMPDIR=/does/not/exist sutaup option=2 tmpdir=
+# Empty, truncated and inconsistent input; errors before any transform.
+[stderr] sutaup
+[stderr] sutaup option=2
+[stderr] printf short | sutaup option=2
+[stderr] { sunull nt=8 ntr=1; sunull nt=9 ntr=1; } | sutaup option=2
+[stderr] suplane nt=65 ntr=3 | sutaup option=0
+[stderr] suplane nt=65 ntr=3 | sutaup option=5
+[stderr] suplane nt=65 ntr=3 | sutaup option=-1
+[stderr] suplane nt=65 ntr=3 | sutaup option=abc
+[stderr] suplane nt=65 ntr=3 | sutaup dt=0
+[stderr] suplane nt=65 ntr=3 | sushw key=dt a=0 | sutaup
+[stderr] sutaup tmpdir=/does/not/exist
+[stderr] CWP_TMPDIR=/does/not/exist sutaup
+[stderr] sutaup verbose=2147483648
+[stderr] suplane nt=65 ntr=3 | sutaup option=0 dt=1e-310
+[stderr] suplane nt=65 ntr=3 | sutaup option=0 np=2147483648
+# Library-level validation retains SU diagnostics and their order.
+[stderr] suplane nt=65 ntr=3 | sutaup option=4 npoints=10
+[stderr] suplane nt=65 ntr=3 | sutaup option=4 npoints=0
+[stderr] suplane nt=31 ntr=3 | sutaup option=4 npoints=71
+# Permission failure is checked before attempting to read even empty input.
+[stderr] mkdir scratch; chmod 555 scratch; sutaup tmpdir=./scratch; result=$?; chmod 755 scratch; exit "$result"
+# Explicit empty numeric values retain defaults.
+[stderr] suplane nt=65 ntr=3 | sutaup option=0 verbose= np= nx= dt= dx= pmin= pmax= fmin= xmin= npoints=
+# Seeded broadband samples exercise the whole time axis in all four modes.
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=2468 | sutaup option=1 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003 fmin=7
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=2468 | sutaup option=2 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=2468 | sutaup option=3 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003 fmin=7
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=2468 | sutaup option=4 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003 npoints=13
+# Restrict both axes, checking the slice-based library count adaptation.
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=1357 | sutaup option=1 nx=3 np=3 dx=4
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=1357 | sutaup option=3 nx=3 np=3 dx=4
+sunull nt=67 ntr=5 dt=0.004 | suaddnoise seed=1357 | sutaup option=4 nx=3 np=3 dx=4 npoints=11
+# One slope starts at pmin, even though dp (also written to d2) divides by zero.
+sunull nt=31 ntr=3 dt=0.004 | suaddnoise seed=1234 | sutaup option=2 np=1 pmin=0.001 pmax=0.003 dx=10 xmin=-10
+sunull nt=31 ntr=3 dt=0.004 | suaddnoise seed=1234 | sutaup option=2 np=1 pmin=0.001 pmax=0.001 dx=10 xmin=-10
+# Preserve unrelated headers, reuse the last header beyond EOF, and set d2/f2.
+sunull nt=41 ntr=3 dt=0.002 | suaddnoise seed=77 | sushw key=cdp,offset,d2,f2 a=100,-10,99,88 b=1,10,0,0 | sutaup option=2 np=5 dt=0.003 dx=10 pmin=-0.001 pmax=0.002
+sunull nt=41 ntr=3 dt=0.002 | suaddnoise seed=77 | sushw key=cdp,offset,d2,f2 a=100,-10,99,88 b=1,10,0,0 | sutaup option=4 npoints=9
+# Filter-length boundary and evenness checked before excessive length.
+sunull nt=31 ntr=3 dt=0.004 | suaddnoise seed=99 | sutaup option=4 npoints=63
+[stderr] sunull nt=31 ntr=3 dt=0.004 | sutaup option=4 npoints=64
+[stderr] sunull nt=31 ntr=3 dt=0.004 | sutaup option=4 npoints=65
+# Named scratch files must be removed after a successful transform.
+[exact] mkdir scratch; sunull nt=37 ntr=3 | sutaup option=4 npoints=7 tmpdir=./scratch > /dev/null; result=$?; find scratch -type f; exit "$result"

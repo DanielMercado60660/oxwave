@@ -1,0 +1,14 @@
+# Default output and odd trace/sample counts.
+sunull nt=1 ntr=1 | sutrcount
+sunull nt=7 ntr=5 | sutrcount
+# Explicit output path, including stdout and a file that is read back.
+sunull nt=3 ntr=9 | sutrcount outpar=/dev/stdout
+sunull nt=3 ntr=7 | sutrcount outpar=count.txt && cat count.txt
+# Diagnostics and invalid output paths.
+[stderr] sunull nt=1 ntr=1 | sutrcount verbose=1
+[stderr] sunull nt=1 ntr=1 | sutrcount unused=0
+[stderr] sunull nt=3 ntr=5 | sutrcount outpar=count.txt verbose=1 && cat count.txt
+[stderr] sunull nt=3 ntr=5 | sutrcount outpar=count.txt unused=-1 && cat count.txt
+sutrcount </dev/null
+sunull nt=1 ntr=1 | sutrcount outpar=/nonexistent-directory/count
+sunull nt=1 ntr=1 | sutrcount outpar=

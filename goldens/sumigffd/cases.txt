@@ -1,0 +1,56 @@
+# Actual migration output is kept on stdout. sustrip needs outpar=/dev/null
+# because the harness has no controlling terminal. There is one SU output mode.
+# Defaults (header dt/d2), explicit defaults, and both header fallback warnings.
+[stderr] sunull nt=6 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=31 ntr=5 dt=0.004 | sushw key=d2 a=10 | sumigffd nz=6 dz=10 vfile=vel.bin
+[stderr] sunull nt=6 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=31 ntr=5 dt=0.004 | sushw key=d2 a=10 | sumigffd nz=6 dz=10 vfile=vel.bin dt=0.004 dx=10 ft=0 fz=0 verbose=0 tmpdir=
+[stderr] sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=17 ntr=5 | sushw key=dt,d2 a=0,0 | sumigffd nz=4 dz=5 vfile=vel.bin
+[stderr] sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=17 ntr=5 | sushw key=dt,d2 a=0,0 | sumigffd nz=4 dz=5 vfile=vel.bin dt=0.002 dx=12
+# Nondefault sampling and coordinates; preserve unrelated header fields.
+[stderr] sunull nt=9 ntr=7 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suplane nt=65 ntr=7 npl=1 dip1=4 dt=0.002 | sushw key=delrt,f1,d1,d2 a=17,8,3,12 | sumigffd nz=9 dz=8 vfile=vel.bin dx=14 dt=0.003 ft=0.01 fz=5 verbose=1
+# Lateral and depth-dependent velocity: exercises the finite difference solve.
+sunull nt=7 ntr=9 | sugain bias=1800 | suaddnoise seed=71 sn=10 | sustrip outpar=/dev/null > vel.bin && sunull nt=43 ntr=9 | suaddnoise seed=42 | sumigffd nz=9 dz=7 dx=17 vfile=vel.bin
+sunull nt=17 ntr=12 | sugain bias=2200 | suaddnoise seed=72 sn=5 | sustrip outpar=/dev/null > vel.bin && suplane nt=97 ntr=17 npl=2 dip1=2 dip2=-3 | sumigffd nz=12 dz=12 dx=25 vfile=vel.bin
+# Zero input and minimal/odd sizes, including spatial FFT padding (17 -> 18).
+sunull nt=5 ntr=17 | sugain bias=2000 | sustrip outpar=/dev/null > vel.bin && sunull nt=37 ntr=17 | sumigffd nz=5 dz=10 dx=20 vfile=vel.bin
+sunull nt=5 ntr=17 | sugain bias=2000 | sustrip outpar=/dev/null > vel.bin && sunull nt=37 ntr=17 | suaddnoise seed=24 | sumigffd nz=5 dz=10 dx=20 vfile=vel.bin
+sunull nt=4 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=1 ntr=3 | sugain bias=1 | sumigffd nz=4 dz=10 dx=10 vfile=vel.bin
+sunull nt=5 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=7 ntr=1 | suaddnoise seed=42 | sumigffd nz=5 dz=10 dx=10 vfile=vel.bin
+sunull nt=5 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=7 ntr=2 | sumigffd nz=5 dz=10 dx=10 vfile=vel.bin
+sunull nt=1 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=19 ntr=3 | sumigffd nz=1 dz=10 dx=10 vfile=vel.bin
+# Named temporary files, environment default, explicit override and cleanup.
+[stderr] mkdir tmp && sunull nt=3 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=3 dz=10 dx=10 vfile=vel.bin tmpdir=tmp verbose=1 && test -z "$(ls -A tmp)"
+[stderr] mkdir tmp && sunull nt=3 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | CWP_TMPDIR=tmp sumigffd nz=3 dz=10 dx=10 vfile=vel.bin verbose=1 && test -z "$(ls -A tmp)"
+[stderr] sunull nt=3 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | CWP_TMPDIR=does-not-exist sumigffd nz=3 dz=10 dx=10 vfile=vel.bin tmpdir= verbose=1
+# Zero and negative sampling values are accepted by the original.
+sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=0 dx=10 vfile=vel.bin
+sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=-5 dx=10 vfile=vel.bin ft=-1 fz=-10 verbose=-1
+sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=5 dx=-10 dt=-0.004 vfile=vel.bin
+sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=5 dx=0 vfile=vel.bin
+sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=5 dx=10 dt=0 vfile=vel.bin
+# Empty input; missing, empty, malformed and invalid required parameters.
+[stderr] sumigffd
+[stderr] sumigffd nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz=10
+[stderr] sunull nt=7 ntr=3 | sumigffd nz= dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz= vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz=10 vfile=
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz=10 dx=10 vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz=10 dx=10 vfile=missing tmpdir=does-not-exist
+[stderr] sunull nt=7 ntr=3 | CWP_TMPDIR=does-not-exist sumigffd nz=3 dz=10 dx=10 vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=999999999999999999999 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=3 | sumigffd nz=3 dz=1e-310 vfile=missing
+# Unknown parameters, last occurrence wins, and par-file lookups.
+[stderr] sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=4 dz=5 dx=10 vfile=vel.bin unknown=1 verbose=1
+[stderr] sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd nz=1 nz=4 dz=10 dz=5 dx=12 dx=10 vfile=missing vfile=vel.bin
+[stderr] printf 'nz=4 dz=5 dx=10 vfile=vel.bin ft=0.5 fz=7 verbose=1\n' > params && sunull nt=4 ntr=5 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=23 ntr=5 | sumigffd par=params
+# Small-array regression: the existing explicit zero boundaries avoid the
+# original's out-of-bounds accesses for one/two traces. nt=1 still has a
+# nonempty frequency loop after real-FFT padding, and exercises the solve.
+sunull nt=4 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=1 ntr=1 | sugain bias=1 | sumigffd nz=4 dz=10 dx=10 vfile=vel.bin
+sunull nt=4 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=1 ntr=2 | sugain bias=1 | sumigffd nz=4 dz=10 dx=10 vfile=vel.bin
+# Exercise all four installed signals with named files and a paused producer.
+# Releasing the producer lets deferred cleanup run after the blocking read.
+# Require exit 1, no output/diagnostics, and removal of both temporary files.
+[stderr] for sig in INT QUIT HUP TERM; do mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s "$sig" "$worker" || exit 1; printf '\n' > gate; wait "$producer"; wait "$worker"; status=$?; test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)" || exit 1; rm input gate output errors; rmdir tmp; done

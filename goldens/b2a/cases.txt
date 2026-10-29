@@ -1,0 +1,18 @@
+# Defaults for n1 and format, including the output parameter file.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=4f", 1.25,-2.5,0,3.125))' | b2a outpar=count; cat count
+# One float per line, fixed format, negative and zero values.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=3f", -1.25,0,0.00001))' | b2a n1=1 format=1 outpar=count; cat count
+# Any nonzero format selects fixed notation; odd group size.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=3f", 1,2,3))' | b2a n1=3 format=-1 outpar=count; cat count
+# Empty input and zero group size.
+b2a outpar=count < /dev/null; cat count
+b2a n1=0 outpar=count < /dev/null; cat count
+# Incomplete lines and trailing partial float.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=3f", 1,2,3))' | b2a n1=2 outpar=/dev/null
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=2f", 1,2)+b"x")' | b2a outpar=/dev/null
+# Parameter errors and default output path with no controlling terminal.
+b2a </dev/null
+b2a outpar=/no/such/directory/count </dev/null
+b2a n1=-1 outpar=/dev/null </dev/null
+b2a n1=999999999999999999999 outpar=/dev/null </dev/null
+[stderr] b2a verbose=1 extra=1 outpar=/dev/null </dev/null

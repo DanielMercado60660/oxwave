@@ -1,0 +1,34 @@
+# Defaults, odd sizes and duplicate positions
+[stderr] suspike ntr=1 nt=1 dt=0.004 | sumatrix
+[stderr] suspike ntr=5 nt=7 dt=0.004 | sumatrix lenzone=12 numzone=3
+# Largest output trace representable by the SU sample count header
+[stderr] suspike ntr=1 nt=1 dt=0.004 | sumatrix lenzone=262140 numzone=1
+# Sparse source/receiver combinations and all fill modes
+[stderr] suspike ntr=9 nt=7 dt=0.004 | sushw key=fldr,gaps a=1,1 b=1,2 j=3,0 | sumatrix lenzone=8 numzone=2 rfill=0
+[stderr] suspike ntr=9 nt=7 dt=0.004 | sushw key=fldr,gaps a=1,1 b=1,2 j=3,0 | sumatrix lenzone=8 numzone=2 rfill=1
+[stderr] suspike ntr=9 nt=7 dt=0.004 | sushw key=fldr,gaps a=1,1 b=1,2 j=3,0 | sumatrix lenzone=8 numzone=2 rfill=2
+[stderr] suspike ntr=7 nt=9 dt=0.002 | sushw key=fldr,gaps,ep,cdp a=1,-4,2,1 b=1,2,1,1 | sumatrix skeyloc=fldr,ep sdivider=-2,1 rkeyloc=gaps,cdp rdivider=2,-1 lenzone=7 numzone=3 maxsources=10 maxreceivers=10 maxtraces=10 verbose=1
+# Parameter validation and input failures
+[stderr] sumatrix skeyloc=bad
+[stderr] sumatrix rkeyloc=bad
+[stderr] sumatrix maxsources=0
+[stderr] sumatrix maxreceivers=-1
+[stderr] sumatrix maxtraces=0
+[stderr] sumatrix sdivider=0
+[stderr] sumatrix rdivider=0
+[stderr] sumatrix skeyloc=fldr,ep sdivider=1
+[stderr] sumatrix rkeyloc=gaps,cdp rdivider=1
+[stderr] sumatrix rfill=-1
+[stderr] sumatrix rfill=3
+[stderr] sumatrix lenzone=0
+[stderr] sumatrix numzone=0
+[stderr] sumatrix numzone=1
+[stderr] suspike ntr=3 nt=5 | sushw key=fldr a=1 b=1 | sumatrix maxsources=1
+[stderr] suspike ntr=3 nt=5 | sushw key=gaps a=1 b=1 | sumatrix maxreceivers=1
+[stderr] suspike ntr=3 nt=5 | sumatrix maxtraces=1
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+[stderr] suspike ntr=8 nt=6 dt=0.004 | sushw key=sx,gx a=-130,45 b=37,-23 j=4,8 c=0,0 | sumatrix skeyloc=sx sdivider=2.5 rkeyloc=gx rdivider=-3 lenzone=8 numzone=2
+[stderr] suspike ntr=6 nt=5 dt=0.004 | sushw key=f2,d2 a=1.25,0.5 b=0.75,-0.25 | sumatrix skeyloc=f2 sdivider=0.5 rkeyloc=d2 rdivider=0.25 lenzone=12 numzone=3 rfill=0
+[stderr] suplane ntr=6 nt=16 dt=0.004 | sushw key=fldr,gaps a=1,1 b=0,1 c=1,0 j=3,3 | sumatrix lenzone=10 numzone=2
+[stderr] suspike ntr=8 nt=4 dt=0.002 | sushw key=fldr,ep,gaps a=1,3,1 b=0,0,1 c=1,0,0 j=4,8,2 | sumatrix skeyloc=fldr,ep rkeyloc=gaps lenzone=6 numzone=5 rfill=2

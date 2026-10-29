@@ -1,0 +1,16 @@
+# Default behavior, single sample and trace, including coincident coordinates.
+sunull nt=1 ntr=1 | suazimuth
+# Positive and negative coordinate scalars and all direction conventions.
+suplane nt=17 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=100,200,-300,500,10 | suazimuth offset=1 cmp=1 az=0
+suplane nt=17 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=100,200,-300,500,-10 | suazimuth offset=1 signedflag=1 cmp=1 az=1
+suplane nt=17 ntr=3 | sushw key=sx,sy,gx,gy a=100,200,100,-500 | suazimuth offset=1 signedflag=1 cmp=1 az=-1
+# Custom output keys, float output, sector and scale including negative values.
+suplane nt=7 ntr=1 | sushw key=sx,sy,gx,gy a=-10,30,25,-40 | suazimuth key=d1 offkey=f1 mxkey=ep mykey=cdp az=-2 scale=-2.5 sector=15 offset=1 signedflag=1 cmp=1
+suplane nt=7 ntr=1 | sushw key=sx,sy,gx,gy a=0,0,0,100 | suazimuth key=d1 sector=0 scale=0 az=1
+# Invalid headers and empty input exercise error paths.
+suazimuth key=notakey
+suazimuth offset=1 offkey=notakey
+suazimuth cmp=1 mxkey=notakey
+suazimuth cmp=1 mykey=notakey
+suazimuth < /dev/null
+[stderr] suplane nt=1 ntr=1 | suazimuth verbose=1

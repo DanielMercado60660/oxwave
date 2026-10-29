@@ -1,0 +1,18 @@
+# Default mode, a single value, and negative and zero values.
+[stderr] tvnmoqc cdp=-3 tnmo=0 vnmo=-1500
+[stderr] tvnmoqc cdp=0 tnmo=-1,0,0,-2,3 vnmo=0,1,2,3,4 verbose=1
+# Other modes perform checks without writing files.
+[stderr] tvnmoqc mode=0 cdp=1 tnmo=1 vnmo=2
+[stderr] tvnmoqc mode=-1 cdp=1 tnmo=1 vnmo=2
+# Output files with odd lengths, repeated CDPs, and empty prefix.
+[stderr] tvnmoqc mode=2 prefix=result cdp=-1,0,3 tnmo=0 vnmo=1 tnmo=-2,0,5 vnmo=0,1000,2500 tnmo=0,1 vnmo=123.456789,1e8 && cat result.-1 result.0 result.3
+[stderr] tvnmoqc mode=2 prefix= cdp=1 tnmo=0 vnmo=2 && cat .1
+# Missing or inconsistent parameters.
+[stderr] tvnmoqc mode=2
+[stderr] tvnmoqc mode=1
+[stderr] tvnmoqc cdp=1 tnmo=0
+[stderr] tvnmoqc cdp=1 vnmo=1500
+[stderr] tvnmoqc cdp=1,2 tnmo=0 vnmo=1500
+[stderr] tvnmoqc cdp=1 tnmo=0,1 vnmo=1500
+[stderr] tvnmoqc cdp=1 tnmo= vnmo=
+[stderr] tvnmoqc mode=2 prefix=missing/path cdp=1 tnmo=0 vnmo=1

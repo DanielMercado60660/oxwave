@@ -1,0 +1,18 @@
+# Defaults and odd trace/sample counts.
+sunull nt=7 ntr=3 | suimpedance
+sunull nt=1 ntr=1 | suimpedance
+# Parameters individually and together, including zero and negative values.
+suspike nt=9 ntr=1 k1=3 mag=0.5 | suimpedance v0=2000
+suspike nt=9 ntr=2 k1=3 mag=-0.5 | suimpedance rho0=1200
+sunull nt=5 ntr=1 | suimpedance v0=0 rho0=-2
+sunull nt=5 ntr=1 | suimpedance v0=-4 rho0=2
+# Reflectivity at and beyond the clamp boundaries.
+suspike nt=5 ntr=1 k1=1 mag=1 | suimpedance
+suspike nt=5 ntr=1 k1=1 mag=-1 | suimpedance
+suspike nt=5 ntr=1 k1=2 mag=2 | suimpedance
+suspike nt=5 ntr=1 k1=2 mag=-2 | suimpedance
+# Unrecognized and verbose parameters are ignored by this program.
+sunull nt=3 ntr=1 | suimpedance verbose=1 unknown=1
+# Empty input and invalid numeric parameter.
+suimpedance v0=1000
+suimpedance v0=1e999

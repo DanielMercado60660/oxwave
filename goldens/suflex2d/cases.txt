@@ -1,0 +1,20 @@
+# Defaults and single trace
+sunull nt=1 ntr=1 | suflex2d
+# Multiple traces per gather with offsets and varying priorities
+sunull nt=7 ntr=12 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=-20 b=-10 j=3 | sushw key=igi a=-12 b=3 | sushw key=igc a=8 b=-2 | suflex2d binfold=3 maxflex=2 minflex=-1 binsize=30 binalign=47 igiadd=-20 maxfold=4
+sunull nt=7 ntr=12 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=7 j=3 | sushw key=igc a=-10 b=2 | suflex2d binbest=1 keepmore=1 binfold=1
+sunull nt=7 ntr=12 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=7 j=3 | sushw key=igc a=-10 b=2 | suflex2d binbest=2 binfold=2
+sunull nt=7 ntr=12 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=7 j=3 | sushw key=igc a=-10 b=2 | suflex2d binbest=-2 maxflex=0
+sunull nt=7 ntr=12 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=7 j=3 | suflex2d binbest=3 binfold=1 binsize=20 binalign=10 keepmore=1 verbose=1
+# Empty input and validation errors
+suflex2d
+suflex2d maxflex=-1
+suflex2d minflex=1
+suflex2d maxfold=0
+suflex2d binfold=0
+suflex2d binbest=4
+suflex2d binsize=0
+suflex2d binalign=-1
+sunull nt=3 ntr=3 | suflex2d maxfold=2
+sunull nt=3 ntr=3 | sushw key=offset a=100 b=-30 | suflex2d
+sunull nt=3 ntr=3 | sushw key=cdp a=3 b=-1 | suflex2d

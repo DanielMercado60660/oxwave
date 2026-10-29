@@ -1,0 +1,18 @@
+# All modes, default, differing dimensions and header preservation.
+suplane nt=5 ntr=7 | sushw key=offset a=10 b=3 | suflip
+suplane nt=5 ntr=7 | suflip flip=-1
+suplane nt=5 ntr=7 | suflip flip=0
+suplane nt=5 ntr=7 | suflip flip=1
+suplane nt=5 ntr=7 | suflip flip=2
+suplane nt=5 ntr=7 | suflip flip=3
+sunull nt=1 ntr=1 | suflip flip=0
+sunull nt=1 ntr=5 | suflip flip=1
+sunull nt=5 ntr=1 | suflip flip=-1
+[stderr] suplane nt=3 ntr=5 | suflip flip=2 verbose=1
+[stderr] suplane nt=3 ntr=5 | suflip flip=0 tmpdir=. verbose=1
+suplane nt=3 ntr=5 | CWP_TMPDIR=. suflip flip=3
+suplane nt=3 ntr=5 | CWP_TMPDIR=/nonexistent suflip tmpdir= flip=2
+suflip flip=4
+suflip flip=-2
+suflip tmpdir=/nonexistent
+suflip flip=0

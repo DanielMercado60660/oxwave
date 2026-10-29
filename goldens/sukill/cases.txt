@@ -1,0 +1,18 @@
+# Default header selection, including matching and nonmatching traces.
+suspike ntr=5 nt=7 | sushw key=trid a=0 b=1 | sukill
+suspike ntr=1 nt=1 | sukill key=trid a=1
+suspike ntr=5 nt=9 | sushw key=offset a=-2 b=1 | sukill key=offset a=-1
+suspike ntr=3 nt=5 | sushw key=d1 a=0.5 b=0.5 | sukill key=d1 a=1.5
+# Range selection, overrides header selection, and nonpositive count.
+suspike ntr=5 nt=7 | sukill min=2 count=3 key=trid a=0
+suspike ntr=3 nt=5 | sukill min=1
+suspike ntr=3 nt=5 | sukill min=2 count=0
+suspike ntr=3 nt=5 | sukill min=2 count=-2
+suspike ntr=1 nt=1 | sukill min=1 count=1
+# Errors and diagnostic output.
+[stderr] sukill min=-1
+[stderr] sukill key=notakey
+[stderr] sukill min=1
+[stderr] suspike ntr=2 nt=5 | sukill min=4
+[stderr] suspike ntr=2 nt=5 | sukill min=2 count=2
+[stderr] suspike ntr=3 nt=5 | sukill min=0 verbose=1

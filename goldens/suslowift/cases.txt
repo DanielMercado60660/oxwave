@@ -1,0 +1,14 @@
+# Default header dt and multiple traces, including stale buffer values.
+suplane nt=15 ntr=3 | suslowift
+# Both signs and explicit positive and negative sampling intervals.
+suplane nt=17 ntr=2 | suslowift sign=1 dt=0.002
+suplane nt=7 ntr=1 | suslowift sign=-1 dt=-0.004
+# Zero dt fallback and diagnostic output.
+[stderr] sunull nt=9 ntr=1 | suslowift dt=0
+[stderr] sunull nt=5 ntr=1 | sushw key=dt a=0 | suslowift
+# One sample and verbose argument (the original does not call checkpars).
+sunull nt=1 ntr=1 | suslowift verbose=1
+# Invalid sign and empty input.
+sunull nt=8 ntr=1 | suslowift sign=0
+sunull nt=8 ntr=1 | suslowift sign=2
+suslowift sign=-1

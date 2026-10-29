@@ -1,0 +1,6 @@
+# No parameters or output modes: arguments are literal prompt words.
+[exact] pause < /dev/null
+[exact] printf 'x' | pause 'single argument'
+[exact] printf '\n' | pause '' 'two  spaces' ''
+[exact] printf '\n' | pause verbose=1 n=0 -1
+[exact] printf 'abc' | pause 'special %s' 'quote"and\\slash'

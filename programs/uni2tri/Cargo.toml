@@ -1,0 +1,17 @@
+[package]
+name = "uni2tri"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "uni2tri"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-lib-tri = { path = "../../crates/oxwave-lib-tri" }
+oxwave-sort = { path = "../../crates/oxwave-sort" }

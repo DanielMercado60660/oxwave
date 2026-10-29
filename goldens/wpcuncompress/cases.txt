@@ -1,0 +1,59 @@
+# No parameters or output modes: the header determines the native float array.
+# Capture raw output as well as the fixed timing diagnostic (inventory cases
+# redirect their output to a file). Keep the default float tolerance of 1e-5.
+[f32] [stderr] suspike nt=256 ntr=256 k1=20 k2=4 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress
+[f32] [stderr] suplane nt=128 ntr=128 | sustrip outpar=/dev/null | wpccompress n1=128 n2=128 error=0.05 | wpcuncompress
+
+# Singleton and odd dimensions are cropped from a valid encoded 256x256 tile.
+# This avoids the vendor compressor's stale-pointer realloc bug for small
+# nonzero sections. The decoder reads n1/n2 from the patched native header.
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,1,1); sys.stdout.buffer.write(b)' | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=9 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,17,1); sys.stdout.buffer.write(b)' | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=9 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,1,17); sys.stdout.buffer.write(b)' | wpcuncompress
+[f32] [stderr] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,63,7); sys.stdout.buffer.write(b)' | wpcuncompress
+
+# Full and multiple tiles, including a partial tile in each dimension.
+[f32] [stderr] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress
+[f32] [stderr] suplane nt=257 ntr=259 | sustrip outpar=/dev/null | wpccompress n1=257 n2=259 | wpcuncompress
+
+# Zero, constant, signed, and noisy data; several encoded quantization errors.
+[f32] [stderr] sunull nt=33 ntr=5 | sustrip outpar=/dev/null | wpccompress n1=33 n2=5 | wpcuncompress
+[f32] [stderr] sunull nt=256 ntr=256 | suop op=exp | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=31 k2=5 | sugain scale=-3 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.001 | wpcuncompress
+[f32] [stderr] sunull nt=256 ntr=256 | suaddnoise seed=37 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.2 | wpcuncompress
+
+# C never calls getpar/checkpars: verbose and arbitrary/invalid arguments
+# are silently ignored, including supplied dimensions and output mode.
+[f32] [stderr] suspike nt=256 ntr=256 k1=10 k2=2 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress verbose=1
+[f32] [stderr] suspike nt=256 ntr=256 k1=10 k2=2 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress n1=-1 n2=0 error=abc output=invalid verbose=0
+
+# Only one compressed section is read; trailing sections are ignored.
+[f32] [stderr] suspike nt=256 ntr=256 k1=10 k2=2 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 > packed; cat packed packed | wpcuncompress
+
+# Empty/short input triggers the original build's SIGSEGV after its diagnostic.
+wpcuncompress
+printf abc | wpcuncompress
+
+# Complete headers with zero dimensions and no code take the consistency
+# failure path without writing samples; C still exits successfully.
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("4i",1,0,0,0)+bytes(144))' | wpcuncompress
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("4i",1,-1,0,0)+bytes(144))' | wpcuncompress
+# A negative row count fails the allocation and faults after the first warning.
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("4i",1,0,-1,0)+bytes(144))' | wpcuncompress
+
+# Replacements for the inventory's two broken sustrip pipelines.
+# Use outpar=/dev/null and compare decoded stdout. The original 64x8 and
+# 128x16 shapes trigger wpccompress's stale-pointer realloc bug once sustrip
+# succeeds; full tiles keep these spike/plane checks on valid compressed data.
+[f32] [stderr] suspike nt=256 ntr=256 k1=20 k2=4 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.01 | wpcuncompress
+[f32] [stderr] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.05 | wpcuncompress
+
+# Real seismic sections with seeded noise and nonzero means. Bias prevents
+# empty edge tiles, so these do not depend on C's uninitialized zero flag.
+# These are direct round trips with genuine non-multiple-of-256 dimensions,
+# without header patching. All output samples are finite; default rtol=1e-5.
+# Exercise default error=0.01 and explicit error=0.05, 0.2, and 0.02.
+[f32] [stderr] suplane nt=253 ntr=251 | suaddnoise seed=37 sn=10 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=253 n2=251 | wpcuncompress
+[f32] [stderr] suplane nt=257 ntr=259 | suaddnoise seed=41 sn=10 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=257 n2=259 error=0.05 | wpcuncompress
+[f32] [stderr] suplane nt=301 ntr=267 | suaddnoise seed=43 sn=10 | sugain bias=-0.25 | sustrip outpar=/dev/null | wpccompress n1=301 n2=267 error=0.2 | wpcuncompress
+[f32] [stderr] susynlv nt=255 nxm=253 | suaddnoise seed=47 sn=10 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=255 n2=253 error=0.02 | wpcuncompress

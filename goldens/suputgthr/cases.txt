@@ -1,0 +1,13 @@
+# Read back output files to check names, trace data, and ntr headers.
+sunull nt=1 ntr=1 | suputgthr dir=. && cat ep=0000000.hsu
+sunull nt=7 ntr=5 | sushw key=ep a=2 b=1 j=2 | suputgthr dir=. && cat ep=*.hsu
+sunull nt=3 ntr=5 | sushw key=cdp a=-2 b=1 | suputgthr dir=. key=cdp suffix=.su numlength=3 && cat cdp=*.su
+sunull nt=3 ntr=3 | suputgthr dir=. key=tracl suffix=.x numlength=0 && cat tracl=*.x
+sunull nt=3 ntr=3 | sushw key=ep a=1 b=1 j=2 | suputgthr dir=. numlength=2 verbose=1 && cat ep=*.hsu
+# Normalize the random temporary filename while checking verbose output.
+sunull nt=1 ntr=3 | suputgthr dir=. key=tracl verbose=1 2> messages && sed -E 's/cmgui[[:alnum:]]{6}/cmguiXXXXXX/g' messages
+sunull nt=3 ntr=2 | suputgthr dir=. suffix= numlength=-3 && cat ep=*
+suputgthr dir=.
+sunull nt=1 ntr=1 | suputgthr
+sunull nt=1 ntr=1 | suputgthr dir=. key=invalid
+sunull nt=1 ntr=1 | suputgthr dir=. suffix=/missing/file

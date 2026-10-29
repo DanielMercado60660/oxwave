@@ -1,0 +1,212 @@
+{
+  "scope": "su/main/dip_moveout part 1 of 1",
+  "programs": [
+    {
+      "name": "sudmofk",
+      "path": "su/main/dip_moveout/sudmofk.c",
+      "purpose": "Apply log-stretch frequency-wavenumber dip-moveout correction to common-offset gathers.",
+      "selfdoc_first_line": " SUDMOFK - DMO via F-K domain (log-stretch) method for common-offset gathers",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets per mix."},
+        {"name": "tdmo", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for the velocity function; must match vdmo in length."},
+        {"name": "vdmo", "type": "float array", "default": "1500.0", "required": false, "description": "RMS velocities at tdmo times."},
+        {"name": "sdmo", "type": "float", "default": "1.0", "required": false, "description": "DMO stretch factor."},
+        {"name": "fmax", "type": "float", "default": "computed: 0.5 divided by the first trace header dt in seconds", "required": false, "description": "Maximum input frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Diagnostic output flag."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Directory for temporary header storage; an empty value uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "countparval", "ealloc1float", "getparstring", "checkpars", "ealloc2float", "ealloc1", "etmpfile", "temporary_filename", "efopen", "efwrite", "efread", "erewind", "puttr", "warn", "efclose", "eremove", "free1", "free1float", "free2float", "cmonot", "intcub", "npfa", "npfar", "ealloc1complex", "pfa2rc", "pfacc", "pfa2cr", "ints8c", "cmplx", "free1complex", "yxtoxy"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT ordering, cubic and sinc interpolation, log-stretch mappings, trigonometric functions, and accumulation across offsets affect rounding; header dt conversion uses double before assignment to float.",
+      "c_lines": 629,
+      "difficulty": "hard",
+      "difficulty_reason": "The program combines offset mixing, log-stretch mapping, interpolation and multidimensional FFT-based DMO.",
+      "test_cases": [
+        {"description": "Single common-offset gather with default velocity.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmofk cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 > out.su"},
+        {"description": "Time-varying velocity and modified stretch.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=300 | sudmofk cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vdmo=1500,2000 sdmo=0.6 fmax=80 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudmofkcw"]
+    },
+    {
+      "name": "sudmofkcw",
+      "path": "su/main/dip_moveout/sudmofkcw.c",
+      "purpose": "Apply converted-wave log-stretch frequency-wavenumber dip-moveout correction to common-offset gathers.",
+      "selfdoc_first_line": " SUDMOFKCW - converted-wave DMO via F-K domain (log-stretch) method for",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets per mix."},
+        {"name": "tdmo", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for the velocity function; must match vdmo in length."},
+        {"name": "vdmo", "type": "float array", "default": "1500.0", "required": false, "description": "RMS velocities at tdmo times."},
+        {"name": "gamma", "type": "float", "default": "0.5", "required": false, "description": "Upgoing-to-downgoing velocity ratio."},
+        {"name": "ntable", "type": "int", "default": "1000", "required": false, "description": "Number of conversion-point table entries."},
+        {"name": "sdmo", "type": "float", "default": "1.0", "required": false, "description": "DMO stretch factor."},
+        {"name": "flip", "type": "int", "default": "0", "required": false, "description": "Reverse conversion-point shift and exchange stretch factors when nonzero."},
+        {"name": "fmax", "type": "float", "default": "computed: 0.5 divided by the first trace header dt in seconds", "required": false, "description": "Maximum input frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Diagnostic output flag."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "countparval", "ealloc1float", "checkpars", "alloc1float", "ealloc1", "ealloc1int", "ealloc2float", "efwrite", "efread", "efseeko", "puttr", "free1", "free1float", "free2float", "cmonot", "intcub", "npfa", "npfar", "ealloc1complex", "pfa2rc", "pfacc", "pfa2cr", "ints8c", "cmplx", "free1complex", "yxtoxy"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT ordering, interpolated conversion-point tables, log-stretch mappings, trigonometric functions and offset accumulation affect rounding.",
+      "c_lines": 843,
+      "difficulty": "hard",
+      "difficulty_reason": "Converted-wave DMO adds conversion-point tables and asymmetric stretching to a multi-trace FFT algorithm.",
+      "test_cases": [
+        {"description": "Converted-wave DMO with default velocity ratio.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmofkcw cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 > out.su"},
+        {"description": "Reverse the shift with a non-default velocity ratio and table size.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=300 | sudmofkcw cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 gamma=0.7 ntable=200 flip=1 sdmo=0.6 fmax=80 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudmofk"]
+    },
+    {
+      "name": "sudmotivz",
+      "path": "su/main/dip_moveout/sudmotivz.c",
+      "purpose": "Apply dip-moveout correction for vertically varying transversely isotropic media.",
+      "selfdoc_first_line": " SUDMOTIVZ - DMO for Transeversely Isotropic V(Z) media for common-offset",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets per mix."},
+        {"name": "fmax", "type": "float", "default": "computed: 0.5 divided by the first trace header dt in seconds", "required": false, "description": "Maximum input frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Diagnostic output flag."},
+        {"name": "speed", "type": "float", "default": "1.0", "required": false, "description": "Controls computation speed and aliasing."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "NMO stretch mute."},
+        {"name": "vnfile", "type": "string", "default": "", "required": false, "description": "Binary native-float NMO interval velocity samples; absent uses tdmo and vndmo."},
+        {"name": "etafile", "type": "string", "default": "", "required": false, "description": "Binary native-float interval eta samples; absent uses tdmo and etadmo."},
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary native-float interval velocity samples; absent uses vdmo or the NMO velocity function."},
+        {"name": "tdmo", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for supplied model arrays; read separately for each model without a file."},
+        {"name": "vndmo", "type": "float array", "default": "1500.0", "required": false, "description": "NMO interval velocities; must match tdmo in length when vnfile is absent."},
+        {"name": "etadmo", "type": "float array", "default": "0.0", "required": false, "description": "Interval eta values; must match tdmo in length when etafile is absent. The selfdoc incorrectly states 1500.0."},
+        {"name": "vdmo", "type": "float array", "default": "computed: copy the sampled NMO velocity function when its value count differs from tdmo", "required": false, "description": "Interval velocities; used when vfile is absent and its value count matches tdmo."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "getparstring", "countparval", "ealloc1float", "ealloc1int", "ealloc1", "ealloc2float", "intlin", "checkpars", "efwrite", "efread", "efseeko", "puttr", "free1", "free1float", "free1int", "free2float", "npfa", "npfar", "ealloc1complex", "pfa2rc", "pfacc", "pfa2cr", "ints8c", "cmplx", "free1complex", "yxtoxy", "sgeco", "sgesl"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Ray tracing, iterative nonlinear mapping and linear solves, FFTs, interpolation, accumulated integrals and transcendental functions are sensitive to rounding and operation order. The anisotropic model adds further coupled calculations.",
+      "c_lines": 1409,
+      "difficulty": "hard",
+      "difficulty_reason": "Anisotropic ray tracing, iterative mapping, linear solves and FFT-based DMO make this a complex numerical program.",
+      "test_cases": [
+        {"description": "Default isotropic model through the anisotropic implementation.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 > out.su"},
+        {"description": "Time-varying anisotropic model and non-default controls.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vndmo=1500,1800 vdmo=1450,1700 etadmo=0.1,0.15 speed=0.8 smute=2 fmax=80 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudmovz"]
+    },
+    {
+      "name": "sudmotx",
+      "path": "su/main/dip_moveout/sudmotx.c",
+      "purpose": "Apply Kirchhoff time-space dip-moveout correction to common-offset gathers.",
+      "selfdoc_first_line": " SUDMOTX - DMO via T-X domain (Kirchhoff) method for common-offset gathers",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets per mix."},
+        {"name": "offmax", "type": "float", "default": "3000.0", "required": false, "description": "Maximum offset used to design the operator."},
+        {"name": "tmute", "type": "float", "default": "2.0", "required": false, "description": "Mute time at offmax used to design the operator."},
+        {"name": "vrms", "type": "float", "default": "1500.0", "required": false, "description": "RMS velocity at tmute."},
+        {"name": "nsmax", "type": "int", "default": "400", "required": false, "description": "Maximum number of DMO time shifts; accepted by code but omitted from selfdoc."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Diagnostic output flag."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Directory for temporary header storage; an empty value uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "getparstring", "checkpars", "ealloc1float", "ealloc2float", "etmpfile", "temporary_filename", "efopen", "efwrite", "efread", "erewind", "puttr", "warn", "efclose", "eremove", "xcor", "stoepf", "convolve_cwp"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Kirchhoff summation order, shaping-filter Toeplitz solve, convolution, and square-root and power calculations affect exact results.",
+      "c_lines": 550,
+      "difficulty": "hard",
+      "difficulty_reason": "The Kirchhoff DMO operator requires multi-trace accumulation and construction of an anti-aliasing shaping filter.",
+      "test_cases": [
+        {"description": "Default operator design.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotx cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 > out.su"},
+        {"description": "Custom operator-design and shift limits.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=300 | sudmotx cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 offmax=800 tmute=0.5 vrms=1800 nsmax=100 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sudmovz",
+      "path": "su/main/dip_moveout/sudmovz.c",
+      "purpose": "Apply dip-moveout correction for a vertically varying velocity model.",
+      "selfdoc_first_line": " SUDMOVZ - DMO for V(Z) media for common-offset gathers\t\t",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets per mix."},
+        {"name": "fmax", "type": "float", "default": "computed: 0.5 divided by the first trace header dt in seconds", "required": false, "description": "Maximum input frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Diagnostic output flag."},
+        {"name": "speed", "type": "float", "default": "1.0", "required": false, "description": "Controls computation speed and aliasing."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "NMO stretch mute."},
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary native-float interval velocity samples; absent uses tdmo and vdmo."},
+        {"name": "tdmo", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for the interval velocity function; must match vdmo in length."},
+        {"name": "vdmo", "type": "float array", "default": "1500.0", "required": false, "description": "Interval velocities at tdmo times."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "getparstring", "countparval", "ealloc1float", "ealloc1int", "ealloc1", "ealloc2float", "intlin", "checkpars", "efwrite", "efread", "efseeko", "puttr", "free1", "free1float", "free1int", "free2float", "npfa", "npfar", "ealloc1complex", "pfa2rc", "pfacc", "pfa2cr", "ints8c", "cmplx", "free1complex", "yxtoxy", "sgeco", "sgesl"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Ray tracing, iterative nonlinear mapping and linear solves, FFTs, interpolation, accumulated integrals and transcendental functions are sensitive to rounding and operation order.",
+      "c_lines": 1194,
+      "difficulty": "hard",
+      "difficulty_reason": "Depth-variable DMO combines ray tracing and iterative numerical mapping with multi-trace FFT processing.",
+      "test_cases": [
+        {"description": "Constant-velocity model.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmovz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 > out.su"},
+        {"description": "Time-varying model and non-default controls.", "command": "suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmovz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vdmo=1500,2000 speed=0.8 smute=2 fmax=80 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudmotivz"]
+    },
+    {
+      "name": "sutihaledmo",
+      "path": "su/main/dip_moveout/sutihaledmo.c",
+      "purpose": "Apply one of several isotropic or anisotropic Hale-style dip-moveout operators to a single common-offset gather.",
+      "selfdoc_first_line": " SUTIHALEDMO - TI Hale Dip MoveOut (based on Hale's PhD thesis)\t",
+      "params": [
+        {"name": "nxmax", "type": "int", "default": "", "required": true, "description": "Maximum number of input midpoints."},
+        {"name": "option", "type": "int", "default": "1", "required": false, "description": "Operator selection: Hale, two Bleistein variants, Zhang, Tsvankin, or weak-anisotropy Tsvankin, numbered 1 through 6."},
+        {"name": "dx", "type": "float", "default": "50.", "required": false, "description": "Midpoint spacing."},
+        {"name": "v", "type": "float", "default": "1500.0", "required": false, "description": "Velocity; must be positive for options 3 and 6."},
+        {"name": "h", "type": "float", "default": "200.0", "required": false, "description": "Source-receiver half-offset."},
+        {"name": "ntpad", "type": "int", "default": "0", "required": false, "description": "Time padding."},
+        {"name": "nxpad", "type": "int", "default": "computed: h/dx converted to int", "required": false, "description": "Midpoint padding."},
+        {"name": "file", "type": "string", "default": "vnmo", "required": false, "description": "ASCII vnmo-versus-ray-parameter file used by option 5; contains np, dp and np velocity values."},
+        {"name": "e", "type": "float", "default": "0.0", "required": false, "description": "Thomsen epsilon."},
+        {"name": "d", "type": "float", "default": "0.0", "required": false, "description": "Thomsen delta."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "getparstring", "checkpars", "efopen", "VNDemalloc", "npfao", "npfar", "VNDtempname", "V2Dop", "V2Dw1", "efwrite", "V2Dr0", "pfarc", "V2Dw0", "VNDr2c", "V2Dr1", "pfacr", "VNDc2r", "efseek", "efread", "puttr", "VNDcl", "VNDfree", "VNDtotalmem", "pfacc", "cmplx", "cadd", "cmul", "crmul"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The six operators use FFTs, complex arithmetic, summation and transcendental functions; results depend on operation order and math implementation. Input buffering stops only after nx exceeds nxmax, allowing one extra trace.",
+      "c_lines": 663,
+      "difficulty": "hard",
+      "difficulty_reason": "Six frequency-wavenumber DMO formulations and disk-backed multidimensional buffering require substantial numerical and state handling.",
+      "test_cases": [
+        {"description": "Traditional Hale operator.", "command": "suplane nt=128 ntr=16 | sutihaledmo nxmax=16 option=1 dx=25 h=100 v=1500 > out.su"},
+        {"description": "True-amplitude Bleistein operator.", "command": "suplane nt=128 ntr=16 | sutihaledmo nxmax=16 option=2 dx=25 h=100 ntpad=16 nxpad=4 > out.su"},
+        {"description": "Weak-anisotropy operator.", "command": "suplane nt=128 ntr=16 | sutihaledmo nxmax=16 option=6 dx=25 h=100 v=1800 e=0.1 d=0.05 > out.su"}
+      ],
+      "license_note": "The author is identified as John E. Anderson, a visitor to CSM from Mobil; the header cites Anderson and Tsvankin's anisotropic DMO work.",
+      "related_programs": []
+    }
+  ]
+}

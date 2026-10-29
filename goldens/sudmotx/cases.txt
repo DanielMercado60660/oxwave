@@ -1,0 +1,52 @@
+# Actual trace output (the inventory examples redirect their output).
+suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotx cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1
+suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=300 | sudmotx cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 offmax=800 tmute=0.5 vrms=1800 nsmax=100
+# Explicit defaults and complete verbose diagnostics.
+[stderr] suspike nt=101 ntr=5 it1=30 | sushw key=cdp,offset a=1,175 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offmax=3000 tmute=2 vrms=1500 nsmax=400 verbose=0 tmpdir=
+[stderr] suspike nt=101 ntr=5 it1=30 | sushw key=cdp,offset a=1,175 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 verbose=1
+# Several offset gathers, repeated CDPs, incomplete final mixes.
+[stderr] suplane nt=129 ntr=15 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=5,5 | sudmotx cdpmin=1 cdpmax=5 dxcdp=30 noffmix=2 verbose=1
+[stderr] suplane nt=67 ntr=9 | sushw key=cdp,offset a=1,50 b=1,0 c=0,50 j=3,3 | sudmotx cdpmin=1 cdpmax=3 dxcdp=20 noffmix=1 verbose=1
+suplane nt=75 ntr=12 | sushw key=cdp,offset a=1,-250 b=1,0 c=0,125 j=4,4 | sudmotx cdpmin=1 cdpmax=4 dxcdp=25 noffmix=5
+# CDP range filtering, including a mix with no output.
+[stderr] suplane nt=65 ntr=7 | sushw key=cdp,offset a=-2,150 b=1,0 | sudmotx cdpmin=0 cdpmax=2 dxcdp=20 noffmix=1 verbose=1
+[stderr] sunull nt=17 ntr=3 | sudmotx cdpmin=10 cdpmax=12 dxcdp=25 noffmix=1 verbose=1
+# Small and odd trace sizes; zero and negative offsets.
+suspike nt=1 ntr=1 it1=1 | sushw key=cdp a=1 | sudmotx cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=3 ntr=1 it1=2 | sushw key=cdp,offset a=-3,-200 | sudmotx cdpmin=-3 cdpmax=-3 dxcdp=25 noffmix=1
+suplane nt=131 ntr=5 | sushw key=cdp,offset a=1,-225 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+# Single-shift and truncated operators.
+suplane nt=91 ntr=3 | sushw key=cdp,offset a=1,150 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 nsmax=1
+suplane nt=97 ntr=5 | sushw key=cdp,offset a=1,300 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=12.5 noffmix=1 nsmax=7
+# Header time origin and time sampling, nonzero noise for summation coverage.
+suplane nt=151 dt=0.002 ntr=7 | suaddnoise seed=31 | sushw key=cdp,offset,delrt a=1,400,80 b=1,0,0 | sudmotx cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offmax=1000 tmute=0.75 vrms=2000
+suplane nt=81 dt=0.008 ntr=3 | sushw key=cdp,offset,delrt a=1,125,-40 b=1,0,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+# Negative design values are converted to absolute values inside maketa.
+suplane nt=69 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=-25 noffmix=1 offmax=-800 tmute=-0.5 vrms=-1800
+suplane nt=43 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=0
+suplane nt=43 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=-1
+suplane nt=43 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offmax=0
+# Temporary header files, environment fallback, explicit empty override.
+[stderr] mkdir scratch; suspike nt=33 ntr=3 it1=10 | sushw key=cdp a=1 b=1 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 tmpdir=scratch verbose=1; test -z "$(ls -A scratch)"
+[stderr] mkdir scratch; suspike nt=35 ntr=3 it1=10 | sushw key=cdp a=1 b=1 | CWP_TMPDIR=scratch sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1; test -z "$(ls -A scratch)"
+[stderr] suspike nt=37 ntr=1 it1=10 | CWP_TMPDIR=/nonexistent-sudmotx sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tmpdir= verbose=1
+# Parameter parsing and checkpars order.
+# Zero design values and invalid operator allocation size.
+suplane nt=39 ntr=3 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 nsmax=0
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 nsmax=-1
+suplane nt=39 ntr=3 | sudmotx cdpmin=0 cdpmax=0 dxcdp=0 noffmix=1
+suplane nt=39 ntr=3 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tmute=0
+suplane nt=39 ntr=3 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vrms=0
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 unknown=1
+sunull nt=7 ntr=1 | sudmotx cdpmin=7 cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+# Error exits, each required parameter and validation.
+[stderr] sudmotx
+[stderr] sunull nt=7 ntr=1 | sudmotx
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=2 cdpmax=1
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tmpdir=/nonexistent-sudmotx
+[stderr] sunull nt=7 ntr=1 | CWP_TMPDIR=/nonexistent-sudmotx sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=999999999999 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=1e-310 noffmix=1

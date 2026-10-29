@@ -1,0 +1,64 @@
+# Default tolerance, one sample and one trace.
+suplane nt=1 ntr=1 > a && sucmp a a
+# Odd trace size and explicit zero tolerance.
+suplane nt=17 ntr=3 > a && sucmp a a limit=0
+# Header mismatch.
+suplane nt=17 ntr=3 > a && sushw < a key=cdp a=42 > b && sucmp a b
+# Different trace count.
+suplane nt=17 ntr=3 > a && dd if=a of=b bs=308 count=2 2>/dev/null && sucmp a b
+# Different sample count.
+suplane nt=17 ntr=2 > a && suplane nt=19 ntr=2 > b && sucmp a b
+# Positive and negative samples, within and outside tolerance.
+sunull nt=9 ntr=1 | sugain bias=1 > a && sugain < a scale=1.001 > b && sucmp a b limit=0.01
+sunull nt=9 ntr=1 | sugain bias=1 > a && sugain < a scale=1.1 > b && sucmp a b limit=0.01
+sunull nt=9 ntr=1 | sugain bias=-1 > a && sugain < a scale=1.1 > b && sucmp a b limit=0.01
+# Zero in A is ignored; negative limit makes identical nonzero samples differ.
+sunull nt=9 ntr=1 > a && sugain < a bias=1 > b && sucmp a b
+sunull nt=9 ntr=1 | sugain bias=1 > a && sucmp a a limit=-1
+# Diagnostics and errors.
+[stderr] suplane nt=7 ntr=1 > a && sucmp a a verbose=1
+[stderr] suplane nt=7 ntr=1 > a && sucmp a a unexpected=1
+sucmp missing_a missing_b
+touch a b && sucmp a b
+sucmp only_one
+sucmp a b limit=1e999
+
+# Auditor regressions: actual noisy sample comparisons and header mismatch.
+[stderr] suplane nt=64 ntr=4 | suaddnoise seed=3 sn=2 > a && suaddnoise < a seed=4 sn=2000 > b && sucmp a b limit=0.001
+[stderr] suplane nt=64 ntr=4 | suaddnoise seed=3 sn=2 > a && suaddnoise < a seed=4 sn=2000 > b && sucmp a b limit=0.5
+[stderr] suplane nt=64 ntr=4 | suaddnoise seed=3 sn=2 > a && suop < a op=neg > b && sucmp a b
+[stderr] suplane nt=16 ntr=5 > a && sushw < a key=offset a=0 b=0 c=0 j=4 | sushw key=cdp a=0 b=0 j=5 > b && sushw < a key=cdp a=0 b=0 j=5 > c && sucmp c b; echo rc=$?
+
+# Successful comparisons of distinct data: compare the printed status as well
+# as the empty stdout of sucmp. These exercise nonzero samples on every trace.
+[stderr] sunull nt=17 ntr=3 | sugain bias=2 > a && sugain < a scale=1.00005 > b && sucmp a b; echo rc=$?
+[stderr] sunull nt=19 ntr=5 | sugain bias=-2 > a && sugain < a scale=0.999 > b && sucmp a b limit=0.01; echo rc=$?
+[stderr] suplane nt=65 ntr=3 | suaddnoise seed=7 sn=2 > a && sugain < a scale=1.00005 > b && sucmp a b limit=0.0001; echo rc=$?
+
+# Both equality boundaries are inclusive, for both signs of A.
+[stderr] sunull nt=3 ntr=2 | sugain bias=1 > a && sugain < a scale=2 > b && sucmp a b limit=0.5; echo rc=$?
+[stderr] sunull nt=3 ntr=2 | sugain bias=3 > a && sugain < a scale=0.6666666667 > b && sucmp a b limit=0.5; echo rc=$?
+[stderr] sunull nt=3 ntr=2 | sugain bias=-1 > a && sugain < a scale=2 > b && sucmp a b limit=0.5; echo rc=$?
+[stderr] sunull nt=3 ntr=2 | sugain bias=-3 > a && sugain < a scale=0.6666666667 > b && sucmp a b limit=0.5; echo rc=$?
+
+# Nonzero A versus zero B differs; reversing A and B ignores zero A.
+[stderr] sunull nt=5 ntr=2 | sugain bias=1 > a && sugain < a scale=0 > b && sucmp a b
+[stderr] sunull nt=5 ntr=2 | sugain bias=-1 > a && sugain < a scale=0 > b && sucmp a b
+
+# Reach a sample difference on the last trace with identical headers,
+# then check the reversed trace-count mismatch.
+[stderr] sunull nt=17 ntr=3 | sugain bias=1 > a && suwind < a count=2 > first && suwind < a skip=2 | sugain bias=1 > last && cat first last > b && sucmp a b
+[stderr] sunull nt=17 ntr=3 | sugain bias=1 > a && suwind < a count=2 > b && sucmp b a
+
+# Parameter handling, explicit default, last occurrence, and empty value.
+[stderr] sunull nt=5 ntr=2 | sugain bias=1 > a && sugain < a scale=1.001 > b && sucmp a b limit=0.0001
+[stderr] sunull nt=5 ntr=2 | sugain bias=1 > a && sugain < a scale=1.001 > b && sucmp a b limit=0 limit=0.01; echo rc=$?
+[stderr] sunull nt=5 ntr=2 | sugain bias=1 > a && sugain < a scale=1.001 > b && sucmp a b limit=
+[stderr] sunull nt=5 ntr=2 | sugain bias=1 > a && sugain < a scale=1.001 > b && sucmp a b limit=abc
+
+# Missing second file and empty/truncated inputs in either position.
+[stderr] sunull nt=5 ntr=1 > a && sucmp a missing_b
+[stderr] sunull nt=5 ntr=1 > a && touch b && sucmp a b
+[stderr] sunull nt=5 ntr=1 > b && touch a && sucmp a b
+[stderr] sunull nt=5 ntr=1 > a && dd if=a of=b bs=1 count=239 2>/dev/null && sucmp a b
+[stderr] sunull nt=5 ntr=1 > a && dd if=a of=b bs=1 count=250 2>/dev/null && sucmp a b

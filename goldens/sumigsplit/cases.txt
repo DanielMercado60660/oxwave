@@ -1,0 +1,74 @@
+# SUMIGSPLIT has one output mode: depth-sampled SU traces.
+# Constant native-float velocity models are stored v[iz][ix]. Default tolerance.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=16 ntr=4 | sumigsplit nz=6 dz=5 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=16 ntr=4 | sumigsplit nz=6 dz=5 vfile=v dt=0.004 dx=1 ft=0 fz=0 verbose=0 tmpdir=
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sushw key=dt,d2 a=0,0 | sumigsplit nz=5 dz=3 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=19 ntr=5 dt=0.002 | sushw key=d2 a=12.5 | sumigsplit nz=7 dz=2 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=19 ntr=5 dt=0.002 | sushw key=d2 a=12.5 | sumigsplit nz=7 dz=2 vfile=v dt=0.006 dx=25
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=17 ntr=3 | sumigsplit nz=9 dz=2 vfile=v ft=1.25 fz=33
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=11 ntr=3 | sumigsplit nz=5 dz=2 vfile=v verbose=1
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=11 ntr=3 | sumigsplit nz=5 dz=2 vfile=v verbose=0
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=11 ntr=3 | sumigsplit nz=5 dz=2 vfile=v tmpdir=. verbose=1
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=11 ntr=3 | CWP_TMPDIR=. sumigsplit nz=5 dz=2 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=11 ntr=3 | CWP_TMPDIR=/no/such/oxwave/directory sumigsplit nz=5 dz=2 vfile=v tmpdir=
+# Single samples/traces, odd transform lengths, spatial and temporal FFT padding.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=1 ntr=1 | sumigsplit nz=1 dz=1 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=7 ntr=1 | sumigsplit nz=5 dz=4 vfile=v dx=20
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=1 ntr=3 | sumigsplit nz=3 dz=4 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=37 ntr=17 nspk=2 ix1=1 it1=4 ix2=17 it2=30 | sumigsplit nz=13 dz=3 vfile=v dx=8
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; sunull nt=13 ntr=7 | sumigsplit nz=5 dz=2 vfile=v
+# Lateral/depth velocity variation and deterministic broadband input.
+python3 -c 'import struct; a=[1400.+30*iz+17*ix for iz in range(9) for ix in range(5)]; open("v","wb").write(struct.pack("=45f",*a))'; suspike nt=23 ntr=5 | suaddnoise seed=31415 sn=3 | sumigsplit nz=9 dz=4 vfile=v dx=15
+# Header restoration: preserve all source headers except ns and d1.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=15 ntr=3 | sushw key=delrt,dt,d1,f1,f2,cdp,tracl a=120,3000,0.25,1.5,70,100,31 b=0,0,0,0,2,1,1 | sumigsplit nz=7 dz=3 vfile=v dx=10
+# Nonpositive sampling and origins (the original performs no validation).
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=5 dz=0 vfile=v
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=5 dz=-3 vfile=v ft=-1 fz=-12 dt=-0.004 dx=-10
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=5 dz=3 vfile=v dt=0
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=5 dz=3 vfile=v dx=0
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=0 dz=3 vfile=v
+# Required parameters, access failures, bad numeric values, and empty input.
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing dx=1e-310
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing ft=1e-310
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing fz=1e-310
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing verbose=2147483648
+[stderr] sumigsplit
+[stderr] sumigsplit nz=2 dz=1 vfile=missing
+[stderr] sunull nt=4 ntr=1 | sumigsplit
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz= dz=1 vfile=missing
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz= vfile=missing
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2147483648 dz=1 vfile=missing
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 dt=1e-310 vfile=missing
+[stderr] sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing tmpdir=/no/such/oxwave/directory
+[stderr] sunull nt=4 ntr=1 | CWP_TMPDIR=/no/such/oxwave/directory sumigsplit nz=2 dz=1 vfile=missing
+# Directory mode checks must report the program's original access error.
+[stderr] mkdir readonly; chmod 555 readonly; sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing tmpdir=readonly
+# Group/other write bits do not grant the owner write access (access(W_OK)).
+[stderr] mkdir owner_readonly; chmod 577 owner_readonly; sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing tmpdir=owner_readonly
+# Input validation occurs while spooling, before FFT size selection or vfile IO.
+[stderr] sunull nt=3 ntr=2 | sushw key=ns a=3 b=1 | sumigsplit nz=2 dz=1 vfile=missing dx=1
+sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing dx=1
+sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile= dx=1
+# Unknown arguments and duplicate getpar values.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=5 dz=3 vfile=v bogus=7
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; suspike nt=9 ntr=3 | sumigsplit nz=1 nz=5 dz=3 vfile=v dt=0.002 dt=0.004
+# Parameter files use the same defaults and last-command-line-value precedence.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=512f",*([1500.0]*512)))'; printf %s 'nz=5 dz=2 vfile=v dt=0.002 dx=15 ft=1 fz=2 verbose=0 tmpdir=' >par; suspike nt=9 ntr=3 | sumigsplit par=par dz=3
+# Longer continuation with both transform dimensions padded, and a rectangular
+# velocity model with independent lateral/depth variation. Default tolerance.
+python3 -c 'import struct; a=[1300.+7*iz+23*ix for iz in range(80) for ix in range(19)]; open("v","wb").write(struct.pack("=1520f",*a))'; suspike nt=257 ntr=19 nspk=3 ix1=1 it1=13 ix2=10 it2=129 ix3=19 it3=245 | suaddnoise seed=271828 sn=4 | sumigsplit nz=80 dz=2.5 vfile=v dx=12.5
+# Exercise spatial radix 11 and 13, and temporal padding to a larger even FFT.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=572f",*([2100.0]*572)))'; suspike nt=127 ntr=13 nspk=2 ix1=4 it1=27 ix2=11 it2=93 | sumigsplit nz=44 dz=3 vfile=v dx=10 dt=0.002
+python3 -c 'import struct; open("v","wb").write(struct.pack("=220f",*([1800.0]*220)))'; suspike nt=65 ntr=11 | sumigsplit nz=20 dz=4 vfile=v dx=16
+# Zero and negative velocities are accepted without validation by C.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=30f",*([0.0]*30)))'; suspike nt=17 ntr=5 | sumigsplit nz=6 dz=2 vfile=v dx=10
+python3 -c 'import struct; open("v","wb").write(struct.pack("=30f",*([-1500.0]*30)))'; suspike nt=17 ntr=5 | sumigsplit nz=6 dz=2 vfile=v dx=10
+# A writable regular file passes access(W_OK) but cannot contain temp files.
+[stderr] touch ordinary_file; sunull nt=4 ntr=1 | sumigsplit nz=2 dz=1 vfile=missing dx=1 tmpdir=ordinary_file
+# Successful named-file spooling must remove both files.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; mkdir spool; suspike nt=11 ntr=3 | sumigsplit nz=5 dz=2 vfile=v dx=12 tmpdir=spool >image; status=$?; cat image; test "$status" -eq 0 && test -z "$(ls -A spool)"
+# Synchronize on checkpars' verbose message, then interrupt while awaiting the
+# next input trace. All four C signal handlers must exit 1 and remove the files.
+python3 -c 'import os, signal, subprocess, sys; os.mkdir("spool"); data=subprocess.check_output(["sunull","nt=7","ntr=1"]); exec("for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGHUP, signal.SIGTERM):\n p=subprocess.Popen(sys.argv[1:],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n p.stdin.write(data); p.stdin.flush(); line=b\"\"\n while b\"Using Big Endian\" not in line:\n  line=p.stderr.readline(); assert line\n p.send_signal(sig); p.wait(timeout=5); p.communicate(); print(int(sig),p.returncode,len(os.listdir(\"spool\")))")' sumigsplit nz=2 dz=1 vfile=missing dx=1 tmpdir=spool verbose=1

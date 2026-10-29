@@ -1,0 +1,63 @@
+# Default parameters, explicit defaults, and zero/finite offsets.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*65*9)'; suspike nt=65 ntr=5 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*65*9)'; suspike nt=65 ntr=5 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel angmax=40 firstcdp=1 lastcdp=9 fcdpdata=1 dcdp=1 hoffset=0 nfc=16 fwidth=5 verbose=0
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1800)*65*9)'; suspike nt=65 ntr=5 | sushw key=cdp,offset a=1,60 b=2,0 | suktmig2d dx=20 vfile=vel verbose=1
+# CDP spacing of one gives dcdp=0 and a warning; all midpoints use vel[0].
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*33*5)'; suspike nt=33 ntr=5 | sushw key=cdp a=1 b=1 | suktmig2d dx=12.5 vfile=vel
+# Distinct velocities along both axes; nonzero firstcdp and fcdpdata.
+python3 -c 'import struct;open("vel","wb").write(b"".join(struct.pack("=f",1200+80*x+4*t) for x in range(15) for t in range(47)))'; suspike nt=47 ntr=7 | sushw key=cdp a=5 b=2 | suktmig2d dx=30 vfile=vel firstcdp=3 lastcdp=17 fcdpdata=2 dcdp=2 hoffset=25
+# Wider aperture and coarse filter steps exercise both interpolation branches.
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1200)*97*21)'; suspike nt=97 ntr=11 | sushw key=cdp a=1 b=2 | suktmig2d dx=35 vfile=vel angmax=70 hoffset=40 fwidth=17 nfc=7
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1400)*65*13)'; sunull nt=65 ntr=7 | suaddnoise seed=171 sn=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=40 vfile=vel angmax=25 hoffset=-20 fwidth=9 nfc=23
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1600)*31*9)'; suplane nt=31 ntr=5 | sushw key=cdp a=1 b=2 | suktmig2d dx=20 vfile=vel angmax=0 hoffset=15 nfc=1 fwidth=200
+# Singleton and very small time/spatial axes, plus non-power-of-two sizes.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500))'; suspike nt=1 ntr=1 | sushw key=cdp a=1 | suktmig2d dx=25 vfile=vel verbose=1
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17)'; suspike nt=17 ntr=1 | sushw key=cdp a=1 | suktmig2d dx=25 vfile=vel
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*2*5)'; suspike nt=2 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*19*5)'; sunull nt=19 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel
+# Nondefault sample interval and preserved headers including delayed time.
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",2000)*63*9)'; suspike nt=63 ntr=5 dt=0.002 | sushw key=cdp,delrt,sx,gx a=1,100,200,280 b=2,0,10,10 | suktmig2d dx=10 vfile=vel hoffset=40 fwidth=30
+# All data CDP changes are reported, including after the third trace.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*9)'; suspike nt=17 ntr=5 | sushw key=cdp a=1 b=1 c=1 j=3 | suktmig2d dx=25 vfile=vel dcdp=0 lastcdp=9 verbose=1
+# No separate output modes: only migrated SU traces are supported.
+# Largest documented aperture and a longer odd transform with dense data.
+python3 -c 'import struct;open("vel","wb").write(b"".join(struct.pack("=f",1700+2*t) for x in range(17) for t in range(257)))'; sunull nt=257 ntr=9 | suaddnoise seed=314 sn=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=45 vfile=vel angmax=80 hoffset=70 nfc=32 fwidth=3
+# Half offset larger than the entire recording time contributes no energy.
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*33*5)'; suspike nt=33 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel hoffset=1000
+# A sufficiently negative fwidth rounds nc up to zero: no filter passes.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*33*5)'; suspike nt=33 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel fwidth=-200 verbose=1
+# Duplicate CDPs and descending CDPs with explicit safe velocity selection.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*33*7)'; suspike nt=33 ntr=4 | sushw key=cdp a=7 b=-2 | suktmig2d dx=25 vfile=vel firstcdp=1 lastcdp=7 fcdpdata=4 dcdp=-1
+# Absolute velocity rows at both bounds of a two-row allocation. A large
+# firstcdp must not change the original's absolute fcdpdata row expression.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=17f",*([1200]*17))+struct.pack("=17f",*([1800]*17)))'; suspike nt=17 ntr=2 | sushw key=cdp a=100 b=1 | suktmig2d dx=25 vfile=vel firstcdp=100 lastcdp=101 fcdpdata=1 dcdp=1 verbose=1
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=17f",*([1200]*17))+struct.pack("=17f",*([1800]*17)))'; suspike nt=17 ntr=2 | sushw key=cdp a=2 b=-1 | suktmig2d dx=25 vfile=vel firstcdp=1 lastcdp=2 fcdpdata=2 dcdp=-1 verbose=1
+# Smallest positive header interval gives a large but valid filter count;
+# large negative fwidth still gives the supported zero-filter case.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500))'; suspike nt=1 ntr=1 | sushw key=cdp,dt a=1,1 | suktmig2d dx=25 vfile=vel fwidth=1000 verbose=1
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*3)'; suspike nt=17 ntr=2 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel fwidth=-2147483648 verbose=1
+# Zero and negative values accepted by the original, including no filter terms.
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=0 vfile=vel
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=-25 vfile=vel
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel nfc=0
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel nfc=-4
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel angmax=-10
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",0)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",-1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel
+# Unknown args, repeated parameters, and par-file precedence.
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel unknown=1
+[stderr] python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",1500)*17*5)'; printf 'dx=10 nfc=4 fwidth=20\n' > params; suspike nt=17 ntr=3 | sushw key=cdp a=1 b=2 | suktmig2d par=params dx=20 vfile=vel nfc=10 nfc=5 verbose=1
+# Empty input, missing required values, bad types, missing file, and padded size.
+[stderr] suktmig2d
+[stderr] suktmig2d dx=25 vfile=vel verbose=1
+[stderr] suspike nt=17 ntr=3 | suktmig2d
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx=25
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx= vfile=vel
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx=25 vfile=
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx=25 vfile=does-not-exist
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx=25 vfile=vel nfc=2147483648
+[stderr] suspike nt=17 ntr=3 | suktmig2d dx=1e-310 vfile=vel
+[stderr] suspike nt=65535 ntr=1 | suktmig2d dx=25 vfile=vel
+# A short velocity file leaves the allocated tail uninitialized in C; use an
+# empty time aperture so that it is never used to contribute output samples.
+[stderr] printf '' > vel; suspike nt=1 ntr=1 | sushw key=cdp a=1 | suktmig2d dx=25 vfile=vel

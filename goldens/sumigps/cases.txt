@@ -1,0 +1,112 @@
+# Defaults, explicit defaults, header sampling, and command-line overrides.
+[stderr] suspike nt=32 ntr=5 | sumigps
+[stderr] suspike nt=32 ntr=5 | sumigps dt=0.004 dx=1 ffil=0,0,125,125 tmig=0 vmig=1500 nxpad=0 ltaper=0 verbose=0 np=200 ntflag=1 tmpdir=
+[stderr] suspike nt=17 ntr=3 dt=0.002 | sushw key=d2 a=12.5 | sumigps
+[stderr] suspike nt=17 ntr=3 | sushw key=dt,d2 a=0,0 | sumigps
+[stderr] suspike nt=17 ntr=3 | sushw key=dt,d2,delrt a=2000,25,200 | sumigps dt=0.003 dx=10
+# Spatial padding and both taper edges (including overlap and negative taper).
+suspike nt=33 ntr=7 | sumigps dx=20 nxpad=5 ltaper=2
+suspike nt=33 ntr=7 | sumigps dx=20 nxpad=1 ltaper=7
+suspike nt=33 ntr=7 | sumigps dx=20 ltaper=-1
+# Frequency filter ramps, empty band, and bounds outside Nyquist.
+suspike nt=65 ntr=5 | sumigps dx=25 ffil=5,15,60,100
+suspike nt=33 ntr=5 | sumigps dx=25 ffil=0,0,0,0
+suspike nt=33 ntr=5 | sumigps dx=25 ffil=-20,-10,200,300
+# Constant and interpolated velocities, increasing velocity to exercise turns.
+suspike nt=65 ntr=5 | sumigps dx=20 vmig=2000
+suspike nt=65 ntr=5 | sumigps dx=20 tmig=0,0.08,0.256 vmig=1000,2000,3500
+suspike nt=65 ntr=5 | sumigps dx=20 tmig=0.04,0.2 vmig=2000,1500 np=11
+# Every image mode, including both mask bits and a zero mask.
+suspike nt=65 ntr=7 | sumigps dx=20 tmig=0,0.256 vmig=800,5000 np=31 ntflag=1
+suspike nt=65 ntr=7 | sumigps dx=20 tmig=0,0.256 vmig=800,5000 np=31 ntflag=2
+suspike nt=65 ntr=7 | sumigps dx=20 tmig=0,0.256 vmig=800,5000 np=31 ntflag=3
+suspike nt=17 ntr=3 | sumigps dx=10 ntflag=0
+suspike nt=17 ntr=3 | sumigps dx=10 ntflag=-1
+# Odd/minimal dimensions, slopes, signed spatial sampling, and zero input.
+suspike nt=1 ntr=1 | sumigps dx=10
+suspike nt=17 ntr=1 | sumigps dx=10 np=2
+suspike nt=2 ntr=3 | sumigps dx=10 np=5
+suspike nt=17 ntr=3 | sumigps dx=-10
+sunull nt=19 ntr=5 | sumigps dx=10
+# Nontrivial deterministic samples.
+sunull nt=33 ntr=7 | suaddnoise seed=171 sn=1 | sumigps dx=20 np=17 ntflag=3
+# Binary vfile has one native float per time sample; tmig/vmig are ignored.
+printf '1500\n1600\n1700\n1800\n1900\n' | a2b n1=1 > vel; suspike nt=5 ntr=3 | sumigps dx=10 vfile=vel
+[stderr] printf '1500\n1600\n1700\n1800\n1900\n' | a2b n1=1 > vel; suspike nt=5 ntr=3 | sumigps dx=10 vfile=vel tmig=2,1 vmig=9
+# Temporary directory option, environment fallback, explicit empty override.
+[stderr] printf '1500\n1500\n1500\n1500\n1500\n' | a2b n1=1 > vel; suspike nt=5 ntr=3 | sumigps dx=10 vfile=vel np=4 verbose=1
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 np=4 tmpdir=. verbose=1
+[stderr] suspike nt=9 ntr=3 | CWP_TMPDIR=. sumigps dx=10 np=4 verbose=1
+[stderr] suspike nt=9 ntr=3 | CWP_TMPDIR=/does-not-exist sumigps dx=10 np=4 tmpdir= verbose=1
+# Empty input and every explicit program validation message.
+[stderr] sumigps
+[stderr] sumigps verbose=1
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 ffil=1,2,3
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 ffil=1,2,3,4,5
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmig=0,1
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 vmig=1500,2000
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmig=0,0 vmig=1500,2000
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmig=1,0 vmig=1500,2000
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmpdir=/does-not-exist
+[stderr] suspike nt=9 ntr=3 | CWP_TMPDIR=/does-not-exist sumigps dx=10
+[stderr] printf '1500\n' | a2b n1=1 > vel; suspike nt=9 ntr=3 | sumigps dx=10 vfile=vel
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 np=2147483648
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 dt=1e-310
+# Unknown parameter warning is checked even on a successful migration.
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 np=4 unknown=1
+# Zero and negative sampling/velocity: the original accepts all these values.
+suspike nt=9 ntr=3 | sumigps dx=0 np=4
+suspike nt=9 ntr=3 | sumigps dx=10 dt=0 np=4
+suspike nt=9 ntr=3 | sumigps dx=10 vmig=0 np=4
+suspike nt=9 ntr=3 | sumigps dx=10 vmig=-1500 np=4
+suspike nt=9 ntr=3 | sumigps dx=10 dt=-0.004 np=4
+# Repeated parameters and parameter-file precedence, including validation.
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 ffil=1,2,3,4 ffil=1,2
+[stderr] printf 'tmig=0,0 vmig=1500,1600\n' > params; suspike nt=9 ntr=3 | sumigps dx=10 par=params
+# Larger spatial FFT, descending CDPs, and a mixed frequency filter.
+suspike nt=47 ntr=13 | sushw key=cdp a=120 b=-2 | sumigps dx=12.5 nxpad=4 ltaper=3 np=23 ffil=3,10,70,115 ntflag=3
+# Verbose diagnostics for returning rays with a rising interval velocity.
+[stderr] suspike nt=65 ntr=3 | sumigps dx=20 np=5 verbose=1 tmig=0,0.256 vmig=800,5000 ntflag=3
+# Explicit spikes ensure singleton dimensions have nonzero input (the generator's
+# default spike positions fall outside a single trace).
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigps dx=10 np=2
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sumigps dx=10 np=2
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | sumigps dx=10 np=5
+# Larger transforms and noise exercise interpolation and phase accumulation.
+suspike nt=257 ntr=31 | sumigps dx=12.5 nxpad=7 ltaper=5 np=101 tmig=0,0.2,0.6,1.2 vmig=1200,2300,1900,4000 ntflag=3 ffil=2,8,80,110
+sunull nt=129 ntr=17 | suaddnoise seed=926 sn=1 | sumigps dx=25 np=29 tmig=0,0.512 vmig=800,6000 ntflag=2
+sunull nt=97 ntr=11 | suaddnoise seed=1729 sn=1 | sumigps dx=-15 dt=0.0025 nxpad=3 ltaper=2 np=13 ffil=5,20,100,180 ntflag=3
+# Preserve all header fields while explicitly ignoring delrt for migration.
+suspike nt=41 ntr=9 | sushw key=cdp,delrt,f1,d1 a=500,-200,1.25,0.25 b=-3,2,0,0 | sumigps dx=10 np=7
+# Verify requested temporary directories are empty after migration.
+[stderr] mkdir work; suspike nt=33 ntr=5 | sumigps dx=10 np=5 tmpdir=work verbose=1 > migrated && rmdir work && cat migrated
+[stderr] mkdir 'temp files'; suspike nt=17 ntr=5 | CWP_TMPDIR='temp files' sumigps dx=10 np=5 > migrated && rmdir 'temp files' && cat migrated
+# An existing writable file is not a usable temporary directory.
+[stderr] touch notdir; suspike nt=9 ntr=3 | sumigps dx=10 tmpdir=notdir
+# Empty numeric arguments select the same defaults as omitted arguments.
+[stderr] suspike nt=17 ntr=3 | sumigps dt= dx= ffil= tmig= vmig= nxpad= ltaper= verbose= np= ntflag=
+# A valid parameter file is overridden by the command line and last occurrence.
+[stderr] printf 'dx=25 np=7 ntflag=2 tmig=0,0.128 vmig=800,4000\n' > params; suspike nt=33 ntr=5 | sumigps par=params dx=10 dx=20 ntflag=3
+# Header-derived negative spacing and legal negative padding for one trace.
+suspike nt=25 ntr=5 | sushw key=d2 a=-12.5 | sumigps np=9
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sumigps dx=10 nxpad=-1 np=2
+# Zero-width filter ramps, reversed filter bounds, and an unused image-mask bit.
+suspike nt=65 ntr=7 | sumigps dx=20 np=31 ffil=15,15,80,80
+suspike nt=33 ntr=5 | sumigps dx=20 np=7 ffil=90,60,30,10
+suspike nt=17 ntr=3 | sumigps dx=10 np=5 ntflag=4
+# Empty velocity files and a later trace with a different sample count.
+[stderr] touch vel; suspike nt=9 ntr=3 | sumigps dx=10 vfile=vel
+[stderr] suspike nt=9 ntr=1 > first; suspike nt=11 ntr=1 > second; cat first second | sumigps dx=10
+# Any nonzero verbose value enables the program diagnostics; only 1 enables
+# the getpar library's XDR notice. Compare all stderr for both alternatives.
+[stderr] suspike nt=17 ntr=3 | sumigps dx=10 np=4 verbose=2
+[stderr] suspike nt=17 ntr=3 | sumigps dx=10 np=4 verbose=-1
+# Binary velocities may include unused trailing samples and spaces in the path.
+[stderr] printf '1200\n1400\n1600\n1800\n2000\n9999\n' | a2b n1=1 > 'velocity file'; suspike nt=5 ntr=3 | sumigps dx=10 np=5 vfile='velocity file' ntflag=3
+# Validation order: bad filters precede tmpdir checks; tmpdir checks precede
+# velocity validation; unknown arguments are checked only after velocities.
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 ffil=1,2 tmpdir=/does-not-exist
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmpdir=/does-not-exist tmig=0,1
+[stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmig=1,0 vmig=1500,2000 unknown=1
+# Empty fields within a filter array are parsed as zeros, with four entries.
+suspike nt=65 ntr=5 | sumigps dx=20 np=17 ffil=,,60,100

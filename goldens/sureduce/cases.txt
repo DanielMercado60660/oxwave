@@ -1,0 +1,17 @@
+# Defaults and varying positive and negative offsets, including sample rounding.
+suspike nt=51 ntr=5 k1=20 | sushw key=offset a=-120 b=60 | sureduce
+suspike nt=51 ntr=5 k1=20 | sushw key=offset a=-120 b=60 | sureduce rv=3.5
+suspike nt=11 ntr=1 k1=4 | sushw key=offset a=16 | sureduce rv=8
+suspike nt=1 ntr=1 | sushw key=offset a=0 | sureduce
+suspike nt=17 ntr=1 | sushw key=offset a=100000 | sureduce rv=1
+# Header dt controls the shift; explicit dt is read only for a zero header.
+suspike nt=17 ntr=1 | sushw key=dt,offset a=2000,12 | sureduce
+suspike nt=17 ntr=1 | sushw key=dt,offset a=0,0 | sureduce dt=0.004
+suspike nt=17 ntr=1 | sushw key=dt,offset a=0,10 | sureduce dt=0.004
+suspike nt=17 ntr=1 | sushw key=dt a=0 | sureduce
+suspike nt=17 ntr=1 | sureduce dt=0.004
+[stderr] suspike nt=17 ntr=1 | sureduce verbose=1
+sureduce rv=0
+sureduce rv=-1
+sureduce rv=abc
+sureduce rv=8

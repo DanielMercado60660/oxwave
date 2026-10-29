@@ -1,0 +1,92 @@
+{
+  "scope": "par/main/refraction (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "grm",
+      "path": "par/main/refraction/grm.c",
+      "purpose": "Estimate refractor velocity and depth from forward and reverse refraction arrival times using the generalized reciprocal method.",
+      "selfdoc_first_line": " GRM - Generalized Reciprocal refraction analysis for a single layer\t",
+      "params": [
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of input arrival-time pairs."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Geophone spacing in meters."
+        },
+        {
+          "name": "v0",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Weathering-layer velocity in meters per second."
+        },
+        {
+          "name": "abtime",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "A-to-B travel time in milliseconds; zero selects the last forward arrival time."
+        },
+        {
+          "name": "xy",
+          "type": "float",
+          "default": "99999.9",
+          "required": false,
+          "description": "Override the selected XY distance in meters. The code accepts lowercase xy, despite uppercase XY in the selfdoc, and truncates xy/(2*dx) to an integer half-offset."
+        },
+        {
+          "name": "xymax",
+          "type": "float",
+          "default": "computed: 2*dx*10",
+          "required": false,
+          "description": "Maximum XY distance searched in meters. The code accepts lowercase xymax, despite XYmax in the selfdoc."
+        },
+        {
+          "name": "depthres",
+          "type": "float",
+          "default": "0.5",
+          "required": false,
+          "description": "Horizontal increment in meters for the dip-correction tangent search."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "err",
+        "checkpars",
+        "alloc1float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The smoothness and slope calculations accumulate floats in loop order; close smoothness values can change the selected offset. Float expressions mix with double constants and double-precision sqrt, fabs, atan and cos before assignment to floats. The dip correction searches discrete positions and selects the smallest residual. Invalid or degenerate input can cause out-of-bounds access, division by zero, invalid square roots, or use of uninitialized values; scanf results are not checked. Offset conversions truncate toward zero.",
+      "c_lines": 277,
+      "difficulty": "hard",
+      "difficulty_reason": "The program combines offset optimization, velocity estimation and a discrete geometric tangent search with sensitive numerical edge cases.",
+      "test_cases": [
+        {
+          "description": "Search for the optimum XY and derive A-to-B time from the final forward arrival.",
+          "command": "suplane nt=24 ntr=1 | suascii bare=1 | awk 'NF {i++; printf \"%d 100 %g %g\\n\", (i-1)*10, 20+(i-1)*5, 135-(i-1)*5}' | grm nt=24 dx=10 v0=500 abtime=0 xymax=40 depthres=1"
+        },
+        {
+          "description": "Use an explicit A-to-B time and override XY with a value truncated to an available half-offset.",
+          "command": "suplane nt=24 ntr=1 | suascii bare=1 | awk 'NF {i++; printf \"%d %g %g %g\\n\", (i-1)*10, 100+(i-1)*0.1, 20+(i-1)*5, 135-(i-1)*5}' | grm nt=24 dx=10 v0=500 abtime=135 xymax=60 xy=25 depthres=0.5"
+        }
+      ],
+      "license_note": "The credits cite D. Palmer's 1982 SEG book on the generalized reciprocal method.",
+      "related_programs": []
+    }
+  ]
+}

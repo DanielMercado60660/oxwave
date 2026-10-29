@@ -1,0 +1,5573 @@
+[
+ {
+  "dir": "3D_Data_Viewing",
+  "scripts": [
+   "Make3Ddata",
+   "Trip1",
+   "Trip2",
+   "Trip3",
+   "Trip4"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data3d.bin",
+   "data3d.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddnoise",
+   "sufilter",
+   "suimp3d",
+   "sushw",
+   "sustrip"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.8,
+   1.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "3D_Model_Building/Tetramod",
+  "scripts": [
+   "Tetramod",
+   "Viewer3"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "hzfile3.grid",
+   "tetrafile3.tetra"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "tetramod"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Amplitude_Correction/Sudipdivcor",
+  "scripts": [
+   "Model",
+   "Dipdivcor",
+   "PSplot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.dipdivcor",
+   "data.divcor",
+   "data.seis",
+   "demo1.1.eps",
+   "demo1.2.eps",
+   "demo1.3.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sudipdivcor",
+   "sudivcor",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Amplitude_Correction/Sudivcor",
+  "scripts": [
+   "Model",
+   "Divcor",
+   "PSplot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.divcor",
+   "data.seis",
+   "demo1.1.eps",
+   "demo1.2.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sudivcor",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Amplitude_Correction/Sugain",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data.seis"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Block",
+  "scripts": [
+   "MakeBlockData"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data3d.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddnoise",
+   "sufilter",
+   "suimp3d",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.9,
+   0.8
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Course/GPGN461_561_scripts/cwpscratch/Data2",
+  "scripts": [
+   "Kdmig2d.simple"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1
+  ],
+  "rc_ox": [
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sukdmig2d"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.2
+  ],
+  "orig_stderr_tail": [
+   "\nsukdmig2d: cannot open infile=simple.su\n\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsukdmig2d: cannot open infile=simple.su\n\n"
+  ]
+ },
+ {
+  "dir": "Course/GPGN461_561_scripts/cwpscratch/Data3",
+  "scripts": [
+   "PSmig",
+   "Stoltmig",
+   "Suttoz.psmig",
+   "Suttoz.stolt"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Course/GPGN461_561_scripts/cwpscratch/Data5",
+  "scripts": [
+   "MakeFake",
+   "CatData",
+   "DeGhosting.sh",
+   "Gbmig",
+   "Homomorphic_Signature_Decon.sh",
+   "Kdmig2d.large",
+   "Nmo",
+   "NmoStack",
+   "Offset_Continuation",
+   "Pbal",
+   "Prestackfd",
+   "Prestackffd",
+   "Prestackffd2",
+   "Prestackpspi",
+   "Prestacksp",
+   "RMS_balance.sh",
+   "RMStoINT",
+   "Radon.final",
+   "Rayt2d.large",
+   "Signature_Decon.sh",
+   "SplitData",
+   "Stoltmig",
+   "Suktmig2d.sh",
+   "Suttoz",
+   "Unif2.sh"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "deghost_mute_seismic.su",
+   "fake+water+pegleg.su",
+   "fake+water+pegleg_wavelet.su",
+   "fake+water.su",
+   "fake.su",
+   "fake_no_noise.su",
+   "junk.bin",
+   "offset_continued_radon_nmo_gain_co.su",
+   "pegleg.su",
+   "pegleg1.1+2.0+3.3sec.su",
+   "pegleg1.1+2.0sec.su",
+   "pegleg1.1sec.su",
+   "radon.data.pbal.gain.jon=1.cdp.su",
+   "stack.radon.su",
+   "suttoz.par",
+   "temp.su",
+   "temp1.su",
+   "tfile.unewvelzx",
+   "tmp",
+   "tmp1",
+   "tmpout",
+   "unewvelxz.bin",
+   "unewvelzx.bin",
+   "waterbottom.su",
+   "waterbottom0.su",
+   "waterbottom1.su",
+   "waterbottom2.su",
+   "waterbottom3.su",
+   "waterbottom4.su",
+   "waterbottom5.su",
+   "waterbottom6.su",
+   "waterbottom7.su",
+   "waterbottom8.su",
+   "waterbottom9.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "rayt2d",
+   "smooth2",
+   "suaddevent",
+   "suaddnoise",
+   "suchw",
+   "suconv",
+   "sudeghost",
+   "sufilter",
+   "sugain",
+   "suintvel",
+   "sukdmig2d",
+   "sunmo",
+   "sunull",
+   "suop2",
+   "suradon",
+   "sushw",
+   "susort",
+   "sustack",
+   "suwind",
+   "transp"
+  ],
+  "fallback_programs": {
+   "susum": "not in catalogue"
+  },
+  "elapsed_s": [
+   2.1,
+   2.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Datuming/Finite_Difference",
+  "scripts": [
+   "PSdisplay",
+   "Proc"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Datuming/Finite_Difference/VelocityFiles",
+  "scripts": [
+   "Zero"
+  ],
+  "verdict": "MATCH_ORIG_ONLY",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "INSTALL",
+   "modelstat.dSYM/Contents/Info.plist",
+   "modelstat.dSYM/Contents/Resources/Relocations/aarch64/modelstat.yml"
+  ],
+  "diffs": [],
+  "unstable": [
+   "modelstat",
+   "modelstat.dSYM/Contents/Resources/DWARF/modelstat"
+  ],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Datuming/KDM_Datuming",
+  "scripts": [
+   "DataDemo2",
+   "DCDemo2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127,
+   0
+  ],
+  "rc_ox": [
+   127,
+   0
+  ],
+  "matched": [
+   "INSTALL",
+   "demo.out",
+   "demo2.data",
+   "demo2.out",
+   "smvel.out",
+   "sumandata.dSYM/Contents/Info.plist",
+   "sumandata.dSYM/Contents/Resources/Relocations/aarch64/sumandata.yml",
+   "times2.out",
+   "vel.out"
+  ],
+  "diffs": [],
+  "unstable": [
+   "sumandata",
+   "sumandata.dSYM/Contents/Resources/DWARF/sumandata"
+  ],
+  "oxwave_programs": [
+   "rayt2d",
+   "smooth2",
+   "sukdmdcr",
+   "sukdmdcs",
+   "susort",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.7,
+   1.3
+  ],
+  "orig_stderr_tail": [
+   "et-variable]\n   59 |                 dxg,dxs,dt,fxg,fxs,ft,xs,xg,emang;\n      |                                             ^\n1 warning generated.\n+ sumandata nt=1600 dt=0.002 dxg=12.5 nxg=100 nxs=25 dxs=12.5 ls=0 fpeak=20 v=2000 zdat=0.0 zref=1500.0\nDataDemo2: line 32: sumandata: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "et-variable]\n   59 |                 dxg,dxs,dt,fxg,fxs,ft,xs,xg,emang;\n      |                                             ^\n1 warning generated.\n+ sumandata nt=1600 dt=0.002 dxg=12.5 nxg=100 nxs=25 dxs=12.5 ls=0 fpeak=20 v=2000 zdat=0.0 zref=1500.0\nDataDemo2: line 32: sumandata: command not found\n"
+  ]
+ },
+ {
+  "dir": "Datuming/Kirchhoff_Datuming/Datuming",
+  "scripts": [
+   "PSplot",
+   "Rayt2d_down",
+   "Sudatum_down",
+   "Synlv",
+   "Unif2_datum"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.eps",
+   "model.data",
+   "vfile_datum"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supswigb",
+   "susynlv",
+   "suwind",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   2.8,
+   1.3
+  ],
+  "orig_stderr_tail": [
+   "\nrayt2d <vfile_datum par=ray_down.par \nRayt2d_down: line 5: vfile_datum: No such file or directory\n \texit\n"
+  ],
+  "ox_stderr_tail": [
+   "\nrayt2d <vfile_datum par=ray_down.par \nRayt2d_down: line 5: vfile_datum: No such file or directory\n \texit\n"
+  ]
+ },
+ {
+  "dir": "Datuming/Kirchhoff_Datuming/Make_Data",
+  "scripts": [
+   "PSplot",
+   "Rayt2d_up",
+   "Sudatum_up",
+   "Synlv",
+   "Unif2_datum"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.eps",
+   "model.data",
+   "vfile_datum"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supswigb",
+   "susynlv",
+   "suwind",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   2.8,
+   0.9
+  ],
+  "orig_stderr_tail": [
+   "\nrayt2d <vfile_datum par=rayup.par \nRayt2d_up: line 5: vfile_datum: No such file or directory\n \texit\n"
+  ],
+  "ox_stderr_tail": [
+   "\nrayt2d <vfile_datum par=rayup.par \nRayt2d_up: line 5: vfile_datum: No such file or directory\n \texit\n"
+  ]
+ },
+ {
+  "dir": "Datuming/Kirchhoff_Datuming/Migration_with_topography",
+  "scripts": [
+   "PSplot",
+   "Plotmig",
+   "Rayt2d_vxz",
+   "Smooth",
+   "SumigTOPO_offs",
+   "Unif2_mig"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   127,
+   1,
+   0,
+   1,
+   0
+  ],
+  "rc_ox": [
+   0,
+   127,
+   1,
+   0,
+   1,
+   0
+  ],
+  "matched": [
+   "data.eps",
+   "mig_950.data",
+   "vfile_mig"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sumigtopo2d",
+   "supsimage",
+   "supswigb",
+   "suwind",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.6
+  ],
+  "orig_stderr_tail": [
+   "Plotmig: line 7: mig_950.data: No such file or directory\nPlotmig: line 11: images: command not found\n\nsuwind: fgettr.c: bad first header\n\nsuwind: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\n",
+   "\nrayt2d <vfile_smooth par=rayvxz.par \nRayt2d_vxz: line 5: vfile_smooth: No such file or directory\n \texit\n",
+   "nput=../Make_Data/shot_TOPO.data\n+ output=mig_950.data\n+ suwind key=offset min=950 max=950\nSumigTOPO_offs: line 11: ../Make_Data/shot_TOPO.data: No such file or directory\n+ sumigtopo2d par=kzmigtopo.par infile=input.tmp off0=950 outfile=mig_950.data\n\nsumigtopo2d: cannot open ttfile=tfilevxz\n\n+ exit\n"
+  ],
+  "ox_stderr_tail": [
+   "Plotmig: line 7: mig_950.data: No such file or directory\nPlotmig: line 11: images: command not found\n\nsuwind: fgettr.c: bad first header\n\nsuwind: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\n",
+   "\nrayt2d <vfile_smooth par=rayvxz.par \nRayt2d_vxz: line 5: vfile_smooth: No such file or directory\n \texit\n",
+   "nput=../Make_Data/shot_TOPO.data\n+ output=mig_950.data\n+ suwind key=offset min=950 max=950\nSumigTOPO_offs: line 11: ../Make_Data/shot_TOPO.data: No such file or directory\n+ sumigtopo2d par=kzmigtopo.par infile=input.tmp off0=950 outfile=mig_950.data\n\nsumigtopo2d: cannot open ttfile=tfilevxz\n\n+ exit\n"
+  ]
+ },
+ {
+  "dir": "Deconvolution/FX",
+  "scripts": [
+   "PSsufxdecon"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "m4.diff.ps",
+   "m4.ps",
+   "susyn1.flt",
+   "susyn1.flt.fx",
+   "susyn1.flt.ps",
+   "susyn1.flt.sufx.ps",
+   "susyn1.fx.diff.ps",
+   "susyn1.out",
+   "susyn1.sn.diff.ps",
+   "susyn1.sn=4.flt",
+   "susyn1.sn=4.flt.ps",
+   "susyn1.sn=4.flt.sufx.ps",
+   "susyn1.sn=4.fx"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddnoise",
+   "sufilter",
+   "sufxdecon",
+   "suop2",
+   "supsimage",
+   "sushw",
+   "susynlv"
+  ],
+  "fallback_programs": {
+   "merge4": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.3,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Deconvolution/Wiener_Levinson",
+  "scripts": [
+   "PSDecon1",
+   "PSDecon2",
+   "PSDecon3",
+   "PSDecon4"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "INSTALL",
+   "decon1.1.eps",
+   "decon1.2.eps",
+   "decon1.3.eps",
+   "decon1.4.eps",
+   "decon1.5.eps",
+   "decon1.6.eps",
+   "decon2.1.eps",
+   "decon2.2.eps",
+   "decon2.3.eps",
+   "decon2.4.eps",
+   "decon2.5.eps",
+   "decon2.6.eps",
+   "decon3.1.eps",
+   "decon3.2.eps",
+   "decon3.3.eps",
+   "decon4.1.eps",
+   "decon4.2.eps",
+   "decon4.3.eps",
+   "deconpanel",
+   "modeldata",
+   "traces.dSYM/Contents/Resources/Relocations/aarch64/traces.yml"
+  ],
+  "diffs": [],
+  "unstable": [
+   "traces.dSYM/Contents/Resources/DWARF/traces"
+  ],
+  "oxwave_programs": [
+   "suacor",
+   "suaddhead",
+   "suaddnoise",
+   "suconv",
+   "sufilter",
+   "sugain",
+   "sugethw",
+   "sunull",
+   "supef",
+   "supswigp",
+   "suresamp",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   2.6,
+   6.3
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Dip_Moveout/Converted_Wave",
+  "scripts": [
+   "Model",
+   "DMOCW",
+   "PSplot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.cwdmo",
+   "data.seis",
+   "demo1.1.eps",
+   "demo1.2.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sudmofkcw",
+   "supsimage",
+   "susynlvcw",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.6,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Dip_Moveout/Fti_Media",
+  "scripts": [
+   "PSplot",
+   "Sudmotivz",
+   "Sudmovz",
+   "Susynlvfti",
+   "Testd"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "matched": [
+   "cmgsynhti",
+   "dmocmghti",
+   "output.eps",
+   "outsynti.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sudmotivz",
+   "sunmo",
+   "supswigp",
+   "susort",
+   "susynlvfti",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   17.7,
+   19.4
+  ],
+  "orig_stderr_tail": [
+   "=cdp min=$CMP max=$CMP count=$nxo |\nsupswigp -geometry 300x800+100+100 \\\n\tn1=$nt d1=$dt f1=$ft label1=\"Time (s)\" \\\n\tn2=$nxo d2=$dxo f2=$fxo label2=\"Offset (km)\" \\\n\ttitle=\"DMO CMP $CMP\" \\\n\tperc=99.7 grid1=solid > $outeps\n\nsuwind: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n\nexit\n",
+   "=cdp min=$CMP max=$CMP count=$nxo |\nsupswigp -geometry 300x800+100+100 \\\n\tn1=$nt d1=$dt f1=$ft label1=\"Time (s)\" \\\n\tn2=$nxo d2=$dxo f2=$fxo label2=\"Offset (km)\" \\\n\ttitle=\"DMO CMP $CMP\" \\\n\tperc=99.7 grid1=solid > $outeps\n\nsuwind: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n\nexit\n"
+  ],
+  "ox_stderr_tail": [
+   "=cdp min=$CMP max=$CMP count=$nxo |\nsupswigp -geometry 300x800+100+100 \\\n\tn1=$nt d1=$dt f1=$ft label1=\"Time (s)\" \\\n\tn2=$nxo d2=$dxo f2=$fxo label2=\"Offset (km)\" \\\n\ttitle=\"DMO CMP $CMP\" \\\n\tperc=99.7 grid1=solid > $outeps\n\nsuwind: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n\nexit\n",
+   "=cdp min=$CMP max=$CMP count=$nxo |\nsupswigp -geometry 300x800+100+100 \\\n\tn1=$nt d1=$dt f1=$ft label1=\"Time (s)\" \\\n\tn2=$nxo d2=$dxo f2=$fxo label2=\"Offset (km)\" \\\n\ttitle=\"DMO CMP $CMP\" \\\n\tperc=99.7 grid1=solid > $outeps\n\nsuwind: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n\nexit\n"
+  ]
+ },
+ {
+  "dir": "Dip_Moveout/Ti_Media/Sutihaledmo",
+  "scripts": [
+   "Figs11to12",
+   "Figs2to6",
+   "Figs7to10"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   0
+  ],
+  "rc_ox": [
+   0,
+   1,
+   0
+  ],
+  "matched": [
+   "DMOmodel1.5.eps",
+   "DMOmodel1.5.su",
+   "NMOmodel1.5.eps",
+   "NMOmodel1.5.su",
+   "TIDMOmodel1.5.eps",
+   "TIDMOmodel1.5.su",
+   "bleistein.eps",
+   "cmpgathers.su",
+   "isotropic_hale.eps",
+   "isotropic_tsvankin.eps",
+   "model0.eps",
+   "model1.5.eps",
+   "model1.5.su",
+   "tidmocogs.su",
+   "tsvankin21.eps",
+   "tsvankin22.eps",
+   "vnmotable",
+   "weak21.eps",
+   "weak22.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sufilter",
+   "sunmo",
+   "supsimage",
+   "supswigp",
+   "susynlvfti",
+   "sutihaledmo",
+   "sutivel",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   107.4,
+   15.2
+  ],
+  "orig_stderr_tail": [
+   "and not found\n\nsufilter: fgettr.c: bad first header\n\nsutihaledmo: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\nFigs2to6: line 49: testtihaledmo: command not found\n\nsufilter: fgettr.c: bad first header\n\nsutihaledmo: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n"
+  ],
+  "ox_stderr_tail": [
+   "and not found\n\nsufilter: fgettr.c: bad first header\n\nsutihaledmo: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\nFigs2to6: line 49: testtihaledmo: command not found\n\nsufilter: fgettr.c: bad first header\n\nsutihaledmo: fgettr.c: bad first header\n\nsupswigp: fgettr.c: bad first header\n"
+  ]
+ },
+ {
+  "dir": "Filtering/Deghosting/Sudeghost",
+  "scripts": [
+   "MakeData"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "synthetic_shot.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddevent",
+   "suchw",
+   "sufilter",
+   "sunull",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Filtering/Sudipfilt",
+  "scripts": [
+   "PSDip1",
+   "PSDip2",
+   "PSDip3"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "dip1.1.eps",
+   "dip1.2.eps",
+   "dip1.3.eps",
+   "dip1.4.eps",
+   "dip1.5.eps",
+   "dip1.6.eps",
+   "dip2.1.eps",
+   "dip2.2.eps",
+   "dip2.3.eps",
+   "dip3.1.eps",
+   "dip3.2.eps",
+   "dip3.3.eps",
+   "dip3.4.eps",
+   "dip3.5.eps",
+   "dip3.6.eps",
+   "suplane.data"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sudipfilt",
+   "suplane",
+   "supswigp",
+   "sushw",
+   "suspecfk"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   3.8
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Filtering/Sufilter",
+  "scripts": [
+   "MakeDataLittle",
+   "PSFilter1",
+   "PSFilter2",
+   "PSGain",
+   "PSLook",
+   "PSMute"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "filt1.2.eps",
+   "filt1.3.eps",
+   "filt1.4.eps",
+   "filt2.1.eps",
+   "filt2.2.eps",
+   "filt2.3.eps",
+   "filt2.4.eps",
+   "gain.1.eps",
+   "gain.2.eps",
+   "gain.3.eps",
+   "gain.4.eps",
+   "look.2.eps",
+   "mute.1.eps",
+   "mute.2.eps",
+   "mute.3.eps",
+   "mute.4.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sugain",
+   "sumute",
+   "supsimage"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.3
+  ],
+  "orig_stderr_tail": [
+   "See the README file for accessing the required data\n"
+  ],
+  "ox_stderr_tail": [
+   "See the README file for accessing the required data\n"
+  ]
+ },
+ {
+  "dir": "Filtering/Sugabor",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "gabor.1.eps",
+   "gabor.2.eps",
+   "gabor.4.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supsimage",
+   "supsmovie"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Geom3D/Subinbigcsv",
+  "scripts": [
+   "BinBig",
+   "BinBigList",
+   "Reject544",
+   "Subinbigcsv_test1",
+   "Subinbigcsv_test2",
+   "Subinbigcsv_test3"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "gethw1",
+   "gethw1list",
+   "gethw3",
+   "gethw3list",
+   "gethw9",
+   "gethw9a",
+   "gethw9b",
+   "gethw9c",
+   "qtest1.csv",
+   "qtest1list.csv",
+   "tnull1.su",
+   "tnull11.su",
+   "tnull12.su",
+   "tnull13.su",
+   "tnull14.su",
+   "tnull2.su",
+   "tnull21.su",
+   "tnull22.su",
+   "tnull23.su",
+   "tnull24.su",
+   "tnull25.su",
+   "tnull26.su",
+   "tnull3.su",
+   "tnull4.su",
+   "tnull5.su",
+   "tnull6.su",
+   "tnull7.su",
+   "tnull8.su",
+   "tnull9.su",
+   "tnull9a.su",
+   "tnull9b.su",
+   "tnull9c.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "subinbigcsv",
+   "subincsv",
+   "subinxxcsv",
+   "suchw",
+   "sugethw",
+   "sunull",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Geom3D/Subincsv",
+  "scripts": [
+   "Subincsv_create1",
+   "Subincsv_create3",
+   "Subincsv_example1",
+   "Subincsv_example2",
+   "Subincsv_example4"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "matched": [
+   "fake0x.su",
+   "fake0xs.su",
+   "fake0xsr.su",
+   "fake0xsrp.su",
+   "fakeEFG.su",
+   "fakeEGF.su",
+   "fakeFEH.su",
+   "fakeFHE.su",
+   "fakeGEH.su",
+   "fakeGHE.su",
+   "fakeHFG.su",
+   "fakeHGF.su",
+   "faketfn.su",
+   "faketfnb.su",
+   "faketfnb2.su",
+   "k1.csv",
+   "k2.csv"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "subincsv",
+   "sugeomcsv",
+   "sugethw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.5
+  ],
+  "orig_stderr_tail": [
+   "xy: corner D raw  XYs= 338800.00000000000000000000 5540700.00000000000000000000 \n\nsubincsv: gridrawxycdpic:          corner D cdp,igi,igc = 2783 121 23 \n\nsubincsv: gridcdpic and gridiccdp: corner D cdp,igi,igc = 2783 121 23 \n\nsubincsv: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ],
+  "ox_stderr_tail": [
+   "xy: corner D raw  XYs= 338800.00000000000000000000 5540700.00000000000000000000 \n\nsubincsv: gridrawxycdpic:          corner D cdp,igi,igc = 2783 121 23 \n\nsubincsv: gridcdpic and gridiccdp: corner D cdp,igi,igc = 2783 121 23 \n\nsubincsv: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Subinqcsv",
+  "scripts": [
+   "Subinqcsv_artificial1_command",
+   "Subinqcsv_artificial1_command_makeqinput",
+   "Subinqcsv_easy_3d_velan_locations",
+   "Subinqcsv_example1_command",
+   "Subinqcsv_example1_qinput",
+   "Subinqcsv_fixed_command",
+   "Subinqcsv_fixed_qinput",
+   "Subinqcsv_just_3dgridXYs",
+   "Subinqcsv_notuples_command",
+   "Subinqcsv_notuples_qinput_2d",
+   "Subinqcsv_piecewise1",
+   "Subinqcsv_tuples_command",
+   "Subinqcsv_tuples_command_iecho2",
+   "Subinqcsv_tuples_qinput"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rc_ox": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "subinqcsv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.7
+  ],
+  "orig_stderr_tail": [
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "t or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Subinxxcsv",
+  "scripts": [
+   "Subinxxcsv_example1",
+   "Subinxxcsv_example2"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1,
+   1
+  ],
+  "rc_ox": [
+   1,
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "subinxxcsv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.2
+  ],
+  "orig_stderr_tail": [
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Sugeomcsv",
+  "scripts": [
+   "Sugeomcsv_create_ufile",
+   "Sugeomcsv_missing",
+   "Sugeomcsv_nicerecord",
+   "Sugeomcsv_scalco_scalel",
+   "Sugeomcsv_statics_and_delim",
+   "Sugeomcsv_unrepeat"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "fakeRESETz.su",
+   "fakeRESETz2.su",
+   "fakex.su",
+   "fakexs.su",
+   "fakexsr.su",
+   "fakexsrazimuth.su",
+   "fakexsrf.su",
+   "fakexsrfn.su",
+   "fakexsrfns.su",
+   "fakexsrfns2.su",
+   "fakexsrfnss.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suazimuth",
+   "subfilt",
+   "sugeomcsv",
+   "sugethw",
+   "sunmo"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.6,
+   0.6
+  ],
+  "orig_stderr_tail": [
+   "\nsugeomcsv: **** Error: Input trace file not allowed when create= (unless spikes=n).\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsugeomcsv: **** Error: Input trace file not allowed when create= (unless spikes=n).\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Sugetqcsv",
+  "scripts": [
+   "Sugetqcsv_test1"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1
+  ],
+  "rc_ox": [
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "Sugetqcsv_test1: line 15: fake3.su: No such file or directory\n"
+  ],
+  "ox_stderr_tail": [
+   "Sugetqcsv_test1: line 15: fake3.su: No such file or directory\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Sunearcsv",
+  "scripts": [
+   "Sunearcsv_test9"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   1
+  ],
+  "rc_ox": [
+   1
+  ],
+  "matched": [
+   "testout92.csv",
+   "tnear91.su",
+   "tnear92.su",
+   "tnull91.su",
+   "tnull92.su",
+   "tnull93.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suazimuth",
+   "sugethw",
+   "sunearcsv",
+   "sunull",
+   "suprofcsv",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.5
+  ],
+  "orig_stderr_tail": [
+   "\nsuprofcsv: **** Error: this program does not input or output traces.\nsed: testout91.csv: No such file or directory\n\nsunearcsv: getviaqfile error: C_SU_NAMES record followed by C_SU_ID record not found.\n\nsuazimuth: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsuprofcsv: **** Error: this program does not input or output traces.\nsed: testout91.csv: No such file or directory\n\nsunearcsv: getviaqfile error: C_SU_NAMES record followed by C_SU_ID record not found.\n\nsuazimuth: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Sunmocsv",
+  "scripts": [
+   "Sunmocsv_test1",
+   "Sunmocsv_test2",
+   "Sunmocsv_test3",
+   "Sunmocsv_test3q"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "tinfo10.txt",
+   "tinfo7.txt",
+   "tinfo8.txt",
+   "tinfo9.txt",
+   "tnull1.su",
+   "tnull11.su",
+   "tnull12.su",
+   "tnull13.su",
+   "tnull2.su",
+   "tnull21.su",
+   "tnull22.su",
+   "tnull23.su",
+   "tnull3.su",
+   "tnull31.su",
+   "tnull32.su",
+   "tnull33.su",
+   "tnullvels1",
+   "tnullvels1.txt",
+   "tnullvels13",
+   "tnullvels13.txt",
+   "tnullvels23",
+   "tnullvels23.txt",
+   "tnullvels33",
+   "tnullvels34.txt"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sunmocsv",
+   "sunull",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Geom3D/Sunszonecsv",
+  "scripts": [
+   "Sunszonecsv_SPS_Stocsv"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1
+  ],
+  "rc_ox": [
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sutoolcsv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   "\nsutoolcsv: **** Error: Traces are not input and not output by this program.\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsutoolcsv: **** Error: Traces are not input and not output by this program.\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Susmoqcsv",
+  "scripts": [
+   "Susmoqcsv_create_realistic_2d",
+   "Susmoqcsv_create_realistic_3d",
+   "Susmoqcsv_create_unrealistic_2d",
+   "Susmoqcsv_create_unrealistic_3d",
+   "Susmoqcsv_realistic_2d_test8",
+   "Susmoqcsv_realistic_3d_test4",
+   "Susmoqcsv_unrealistic_2d_test7",
+   "Susmoqcsv_unrealistic_3d_test1",
+   "Susmoqcsv_unrealistic_3d_test2",
+   "Susmoqcsv_unrealistic_3d_test3"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rc_ox": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "subinqcsv",
+   "subinxxcsv",
+   "susmoqcsv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.4
+  ],
+  "orig_stderr_tail": [
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsubinxxcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n\nsubinqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n",
+   "\nsusmoqcsv: **** Error: this program does not input or output traces.\n"
+  ]
+ },
+ {
+  "dir": "Geom3D/Sutoolcsv",
+  "scripts": [
+   "Sutoolcsv_errors",
+   "Sutoolcsv_example1",
+   "Sutoolcsv_process",
+   "Sutoolcsv_simple2d",
+   "Sutoolcsv_sps2_sps1",
+   "Sutoolcsv_unrepeat"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sutoolcsv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.3
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Header_Remapping/UTMdemo",
+  "scripts": [
+   "PSsuutm",
+   "Utmconv"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "coords.bin",
+   "lldata.su",
+   "llplot.bin",
+   "llplot.ps",
+   "lonlat.txt",
+   "lonlat1.txt",
+   "utm1.txt",
+   "utm2.txt",
+   "utmdata.su",
+   "utmplot.bin",
+   "utmplot.ps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "a2b",
+   "psgraph",
+   "suazimuth",
+   "suchw",
+   "sugethw",
+   "suplane",
+   "sushw",
+   "suutm",
+   "utmconv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.8
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Kaperture",
+  "scripts": [
+   "PSKaperture"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "junk.ps",
+   "junk1.bin"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "kaperture",
+   "psimage",
+   "xy2z"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Making_Data/CommonOffset",
+  "scripts": [
+   "OffsetHeaders",
+   "PSCommonOffset",
+   "PSLabelDifficulty",
+   "PSZeroOffset"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "dip00.eps",
+   "dip20.eps",
+   "dip40.eps",
+   "dip60.eps",
+   "label1.eps",
+   "label2.eps",
+   "label3.eps",
+   "model00.eps",
+   "model20.eps",
+   "model40.eps",
+   "model60.eps",
+   "zdip00.eps",
+   "zdip20.eps",
+   "zdip40.eps",
+   "zdip60.eps",
+   "zmodel00.eps",
+   "zmodel20.eps",
+   "zmodel40.eps",
+   "zmodel60.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psimage",
+   "supsimage",
+   "surange",
+   "susynlv",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Making_Data/ShotGathers",
+  "scripts": [
+   "PSLabelDifficulty",
+   "PSMultipleShots",
+   "PSSingleShot",
+   "ShotHeaders"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "dip00.eps",
+   "dip60.eps",
+   "label1.eps",
+   "label2.eps",
+   "label3.eps",
+   "model00.eps",
+   "model60.eps",
+   "sdip00.eps",
+   "sdip20.eps",
+   "sdip40.eps",
+   "sdip60.eps",
+   "smodel00.eps",
+   "smodel20.eps",
+   "smodel40.eps",
+   "smodel60.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psimage",
+   "suaddnoise",
+   "supsimage",
+   "surange",
+   "susynlv",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Kirchhoff/Sukdmig2d_common_offset",
+  "scripts": [
+   "PSmod",
+   "PSplot",
+   "PStime",
+   "Rayt2d.sh",
+   "Sukdmig2d.sh",
+   "Synlv",
+   "Unif2.sh"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "matched": [
+   "data",
+   "tmpdata.su",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "susort",
+   "susynlv",
+   "suwind",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.7,
+   0.4
+  ],
+  "orig_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d.sh: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsukdmig2d<data  par=kdmig.par>kd.data \nSukdmig2d.sh: line 5: data: No such file or directory\n \texit\n"
+  ],
+  "ox_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d.sh: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsukdmig2d<data  par=kdmig.par>kd.data \nSukdmig2d.sh: line 5: data: No such file or directory\n \texit\n"
+  ]
+ },
+ {
+  "dir": "Migration_Inversion/Kirchhoff/Sukdmig2d_common_shot",
+  "scripts": [
+   "PSmod",
+   "PSplot",
+   "PStime",
+   "Rayt2d",
+   "Sukdmig2d",
+   "Synlv",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0
+  ],
+  "matched": [
+   "data",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "susynlv",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.2
+  ],
+  "orig_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsufrac < data phasefac=.25  > data.tmp\nSukdmig2d: line 5: data: No such file or directory\n\nsukdmig2d < data.tmp par=kdmig.par>kd.data \nSukdmig2d: line 7: data.tmp: No such file or directory\n \texit\n"
+  ],
+  "ox_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsufrac < data phasefac=.25  > data.tmp\nSukdmig2d: line 5: data: No such file or directory\n\nsukdmig2d < data.tmp par=kdmig.par>kd.data \nSukdmig2d: line 7: data.tmp: No such file or directory\n \texit\n"
+  ]
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/3D/Suinvco3d/ImpulseResponse",
+  "scripts": [
+   "Psplot",
+   "Sudata",
+   "Suinvzco3d",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.su",
+   "inv.su",
+   "inversion.ps",
+   "sudata.ps",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pscube",
+   "sufrac",
+   "suinvzco3d",
+   "supsimage",
+   "suspike",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/3D/Suinvco3d/PointScatterer",
+  "scripts": [
+   "Model",
+   "Psplot",
+   "Suinvzco3d",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data3d.ps",
+   "data3d.su",
+   "inv.su",
+   "inversion.ps",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pscube",
+   "sufilter",
+   "sufrac",
+   "sugain",
+   "suimp3d",
+   "suinvzco3d",
+   "sushw",
+   "sustrip",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.1,
+   1.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Finite_Difference",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "datamigfd.su",
+   "fd1.ps",
+   "fd2.ps",
+   "migfd.ps",
+   "rawdatafd.su",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "sumigfd",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {
+   "merge2": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.5,
+   0.9
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Fourier_Finite_Difference",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "datamigffd.su",
+   "ffd1.ps",
+   "ffd2.ps",
+   "migffd.ps",
+   "rawdataffd.su",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "sumigffd",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {
+   "merge2": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.5,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Gazdag",
+  "scripts": [
+   "PSGazmig"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "gazdag.1.eps",
+   "gazdag.2.eps",
+   "gazdag.3.eps",
+   "gazdag.4.eps",
+   "gazdag.5.eps",
+   "gazdag.6.eps",
+   "gazdag.7.eps",
+   "gazdag.8.eps",
+   "gazdag.9.eps",
+   "syndata1",
+   "syndata2",
+   "syndata3"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sugazmig",
+   "sumigps",
+   "supsimage",
+   "sushw",
+   "suspike",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Phase_Shift_Plus_Interpolation",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "datamigpspi.su",
+   "migpspi.ps",
+   "pspi1.ps",
+   "pspi2.ps",
+   "rawdatapspi.su",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "sumigpspi",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {
+   "merge2": "not in catalogue"
+  },
+  "elapsed_s": [
+   1.2,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Split_Step",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "datamigsplit.su",
+   "migsplit.ps",
+   "rawdatasplit.su",
+   "split1.ps",
+   "split2.ps",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "sumigsplit",
+   "supsimage",
+   "susynlv"
+  ],
+  "fallback_programs": {
+   "merge2": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.3,
+   0.3
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Stolt",
+  "scripts": [
+   "PSplot",
+   "Sustolt",
+   "Synlv"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   0
+  ],
+  "rc_ox": [
+   0,
+   1,
+   0
+  ],
+  "matched": [
+   "data",
+   "temp.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sushw",
+   "susort",
+   "susynlv",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.7,
+   0.3
+  ],
+  "orig_stderr_tail": [
+   "Sustolt: line 7: data: No such file or directory\n"
+  ],
+  "ox_stderr_tail": [
+   "Sustolt: line 7: data: No such file or directory\n"
+  ]
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Suinvvxzco",
+  "scripts": [
+   "PSmod",
+   "PSplot",
+   "Smooth",
+   "Suinvvxzco",
+   "Susynvxz",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   1,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   1,
+   0,
+   0
+  ],
+  "matched": [
+   "data.inv",
+   "data.tmp",
+   "data.v",
+   "vpfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "farith",
+   "smooth3d",
+   "suinvvxzco",
+   "unif2",
+   "unisam2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.6
+  ],
+  "orig_stderr_tail": [
+   "vpfile\n+ sufrac phasefac=0.25\nSuinvvxzco: line 11: data: No such file or directory\n+ suinvvxzco nxm=201 dxm=15 fxm=500 nxd=5 nx=81 nz=51 fx=0 dx=50 dz=50 nxb=40 vfile=vsfile dxo=15 nxo=267 fxo=0 fzo=0 nzo=251 dzo=10 fmax=50 ls=1 verbose=1 pert=1 vpfile=vpfile\n\nsuinvvxzco: fgettr.c: bad first header\n"
+  ],
+  "ox_stderr_tail": [
+   "vpfile\n+ sufrac phasefac=0.25\nSuinvvxzco: line 11: data: No such file or directory\n+ suinvvxzco nxm=201 dxm=15 fxm=500 nxd=5 nx=81 nz=51 fx=0 dx=50 dz=50 nxb=40 vfile=vsfile dxo=15 nxo=267 fxo=0 fzo=0 nzo=251 dzo=10 fmax=50 ls=1 verbose=1 pert=1 vpfile=vpfile\n\nsuinvvxzco: fgettr.c: bad first header\n"
+  ]
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Sumiggbzo/Demo2/miggbzo.dir",
+  "scripts": [
+   "Unisam2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "infile.v",
+   "junkv"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "a2b",
+   "unisam2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Sumiggbzo/Demo4/miggbzo.dir",
+  "scripts": [
+   "Unisam2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "infile.v",
+   "junkv"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "a2b",
+   "unisam2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Post_stack/Sumigpsti",
+  "scripts": [
+   "PSdemo"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data.eps",
+   "junksss",
+   "mig.eps",
+   "tttss",
+   "vt.F"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sumigpsti",
+   "supsimage",
+   "susynlvfti",
+   "vtlvz"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Migration_Inversion/Slant_Stack",
+  "scripts": [
+   "MakeData"
+  ],
+  "verdict": "TIMEOUT",
+  "rc_orig": [
+   "timeout"
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [
+   [
+    "shot_dat.su",
+    "only in orig"
+   ],
+   [
+    "shot_dat1.su",
+    "only in ox"
+   ],
+   [
+    "shot_dat2.su",
+    "only in ox"
+   ]
+  ],
+  "unstable": [],
+  "oxwave_programs": [
+   "sugain",
+   "sushw",
+   "susort",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   300.3,
+   229.1
+  ],
+  "orig_stderr_tail": [
+   ""
+  ],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Multicomponent/Polarization_Analysis",
+  "scripts": [
+   "MakeData"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data3c.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddnoise",
+   "sushw",
+   "susort",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "NMO",
+  "scripts": [
+   "MakeData",
+   "PSall",
+   "PSdata",
+   "PSmodel",
+   "PSnmo",
+   "PSvelocity"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   127,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   127,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "allshots.eps",
+   "model.eps",
+   "modeldata",
+   "nmo.eps",
+   "nmodata",
+   "shots.eps",
+   "stack.eps",
+   "stackdata",
+   "stkvel.p",
+   "unisam.p",
+   "vpick.1500.eps",
+   "vpick.2000.eps",
+   "vpick.2500.eps",
+   "vpick.3000.eps",
+   "vscan.1500.eps",
+   "vscan.2000.eps",
+   "vscan.2500.eps",
+   "vscan.3000.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "psimage",
+   "suaddnoise",
+   "suchw",
+   "sugain",
+   "sunmo",
+   "supscontour",
+   "supsimage",
+   "susort",
+   "sustack",
+   "susynlv",
+   "suvelan",
+   "suwind",
+   "unif2",
+   "unisam"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.2,
+   0.8
+  ],
+  "orig_stderr_tail": [
+   "PSall: line 3: PSmodel: command not found\nPSall: line 4: MakeData: command not found\nPSall: line 5: PSdata: command not found\nPSall: line 6: PSvelocity: command not found\nPSall: line 7: PSnmo: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PSall: line 3: PSmodel: command not found\nPSall: line 4: MakeData: command not found\nPSall: line 5: PSdata: command not found\nPSall: line 6: PSvelocity: command not found\nPSall: line 7: PSnmo: command not found\n"
+  ]
+ },
+ {
+  "dir": "Offset_Continuation",
+  "scripts": [
+   "PSsuocext"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "m4.susyn.ps",
+   "susyn.co025",
+   "susyn.co025.geom",
+   "susyn.co025.ps",
+   "susyn.co175",
+   "susyn.co175.geom",
+   "susyn.co175.ps",
+   "susyn.diff",
+   "susyn.diff.ps",
+   "susyn.fo025",
+   "susyn.fo025.ps",
+   "susyn.out"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sunmo",
+   "suocext",
+   "suop2",
+   "supsimage",
+   "sushw",
+   "susynlv",
+   "suwind"
+  ],
+  "fallback_programs": {
+   "merge4": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.2,
+   0.3
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Plotting/CurveOnImage/DashCurvesPS",
+  "scripts": [
+   "PSdash"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "spike.su",
+   "spike1.ps",
+   "spike2.ps",
+   "spike3.ps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supsimage",
+   "supswigb",
+   "supswigp",
+   "suspike"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Plotting/CurveOnImage/SolidCurves",
+  "scripts": [
+   "PSCurve"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "image.eps",
+   "wigb.eps",
+   "wigp.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sufilter",
+   "suplane",
+   "supsimage",
+   "supswigb",
+   "supswigp"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Ray_Tracing/Wkbj",
+  "scripts": [
+   "Makevel",
+   "PSplot",
+   "Wkbj"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "afile",
+   "bfile",
+   "data.v",
+   "sfile",
+   "tfile",
+   "wkbj.1.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "psimage",
+   "wkbj"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Reading_Data/Segy_read_write",
+  "scripts": [
+   "Segy"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "junk.su",
+   "junk1.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "segyclean",
+   "segyhdrs",
+   "segyread",
+   "segywrite",
+   "suplane"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Reflection_Coefficients/Linrort",
+  "scripts": [
+   "Linrort_Demo"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "Linrort_Demo: line 11: linrort: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "Linrort_Demo: line 11: linrort: command not found\n"
+  ]
+ },
+ {
+  "dir": "Reflection_Coefficients/Refaniso",
+  "scripts": [
+   "Hti2Stiff",
+   "Hudson",
+   "Thom2hti",
+   "Thom2stiff"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   127,
+   127,
+   127,
+   127
+  ],
+  "rc_ox": [
+   127,
+   127,
+   127,
+   127
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   "Hti2Stiff: line 17: hti2stiff: command not found\n",
+   "Hudson: line 20: hudson: command not found\n",
+   "Thom2hti: line 10: thom2hti: command not found\n",
+   "Thom2stiff: line 10: thom2stiff: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "Hti2Stiff: line 17: hti2stiff: command not found\n",
+   "Hudson: line 20: hudson: command not found\n",
+   "Thom2hti: line 10: thom2hti: command not found\n",
+   "Thom2stiff: line 10: thom2stiff: command not found\n"
+  ]
+ },
+ {
+  "dir": "SUManual/Plotting/Psmerge",
+  "scripts": [
+   "Psmerge",
+   "Psmerge2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "junk.su",
+   "junk1.eps",
+   "junk1.su",
+   "junk3.eps",
+   "junk4.eps",
+   "junk5.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psmerge",
+   "sufilter",
+   "suplane",
+   "supscontour",
+   "supswigb",
+   "supswigp"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Selecting_Traces",
+  "scripts": [
+   "PSselect"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "alt.eps",
+   "chart.eps",
+   "even.eps",
+   "far.eps",
+   "fullfold.eps",
+   "interp.eps",
+   "middle.eps",
+   "model.eps",
+   "modeldata",
+   "near.eps",
+   "odd.eps",
+   "reject.eps",
+   "resamp.eps",
+   "subsamp.eps",
+   "tco1.eps",
+   "tco2.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "suchart",
+   "suchw",
+   "sufilter",
+   "supsimage",
+   "supswigp",
+   "suresamp",
+   "susort",
+   "susynlv",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Sorting_Traces/Demo",
+  "scripts": [
+   "PSsort"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "cdpminus.eps",
+   "cdpplus.eps",
+   "chart.eps",
+   "model.eps",
+   "modeldata",
+   "receiver.eps",
+   "stack.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "suchart",
+   "suchw",
+   "supsimage",
+   "supswigp",
+   "susort",
+   "sustack",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Sorting_Traces/Tutorial",
+  "scripts": [
+   "PSsort"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data.far",
+   "data.fullfold",
+   "data.near",
+   "data.recgather",
+   "data.seis",
+   "data.sortdown",
+   "data.stack",
+   "data.unsort"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pause",
+   "psgraph",
+   "suchart",
+   "suchw",
+   "sugethw",
+   "sumax",
+   "suop2",
+   "supsimage",
+   "supswigp",
+   "surange",
+   "susort",
+   "sustack",
+   "susynlv",
+   "suwind"
+  ],
+  "fallback_programs": {
+   "sudiff": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.6,
+   0.7
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Statics/Residual_Refraction_Statics/Stat/MakeData",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo81.eps",
+   "demo82.eps",
+   "demo8plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sugain",
+   "supswigb",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo8traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo8traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Statics/Residual_Refraction_Statics/Stat",
+  "scripts": [
+   "NMO",
+   "PSdisplay",
+   "Residual"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "INSTALL",
+   "cmp_11000_raw.ps",
+   "cmp_11000_rrs.ps",
+   "data_stk.su",
+   "data_stk_bulk.su",
+   "stk.ps",
+   "stk_bulk.ps",
+   "stkpar",
+   "surfmaker.dSYM/Contents/Info.plist",
+   "surfmaker.dSYM/Contents/Resources/Relocations/aarch64/surfmaker.yml"
+  ],
+  "diffs": [],
+  "unstable": [
+   "surfmaker",
+   "surfmaker.dSYM/Contents/Resources/DWARF/surfmaker"
+  ],
+  "oxwave_programs": [
+   "suchw",
+   "sumute",
+   "supsimage",
+   "supswigb",
+   "supswigp",
+   "sustack",
+   "sustaticrrs",
+   "sustkvel"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.4,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Sunearcsv",
+  "scripts": [
+   "Sunearcsv_test9"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   1
+  ],
+  "rc_ox": [
+   1
+  ],
+  "matched": [
+   "testout92.csv",
+   "tnear91.su",
+   "tnear92.su",
+   "tnull91.su",
+   "tnull92.su",
+   "tnull93.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suazimuth",
+   "sugethw",
+   "sunearcsv",
+   "sunull",
+   "suprofcsv",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   "\nsuprofcsv: **** Error: this program does not input or output traces.\nsed: testout91.csv: No such file or directory\n\nsunearcsv: getviaqfile error: C_SU_NAMES record followed by C_SU_ID record not found.\n\nsuazimuth: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ],
+  "ox_stderr_tail": [
+   "\nsuprofcsv: **** Error: this program does not input or output traces.\nsed: testout91.csv: No such file or directory\n\nsunearcsv: getviaqfile error: C_SU_NAMES record followed by C_SU_ID record not found.\n\nsuazimuth: fgettr.c: bad first header\n\nsugethw: fgettr.c: bad first header\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo01",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH_ORIG_ONLY",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo1plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo02",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo2.eps",
+   "demo2plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo03",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo3.eps",
+   "demo3plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo04",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo4.eps",
+   "demo4plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo05",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo5.eps",
+   "demo5plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo06",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo6.eps",
+   "demo6plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo07",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo7.eps",
+   "demo7plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PScshot: line 9: cshot1: command not found\nPScshot: line 10: cshotplot: command not found\n\npsgraph: subcalls.c: efopen: fopen failed\nPScshot: line 18: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo08",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo81.eps",
+   "demo82.eps",
+   "demo8plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sugain",
+   "supswigb",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo8traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo8traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo09",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo91.eps",
+   "demo92.eps",
+   "demo9plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sugain",
+   "supswigb",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo9traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   " failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 22: demo9traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 29: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo11",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo111.eps",
+   "demo112.eps",
+   "demo113.eps",
+   "demo114.eps",
+   "demo115.eps",
+   "demo116.eps",
+   "demo11plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sugain",
+   "supswigb",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   "failed\nPScshot: line 58: rsh: command not found\nPScshot: line 59: cshot2: command not found\nPScshot: line 60: demo11traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 66: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "failed\nPScshot: line 58: rsh: command not found\nPScshot: line 59: cshot2: command not found\nPScshot: line 60: demo11traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 66: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot/Demo12",
+  "scripts": [
+   "PScshot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127
+  ],
+  "rc_ox": [
+   127
+  ],
+  "matched": [
+   "demo121.eps",
+   "demo122.eps",
+   "demo12plot"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sugain",
+   "supswigb",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.0
+  ],
+  "orig_stderr_tail": [
+   "failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 23: demo12traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 30: rsh: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "failed\nPScshot: line 19: rsh: command not found\nPScshot: line 21: cshot2: command not found\nPScshot: line 23: demo12traces: No such file or directory\n\nsushw: fgettr.c: bad first header\n\nsugain: fgettr.c: bad first header\n\nsupswigb: fgettr.c: bad first header\nPScshot: line 30: rsh: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Cshot",
+  "scripts": [
+   "Doall"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pause"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Finite_Difference/Sufdmod1",
+  "scripts": [
+   "PSdemo1"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "demo.ps",
+   "density.bin",
+   "density.bin.ps",
+   "seismogram.su",
+   "seismogram.su.ps",
+   "velocity.bin",
+   "velocity.bin.ps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "sufdmod1",
+   "supsgraph",
+   "unisam"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.6,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Finite_Difference/Sufdmod2",
+  "scripts": [
+   "PSDemo",
+   "PSDemo3",
+   "PSsufdmod2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "all.ps",
+   "contourcube.ps",
+   "cube.ps",
+   "cube.su",
+   "fdmod2.eps",
+   "hseis.out",
+   "hseis.ps",
+   "hseis.su",
+   "model.out",
+   "movie.ps",
+   "movie.su",
+   "snap.ps",
+   "sseis.out",
+   "sseis.su",
+   "tmp.su",
+   "vel.out",
+   "vel.ps",
+   "vseis.out",
+   "vseis.ps",
+   "vseis.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "psimage",
+   "smooth2",
+   "sufdmod2",
+   "suflip",
+   "supscube",
+   "supscubecontour",
+   "supsimage",
+   "supsmovie",
+   "sushw",
+   "suwind",
+   "unif2"
+  ],
+  "fallback_programs": {
+   "merge4": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.9,
+   1.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Impulse",
+  "scripts": [
+   "PSsuimp2d"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "spike.1.eps",
+   "spike.2.eps",
+   "spike.3.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suimp2d",
+   "supswigp",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.5,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Sukdsyn",
+  "scripts": [
+   "PSmod",
+   "PSplot",
+   "Rayt2d",
+   "Sukdmig2d",
+   "Sukdsyn2d",
+   "Suplane",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   0
+  ],
+  "matched": [
+   "data",
+   "kdsyn.data",
+   "vfile"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sukdsyn2d",
+   "suplane",
+   "sushw",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.3
+  ],
+  "orig_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsukdmig2d<data  par=kdmig.par>kd.data \nSukdmig2d: line 5: data: No such file or directory\n \texit\n",
+   "\nsustrip < kd.data > data.stripped\nSukdsyn2d: line 5: kd.data: No such file or directory\nsukdsyn2d infile=data.stripped  par=kdsyn.par > kdsyn.data \n\nsukdsyn2d: cannot open infile=data.stripped\n\n \texit\n"
+  ],
+  "ox_stderr_tail": [
+   "\nrayt2d <vfile par=rayt2d.par \nRayt2d: line 5: vfile: No such file or directory\n \texit\n",
+   "\nsukdmig2d<data  par=kdmig.par>kd.data \nSukdmig2d: line 5: data: No such file or directory\n \texit\n",
+   "\nsustrip < kd.data > data.stripped\nSukdsyn2d: line 5: kd.data: No such file or directory\nsukdsyn2d infile=data.stripped  par=kdsyn.par > kdsyn.data \n\nsukdsyn2d: cannot open infile=data.stripped\n\n \texit\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Sukdsynan",
+  "scripts": [
+   "Rayt2dan",
+   "Sukdsynan",
+   "Sukdsynan.orig",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   1,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   1,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "VP0",
+   "VP0sm",
+   "a3333",
+   "a3333sm",
+   "data.temp",
+   "data.v",
+   "delta",
+   "deltasm",
+   "epsilon",
+   "epsilonsm",
+   "jpfile.kd",
+   "jpfile.kdsyn",
+   "kd.stripped",
+   "kd.su",
+   "kdsyn.su",
+   "ttime",
+   "vxz.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "rayt2dan",
+   "smooth2",
+   "suaddhead",
+   "sukdmig2d",
+   "sukdsyn2d",
+   "sushw",
+   "sustrip",
+   "susynvxz",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   64.9,
+   8.4
+  ],
+  "orig_stderr_tail": [
+   "m VP0file=VP0sm epsilonfile=epsilonsm \\\ndeltafile=deltasm tfile=ttime fxo=0 nxo=401 dxo=50 fzo=0 nzo=51 dzo=50 fsx=0 \\\nnsx=200 dsx=100 nt=$nt nx=$nx nz=$nz dx=$dx dz=$dz fx=$fx fz=$fz dt=$dt fa=-75 \\\nna=76 amax=75 \nUnknown rayt2dan argument a3333file=a3333sm\n\nrayt2dan: error opening VP0file=VP0sm!\n\n"
+  ],
+  "ox_stderr_tail": [
+   "m VP0file=VP0sm epsilonfile=epsilonsm \\\ndeltafile=deltasm tfile=ttime fxo=0 nxo=401 dxo=50 fzo=0 nzo=51 dzo=50 fsx=0 \\\nnsx=200 dsx=100 nt=$nt nx=$nx nz=$nz dx=$dx dz=$dz fx=$fx fz=$fz dt=$dt fa=-75 \\\nna=76 amax=75 \nUnknown rayt2dan argument a3333file=a3333sm\n\nrayt2dan: error opening VP0file=VP0sm!\n\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Sukdsynantti",
+  "scripts": [
+   "Rayt2dantti",
+   "Sukdsynantti",
+   "Unif2"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   127,
+   1,
+   0
+  ],
+  "rc_ox": [
+   127,
+   1,
+   0
+  ],
+  "matched": [
+   "VP0",
+   "VP0sm",
+   "a3333",
+   "a3333sm",
+   "data.temp",
+   "data.v",
+   "delta",
+   "deltasm",
+   "epsilon",
+   "epsilonsm",
+   "kd.stripped",
+   "kd.su",
+   "kdsyn.su",
+   "vxz.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "smooth2",
+   "suaddhead",
+   "sukdmig2d",
+   "sukdsyn2d",
+   "sushw",
+   "sustrip",
+   "susynvxz",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   6.8,
+   3.3
+  ],
+  "orig_stderr_tail": [
+   "ace\nrayt2dantti a3333file=a3333sm VP0file=VP0sm epsilonfile=epsilonsm \\\ndeltafile=deltasm tfile=ttime fxo=0 nxo=401 dxo=50 fzo=0 nzo=51 dzo=50 fsx=0 \\\nnsx=200 dsx=100 nt=$nt nx=$nx nz=$nz dx=$dx dz=$dz fx=$fx fz=$fz dt=$dt fa=-75 \\\nna=76 amax=75 \nRayt2dantti: line 12: rayt2dantti: command not found\n",
+   "nthetics \nsukdmig2d infile=vxz.su par=kdmig.par > kd.su\n\nsukdmig2d: cannot open ttfile=ttime\n\n# Generate Synthetics\nsustrip < kd.su > kd.stripped\n\nsustrip: subcalls.c: efopen: fopen failed\nsukdsyn2d infile=kd.stripped par=kdsyn.par > kdsyn.su\n\nsukdsyn2d: Got A\n\nsukdsyn2d: cannot open ttfile=ttime\n\n\n"
+  ],
+  "ox_stderr_tail": [
+   "ace\nrayt2dantti a3333file=a3333sm VP0file=VP0sm epsilonfile=epsilonsm \\\ndeltafile=deltasm tfile=ttime fxo=0 nxo=401 dxo=50 fzo=0 nzo=51 dzo=50 fsx=0 \\\nnsx=200 dsx=100 nt=$nt nx=$nx nz=$nz dx=$dx dz=$dz fx=$fx fz=$fz dt=$dt fa=-75 \\\nna=76 amax=75 \nRayt2dantti: line 12: rayt2dantti: command not found\n",
+   "nthetics \nsukdmig2d infile=vxz.su par=kdmig.par > kd.su\n\nsukdmig2d: cannot open ttfile=ttime\n\n# Generate Synthetics\nsustrip < kd.su > kd.stripped\n\nsustrip: subcalls.c: efopen: fopen failed\nsukdsyn2d infile=kd.stripped par=kdsyn.par > kdsyn.su\n\nsukdsyn2d: Got A\n\nsukdsyn2d: cannot open ttfile=ttime\n\n\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Susynlv",
+  "scripts": [
+   "PSsusynlv"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "synlv.1.eps",
+   "synlv.2.eps",
+   "synlv.3.eps",
+   "synlv.4.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supsimage",
+   "susynlv",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Susynlvfti",
+  "scripts": [
+   "PSplot",
+   "Susynlvfti"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "junk1",
+   "junk2"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "susynlvfti"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Kirchhoff/Susynvxz",
+  "scripts": [
+   "Makevel",
+   "PSplot",
+   "Susynvxz"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "data.su",
+   "data.v",
+   "synvxz.1.eps",
+   "synvxz.2.eps",
+   "synvxz.3.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "psimage",
+   "supsimage",
+   "susynvxz"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   2.1,
+   1.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tetra/Model3",
+  "scripts": [
+   "Tetramod",
+   "Tetraray",
+   "Viewer3"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "hzfile3.grid",
+   "rayfile3.grid",
+   "sttfile3.grid",
+   "tetrafile3.grid",
+   "ttfile3.su",
+   "wffile3.grid"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sutetraray",
+   "tetramod"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Models",
+  "scripts": [
+   "Doall",
+   "PSmodel1",
+   "PSmodel2",
+   "PSmodel3",
+   "PSmodel4",
+   "PSmodel5"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/NormalRays",
+  "scripts": [
+   "PSnormrays"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "AInterface",
+   "NShoot.eps",
+   "XInterface",
+   "XZInterface",
+   "ZInterface",
+   "model.eps",
+   "nray.40.eps",
+   "nray.bin",
+   "nrayend.bin",
+   "outpar"
+  ],
+  "diffs": [],
+  "unstable": [
+   "model.bin"
+  ],
+  "oxwave_programs": [
+   "normray",
+   "psgraph",
+   "psmerge",
+   "spsplot",
+   "trimodel"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Rays",
+  "scripts": [
+   "PSray1",
+   "PSray2",
+   "PSray3",
+   "PSray4",
+   "PSray5",
+   "PSray6"
+  ],
+  "verdict": "ORIG_FAILS",
+  "rc_orig": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rc_ox": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  "ox_stderr_tail": [
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/PSdemo1",
+  "scripts": [
+   "Model",
+   "Beams",
+   "PSdemo",
+   "Rays"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   127,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   127,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pswigb"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.2
+  ],
+  "orig_stderr_tail": [
+   "PSdemo: line 7: Model: command not found\nPSdemo: line 8: Rays: command not found\nPSdemo: line 9: Beams: command not found\n"
+  ],
+  "ox_stderr_tail": [
+   "PSdemo: line 7: Model: command not found\nPSdemo: line 8: Rays: command not found\nPSdemo: line 9: Beams: command not found\n"
+  ]
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/PSdemo2",
+  "scripts": [
+   "Model",
+   "Finite",
+   "PSdemo",
+   "Zero"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pswigb"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/PSdemo3",
+  "scripts": [
+   "Model",
+   "Beams",
+   "PSdemo",
+   "Rays"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pswigb"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/PSdemo4",
+  "scripts": [
+   "Model",
+   "Beams",
+   "PSdemo",
+   "Rays"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "seis.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pswigb"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/PSdemo5",
+  "scripts": [
+   "Model",
+   "PSdemo",
+   "Seis1",
+   "Seis2",
+   "Seis3"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "pswigb"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.1,
+   0.1
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/Xdemo1",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/Xdemo2",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/Xdemo3",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/Xdemo4",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Tri/Seismograms/Xdemo5",
+  "scripts": [
+   "Model",
+   "Model.bak"
+  ],
+  "verdict": "NO_OUTPUT",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Synthetic/Trielas",
+  "scripts": [
+   "CheckModel",
+   "DisplModel"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "elamod.1",
+   "elamod.2",
+   "elamod.3",
+   "elamod.a1111",
+   "elamod.a1113",
+   "elamod.a1133",
+   "elamod.a1212",
+   "elamod.a1223",
+   "elamod.a1313",
+   "elamod.a2323",
+   "elamod.a3313",
+   "elamod.a3333",
+   "elamod.rho"
+  ],
+  "diffs": [],
+  "unstable": [
+   "elamod.model"
+  ],
+  "oxwave_programs": [
+   "elamodel",
+   "elaps",
+   "elatriuni",
+   "psimage"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Tau_P/Sutaup",
+  "scripts": [
+   "Model"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sushw",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Time_Freq_Analysis/Sugabor",
+  "scripts": [
+   "PSsugabor"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "gabor.1.eps",
+   "gabor.2.eps",
+   "gabor.3.eps",
+   "gabor.4.eps",
+   "gabor.5.eps",
+   "gabor.6.eps",
+   "gabor.7.eps",
+   "gabor.8.eps",
+   "vibrodata.1",
+   "vibrodata.2",
+   "vibrodata.3",
+   "vibrodata.4"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sugabor",
+   "suop2",
+   "supsgraph",
+   "supsimage",
+   "suvibro"
+  ],
+  "fallback_programs": {
+   "susum": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.4,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Time_Freq_Analysis/Sutvband",
+  "scripts": [
+   "PSsugabor",
+   "PSsutvband"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "gabor.1.eps",
+   "gabor.2.eps",
+   "gabor.3.eps",
+   "gabor.4.eps",
+   "gabor.5.eps",
+   "gabor.6.eps",
+   "gabor.7.eps",
+   "gabor.8.eps",
+   "recon.1",
+   "recon.2",
+   "recon.3",
+   "tvband.1.eps",
+   "tvband.2.eps",
+   "tvband.3.eps",
+   "tvband.4.eps",
+   "tvband.5.eps",
+   "tvband.6.eps",
+   "vibrodata.1",
+   "vibrodata.2",
+   "vibrodata.3",
+   "vibrodata.4"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sugabor",
+   "suop2",
+   "supsgraph",
+   "supsimage",
+   "sutvband",
+   "suvibro"
+  ],
+  "fallback_programs": {
+   "susum": "not in catalogue"
+  },
+  "elapsed_s": [
+   0.6,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Utilities/Subraid",
+  "scripts": [
+   "Subraid_test1",
+   "Subraid_test2",
+   "Subraid_test3",
+   "Subraid_test4",
+   "Subraid_test5",
+   "Subraid_test6"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "matched": [
+   "info21.txt",
+   "info23.txt",
+   "info46.txt",
+   "info48.txt",
+   "info66.txt",
+   "info68.txt",
+   "info86.txt",
+   "info88.txt",
+   "info90.txt",
+   "tnull01.su",
+   "tnull02.su",
+   "tnull03.su",
+   "tnull04.su",
+   "tnull05.su",
+   "tnull06.su",
+   "tnull07.su",
+   "tnull11.su",
+   "tnull12.su",
+   "tnull13.su",
+   "tnull14.su",
+   "tnull15.su",
+   "tnull16.su",
+   "tnull17.su",
+   "tnull18.su",
+   "tnull19.su",
+   "tnull20.su",
+   "tnull21.su",
+   "tnull22.su",
+   "tnull23.su",
+   "tnull31.su",
+   "tnull32.su",
+   "tnull33.su",
+   "tnull34.su",
+   "tnull35.su",
+   "tnull36.su",
+   "tnull37.su",
+   "tnull38.su",
+   "tnull39.su",
+   "tnull40.su",
+   "tnull41.su",
+   "tnull42.su",
+   "tnull43.su",
+   "tnull44.su",
+   "tnull45.su",
+   "tnull46.su",
+   "tnull47.su",
+   "tnull48.su",
+   "tnull51.su",
+   "tnull52.su",
+   "tnull53.su",
+   "tnull54.su",
+   "tnull55.su",
+   "tnull56.su",
+   "tnull57.su",
+   "tnull58.su",
+   "tnull59.su",
+   "tnull60.su",
+   "tnull61.su",
+   "tnull62.su",
+   "tnull63.su",
+   "tnull64.su",
+   "tnull65.su",
+   "tnull66.su",
+   "tnull67.su",
+   "tnull68.su",
+   "tnull71.su",
+   "tnull72.su",
+   "tnull73.su",
+   "tnull74.su",
+   "tnull75.su",
+   "tnull76.su",
+   "tnull77.su",
+   "tnull78.su",
+   "tnull79.su",
+   "tnull80.su",
+   "tnull81.su",
+   "tnull82.su",
+   "tnull83.su",
+   "tnull84.su",
+   "tnull85.su",
+   "tnull86.su",
+   "tnull87.su",
+   "tnull88.su",
+   "tnull89.su",
+   "tnull90.su",
+   "tnull91.su",
+   "tnull92.su",
+   "tnull93.su",
+   "tnull94.su",
+   "tnull95.su",
+   "tnull96.su",
+   "tnull97.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suascii",
+   "subraid",
+   "sugethw",
+   "suhtmath",
+   "sunull",
+   "sushw",
+   "susort"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.1,
+   1.3
+  ],
+  "orig_stderr_tail": [
+   ""
+  ],
+  "ox_stderr_tail": [
+   ""
+  ]
+ },
+ {
+  "dir": "Utilities/Sucleave",
+  "scripts": [
+   "Sucleave_test1",
+   "Sucleave_test2",
+   "Sucleave_test3",
+   "Sucleave_test4",
+   "Sucleave_test5",
+   "Sucleave_test6",
+   "Sucleave_test7",
+   "Sucleave_test8"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "cleave_cdp_150.su",
+   "cleave_cdp_250.su",
+   "cleave_cdp_350.su",
+   "cleave_cdp_50.su",
+   "cleave_offset_-100.su",
+   "cleave_offset_-150.su",
+   "cleave_offset_-160.su",
+   "cleave_offset_-220.su",
+   "cleave_offset_-250.su",
+   "cleave_offset_-280.su",
+   "cleave_offset_-340.su",
+   "cleave_offset_-350.su",
+   "cleave_offset_-40.su",
+   "cleave_offset_-50.su",
+   "cleave_offset_140.su",
+   "cleave_offset_150.su",
+   "cleave_offset_20.su",
+   "cleave_offset_200.su",
+   "cleave_offset_250.su",
+   "cleave_offset_260.su",
+   "cleave_offset_320.su",
+   "cleave_offset_350.su",
+   "cleave_offset_50.su",
+   "cleave_offset_80.su",
+   "l2r_-150.su",
+   "l2r_-250.su",
+   "l2r_-50.su",
+   "l2r_150.su",
+   "l2r_50.su",
+   "tnull11.su",
+   "tnull12.su",
+   "tnull21.su",
+   "tnull22.su",
+   "tnull31.su",
+   "tnull32.su",
+   "tnull41.su",
+   "tnull42.su",
+   "tnull51.su",
+   "tnull52.su",
+   "tnull61.su",
+   "tnull62.su",
+   "tnull71.su",
+   "tnull72.su",
+   "tnull81.su",
+   "tnull82.su"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "sucleave",
+   "sugethw",
+   "sunull",
+   "sushw"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.6,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Utilities/Sucommand",
+  "scripts": [
+   "MakeData",
+   "Sucommand"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "modeldata"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "suaddnoise",
+   "suchw",
+   "sucommand",
+   "sugain",
+   "susynlv"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.1,
+   0.7
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Analysis/Residual_Moveout_Analysis/Anisotropic/Surelanan",
+  "scripts": [
+   "Rayt2dan.sh",
+   "Sukdmig2d.sh",
+   "Susynlvfti.sh"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "TEST.data",
+   "VP0",
+   "VP0sm",
+   "delta",
+   "deltasm",
+   "epsilon",
+   "epsilonsm"
+  ],
+  "diffs": [],
+  "unstable": [
+   "ttime"
+  ],
+  "oxwave_programs": [
+   "rayt2dan",
+   "smooth2",
+   "susynlvfti",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   10.7,
+   2.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Analysis/Residual_Moveout_Analysis/Anisotropic/Velpertan",
+  "scripts": [
+   "Rayt2dan.sh",
+   "Sukdmig2d.sh",
+   "Synlv"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "TEST.data",
+   "VP0",
+   "VP0sm",
+   "delta",
+   "deltasm",
+   "epsilon",
+   "epsilonsm"
+  ],
+  "diffs": [],
+  "unstable": [
+   "ttime"
+  ],
+  "oxwave_programs": [
+   "rayt2dan",
+   "smooth2",
+   "susynlvfti",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   28.5,
+   7.3
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Analysis/Residual_Moveout_Analysis/Isotropic",
+  "scripts": [
+   "Dzdv.sh",
+   "PSmod",
+   "PSplot",
+   "Rayt2d.sh",
+   "Sukdmig2d.sh",
+   "Synvxz.sh",
+   "Unif2.sh",
+   "Unif2_modified.sh",
+   "Velpert.sh"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1
+  ],
+  "rc_ox": [
+   0,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1
+  ],
+  "matched": [
+   "afile",
+   "data",
+   "dzfile",
+   "infile",
+   "pvfile",
+   "vfile",
+   "vfile1"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "dzdv",
+   "sustrip",
+   "susynvxz",
+   "unif2"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   1.7,
+   0.9
+  ],
+  "orig_stderr_tail": [
+   "PSmod: line 4: data: No such file or directory\n",
+   "PSplot: line 4: data: No such file or directory\n",
+   "Velpert.sh: line 11: dfile: No such file or directory\n"
+  ],
+  "ox_stderr_tail": [
+   "PSmod: line 4: data: No such file or directory\n",
+   "PSplot: line 4: data: No such file or directory\n",
+   "Velpert.sh: line 11: dfile: No such file or directory\n"
+  ]
+ },
+ {
+  "dir": "Velocity_Analysis/Ti_Media/Fowler",
+  "scripts": [
+   "Fimpulse",
+   "Fowler",
+   "Plot"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "INSTALL",
+   "best0.eps",
+   "best0.su",
+   "etascan.eps",
+   "etascan.su",
+   "etascana.eps",
+   "etascanall.eps",
+   "etascanb.eps",
+   "fdmoa.eps",
+   "fgood.eps",
+   "fgood.su",
+   "newgathers.su",
+   "testtifowler.dSYM/Contents/Info.plist",
+   "testtifowler.dSYM/Contents/Resources/Relocations/aarch64/testtifowler.yml",
+   "vscan.eps",
+   "vscan.su",
+   "vscana.eps",
+   "vscanall.eps",
+   "vscanb.eps",
+   "vscanc.eps",
+   "vscaneta0.eps",
+   "vscaneta0.su",
+   "vscaneta0a.eps",
+   "vscaneta0all.eps",
+   "vscaneta0b.eps",
+   "vscaneta0c.eps"
+  ],
+  "diffs": [],
+  "unstable": [
+   "testtifowler",
+   "testtifowler.dSYM/Contents/Resources/DWARF/testtifowler",
+   "<stdout of Fowler>"
+  ],
+  "oxwave_programs": [
+   "psmerge",
+   "sufilter",
+   "sugain",
+   "supsimage",
+   "supswigp",
+   "susort",
+   "susynlvfti",
+   "sutifowler",
+   "suwind"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   83.6,
+   30.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Analysis/Traditional",
+  "scripts": [
+   "MakeData",
+   "PSdata",
+   "PSmodel",
+   "PSnmo",
+   "PSvelocity"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "allshots.eps",
+   "gathers.eps",
+   "model.eps",
+   "modeldata",
+   "nmodata",
+   "shots.eps",
+   "stack.eps",
+   "stackdata",
+   "stkvel.p",
+   "vpick.1500.eps",
+   "vpick.2000.eps",
+   "vpick.2500.eps",
+   "vpick.3000.eps",
+   "vscan.1500.eps",
+   "vscan.2000.eps",
+   "vscan.2500.eps",
+   "vscan.3000.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "psimage",
+   "suaddnoise",
+   "suchw",
+   "sugain",
+   "sunmo",
+   "supsimage",
+   "susort",
+   "sustack",
+   "susynlv",
+   "suvelan",
+   "suwind",
+   "unif2",
+   "unisam"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.9,
+   0.6
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Analysis/Velancc",
+  "scripts": [
+   "MakeData",
+   "PSdata",
+   "PSmodel",
+   "PSnmo",
+   "PSvelocity"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "matched": [
+   "allshots.eps",
+   "gathers.eps",
+   "model.eps",
+   "modeldata",
+   "nmodata",
+   "shots.eps",
+   "stack.eps",
+   "stackdata",
+   "stkvel.p",
+   "vpick.1500.eps",
+   "vpick.2000.eps",
+   "vpick.2500.eps",
+   "vpick.3000.eps",
+   "vscan.1500.eps",
+   "vscan.2000.eps",
+   "vscan.2500.eps",
+   "vscan.3000.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "psgraph",
+   "psimage",
+   "suaddnoise",
+   "suchw",
+   "sugain",
+   "sunmo",
+   "supsimage",
+   "susort",
+   "sustack",
+   "susynlv",
+   "suvelan",
+   "suwind",
+   "unif2",
+   "unisam"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.9,
+   0.5
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Profiles/Makevel",
+  "scripts": [
+   "Makevel"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "data.v"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.0,
+   0.0
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Velocity_Profiles/Vel2stiff",
+  "scripts": [
+   "Vel2stiff"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "c11_lens",
+   "c13_lens",
+   "c33_lens",
+   "c44_lens",
+   "c55_file",
+   "c66_lens",
+   "delta_lens",
+   "eps_lens",
+   "gamma_lens",
+   "rho_lens",
+   "vp_lens",
+   "vs_lens"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "makevel",
+   "unif2",
+   "vel2stiff"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Vibroseis_Sweeps",
+  "scripts": [
+   "PSvibro"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0
+  ],
+  "rc_ox": [
+   0
+  ],
+  "matched": [
+   "vibro.1.eps",
+   "vibro.10.eps",
+   "vibro.2.eps",
+   "vibro.3.eps",
+   "vibro.4.eps",
+   "vibro.5.eps",
+   "vibro.6.eps",
+   "vibro.7.eps",
+   "vibro.8.eps",
+   "vibro.9.eps"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "supswigp",
+   "suspecfx",
+   "suvibro"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.3,
+   0.4
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ },
+ {
+  "dir": "Wavelet_Transforms/Mrafxzwt/Demos",
+  "scripts": [
+   "PSGrid",
+   "PSSine"
+  ],
+  "verdict": "MATCH",
+  "rc_orig": [
+   0,
+   0
+  ],
+  "rc_ox": [
+   0,
+   0
+  ],
+  "matched": [
+   "dif.eps",
+   "ffile.dat",
+   "mra.dat",
+   "mra.eps",
+   "orig.eps",
+   "original.eps",
+   "recon.eps",
+   "x.dat",
+   "xy.dat"
+  ],
+  "diffs": [],
+  "unstable": [],
+  "oxwave_programs": [
+   "farith",
+   "psimage",
+   "unisam"
+  ],
+  "fallback_programs": {},
+  "elapsed_s": [
+   0.2,
+   0.2
+  ],
+  "orig_stderr_tail": [],
+  "ox_stderr_tail": []
+ }
+]

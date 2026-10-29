@@ -1,0 +1,181 @@
+{
+  "scope": "wave 3 programs batch 2",
+  "programs": [
+    {
+      "name": "elatriuni",
+      "path": "Trielas/main/elatriuni.c",
+      "purpose": "Sample a triangulated elastic model onto a regular grid and write its stiffness and density components to separate files.",
+      "selfdoc_first_line": " ELATRIUNI - convert TRIangulated ELAstic models to UNIformly sampled models",
+      "params": [
+        {"name": "nx", "type": "int", "default": "", "required": true, "description": "Number of horizontal samples."},
+        {"name": "nz", "type": "int", "default": "", "required": true, "description": "Number of vertical samples."},
+        {"name": "dx", "type": "float", "default": "1.0", "required": false, "description": "Horizontal sampling interval."},
+        {"name": "dz", "type": "float", "default": "1.0", "required": false, "description": "Vertical sampling interval."},
+        {"name": "fx", "type": "float", "default": "0.0", "required": false, "description": "First horizontal coordinate."},
+        {"name": "fz", "type": "float", "default": "0.0", "required": false, "description": "First vertical coordinate."},
+        {"name": "a1111file", "type": "string", "default": "a1111.bin", "required": false, "description": "Output file for a1111."},
+        {"name": "a3333file", "type": "string", "default": "a3333.bin", "required": false, "description": "Output file for a3333."},
+        {"name": "a1133file", "type": "string", "default": "a1133.bin", "required": false, "description": "Output file for a1133."},
+        {"name": "a1313file", "type": "string", "default": "a1313.bin", "required": false, "description": "Output file for a1313."},
+        {"name": "a1113file", "type": "string", "default": "a1113.bin", "required": false, "description": "Output file for a1113."},
+        {"name": "a3313file", "type": "string", "default": "a3313.bin", "required": false, "description": "Output file for a3313."},
+        {"name": "a1212file", "type": "string", "default": "a1212.bin", "required": false, "description": "Output file for a1212."},
+        {"name": "a1223file", "type": "string", "default": "a1223.bin", "required": false, "description": "Output file for a1223; the selfdoc incorrectly says a1212.bin."},
+        {"name": "a2323file", "type": "string", "default": "a2323.bin", "required": false, "description": "Output file for a2323."},
+        {"name": "rhofile", "type": "string", "default": "rho.bin", "required": false, "description": "Output file for density."}
+      ],
+      "stdin": "other",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "getparstring", "err", "efopen", "checkpars", "readModel", "ealloc2float", "insideTriInModel"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Grid coordinates are incremented repeatedly in float, and triangle selection at boundaries can depend on floating-point rounding. The program returns status 1 even after successful output.",
+      "c_lines": 185,
+      "difficulty": "medium",
+      "difficulty_reason": "It reads a triangulated model and locates each grid point in a triangle.",
+      "test_cases": [
+        {"description": "Sample a homogeneous isotropic model on a small grid.", "command": "elamodel fill=0.5,0.5,2,1,1 > model.bin && elatriuni nx=3 nz=3 dx=0.5 dz=0.5 < model.bin"},
+        {"description": "Sample an interior grid and use a custom density output path.", "command": "elamodel fill=0.5,0.5,3,1.5,2 > model.bin && elatriuni nx=2 nz=2 fx=0.25 fz=0.25 dx=0.5 dz=0.5 rhofile=density.bin < model.bin"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "raydata",
+      "path": "Trielas/main/raydata.c",
+      "purpose": "Extract selected values from elastic ray endpoints into binary or ASCII data files.",
+      "selfdoc_first_line": " RAYDATA - simple program to display ray data from elaray\t\t",
+      "params": [
+        {"name": "kend", "type": "int", "default": "INT_MAX", "required": false, "description": "Select endpoints with this index; INT_MAX selects all."},
+        {"name": "t", "type": "int", "default": "0", "required": false, "description": "Write travel time against position when set to 1."},
+        {"name": "px", "type": "int", "default": "0", "required": false, "description": "Write horizontal slowness against position when set to 1."},
+        {"name": "pz", "type": "int", "default": "0", "required": false, "description": "Write vertical slowness against position when set to 1."},
+        {"name": "vgx", "type": "int", "default": "0", "required": false, "description": "Write horizontal group velocity against position when set to 1."},
+        {"name": "vgz", "type": "int", "default": "0", "required": false, "description": "Write vertical group velocity against position when set to 1."},
+        {"name": "pxvx", "type": "int", "default": "0", "required": false, "description": "Write horizontal slowness and group velocity when nonzero."},
+        {"name": "pol", "type": "int", "default": "0", "required": false, "description": "Write position and polarization angle when nonzero."},
+        {"name": "ascci", "type": "int", "default": "0", "required": false, "description": "Set to 1 for ASCII output; 0 selects binary output."}
+      ],
+      "stdin": "other",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "checkpars", "efopen", "ealloc1", "erealloc1"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Polarization uses sqrt and atan with float inputs and double math. With kend filtering, the polarization loop runs over all input endpoints rather than the selected count, causing out-of-bounds access; some zero-component cases leave polarization uninitialized. RayEnd input is a native C struct and therefore ABI-dependent. The program returns failure status after output.",
+      "c_lines": 257,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers native ray endpoint records, filters them, and writes several optional output formats.",
+      "test_cases": [
+        {"description": "Extract several fields as ASCII from a small ray set.", "command": "elamodel fill=0.5,0.5,2,1,1 > model.bin && elaray nangle=5 fangle=-20 langle=20 < model.bin > rays.bin && raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=1 < rays.bin"},
+        {"description": "Write binary travel time and polarization data.", "command": "elamodel fill=0.5,0.5,2,1,1 > model.bin && elaray nangle=5 fangle=-20 langle=20 < model.bin > rays.bin && raydata t=1 pol=1 ascci=0 < rays.bin"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "dctcomp",
+      "path": "comp/dct/main/dctcomp.c",
+      "purpose": "Compress a two-dimensional array of binary floats using block discrete cosine transforms and entropy coding.",
+      "selfdoc_first_line": " DCTCOMP - Compression by Discrete Cosine Transform\t\t\t",
+      "params": [
+        {"name": "n1", "type": "int", "default": "", "required": true, "description": "Number of samples in the fast dimension."},
+        {"name": "n2", "type": "int", "default": "", "required": true, "description": "Number of samples in the slow dimension."},
+        {"name": "blocksize1", "type": "int", "default": "16", "required": false, "description": "Transform block size in the first dimension."},
+        {"name": "blocksize2", "type": "int", "default": "16", "required": false, "description": "Transform block size in the second dimension."},
+        {"name": "error", "type": "float", "default": "0.01", "required": false, "description": "Acceptable quantization error."}
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "err", "checkpars", "alloc2float", "alloc1int"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Transform table generation, floating-point accumulation, and quantization thresholds can change compressed bytes. The stream stores native int and float representations. Short input reads leave samples uninitialized.",
+      "c_lines": 136,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines block transforms, quantization, run-length coding, and Huffman coding in a custom binary format.",
+      "test_cases": [
+        {"description": "Compress a small float array using default blocks.", "command": "suplane nt=32 ntr=4 | sustrip | dctcomp n1=32 n2=4 > compressed.dct"},
+        {"description": "Exercise non-default blocks, padding, and error tolerance.", "command": "suspike nt=31 ntr=5 | sustrip | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 > compressed.dct"}
+      ],
+      "license_note": "",
+      "related_programs": ["dctuncomp", "wptcomp", "wptuncomp"]
+    },
+    {
+      "name": "dctuncomp",
+      "path": "comp/dct/main/dctuncomp.c",
+      "purpose": "Decode a DCT-compressed stream into a two-dimensional array of binary floats.",
+      "selfdoc_first_line": " DCTUNCOMP - Discrete Cosine Transform Uncompression \t\t\t",
+      "params": [],
+      "stdin": "other",
+      "stdout": "binary_floats",
+      "lib_calls": ["initargs", "requestdoc", "alloc2float", "alloc1int", "err"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inverse transform accumulation and transform table generation can vary with floating-point implementation. Input headers use native int and float representations, and short reads are not checked.",
+      "c_lines": 118,
+      "difficulty": "hard",
+      "difficulty_reason": "It decodes a custom Huffman and run-length format, dequantizes values, and applies inverse block transforms.",
+      "test_cases": [
+        {"description": "Round-trip a small array using default blocks.", "command": "suplane nt=32 ntr=4 | sustrip | dctcomp n1=32 n2=4 > compressed.dct && dctuncomp < compressed.dct > restored.bin"},
+        {"description": "Decode a padded array compressed with smaller blocks.", "command": "suspike nt=31 ntr=5 | sustrip | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 > compressed.dct && dctuncomp < compressed.dct > restored.bin"}
+      ],
+      "license_note": "",
+      "related_programs": ["dctcomp", "wptuncomp", "wptcomp"]
+    },
+    {
+      "name": "entropy",
+      "path": "comp/dct/main/entropy.c",
+      "purpose": "Compute a quantized signal histogram and report its entropy and relative quantization error.",
+      "selfdoc_first_line": " ENTROPY - compute the ENTROPY of a signal\t\t\t",
+      "params": [
+        {"name": "n", "type": "int", "default": "", "required": true, "description": "Number of input float values."},
+        {"name": "dev", "type": "float", "default": "computed: square root of the mean of the input values squared", "required": false, "description": "Scale used to set the quantization interval; omitted from the selfdoc."}
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": ["initargs", "requestdoc", "MUSTGETPARINT", "alloc1float", "getparfloat", "checkpars"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float accumulation order, rounding through NINT, and sqrt and log implementations affect the histogram and reported statistics. Zero RMS causes division by zero, and sufficiently large quantized values index outside the 1024-bin histogram. Short reads leave input uninitialized.",
+      "c_lines": 86,
+      "difficulty": "easy",
+      "difficulty_reason": "It computes a histogram and scalar statistics over one buffered array.",
+      "test_cases": [
+        {"description": "Compute a histogram using the input RMS scale.", "command": "suspike nt=32 ntr=4 | sustrip | entropy n=128 > histogram.bin"},
+        {"description": "Use an explicit quantization scale.", "command": "suplane nt=32 ntr=4 | sustrip | entropy n=128 dev=1 > histogram.bin"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "wptcomp",
+      "path": "comp/dct/main/wptcomp.c",
+      "purpose": "Compress a two-dimensional array of binary floats using a wavelet packet transform and entropy coding.",
+      "selfdoc_first_line": " WPTCOMP - Compression by Wavelet Packet Compression \t\t\t",
+      "params": [
+        {"name": "n1", "type": "int", "default": "", "required": true, "description": "Number of samples in the fast dimension."},
+        {"name": "n2", "type": "int", "default": "", "required": true, "description": "Number of samples in the slow dimension."},
+        {"name": "nfilter1", "type": "int", "default": "11", "required": false, "description": "Wavelet filter selection in the first dimension."},
+        {"name": "nfilter2", "type": "int", "default": "11", "required": false, "description": "Wavelet filter selection in the second dimension."},
+        {"name": "nstage1", "type": "int", "default": "computed: 3 if ceil(log2(n1)) > 4, 2 if it is > 1, otherwise ceil(log2(n1))", "required": false, "description": "Number of transform stages in the first dimension."},
+        {"name": "nstage2", "type": "int", "default": "computed: 3 if ceil(log2(n2)) > 4, 2 if it is > 1, otherwise ceil(log2(n2))", "required": false, "description": "Number of transform stages in the second dimension."},
+        {"name": "error", "type": "float", "default": "0.01", "required": false, "description": "Acceptable quantization error."}
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "err", "checkpars", "alloc2float", "alloc1int"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Wavelet filtering and quantization depend on floating-point accumulation and rounding; small differences can change compressed bytes. The stream stores native int and float representations. Short input reads leave samples uninitialized.",
+      "c_lines": 166,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines a multistage wavelet packet transform with quantization and custom entropy coding.",
+      "test_cases": [
+        {"description": "Compress a small array with automatically selected stages.", "command": "suplane nt=32 ntr=4 | sustrip | wptcomp n1=32 n2=4 > compressed.wpt"},
+        {"description": "Exercise explicit stages, error tolerance, and power-of-two padding.", "command": "suspike nt=31 ntr=5 | sustrip | wptcomp n1=31 n2=5 nfilter1=11 nfilter2=11 nstage1=2 nstage2=1 error=0.05 > compressed.wpt"}
+      ],
+      "license_note": "",
+      "related_programs": ["wptuncomp", "dctcomp", "dctuncomp"]
+    }
+  ]
+}

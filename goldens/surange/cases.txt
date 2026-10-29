@@ -1,0 +1,15 @@
+# Defaults, single trace and odd sample counts
+sunull nt=1 ntr=1 | surange
+sunull nt=7 ntr=5 | surange dim=0
+# Selected keys, signed values, and repeated keys
+sunull nt=3 ntr=5 | sushw key=cdp,offset a=-5,100 b=3,-40 | surange key=offset,cdp
+sunull nt=1 ntr=1 | sushw key=cdp a=-7 | surange key=cdp,cdp dim=1
+# Coordinate scale, directional extrema and line dimensions
+sunull nt=5 ntr=5 | sushw key=scalco,sx,sy,gx,gy a=-10,100,30,300,-40 b=0,-20,10,30,-5 | surange dim=1
+sunull nt=5 ntr=3 | sushw key=scalco,sx,gx a=2,-100,50 b=0,25,-10 | surange dim=2
+sunull nt=1 ntr=2 | surange dim=3 verbose=1
+sunull nt=1 ntr=3 | surange key= dim=-1
+# Empty input and invalid parameter or key
+surange < /dev/null
+surange dim=999999999999999999999 < /dev/null
+sunull nt=1 ntr=1 | surange key=bogus

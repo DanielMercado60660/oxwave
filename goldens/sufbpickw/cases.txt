@@ -1,0 +1,59 @@
+# Defaults and output modes
+suplane nt=128 ntr=4 | sufbpickw
+suplane nt=128 ntr=4 | sufbpickw test=0 window=0.012
+# Template, alternative gather key, and verbose
+[stderr] suplane nt=129 ntr=3 | sufbpickw keyg=cdp t=0.04,0.1 o=0,1000 tdv=0.01 window=0.008 test=1 verbose=1
+# Parameter errors and empty input
+[stderr] sufbpickw t=0.1,0.2 o=1
+[stderr] sufbpickw </dev/null
+# Small and zero-window inputs
+suspike nt=1 ntr=1 | sufbpickw window=0
+suspike nt=31 ntr=1 | sufbpickw window=0 test=0 tdv=0
+# Ignored offset array, negative search width, and unknown argument
+suspike nt=65 ntr=1 | sufbpickw o=0,100 test=0 window=0.004
+suspike nt=65 ntr=1 | sufbpickw tdv=-0.01 window=0.004 test=0
+sufbpickw t=0.1
+sufbpickw bogus=1 </dev/null
+# Explicit implementation defaults (selfdoc lists different window/tdv defaults)
+suplane nt=128 ntr=4 | sufbpickw keyg=ep window=0.02 tdv=-1 test=1
+# A singleton template, negative offset, and non-default sample interval
+suspike nt=101 ntr=1 dt=0.002 it=40 | sushw key=offset a=-100 | sufbpickw t=0.08 o=-100 tdv=0.02 window=0.01 test=0
+# Multiple contiguous gathers, including the reader's final-singleton EOF case
+sunull nt=33 ntr=5 | sushw key=ep a=0 b=1 j=2 | sufbpickw keyg=ep window=0.004 test=0
+# Nonzero test values all select the characteristic function; zero trace data
+sunull nt=63 ntr=1 | sufbpickw window=0.004 test=-1 tdv=0
+# Compare the full verbose and unknown-argument diagnostics
+[stderr] sunull nt=33 ntr=1 | sufbpickw window=0.004 test=0 verbose=1 bogus=1
+# Header lookup and numeric conversion errors
+[stderr] sunull nt=33 ntr=1 | sufbpickw keyg=notakey
+[stderr] sufbpickw test=2147483648
+# Empty numeric values restore defaults; last occurrence wins
+sunull nt=33 ntr=1 | sufbpickw window= test= tdv=
+sunull nt=33 ntr=1 | sufbpickw window=0.02 window=0.004 test=1 test=0
+# Empty gather key and floating-point conversion failures
+[stderr] sunull nt=33 ntr=1 | sufbpickw keyg=
+[stderr] sufbpickw window=1e-310
+[stderr] sufbpickw tdv=1e309
+# A negative window shorter than half a sample rounds to zero
+sunull nt=33 ntr=1 | sufbpickw window=-0.001 tdv=-0.01 test=0
+# Parameter-file defaults and command-line precedence, including full diagnostics
+[stderr] printf 'window=0.004\ntest=1\ntdv=0\n' > picker.par; sunull nt=33 ntr=1 | sufbpickw par=picker.par test=0 verbose=1
+# Descending template offsets, a negative template time, and interior interpolation
+suspike nt=67 ntr=1 dt=0.004 it=20 | sushw key=offset a=50 | sufbpickw t=-0.02,0.08 o=100,0 tdv=0.012 window=0.004 test=0
+# Seeded nonzero noise exercises both amplitude sums with signed samples
+suspike nt=67 ntr=3 it=25 | suaddnoise seed=7 sn=3 | sufbpickw window=0.004 test=1
+# Smoothing regressions: signed noisy samples and a seven-sample radius in both modes
+suspike nt=257 ntr=3 it=91 dt=0.002 | suaddnoise seed=19 sn=2 | sufbpickw window=0.014 test=1
+suspike nt=257 ntr=3 it=91 dt=0.002 | suaddnoise seed=19 sn=2 | sufbpickw window=0.014 test=0
+# A 33-tap smoothing kernel exercises the longer convolution path
+suplane nt=257 ntr=6 | sufbpickw window=0.064 test=1
+# Flat characteristic function: smoothing changes which tied peak is first
+sunull nt=35 ntr=1 | sufbpickw window=0.024
+# A window wider than nt makes C's negative smoothing count fail allocation
+[stderr] sunull nt=1 ntr=1 | sufbpickw
+# Short traces with empty or singleton smoothing slices
+sunull nt=2 ntr=1 | sufbpickw window=0
+sunull nt=3 ntr=1 | sufbpickw window=0.004
+sunull nt=7 ntr=1 | sufbpickw
+# Nonzero data in several gathers exercises cf clearing and find initialization
+suplane nt=129 ntr=6 | sushw key=ep a=0 b=1 j=2 | sufbpickw window=0.012 test=1

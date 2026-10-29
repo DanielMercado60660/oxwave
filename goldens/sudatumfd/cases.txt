@@ -1,0 +1,70 @@
+# All explicit required-parameter errors, including the undocumented requirements.
+[stderr] sudatumfd
+[stderr] sudatumfd nt=17
+[stderr] sudatumfd nt=17 nx=5
+[stderr] sudatumfd nt=17 nx=5 nz=1
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8
+[stderr] sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1
+[stderr] sudatumfd nt=abc
+[stderr] sudatumfd nt=
+[stderr] sudatumfd nt=2147483648
+# Complete parameters, empty stdin: the trace reader's first-header error.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+# Default v; header dt; missing header d2 gives warnings on every trace.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+# Explicit optional defaults and both independently supplied velocity files.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; makevel nx=32 nz=8 v000=1800 > v2; suspike nt=33 ntr=7 nspk=1 ix1=4 it1=12 | sudatumfd nt=33 nx=7 nz=4 nsx=1 dz=10 x_0=0 buff=5 tap_len=5 mx=32 mz=8 vfile1=v1 vfile2=v2 dx=10 dt=.004 v=1000
+# Several gathers, receiver coordinates, varying velocities, nonzero origin,
+# padding and taper; all remaining headers must come from the last trace.
+[stderr] makevel nx=32 nz=8 v000=1200 dvdx=12 dvdz=30 > v1; makevel nx=32 nz=8 v000=1700 dvdx=8 dvdz=25 > v2; suspike nt=31 ntr=15 nspk=4 ix1=2 ix2=7 ix3=10 ix4=14 it1=3 it2=9 it3=15 it4=21 | sushw key=gx,sx,cdp,offset,d2 a=100,50,10,-20,10 b=10,3,1,4,0 j=5,5,15,15,15 c=0,5,0,0,0 | sudatumfd nt=31 nx=5 nz=3 nsx=3 dz=4 x_0=100 buff=3 tap_len=2 mx=32 mz=8 vfile1=v1 vfile2=v2 v=2500
+# nt=1 and a single receiver with enough padding for the recurrence.
+[stderr] makevel nx=1 nz=1 v000=2000 > v1; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sudatumfd nt=1 nx=1 nz=1 nsx=1 dz=2 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=1
+# No buffer: diffraction imposes zero boundary traces.
+[stderr] makevel nx=32 nz=8 v000=2000 > v1; suspike nt=19 ntr=5 nspk=1 ix1=3 it1=8 | sudatumfd nt=19 nx=5 nz=2 nsx=1 dz=3 x_0=0 buff=0 tap_len=1 mx=32 mz=8 vfile1=v1 vfile2=v1 dx=10
+# Header dt=0 and d2=0 trigger both fallback warnings, including getpar after checkpars.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=9 ntr=3 nspk=1 ix1=2 it1=4 | sushw key=dt a=0 | sudatumfd nt=9 nx=3 nz=1 nsx=1 dz=1 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 verbose=1
+# Explicit sampling overrides differing header values; unused/unknown args warn per trace.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=23 ntr=3 nspk=1 ix1=2 it1=9 dt=.002 | sushw key=d2 a=15 | sudatumfd nt=23 nx=3 nz=2 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dt=.003 dx=12 verbose=1 unused=7
+# Signed model coordinates and negative propagation distance are accepted.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=27 ntr=5 nspk=1 ix1=3 it1=11 | sushw key=gx a=-20 b=10 | sudatumfd nt=27 nx=5 nz=2 nsx=1 dz=-5 x_0=-20 buff=2 tap_len=2 mx=32 mz=8 vfile1=v1 vfile2=v1 dt=.002 dx=10 v=-1
+# Input ns replaces a larger nt allocation.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=13 ntr=3 nspk=1 ix1=2 it1=6 | sudatumfd nt=29 nx=3 nz=1 nsx=1 dz=5 x_0=0 buff=1 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dx=10
+# Broad signal, seeded noise, longer FFT and depth recurrence.
+[stderr] makevel nx=32 nz=8 v000=1800 dvdx=7 dvdz=5 > v1; suplane nt=129 ntr=9 | suaddnoise seed=19 | sushw key=gx,d2 a=0,10 b=10,0 | sudatumfd nt=129 nx=9 nz=8 nsx=1 dz=6 x_0=0 buff=4 tap_len=3 mx=32 mz=8 vfile1=v1 vfile2=v1
+# Zero input and explicit zero v (overwritten by the model in both helpers).
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; sunull nt=11 ntr=3 | sudatumfd nt=11 nx=3 nz=2 nsx=1 dz=3 x_0=0 buff=1 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dx=10 dt=.004 v=0
+
+# Degenerate continuation/taper, zero and signed sampling, and 16-bit dt overflow.
+# nz<=0 and tap_len<0 use uninitialized C allocations; these small allocations
+# are zero-filled in the original on this platform (no tolerance relaxation).
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=0 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=-1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=0 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=-1 mx=32 mz=8 vfile1=v1 vfile2=v1
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dt=0
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dt=-.004
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dt=.1
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dx=0
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1 dx=-10
+[stderr] makevel nx=32 nz=8 v000=0 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+[stderr] makevel nx=32 nz=8 v000=-1500 > v1; suspike nt=17 ntr=5 nspk=1 ix1=3 it1=7 | sudatumfd nt=17 nx=5 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+
+# Unchecked missing velocity files cause SIGSEGV without an SU error message.
+[stderr] exec sudatumfd nt=1 nx=1 nz=1 nsx=1 dz=1 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=does-not-exist vfile2=does-not-exist
+[stderr] makevel nx=1 nz=1 v000=1500 > v1; exec sudatumfd nt=1 nx=1 nz=1 nsx=1 dz=1 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=does-not-exist
+
+# Trace-size mismatch must retain the core reader error and exit.
+[stderr] makevel nx=32 nz=8 v000=1500 > v1; (suspike nt=9 ntr=1 nspk=1 ix1=1 it1=4; suspike nt=11 ntr=1 nspk=1 ix1=1 it1=4) | sudatumfd nt=11 nx=2 nz=1 nsx=1 dz=5 x_0=0 buff=2 tap_len=0 mx=32 mz=8 vfile1=v1 vfile2=v1
+
+# Exact gather/sample bounds: one receiver per gather, three complete gathers.
+[stderr] makevel nx=1 nz=1 v000=1500 > v1; suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sudatumfd nt=1 nx=1 nz=1 nsx=3 dz=1 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=1
+# A smaller header ns remains valid, including a single sample per trace.
+[stderr] makevel nx=1 nz=1 v000=1500 > v1; suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sudatumfd nt=2 nx=1 nz=1 nsx=3 dz=1 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=1
+# Excess traces and ns greater than allocated nt are checked separately against
+# Rust's err! diagnostics: the reference accesses memory out of bounds for them.

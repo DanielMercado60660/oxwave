@@ -1,0 +1,113 @@
+# Defaults and explicit defaults (the C default scanstep is 1, not the documented 0.5).
+[stderr] suplane nt=129 ntr=9 | sushw key=cdp a=1 b=1 | susembase
+[stderr] suplane nt=129 ntr=9 | sushw key=cdp a=1 b=1 | susembase lockey=cdp outputinc=1 outputalign=0 outputshift=0 locmaxscan=3 scanstep=1 scanmax=12 scanmin=-12 dipext=12 dipuse=1 locmaxsum=3 sumopt=stack bypass=0 numrolling=17
+# Every combination mode with dips at input and output locations, on seeded noisy data.
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=stack outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=sum outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=one outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=two outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=twolinear outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=dadstack outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2 dadscale=0.95 dadnoise=0.02 dadext=8
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=0 sumopt=dadsum outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2 dadscale=0.95 dadnoise=0.02 dadext=8
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=stack outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=sum outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=one outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=two outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=twolinear outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=dadstack outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2 dadscale=0.95 dadnoise=0.02 dadext=8
+[stderr] suplane nt=65 ntr=11 | suaddnoise seed=79 sn=3 | sushw key=cdp a=-3 b=1 | susembase dipuse=1 sumopt=dadsum outputinc=0.5 outputalign=0.25 outputshift=10 scanstep=0.5 scanmin=-7 scanmax=9 dipext=8 locmaxscan=2 locmaxsum=2 dadscale=0.95 dadnoise=0.02 dadext=8
+# Bypass variants; wider increment, wrapped alignment, fractional windows, sparse input.
+[stderr] suplane nt=45 ntr=9 | sushw key=cdp a=1 b=1 | susembase bypass=1 outputinc=0.5
+[stderr] suplane nt=45 ntr=9 | sushw key=cdp a=1 b=1 | susembase bypass=-1 outputinc=0.5
+[stderr] suplane nt=37 ntr=8 | sushw key=offset a=4 b=3 | susembase lockey=offset outputinc=2 outputalign=4.5 outputshift=-7 locmaxscan=4.5 locmaxsum=3.5 scanstep=3 scanmin=0 scanmax=9 dipext=0
+[stderr] suplane nt=31 ntr=5 | sushw key=cdp a=1 b=9 | susembase dipuse=0 locmaxscan=1 locmaxsum=1 scanmax=0 dipext=0
+# Scanning disabled, duplicate locations, rolling wrap, and group changes.
+[stderr] suplane nt=41 ntr=30 | sushw key=cdp a=1 b=1 | susembase locmaxscan=0 locmaxsum=1 numrolling=5
+[stderr] suplane nt=33 ntr=15 | sushw key=cdp a=5 b=0 | susembase numrolling=40 sumopt=sum
+[stderr] suplane nt=33 ntr=18 | sushw key=cdp a=1 b=1 j=6 | sushw key=igi a=1 b=0 c=1 j=6 | susembase groupkey=igi dipuse=0 sumopt=twolinear outputinc=0.5
+[stderr] suplane nt=35 ntr=12 | sushw key=offset a=1 b=1 j=6 | sushw key=cdp a=1 b=0 c=1 j=6 | susembase lockey=offset groupkey=cdp locmaxscan=0 locmaxsum=2 sumopt=dadsum dadext=0 dadscale=1.1 dadnoise=100
+[stderr] suplane nt=35 ntr=12 | sushw key=cdp a=2 b=0 j=6 | sushw key=igi a=1 b=0 c=1 j=6 | susembase groupkey=igi numrolling=30
+# Degenerate sizes, all-zero scans, one scan choice and verbose/unknown arguments.
+[stderr] sunull nt=1 ntr=1 dt=0.016 | sushw key=cdp a=1 | susembase
+[stderr] suspike nt=1 ntr=1 it1=1 | sushw key=cdp a=1 | susembase dipext=0 scanmax=0
+[stderr] sunull nt=17 ntr=1 | sushw key=cdp a=0 | susembase dipuse=0
+[stderr] sunull nt=19 ntr=7 | sushw key=cdp a=1 b=1 | susembase scanmin=0 scanmax=0 dipext=0
+[stderr] suplane nt=33 ntr=5 | sushw key=cdp a=1 b=1 | susembase scanstep=2 scanmin=-3 scanmax=2 verbose=1 mystery=7
+# Auxiliary files are concatenated to stdout so their headers and samples are checked.
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outputinc=0.5 outdip=aux.su > main.su && cat aux.su
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outputinc=0.5 outpow=aux.su > main.su && cat aux.su
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outputinc=0.5 outsem=aux.su > main.su && cat aux.su
+suplane nt=49 ntr=7 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su outpow=p.su outsem=s.su > main.su && cat d.su p.su s.su
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=1 outputinc=0.5 outdip=aux.su > main.su && cat aux.su
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=1 outputinc=0.5 outpow=aux.su > main.su && cat aux.su
+suplane nt=67 ntr=9 | suaddnoise seed=12 sn=5 | sushw key=cdp a=1 b=1 | susembase dipuse=1 outputinc=0.5 outsem=aux.su > main.su && cat aux.su
+suplane nt=49 ntr=7 | sushw key=cdp a=1 b=1 | susembase dipuse=1 outdip=d.su outpow=p.su outsem=s.su > main.su && cat d.su p.su s.su
+# Input dip files at input and output locations, and their error paths.
+suplane nt=49 ntr=7 | sushw key=cdp a=1 b=1 > in.su && susembase dipuse=0 outputinc=0.5 outdip=dip.su < in.su > first.su && susembase dipuse=0 outputinc=0.5 indip=dip.su locmaxsum=3 sumopt=twolinear < in.su
+sunull nt=33 ntr=6 | sushw key=cdp a=1 b=1 > in.su && susembase indip=in.su locmaxsum=1 < in.su
+sunull nt=33 ntr=2 | sushw key=cdp a=2 b=1 > dip.su && sunull nt=33 ntr=3 | sushw key=cdp a=1 b=1 | susembase indip=dip.su
+sunull nt=33 ntr=2 | sushw key=cdp a=1 b=1 > dip.su && sunull nt=33 ntr=3 | sushw key=cdp a=1 b=1 | susembase indip=dip.su
+sunull nt=33 ntr=2 | sushw key=cdp a=20 b=1 > dip.su && sunull nt=33 ntr=3 | sushw key=cdp a=1 b=1 | susembase indip=dip.su dipuse=0
+sunull nt=33 ntr=1 | sushw key=cdp a=-2 b=1 > dip.su && sunull nt=33 ntr=3 | sushw key=cdp a=1 b=1 | susembase indip=dip.su dipuse=0
+# Validation errors (each independent restricted parameter is exercised).
+susembase
+susembase lockey=no_such_header
+susembase groupkey=no_such_header
+susembase locmaxscan=-1
+susembase locmaxscan=0
+susembase locmaxsum=0
+susembase locmaxsum=-1
+susembase dipuse=-1
+susembase dipuse=2
+susembase bypass=-2
+susembase bypass=2
+susembase dipext=-1
+susembase scanstep=-1
+# Zero scanstep is accepted by argument validation; no input avoids undefined scan allocation.
+susembase scanstep=0
+susembase scanmax=-1 scanmin=0
+susembase numrolling=4
+susembase outputinc=0
+susembase outputinc=-1
+susembase outputalign=-1
+susembase sumopt=bad
+susembase sumopt=stack dadscale=1
+susembase sumopt=one dadext=0
+susembase sumopt=two dadnoise=0
+susembase sumopt=dadstack dadext=-1
+susembase sumopt=dadsum dadnoise=-1
+susembase outdip=/no/such/dir/dip.su
+susembase outpow=/no/such/dir/pow.su
+susembase outsem=/no/such/dir/sem.su
+susembase indip=no-such-file.su
+susembase locmaxscan=0 locmaxsum=1 scanstep=1
+susembase locmaxscan=0 locmaxsum=1 scanmax=1
+susembase locmaxscan=0 locmaxsum=1 scanmin=-1
+susembase locmaxscan=0 locmaxsum=1 dipext=0
+susembase indip=dip.su scanstep=1
+susembase indip=dip.su scanmax=1
+susembase indip=dip.su scanmin=-1
+susembase indip=dip.su dipext=0
+susembase indip=dip.su locmaxscan=1
+sunull nt=33 ntr=3 | sushw key=cdp a=3 b=-1 | susembase
+# Last occurrence, parameter file, and an empty numeric value.
+printf 'sumopt=one\noutputinc=2\n' > params && suplane nt=33 ntr=5 | sushw key=cdp a=1 b=1 | susembase par=params outputinc=1 outputinc=0.5 dipext=
+# Default smoothing extent exceeds very short traces; exercise the C endpoint loops.
+suspike nt=1 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=1 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=1 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+suspike nt=2 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=2 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=2 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+suspike nt=3 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=3 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=3 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+suspike nt=4 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=4 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=4 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+suspike nt=5 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=5 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=5 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
+suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
+suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su

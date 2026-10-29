@@ -1,0 +1,18 @@
+# Defaults and small, odd-length traces.
+suplane nt=127 ntr=3 | sudlmo
+suplane nt=1 ntr=1 | sudlmo
+suplane nt=63 ntr=1 | sushw key=offset a=-123 | sudlmo dt=0.002 vnmo=350
+# Inverse, centimeter offsets, frequency-dependent velocities and verbosity.
+suplane nt=127 ntr=4 | sushw key=offset a=100 b=100 | sudlmo cm=1 invert=1 vnmo=300,450,600 fnmo=0,20,80 verbose=1
+suplane nt=64 ntr=2 | sushw key=offset a=50 b=-1 | sudlmo cm=2 invert=-1 dt=-0.004
+# CDP sorting, interpolation and extrapolation.
+suplane nt=31 ntr=4 | sushw key=cdp,offset a=1,100 b=1,10 | sudlmo cdp=4,1 vnmo=600,700 vnmo=300,400 fnmo=0,40 fnmo=0,40
+# Errors.
+sudlmo
+suplane nt=32 ntr=1 | sudlmo dt=0
+suplane nt=32 ntr=1 | sudlmo cdp=1,2 vnmo=400 fnmo=0 fnmo=0
+suplane nt=32 ntr=1 | sudlmo cdp=1,2 vnmo=400 vnmo=500 fnmo=0
+suplane nt=32 ntr=1 | sudlmo vnmo=400 vnmo=500
+suplane nt=32 ntr=1 | sudlmo fnmo=0 fnmo=1
+suplane nt=32 ntr=1 | sudlmo vnmo=400,500 fnmo=0
+suplane nt=32 ntr=1 | sudlmo vnmo=400,500 fnmo=10,10

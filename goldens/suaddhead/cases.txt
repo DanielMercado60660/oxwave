@@ -1,0 +1,23 @@
+# Defaults, aliases, precedence, odd sizes and partial final trace.
+suplane nt=32 ntr=4 | sustrip outpar=/dev/null | suaddhead ns=32 ftn=0
+suplane nt=64 ntr=3 | sustrip outpar=/dev/null | suaddhead nt=64 tsort=2 ntrpr=3
+suplane nt=1 ntr=1 | sustrip outpar=/dev/null | suaddhead ns=1
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | suaddhead n1=7 nt=4 ns=2
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | suaddhead nt=7 ns=2
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | suaddhead ns=8
+# Fortran record markers, including a short trailing marker.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=i3fi",12,1.,-2.,3.,12)*2)' | suaddhead ns=3 ftn=1
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=i2f",8,1.,2.))' | suaddhead ns=2 ftn=1
+# Optional parameters, ignored line-header option, verbose, empty input and errors.
+suplane nt=5 ntr=1 | sustrip outpar=/dev/null | suaddhead ns=5 ntrpr=0 tsort=-1 head=missing verbose=1
+suaddhead ns=4 </dev/null
+suaddhead ns=-1 </dev/null
+# Oversized sample counts with data that fits in the trace buffer.
+suaddhead ns=65536 </dev/null
+suaddhead ns=65536 ftn=1 </dev/null
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(65535 * 4 - 1))' | suaddhead ns=65536
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(65535 * 4))' | suaddhead ns=65536
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(17))' | suaddhead ns=2147483647
+suaddhead </dev/null
+suaddhead ns=3 ftn=2 </dev/null
+suaddhead ns=3 ftn=-1 </dev/null

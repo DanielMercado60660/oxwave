@@ -1,0 +1,24 @@
+# Descriptor output, including odd trace and sample counts.
+suspike nt=1 ntr=1 | suput fd=3 3> out.su; cat out.su
+suplane nt=17 ntr=3 | suput fd=1
+[stderr] suspike nt=1 ntr=1 | suput fd=3 verbose=0 3> out.su; cat out.su
+suspike nt=7 ntr=3 | suput fd=3 verbose=1 3> out.su; cat out.su
+[stderr] suspike nt=5 ntr=2 | suput fd=3 verbose=1 3> out.su; cat out.su
+[stderr] suspike nt=5 ntr=1 | suput fd=3 verbose=-1 3> out.su; cat out.su
+# Invalid or omitted descriptors and empty input.
+[stderr] suput
+[stderr] suput fd=-1
+[stderr] suput fd=99
+# Closed descriptors must be rejected before creating Rust descriptor handles.
+[stderr] suput fd=99999
+[stderr] suput fd=2147483647
+[stderr] suput fd=3 3>&-
+[stderr] suput fd=4 4>&-
+[stderr] suspike nt=1 ntr=1 | suput fd=99999
+[stderr] suput fd=
+[stderr] suput fd=0
+[stderr] suput fd=3 3> out.su
+[stderr] suput fd=abc
+[stderr] suput fd=3 unknown=1 3> out.su
+[stderr] suspike nt=1 ntr=1 | suput fd=3 3< /dev/null
+[stderr] suspike nt=3 ntr=1 | suput fd=0

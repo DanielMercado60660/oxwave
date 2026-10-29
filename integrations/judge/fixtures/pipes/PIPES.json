@@ -1,0 +1,6 @@
+{
+ "gain": "suplane nt=64 ntr=8 | sugain scale=2.5",
+ "filter_agc": "suplane nt=128 ntr=12 dt=0.002 | sufilter f=5,10,40,50 | sugain agc=1 wagc=0.1",
+ "wind_hw": "sushw key=offset a=-200 b=50 < plane.su | suwind key=offset min=-100 max=100",
+ "nmo": "sunmo vnmo=1500,2500 tnmo=0,0.25 < gather.su"
+}

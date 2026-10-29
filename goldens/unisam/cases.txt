@@ -1,0 +1,24 @@
+# Native float output, interpolation methods and extrapolation.
+[f32] unisam xin=0,1,2,4 yin=2,4,3,7 nout=11 dxout=0.5 fxout=-1
+[f32] unisam xin=0,1,2,4 yin=2,4,3,7 nout=11 dxout=0.5 fxout=-1 method=mono
+[f32] unisam xin=0,1,2,4 yin=2,4,3,7 nout=11 dxout=0.5 fxout=-1 method=akima
+[f32] unisam xin=0,1,2,4 yin=2,4,3,7 nout=11 dxout=0.5 fxout=-1 method=spline
+[f32] unisam xin=3 yin=8 nout=5 method=invalid
+[f32] unisam xin=0,2,4,6 yin=2,3,5,4 nout=13 dxout=0.5 isint=1 amp=0.2
+[f32] unisam xin=0,2,4,6 yin=2,3,5,4 nout=13 dxout=0.5 isint=1 amp=0.2 phase0=0.3 totalphase=0 nwidth=4
+[f32] unisam xin=0,1,2,3 yin=2,4,3,5 nout=7 dxout=0.5 sloth=1 smooth=1
+[f32] unisam xin=0,1,2,3 yin=2,4,3,5 nout=7 dxout=0.5 sloth=2 smooth=1 r=5
+[f32] unisam xin=0,1 yin=0,3 nout=1 dxout=-1 fxout=1 nwidth=-2
+[stderr] unisam xin=0,1 yin=1,2 nout=3 verbose=1 > /dev/null
+unisam nout=2
+unisam xin=0,1 yin=2 nout=3
+unisam xin=0,1 yin=2,3
+unisam xin=0,1 yin=2,3 nout=2 method=bad
+unisam xin=0,1,2 yin=2,3,4 nout=3 isint=0
+unisam xyfile=missing npairs=2 nout=3
+unisam xfile=missing yfile=missing npairs=2 nout=3
+unisam xyfile=missing nout=3
+unisam xyfile=/dev/null npairs=2 nout=3
+unisam xfile=/dev/null yfile=/dev/null npairs=2 nout=3
+[f32] unisam xin=0,1,2,3,4,5,6,7 yin=0,2,1,3,2,4,3,5 nout=8 > xy.bin && unisam xyfile=xy.bin npairs=4 nout=7 dxout=0.5 method=spline
+[f32] unisam xin=0,1 yin=0,3 nout=4 > x.bin && unisam xin=0,1 yin=2,5 nout=4 > y.bin && unisam xfile=x.bin yfile=y.bin npairs=4 nout=7 dxout=0.5 method=mono sloth=2 smooth=1 r=5

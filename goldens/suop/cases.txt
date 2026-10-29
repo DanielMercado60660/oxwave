@@ -1,0 +1,76 @@
+# Operations on seeded mixed-sign data
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=abs
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=ssqrt
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sqr
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=ssqr
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sgn
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=exp
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sexp
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=slog
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=slog2
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=slog10
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=cos
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sin
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=tan
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=cosh
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sinh
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=tanh
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=norm
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=db
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=neg
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=nop
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=posonly
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=negonly
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=sum
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=refl
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=diff
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=mod2pi
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=inv
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=avg
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=rmsamp
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=std nw=5
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=var nw=5
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=mean nw=5
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=despike nw=5
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=s2v
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=s2vm
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=d2m
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=drv2
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=drv4
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=integ
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=spike
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=freq
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=lnza
+suplane nt=63 ntr=2 | suaddnoise seed=42 | suop op=saf
+sunull nt=32 ntr=1 | suop
+[stderr] suplane nt=31 ntr=1 | suop op=mean nw=4 verbose=1
+suplane nt=32 ntr=1 | sushw key=trid a=111 | suop op=cnorm
+[stderr] suplane nt=32 ntr=1 | suop op=cnorm
+suplane nt=1 ntr=1 | suop op=abs
+suplane nt=32 ntr=1 | suop op=bogus
+suop op=abs
+suplane nt=32 ntr=1 | suop op=mean
+suplane nt=32 ntr=1 | suop op=std nw=0
+sunull nt=31 ntr=1 | suop op=inv
+sunull nt=31 ntr=1 | suop op=norm
+# Negative windows must report the original allocation error for every op.
+[stderr] sunull nt=10 ntr=1 | suop nw=-1
+[stderr] sunull nt=10 ntr=1 | suop op=nop nw=-2
+[stderr] sunull nt=10 ntr=1 | suop op=despike nw=-21
+[stderr] sunull nt=10 ntr=1 | suop op=mean nw=-2147483648
+# Short traces with valid median windows, including both allocation boundaries.
+suplane nt=10 ntr=2 | suaddnoise seed=42 | suop op=despike nw=9
+suplane nt=21 ntr=2 | suaddnoise seed=42 | suop op=despike
+suplane nt=21 ntr=2 | suaddnoise seed=42 | suop op=despike nw=20
+sunull nt=1 ntr=1 | suop op=despike nw=0
+sunull nt=1 ntr=1 | suop op=despike nw=1
+# Other window operations safely return zeros when nw exceeds nt.
+suplane nt=10 ntr=1 | suop op=mean
+suplane nt=10 ntr=1 | suop op=std
+suplane nt=10 ntr=1 | suop op=var
+# Odd cnorm traces use the following in-array sample, as in the original.
+suplane nt=31 ntr=2 | sushw key=trid a=111 | suop op=cnorm
+sunull nt=1 ntr=1 | sushw key=trid a=111 | suop op=cnorm
+suplane nt=65534 ntr=1 | sushw key=trid a=111 | suop op=cnorm
+# Undefined C accesses (despike nw>nt; cnorm ns=65535) are checked manually
+# for clean SU errors, because the original has no defined output to record.

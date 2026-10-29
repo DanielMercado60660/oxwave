@@ -1,0 +1,23 @@
+# Numeric filters, defaults, correlation order, negative and zero options.
+suplane nt=33 ntr=3 | suxcor filter=1,-2,0,3
+suplane nt=33 ntr=3 | suxcor filter=1,-2,0,3 first=0 vibroseis=11
+suplane nt=17 ntr=1 | suxcor filter=0 vibroseis=-1 first=-1 panel=2 ntwin=5 ftwin=2 ltwin=3 ntrc=2
+suspike nt=1 ntr=1 | suxcor filter=2
+# Largest representable output trace, with a one-sample correlation.
+suspike nt=1 ntr=1 | suxcor filter=2 vibroseis=65535
+[stderr] suplane nt=17 ntr=1 | suxcor filter=1,2 verbose=1
+# Single SU filter, precedence, and header reset in vibroseis mode.
+suplane nt=7 ntr=2 > filter.su && suplane nt=19 ntr=2 | suxcor sufile=filter.su
+suplane nt=7 ntr=1 > filter.su && suplane nt=19 ntr=2 | sushw key=delrt a=123 | suxcor sufile=filter.su filter=9 vibroseis=25 first=0
+# Panel defaults, reverse order, sloping windows, and gather reset.
+suplane nt=19 ntr=3 > filter.su && suplane nt=19 ntr=3 | suxcor sufile=filter.su panel=1
+suplane nt=31 ntr=6 > filter.su && suplane nt=31 ntr=6 | suxcor sufile=filter.su panel=1 first=0 ftwin=2 ltwin=8 ntwin=13 ntrc=3 vibroseis=17
+suplane nt=9 ntr=1 > filter.su && suplane nt=9 ntr=1 | suxcor sufile=filter.su panel=1 ntrc=1 ftwin=0 ltwin=0 ntwin=1
+suplane nt=9 ntr=1 > filter.su && suplane nt=9 ntr=1 | suxcor sufile=filter.su panel=1 ntrc=0 ntwin=3
+# Errors: missing filter, nonexistent or exhausted filter file, empty input.
+suplane nt=17 ntr=1 | suxcor
+suplane nt=17 ntr=1 | suxcor filter=
+suplane nt=17 ntr=1 | suxcor filter=1 first=9999999999999999999999999
+suplane nt=17 ntr=1 | suxcor sufile=missing.su
+suplane nt=17 ntr=1 > filter.su && suplane nt=17 ntr=2 | suxcor sufile=filter.su panel=1
+suxcor filter=1 </dev/null

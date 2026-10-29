@@ -1,0 +1,20 @@
+120 traces:
+tracl    1 120 (1 - 120)
+tracr    1 120 (1 - 120)
+fldr     1 5 (1 - 5)
+tracf    1 24 (1 - 24)
+cdp      1050 1537 (1050 - 1537)
+offset   100 675 (100 - 675)
+sx       1000 1200 (1000 - 1200)
+gx       1100 1875 (1100 - 1875)
+ns       250
+dt       2000
+
+Shot coordinate limits:
+	North(1000,0) South(1000,0) East(1200,0) West(1000,0)
+
+Receiver coordinate limits:
+	North(1100,0) South(1100,0) East(1875,0) West(1100,0)
+
+Midpoint coordinate limits:
+	North(1050,0) South(1050,0) East(1537.5,0) West(1050,0)

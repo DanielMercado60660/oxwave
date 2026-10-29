@@ -1,0 +1,13 @@
+# Results and intermediate calculations are emitted on stderr.
+[stderr] suplane nt=37 ntr=3 | suop op=abs | sugain bias=2000 | sulprime
+[stderr] suplane nt=37 ntr=3 | suop op=abs | sugain bias=2000 | sulprime b=0.3 dz=0.5 f=40 nmax=15 verbose=1
+[stderr] suplane nt=11 ntr=4 | suop op=abs | sugain bias=1500 | sulprime b=-1 dz=-2 f=0 nmax=4 verbose=1
+[stderr] suplane nt=1 ntr=3 | sugain bias=1000 | sulprime nmax=5 verbose=1
+[stderr] sunull nt=7 ntr=3 | sulprime nmax=5 verbose=1
+[stderr] suplane nt=5 ntr=3 | sulprime nmax=0 verbose=1
+[stderr] suplane nt=5 ntr=3 | sulprime nmax=-1 verbose=2
+[stderr] sulprime b=3
+[stderr] sulprime nmax=999999999999999999999
+[stderr] suplane nt=9 ntr=3 | sulprime nonsense=1 nmax=1
+[stderr] (suplane nt=5 ntr=1; suplane nt=7 ntr=1) | sulprime nmax=1
+[stderr] (suplane nt=5 ntr=2; suplane nt=7 ntr=1) | sulprime nmax=1

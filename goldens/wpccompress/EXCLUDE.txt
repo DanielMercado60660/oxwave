@@ -1,0 +1,14 @@
+# Cases excluded because the original SU program reads freed memory here.
+# wpcCompress (src/comp/dwpt/2d/lib/wpc.c:209/261/280) assigns realloc's result to a local only, so wpc->code still points at the
+# freed buffer and wpcWrite writes freed memory (AddressSanitizer: heap-use-after-free).
+# Rule: a case is excluded only if its output changes when that one line is fixed
+# (code = wpc->code = realloc(...)), built with SU's own flags. Cases where the freed
+# memory still held the right bytes give the same output and stay as tests.
+suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wpccompress n1=128 n2=16
+suspike nt=100 ntr=9 | sustrip outpar=/dev/null | wpccompress n1=100 n2=9 error=0.05
+suplane nt=64 ntr=4 | sustrip outpar=/dev/null | wpccompress n1=64 n2=4 error=0.1 verbose=1
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=1 n2=1
+suspike nt=17 ntr=3 | sustrip outpar=/dev/null | wpccompress n1=17 n2=3 error=0
+suspike nt=17 ntr=3 | sustrip outpar=/dev/null | wpccompress n1=17 n2=3 error=-0.1
+wpccompress n1=1 n2=1 < /dev/null
+printf '\000\000\000\000' | wpccompress n1=1 n2=1

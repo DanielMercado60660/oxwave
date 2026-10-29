@@ -1,0 +1,15 @@
+[package]
+name = "b2a"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "b2a"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

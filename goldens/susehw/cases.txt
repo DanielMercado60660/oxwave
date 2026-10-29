@@ -1,0 +1,16 @@
+# Defaults, single sample and trace, and odd-sized ensembles.
+sunull nt=1 ntr=1 | susehw
+sunull nt=7 ntr=7 | sushw key=cdp a=2 c=1 j=3 | susehw
+# Explicit values, decreasing and constant sequences, signed and float headers.
+sunull nt=5 ntr=5 | susehw key1=tracl key2=offset a=-4 b=0
+sunull nt=3 ntr=7 | sushw key=fldr a=1 c=1 j=3 | susehw key1=fldr key2=d1 a=-1.25 b=0.375
+sunull nt=3 ntr=5 | susehw key1=cdp key2=scalco a=-3.9 b=1.5
+sunull nt=3 ntr=5 | susehw key2=dt a=2 b=3
+# Grouping uses integer conversion of float headers; repeated groups reset.
+sunull nt=3 ntr=7 | sushw key=d1 a=0.2 b=0.4 | susehw key1=d1 key2=tracf a=0 b=2
+[stderr] sunull nt=1 ntr=3 | susehw verbose=1 extra=1
+susehw < /dev/null
+sunull nt=1 ntr=1 | susehw key1=invalid
+sunull nt=1 ntr=1 | susehw key2=invalid
+sunull nt=1 ntr=1 | susehw a=1e-400
+sunull nt=1 ntr=1 | susehw key1= key2=cdpt

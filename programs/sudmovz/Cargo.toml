@@ -1,0 +1,20 @@
+[package]
+name = "sudmovz"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sudmovz"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-inverse-interp = { path = "../../crates/oxwave-inverse-interp" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }
+oxwave-lu = { path = "../../crates/oxwave-lu" }
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-sinc-interp = { path = "../../crates/oxwave-sinc-interp" }

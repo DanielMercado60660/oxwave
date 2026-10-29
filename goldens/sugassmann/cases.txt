@@ -1,0 +1,21 @@
+# Defaults, modes, and overridden trace dimensions
+sugassmann
+sugassmann mode=1 nt=1 ntr=1 dt=.002 it1=0
+sugassmann mode=2 nt=7 ntr=3 dt=.001 it1=2
+sugassmann mode=-1 nt=0 ntr=0
+# Rock, fluid, environment, and sensitivity parameters
+sugassmann temp=80 pres=30 v1=2800 r1=2.4 g=.7 api=35 s=.1 so=.5 sg=.3
+sugassmann kmin=35000 mumin=40000 rmin=2.5 phi=.2 a=1.2 b=12 c=1.1 h=15 p=.05
+sugassmann p=0 sg=0 so=.5
+[stderr] sugassmann verbose=1
+sugassmann so=.9 sg=.5
+sugassmann nt=65536
+sugassmann mode=1 unknown=1
+sugassmann mode=1 dt=-.001 nt=-1 ntr=-1
+sugassmann dt=0 p=-.1
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+sugassmann api=10 g=1.8 s=.02 temp=15 pres=5 so=.3 sg=.4
+sugassmann phi=.05 c=2.5 a=.8 b=30 kmin=70000 mumin=30000 rmin=2.71 v1=4500 r1=2.5
+sugassmann sg=.01 so=0 p=1 g=.6 api=30
+sugassmann temp=250 pres=300 s=.8 so=.1 sg=.05 v1=2000 r1=2.1 p=.5

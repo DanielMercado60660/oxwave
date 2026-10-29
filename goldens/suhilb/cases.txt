@@ -1,0 +1,14 @@
+# No parameters or output modes; exercise small and non-power-of-two traces.
+suspike nt=1 ntr=1 | suhilb
+suspike nt=31 ntr=1 | suhilb
+suspike nt=61 ntr=2 | suhilb
+suspike nt=63 ntr=3 | suaddnoise seed=42 | suhilb
+sunull nt=37 ntr=2 | suhilb
+# First-trace seismic classifications, including non-seismic and negative IDs.
+[stderr] suspike nt=33 ntr=2 | sushw key=trid a=18 | suhilb
+[stderr] suspike nt=33 ntr=1 | sushw key=trid a=-1 | suhilb
+[stderr] suspike nt=33 ntr=1 | sushw key=trid a=109 | suhilb
+# Arguments are ignored by the original, including verbose and unknown names.
+[stderr] suspike nt=17 ntr=1 | suhilb verbose=1 unknown=-1
+# Empty input is an error.
+suhilb </dev/null

@@ -1,0 +1,12 @@
+# Raw midpoint pairs, defaults and zero scaling, with odd dimensions.
+[f32] suplane nt=1 ntr=1 | sushw key=sx,gx,sy,gy,scalco a=-101,200,301,-400,0 | su3dchart
+[f32] suplane nt=7 ntr=3 | sushw key=sx,gx,sy,gy,scalco a=100,200,-300,400,10 b=11,22,33,44,0 | su3dchart degree=0
+[f32] suplane nt=7 ntr=3 | sushw key=sx,gx,sy,gy,scalco,counit a=3600,7200,-10800,14400,-10,2 | su3dchart degree=1
+[f32] suplane nt=3 ntr=1 | sushw key=sx,gx,sy,gy,scalco,counit a=3600,7200,10800,14400,-2,1 | su3dchart degree=1
+[f32] suplane nt=3 ntr=1 | sushw key=sx,gx,sy,gy,scalco,counit a=3600,7200,10800,14400,-2,2 | su3dchart degree=-1
+# Parameter file is an additional output.
+suplane nt=3 ntr=3 | su3dchart outpar=count.par > pairs.bin; cat count.par
+[stderr] suplane nt=3 ntr=1 | su3dchart verbose=1 > /dev/null
+[stderr] su3dchart < /dev/null
+[stderr] su3dchart degree=999999999999999999999 < /dev/null
+[stderr] suplane nt=3 ntr=1 | su3dchart outpar=/nonexistent/path/count > /dev/null

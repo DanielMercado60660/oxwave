@@ -1,0 +1,557 @@
+{
+  "scope": "su/main/decon_shaping part 1 of 1",
+  "programs": [
+    {
+      "name": "sucddecon",
+      "path": "su/main/decon_shaping/sucddecon.c",
+      "purpose": "Deconvolve each trace by dividing its spectrum by the spectrum of a supplied filter.",
+      "selfdoc_first_line": " SUCDDECON - DECONvolution with user-supplied filter by straightforward",
+      "params": [
+        {
+          "name": "filter",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Filter coefficients; required unless sufile is supplied. Ignored when sufile is supplied."
+        },
+        {
+          "name": "sufile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "SU file containing filter traces; required unless filter is supplied."
+        },
+        {
+          "name": "panel",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use successive filter traces when nonzero; filter= forces this option off."
+        },
+        {
+          "name": "pnoise",
+          "type": "float",
+          "default": "0.001",
+          "required": false,
+          "description": "Spectral division stabilizing factor."
+        },
+        {
+          "name": "sym",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, change the sign of alternating spectral samples."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print diagnostic messages when nonzero."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "npfaro",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "countparval",
+        "warn",
+        "ealloc1float",
+        "ealloc1complex",
+        "efopen",
+        "fgettr",
+        "checkpars",
+        "pfarc",
+        "rcabs",
+        "cmplx",
+        "cmul",
+        "conjg",
+        "cadd",
+        "cdiv",
+        "pfacr",
+        "puttr"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT and complex division are sensitive to arithmetic order. sum_powspec is never reset between traces, so the stabilizer accumulates across the entire input. The file-based filter buffer is not initialized beyond the copied samples in the non-panel path. The code sums nfft complex bins although a real FFT produces only nfft/2+1 meaningful bins, and does not normalize the inverse FFT. Filter length and shifted trace copies can exceed the FFT buffers for unsuitable inputs.",
+      "c_lines": 286,
+      "difficulty": "medium",
+      "difficulty_reason": "The program performs FFT-based complex deconvolution and handles either a fixed filter or a trace-by-trace filter panel.",
+      "test_cases": [
+        {
+          "description": "Use command-line coefficients and non-default stabilization.",
+          "command": "suplane nt=128 ntr=16 | sucddecon filter=1,0.3,-0.1 pnoise=0.02 sym=1"
+        },
+        {
+          "description": "Use a separate filter panel.",
+          "command": "suspike nt=64 ntr=8 > filter.su && suplane nt=128 ntr=8 | sucddecon sufile=filter.su panel=1 pnoise=0.01"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sufxdecon",
+      "path": "su/main/decon_shaping/sufxdecon.c",
+      "purpose": "Attenuate random noise using spatial prediction filters in the frequency domain.",
+      "selfdoc_first_line": " SUFXDECON - random noise attenuation by FX-DECONvolution              ",
+      "params": [
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: tr.dt / 1000000; 0.004 if zero",
+          "required": false,
+          "description": "Trace sample interval in seconds."
+        },
+        {
+          "name": "taper",
+          "type": "float",
+          "default": "0.1",
+          "required": false,
+          "description": "Time-window taper length in seconds; an explicit zero is replaced by 0.004."
+        },
+        {
+          "name": "fmin",
+          "type": "float",
+          "default": "6",
+          "required": false,
+          "description": "Minimum processed frequency in Hz; an explicit zero remains zero despite the warning."
+        },
+        {
+          "name": "fmax",
+          "type": "float",
+          "default": "computed: 0.6 / (2 * dt)",
+          "required": false,
+          "description": "Maximum processed frequency in Hz; an explicit zero remains zero despite the warning."
+        },
+        {
+          "name": "twlen",
+          "type": "float",
+          "default": "computed: max((ns - 1) * dt, 0.3)",
+          "required": false,
+          "description": "Time-window length in seconds; values below 0.3 are raised to 0.3."
+        },
+        {
+          "name": "ntrw",
+          "type": "int",
+          "default": "10",
+          "required": false,
+          "description": "Number of traces per spatial window; zero is replaced by 10."
+        },
+        {
+          "name": "ntrf",
+          "type": "int",
+          "default": "4",
+          "required": false,
+          "description": "Prediction filter length in traces; an explicit zero remains zero despite the warning."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print diagnostic messages when nonzero."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string",
+          "required": false,
+          "description": "Directory for named temporary files; an empty string uses tmpfile()."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "warn",
+        "checkpars",
+        "etmpfile",
+        "temporary_filename",
+        "efopen",
+        "efwrite",
+        "erewind",
+        "npfaro",
+        "ealloc1complex",
+        "ealloc1float",
+        "ealloc1int",
+        "ealloc2complex",
+        "ealloc2float",
+        "efread",
+        "efclose",
+        "pfarc",
+        "conjg",
+        "LU_decomposition",
+        "backward_substitution",
+        "cmplx",
+        "pfacr",
+        "puttr",
+        "free1float",
+        "free1complex",
+        "free2complex",
+        "free2float",
+        "eremove",
+        "alloc1complex",
+        "cadd",
+        "cmul"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, complex correlation, LU decomposition, and overlap accumulation depend on floating-point operation order. ffreq is allocated without initialization and is assigned only for frequencies inside the requested band, but all its frequency bins are subsequently read. Spatial window count uses integer division; inputs with fewer traces than ntrw receive zero output, and the handling of incomplete windows depends on the window count. The local complex convolution shifts pointers outside their original arrays, which is undefined C behavior.",
+      "c_lines": 608,
+      "difficulty": "hard",
+      "difficulty_reason": "Windowed FFT processing combines multi-trace buffering with complex correlation, dense linear solves, and overlap reconstruction.",
+      "test_cases": [
+        {
+          "description": "Process a single time window with a smaller spatial prediction filter.",
+          "command": "suplane nt=256 ntr=20 | sufxdecon dt=0.004 ntrw=10 ntrf=2 fmin=5 fmax=60"
+        },
+        {
+          "description": "Exercise multiple time and spatial windows.",
+          "command": "suplane nt=512 ntr=24 | sufxdecon dt=0.004 twlen=0.8 taper=0.08 ntrw=8 ntrf=3 fmin=4 fmax=80"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "supef",
+      "path": "su/main/decon_shaping/supef.c",
+      "purpose": "Apply a Wiener predictive error filter to each input trace.",
+      "selfdoc_first_line": " SUPEF - Wiener (least squares) predictive error filtering\t\t",
+      "params": [
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt / 1000000",
+          "required": false,
+          "description": "Sample interval in seconds; required only if the first trace header dt is zero, and otherwise not read from the command line."
+        },
+        {
+          "name": "cdp",
+          "type": "float array",
+          "default": "computed: first trace header cdp",
+          "required": false,
+          "description": "CDP positions for lag arrays; specifying it requires equally sized minlag and maxlag arrays."
+        },
+        {
+          "name": "minlag",
+          "type": "float array",
+          "default": "computed: one sample, equivalent to dt",
+          "required": false,
+          "description": "First prediction lag in seconds; required when cdp is supplied."
+        },
+        {
+          "name": "maxlag",
+          "type": "float array",
+          "default": "computed: NINT(0.05 * ns) samples",
+          "required": false,
+          "description": "Last prediction lag in seconds; required when cdp is supplied."
+        },
+        {
+          "name": "pnoise",
+          "type": "float",
+          "default": "0.001",
+          "required": false,
+          "description": "Relative additive noise applied to zero-lag autocorrelation."
+        },
+        {
+          "name": "mincorr",
+          "type": "float",
+          "default": "computed: sample index 0",
+          "required": false,
+          "description": "Start of the correlation window in seconds."
+        },
+        {
+          "name": "maxcorr",
+          "type": "float",
+          "default": "computed: sample index ns",
+          "required": false,
+          "description": "End of the correlation window in seconds; the code uses an inclusive count."
+        },
+        {
+          "name": "wienerout",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Output prediction error filter traces and write Wiener coefficients to outpar when nonzero."
+        },
+        {
+          "name": "mix",
+          "type": "float array",
+          "default": "1",
+          "required": false,
+          "description": "Autocorrelation mixing weights, each divided by the number of supplied weights."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/null",
+          "required": false,
+          "description": "File opened for Wiener coefficient output."
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "default": "linear",
+          "required": false,
+          "description": "CDP interpolation method: linear, mono, akima, or spline."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparfloat",
+        "getparstring",
+        "getparint",
+        "countparval",
+        "efopen",
+        "ealloc1float",
+        "ealloc1int",
+        "ealloc2float",
+        "checkpars",
+        "free1float",
+        "free2float",
+        "intlin",
+        "cmonot",
+        "intcub",
+        "cakima",
+        "csplin",
+        "xcor",
+        "puttr",
+        "warn",
+        "stoepf"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Correlation, mixed autocorrelation accumulation, Wiener-Levinson recursion, interpolation, and convolution depend on float operation order. The CDP branch compares iminlag and imaxlag pointers instead of their elements and contains potentially out-of-bounds interpolation and filter-output accesses; buffer byte sizes are not consistently updated after changing CDP. The default correlation count is ns+1, and the correlation call uses the original data pointer with nonzero correlation indices rather than offsetting it.",
+      "c_lines": 604,
+      "difficulty": "hard",
+      "difficulty_reason": "Wiener-Levinson filtering combines stateful trace mixing with CDP-dependent interpolation and complicated buffer management.",
+      "test_cases": [
+        {
+          "description": "Apply a gapped prediction filter with mixed autocorrelations.",
+          "command": "suplane nt=256 ntr=12 | supef minlag=0.008 maxlag=0.04 mincorr=0.0 maxcorr=0.8 pnoise=0.01 mix=1,0.5"
+        },
+        {
+          "description": "Output prediction error filter traces and coefficients.",
+          "command": "suplane nt=128 ntr=8 | supef minlag=0.004 maxlag=0.024 wienerout=1 outpar=/dev/null"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "sushape"
+      ]
+    },
+    {
+      "name": "suphidecon",
+      "path": "su/main/decon_shaping/suphidecon.c",
+      "purpose": "Extract a wavelet using the pseudo-cepstrum and remove it from each trace.",
+      "selfdoc_first_line": " SUPHIDECON - PHase Inversion Deconvolution\t\t\t\t",
+      "params": [
+        {
+          "name": "tm",
+          "type": "float",
+          "default": "-0.1",
+          "required": false,
+          "description": "Pre-zero time defining the wavelet extraction window."
+        },
+        {
+          "name": "tp",
+          "type": "float",
+          "default": "0.4",
+          "required": false,
+          "description": "Post-zero time defining the wavelet extraction window."
+        },
+        {
+          "name": "pad",
+          "type": "float",
+          "default": "0.1",
+          "required": false,
+          "description": "Used as a percentage in the spectral stabilizer; overwritten with the resulting stabilizer on every trace. FFT padding is actually fixed at 50 percent."
+        },
+        {
+          "name": "pnoise",
+          "type": "float",
+          "default": "",
+          "required": false,
+          "description": "Listed in the selfdoc as 0.001, but the source never reads or uses this parameter."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "gettr",
+        "err",
+        "ealloc1float",
+        "hanningnWindow",
+        "ealloc1complex",
+        "wrapArray",
+        "crmul",
+        "pfacc",
+        "sscal",
+        "cwp_cexp",
+        "cmplx",
+        "pfarc",
+        "rcabs",
+        "cdiv",
+        "pfacr",
+        "puttr",
+        "free1complex",
+        "npfao",
+        "hilbert",
+        "cwp_clog",
+        "free1float"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, Hilbert transform, complex logarithm and exponential, and complex division are sensitive to floating-point and math-library behavior. The stabilizer pad is mutated between traces. The code pads tr.data through nfft without checking that nfft fits the trace data array; window sizes are also unchecked. The reconstructed full spectrum leaves a bin uninitialized for even nfft.",
+      "c_lines": 272,
+      "difficulty": "medium",
+      "difficulty_reason": "The algorithm combines FFTs, a Hilbert transform, complex logarithms, windowing, and spectral division.",
+      "test_cases": [
+        {
+          "description": "Use a short extraction window and non-default stabilizer.",
+          "command": "suplane nt=256 ntr=8 | suphidecon tm=-0.04 tp=0.12 pad=0.2"
+        },
+        {
+          "description": "Process multiple spike traces with a different extraction window.",
+          "command": "suspike nt=128 ntr=4 dt=0.004 | suphidecon tm=-0.02 tp=0.08 pad=1"
+        }
+      ],
+      "license_note": "Credits Potash Corporation, Saskatchewan, and Balasz Nemeth; supplied to CWP by Potash Corporation in 2008, originally as supid.c. References an SEG Geophysics reprint.",
+      "related_programs": []
+    },
+    {
+      "name": "sushape",
+      "path": "su/main/decon_shaping/sushape.c",
+      "purpose": "Apply a Wiener filter that shapes an input wavelet into a desired wavelet.",
+      "selfdoc_first_line": " SUSHAPE - Wiener shaping filter\t\t\t\t\t",
+      "params": [
+        {
+          "name": "w",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Input wavelet coefficients; required unless wfile is supplied."
+        },
+        {
+          "name": "wfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "SU file whose first trace supplies the input wavelet."
+        },
+        {
+          "name": "d",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Desired wavelet coefficients; required unless dfile is supplied."
+        },
+        {
+          "name": "dfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "SU file whose first trace supplies the desired wavelet."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt / 1000000",
+          "required": false,
+          "description": "Sample interval in seconds; required only if the first trace header dt is zero, and otherwise not read from the command line."
+        },
+        {
+          "name": "nshape",
+          "type": "int",
+          "default": "computed: first trace ns",
+          "required": false,
+          "description": "Number of shaping filter coefficients."
+        },
+        {
+          "name": "pnoise",
+          "type": "float",
+          "default": "0.001",
+          "required": false,
+          "description": "Relative additive noise applied to zero-lag autocorrelation."
+        },
+        {
+          "name": "showshaper",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print shaping filter coefficients to stderr when nonzero."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print the shaping filter label when showshaper is enabled."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparfloat",
+        "getparint",
+        "getparstring",
+        "countparval",
+        "ealloc1float",
+        "fgettr",
+        "checkpars",
+        "xcor",
+        "stoepf",
+        "warn",
+        "convolve_cwp",
+        "puttr"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Correlation, Wiener-Levinson recursion, and convolution depend on floating-point accumulation order; the filter origin uses integer division of (nw-nd)/2.",
+      "c_lines": 186,
+      "difficulty": "medium",
+      "difficulty_reason": "The program constructs and solves Wiener shaping equations before convolving every trace.",
+      "test_cases": [
+        {
+          "description": "Shape using command-line wavelets and print the filter.",
+          "command": "suplane nt=128 ntr=8 | sushape w=1,0.5,0.2 d=1,0,-0.2 nshape=12 pnoise=0.01 showshaper=1"
+        },
+        {
+          "description": "Read both wavelets from SU files.",
+          "command": "suspike nt=32 ntr=1 > wavelet.su && suspike nt=32 ntr=1 > desired.su && suplane nt=128 ntr=8 | sushape wfile=wavelet.su dfile=desired.su nshape=16 pnoise=0.005"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "supef"
+      ]
+    }
+  ]
+}

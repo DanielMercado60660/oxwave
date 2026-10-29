@@ -1,0 +1,69 @@
+# Strip volatile PostScript metadata so successful plots are compared.
+suplane nt=5 ntr=9 | sustrip outpar=/dev/null | pscube n1=5 n2=3 n3=3 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=9 | sustrip outpar=/dev/null | pscube n1=5 n2=3 n3=3 legend=1 lstyle=horibottom brgb=0,0,1 wrgb=1,0,0 bps=24 d1s=0.5 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=9 | sustrip outpar=/dev/null | pscube n1=5 n2=3 n3=3 faces=1 bhls=0,0.2,1 whls=0.8,0.8,1 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pscube n2=2 n3=2
+pscube n1=2 n3=2
+pscube n1=2 n2=2
+pscube n1=2 n2=2 n3=2
+pscube n1=2 n2=2 n3=2 faces=1
+pscube n1=2 n2=2 n3=2 front=missing
+pscube n1=2 n2=2 n3=2 front=missing side=missing top=missing
+pscube n1=2 n2=2 n3=2 brgb=0,0,1 bps=8
+suplane nt=5 ntr=9 | sustrip outpar=/dev/null | pscube n1=5 n2=3 n3=3 brgb=0,0,1 wrgb=1,0,0 bps=24 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Percentiles, explicit clips, and their parameter-read order.
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 perc=82 bperc=65 wperc=20 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 perc=-10 bperc=-1 wperc=110 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 clip=0.5 bclip=0.25 wclip=-0.3 legend=1 units=Amplitude verbose=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 bclip=0.25 perc=90 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 wclip=-0.3 perc=90 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 clip=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 bclip=-0.5 wclip=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# All three legend styles, supplied endpoints, size/position overrides and grids.
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 legend=1 lstyle=vertleft lgrid=dot ldnum=0.1 units=V verbose=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 legend=1 lstyle=vertright lgrid=dash lbeg=-2 lend=2 lfnum=1 ldnum=0.5 lntic=3 legendfont=Courier lwidth=0.3 lheight=2 lx=7 ly=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 legend=1 lstyle=horibottom lgrid=solid lbeg=-2 ldnum=0.5 units=Volts verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 legend=1 lstyle=invalid lgrid=invalid lend=2 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Sampling, axis ranges, ticks, labels, fonts, colors and dimensions.
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 d1=0.2 d2=2 d3=3 f1=1 f2=-3 f3=10 x1end=1.71 x2beg=-1.1 x3end=16.1 d1num=0.2 f1num=1 n1tic=2 d2num=2 f2num=-3 n2tic=2 d3num=3 f3num=10 n3tic=3 grid1=dot grid2=dash grid3=solid label1=Depth label2=Inline label3=Crossline labelfont=Courier labelsize=12 title='Cube plot' titlefont=Times-Bold titlesize=20 titlecolor=red axescolor=blue gridcolor=#255 angle=30 size1=3 size2=5 size3=2 xbox=2 ybox=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 d1=-0.2 d2=-2 d3=-3 f1=1 f2=3 f3=10 d1s=0.5 d2s=0.5 d3s=2 grid1=solid grid2=dot grid3=dash label1=A label2=B label3=C | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 x1end=-100 x2beg=100 x3end=-100 grid1=bad grid2=none grid3=bad | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 d1s=-0.6 d2s=1.8 d3s=-0.7 angle=60 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 d1s=20 d2s=20 d3s=20 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 angle=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 angle=100 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 d1=0 d2=0 d3=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# RGB and HLS, both 12/24-bit packing, even/odd row widths and gray shortcuts.
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 brgb=-1,0.2,2 wrgb=0.8,0.7,-1 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 wrgb=0.1,0.2,0.3 bps=24 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 brgb=0,0,0 wrgb=1,1,1 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 bhls=-1.2,0.2,1 whls=2.1,0.8,0.7 bps=24 legend=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 bhls=0,0,0 whls=0,1,0 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 whls=1,0.5,2 bps=24 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 bhls=0.1,-1,2 brgb=0.1,0.2,0.3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=4 ntr=8 | suaddnoise seed=12 | sustrip outpar=/dev/null | pscube n1=4 n2=2 n3=4 brgb=0.1,0.2,0.8 wrgb=0.9,0.5,0.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Singleton and non-power-of-two dimensions; explicit defaults.
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | pscube n1=1 n2=1 n3=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=1 ntr=15 | sustrip outpar=/dev/null | pscube n1=1 n2=3 n3=5 d2s=0.5 d3s=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | pscube n1=7 n2=1 n3=5 d1s=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=1 d2s=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=123 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 faces=0 d1=1 d2=1 d3=1 f1=0 f2=0 f3=0 perc=100 d1s=1 d2s=1 d3s=1 angle=45 size1=4 size2=4 size3=3 xbox=1.5 ybox=1.5 d1num=0 d2num=0 d3num=0 n1tic=1 n2tic=1 n3tic=1 grid1=none grid2=none grid3=none labelfont=Helvetica labelsize=18 titlefont=Helvetica-Bold titlesize=24 titlecolor=black axescolor=black gridcolor=black legend=0 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Separate face files, face stream and every opening/short-read error.
+[stderr] suplane nt=7 ntr=15 | suaddnoise seed=12 | sustrip outpar=/dev/null | pscube n1=7 n2=3 n3=5 faces=1 d1s=0.5 d2s=1.5 d3s=0.5 legend=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=5 | sustrip outpar=/dev/null > face; pscube n1=7 n2=3 n3=5 front=face side=face top=face legend=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pscube n1=2 n2=2 n3=2 side=missing
+[stderr] pscube n1=2 n2=2 n3=2 top=missing
+[stderr] pscube n1=2 n2=2 n3=2 front=/dev/null side=missing top=missing
+[stderr] suplane nt=4 ntr=1 | sustrip outpar=/dev/null > face; pscube n1=2 n2=2 n3=2 front=face side=missing top=missing
+[stderr] suplane nt=4 ntr=1 | sustrip outpar=/dev/null > face; pscube n1=2 n2=2 n3=2 front=face side=/dev/null top=missing
+[stderr] suplane nt=4 ntr=1 | sustrip outpar=/dev/null > face; pscube n1=2 n2=2 n3=2 front=face side=face top=missing
+[stderr] suplane nt=4 ntr=1 | sustrip outpar=/dev/null > face; pscube n1=2 n2=2 n3=2 front=face side=face top=/dev/null
+[stderr] suplane nt=4 ntr=1 | sustrip outpar=/dev/null | pscube n1=2 n2=2 n3=2 faces=1
+[stderr] suplane nt=4 ntr=2 | sustrip outpar=/dev/null | pscube n1=2 n2=2 n3=2 faces=1
+[stderr] pscube n1=2 n2=2 n3=2 bhls=0,0,1 bps=8
+# Empty dimensions: retain the original build's zero-valued guard reads.
+[stderr] pscube n1=0 n2=2 n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pscube n1=2 n2=0 n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pscube n1=2 n2=2 n3=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pscube n1=-3 n2=2 n3=2
+[stderr] pscube n1=2147483648 n2=2 n3=2

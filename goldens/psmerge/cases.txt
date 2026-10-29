@@ -1,0 +1,16 @@
+# Default transforms, comments, showpage, and integer bounding box.
+printf '%%!PS\n%%%%BoundingBox: -5 -10 101 203\n1 2 moveto\nshowpage\n' > a.ps; psmerge in=a.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# All transformations, negative scale, and repeated inputs with inherited values.
+printf '%%%%BoundingBox: -21 5 77 113\n123 456 moveto\n' > a.ps; psmerge in=a.ps in=a.ps in=a.ps origin=1,-2 origin=3 scale=-1,0.5 scale=2 rotate=33 rotate=-45 translate=2,-1 translate=0,0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Floating bounding box, atend comment, and a subsequent box.
+printf '%%%%BoundingBox: (atend)\n%%%%BoundingBox: -1.5 -2.5 10.5 20.5\n0 0 moveto\n' > a.ps; psmerge in=a.ps rotate=90 scale=0,2 origin=-1,1 translate=-2,3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Empty input and input without bounding box.
+touch a.ps; psmerge in=a.ps verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf 'hello\n showpage\n' > a.ps; psmerge in=a.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Error exits.
+psmerge | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmerge in=missing.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%BoundingBox: nonsense\n' > a.ps; psmerge in=a.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Real PostScript generators and odd dimensions.
+pslabel t=First > a.ps; pslabel t=Second > b.ps; psmerge in=a.ps in=b.ps translate=0,0 translate=2,1 rotate=30 scale=0.8,1.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=63 ntr=7 | sustrip outpar=/dev/null | pswigb n1=63 n2=7 verbose=0 > a.ps && psmerge in=a.ps origin=1,1 scale=0.5,0.5 rotate=-90 translate=1,2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

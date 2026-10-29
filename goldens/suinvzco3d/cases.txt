@@ -1,0 +1,66 @@
+# Small full 3D inversions, with nonzero samples and odd lengths.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 verbose=0
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=7.5 na=37 fzo=7.5 fyo=3.5 dzo=7.5 fmax=40 ang=65 nxc=3 nzc=2 nxb=4
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=-7.5 dt=0.006 fxo=3 fxm=2 dxo=12 dyo=11
+# Header defaults and parsed but unused options.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | sushw key=d2 a=15 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dy=15 dz=15 nxo=5 nyo=4 nzo=5 nxc=99 nzc=99
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 dx=77 fx=30 nxd=2
+# Empty input and ordered parameter validation.
+[stderr] suinvzco3d
+[stderr] sunull nt=1 | suinvzco3d dt=0
+[stderr] sunull nt=1 | suinvzco3d dt=-1
+[stderr] sunull nt=1 | suinvzco3d dxm=0
+[stderr] sunull nt=1 | suinvzco3d dxm=-1
+[stderr] sunull nt=1 | suinvzco3d dxm=15
+[stderr] sunull nt=1 | suinvzco3d dxm=15 ny=1
+[stderr] sunull nt=1 | suinvzco3d dxm=15 ny=1 nz=5
+[stderr] sunull nt=1 | suinvzco3d dxm=15 ny=1 nz=5 nxm=1
+[stderr] sunull nt=1 | suinvzco3d dxm=15 ny=1 nz=5 nxm=1 vfile=x fxm=1
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=1000
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 dxo=1000
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 dyo=1000
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=2f",*([1500.0]*2)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5
+# Single input trace and nt=1; nxo=nyo=2 are the stencil minimum.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=1 ntr=1 dt=0.004 | suinvzco3d ny=1 nz=10 nxm=1 vfile=v dxm=60 dy=60 dz=15 nxo=2 nyo=2 nzo=5 na=9 nxb=0
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nzo=1
+{ python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nxo=1; } 2>/dev/null
+{ python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nyo=1; } 2>/dev/null
+# Default output counts and spacings, retained by an undersized model error.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15
+# Negative band and output-grid origin errors.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nxb=-1
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 fxo=-1
+# Velocity turning rays.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",1500,1600,1700,1800,1900,2000,2100,2200,2300,2400))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 na=9
+# All zero data and no verbose lines.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=127 ntr=20 dt=0.004 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 verbose=0
+# Read failures: missing velocity file is unchecked by C.
+{ sunull nt=1 | suinvzco3d dxm=15 ny=1 nz=5 nxm=1 vfile=missing nxo=2 nyo=2 nzo=2; } 2>/dev/null
+# Default dy, dz, grid counts and spacings, single input trace.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=101f",*([2000.0]*101)))'; sunull nt=1 ntr=1 | sushw key=d2 a=2000 | suinvzco3d ny=31 nz=101 nxm=1 vfile=v
+# Random nonzero samples exercise every interpolation term.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=3 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=15 na=101
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=11 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=0 na=2
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=29 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=0 na=17 dzo=9 dz=18 fyo=4 fzo=3 dxo=9 dyo=12
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=59 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 offs=0 na=63 dxo=10 dyo=13 nxb=9
+# Empty velocity file, zero output count, parameter-file precedence.
+[stderr] python3 -c 'import struct; open("v","wb").write(b"")'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nxo=0
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; printf "offs=0\nna=13\nverbose=0\n" > p; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 par=p na=21
+# Equal velocity/output spacing reads the C velocity boundary.
+python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 nz=5
+# No additional output modes: output is always an SU depth volume.
+# Header-derived dt validation and getpar conversion errors.
+[stderr] sunull nt=3 ntr=1 | sushw key=dt a=0 | suinvzco3d dxm=15 ny=1 nz=5 nxm=1 vfile=v
+[stderr] sunull nt=3 ntr=1 | suinvzco3d dxm=15 ny=2147483648
+# Explicit verbose=1 and disabled operator options at zero/negative values.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=71 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 verbose=1 fmax=0 ang=-30 nxc=-1 nzc=-1
+# Nonconstant decreasing velocity and a header-supplied negative offset.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",2400,2300,2200,2100,2000,1900,1800,1700,1600,1500))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=73 | sushw key=offset a=-7 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 na=31
+# Empty numeric dt uses the header; repeated numeric parameters use the last value.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=3 ntr=20 dt=0.004 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=5 dt= verbose=0 verbose=1
+# Finer output depth grids reach iz > nz while zo remains in the model.
+# The unused sins/sing calculations must not panic on the C velocity tail reads.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=79 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=19 dzo=7.5 na=37
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",1500,1600,1700,1800,1900,2000,2100,2200,2300,2400))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=27 dzo=5 fzo=2.5 na=31

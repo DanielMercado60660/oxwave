@@ -1,0 +1,11 @@
+# No BoundingBox and malformed BoundingBox.
+psepsi </dev/null | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: 0 1 bad 4\n%%%%EndComments\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: (atend)\n%%%%EndComments\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Valid, odd-sized, negative-origin, zero-sized and deferred bounding boxes.
+printf '%%!PS\n%%%%BoundingBox: 0 0 3 5\n%%%%EndComments\nshowpage\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: -3 -5 4 6\n%%%%EndComments\nshowpage\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: 0 0 0 0\n%%%%EndComments\nshowpage\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: (atend)\n%%%%EndComments\nshowpage\n%%%%BoundingBox: 0 0 1 1\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%!PS\n%%%%BoundingBox: 0 0 1 1\nshowpage\n' | psepsi verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=4 | sustrip | psgraph n=32 d1=1 | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

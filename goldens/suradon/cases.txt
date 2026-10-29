@@ -1,0 +1,72 @@
+# Effective defaults, including the second ninterp=1 default in the C source.
+suplane nt=65 ntr=7 | sushw key=cdp,offset a=1,100 b=0,150 | suradon
+suplane nt=65 ntr=7 | sushw key=cdp,offset a=1,100 b=0,150 | suradon choose=0 igopt=1 offref=2000 interoff=0 pmin=-200 pmax=400 dp=16 anderson=1 pmula=80 pmulb=200 depthref=500 nwin=1 f1=60 f2=80 prewhite=0.1 cdpkey=cdp offkey=offset nxmax=240 ltaper=7 ninterp=1 freq1=4 freq2=20 lagc=400 lent=5 lenx=7 xopt=1
+# All output modes, both parameter-header conventions, and geometries.
+suplane nt=73 ntr=9 | sushw key=offset a=-800 b=200 | suradon choose=0 igopt=2 depthref=750 offref=1800 interoff=100 pmin=-64 pmax=96 dp=8 ninterp=0 anderson=0
+suplane nt=67 ntr=7 | sushw key=offset a=-600 b=200 | suradon choose=0 igopt=3 interoff=-25 offref=1500 pmin=-48 pmax=48 dp=8 anderson=2
+suplane nt=67 ntr=7 | sushw key=offset a=-600 b=200 | suradon choose=0 igopt=4 pmin=-48 pmax=48 dp=8
+suplane nt=67 ntr=7 | sushw key=offset a=-600 b=200 | suradon choose=0 igopt=0 pmin=-48 pmax=48 dp=8
+suplane nt=81 ntr=9 | sushw key=offset a=100 b=200 | suradon choose=1 ninterp=2 pmin=-32 pmax=96 dp=8 pmula=0 pmulb=64 ltaper=3
+suplane nt=81 ntr=9 | sushw key=offset a=100 b=200 | suradon choose=2 ninterp=0 pmin=-32 pmax=96 dp=8 pmula=0 pmulb=64
+suplane nt=81 ntr=9 | sushw key=offset a=100 b=200 | suradon choose=3 ninterp=0 igopt=2 prewhite=0.25 pmin=-32 pmax=96 dp=8
+suplane nt=63 ntr=7 | sushw key=offset a=100 b=100 | suradon choose=4 pmin=-48 pmax=48 dp=16
+# Inverse mode counts distinct consecutive offsets, keeping the first headers.
+suplane nt=63 ntr=8 | sushw key=offset a=100 b=100 j=2 | suradon choose=4 igopt=3 pmin=-32 pmax=32 dp=8
+suplane nt=63 ntr=7 | suradon choose=4
+suplane nt=65 ntr=7 | sushw key=offset a=100 b=200 | suradon choose=-1 ninterp=0 pmin=-32 pmax=32 dp=16
+suplane nt=65 ntr=7 | sushw key=offset a=100 b=200 | suradon choose=5 ninterp=0 pmin=-32 pmax=32 dp=16
+# Multiple ensembles, varying gather sizes, and header-key selection.
+suplane nt=55 ntr=17 | sushw key=cdp,offset a=1,-400 b=0,200 c=1,0 j=6,6 | suradon nxmax=6 ninterp=0 pmin=-32 pmax=32 dp=16
+suplane nt=55 ntr=15 | sushw key=fldr,gx a=10,-500 b=0,250 c=1,0 j=5,5 | suradon cdpkey=fldr offkey=gx nxmax=5 choose=3 igopt=4 ninterp=1 pmin=-32 pmax=32 dp=16
+# Mute-zone windows; use no trace interpolation so mute indices are defined.
+suplane nt=97 ntr=12 | sushw key=offset,muts a=100,0 b=100,24 | suradon nwin=3 ninterp=0 pmin=-64 pmax=128 dp=8
+suplane nt=97 ntr=12 | sushw key=offset,muts a=100,0 b=100,24 | suradon nwin=3 ninterp=0 choose=1 pmin=-64 pmax=128 dp=8 pmula=16 pmulb=80 ltaper=0
+suplane nt=49 ntr=5 | sushw key=offset a=100 b=300 | suradon nwin=-2 ninterp=0 pmin=-16 pmax=16 dp=16
+# nwin=0 skips the transform's window loops (C uses untouched scratch memory).
+suplane nt=25 ntr=3 | suradon nwin=0 ninterp=0 pmin=-16 pmax=16 dp=16
+# Interpolation picker options: finite differences, FFT derivative, fallback.
+suplane nt=91 ntr=17 | sushw key=offset a=-800 b=100 | suradon igopt=3 ninterp=1 xopt=0 freq1=3 freq2=25 lagc=120 lent=4 lenx=2 pmin=-48 pmax=48 dp=8
+suplane nt=79 ntr=5 | sushw key=offset a=-400 b=200 | suradon igopt=3 ninterp=2 xopt=0 freq1=2 freq2=15 lagc=0 lent=1 lenx=1 pmin=-32 pmax=32 dp=8
+suplane nt=79 ntr=5 | sushw key=offset a=-400 b=200 | suradon igopt=3 ninterp=1 freq1=0 freq2=20 lagc=-1 lent=-1 lenx=-1 pmin=-32 pmax=32 dp=8
+# Negative interpolation count (-1 collapses the interpolated gather to one).
+suplane nt=45 ntr=5 | sushw key=offset a=100 b=200 | suradon ninterp=-1 pmin=-16 pmax=16 dp=16
+# Frequency taper, a single ray parameter, zero data, and zero mute limits.
+suplane nt=77 ntr=7 | sushw key=offset a=100 b=200 | suradon ninterp=0 f1=10 f2=30 pmin=0 pmax=0 dp=16
+suplane nt=77 ntr=7 | sushw key=offset a=100 b=200 | suradon ninterp=0 f1=-1 f2=0 pmin=-32 pmax=32 dp=16
+sunull nt=43 ntr=5 | sushw key=offset a=100 b=200 | suradon ninterp=1 prewhite=0 pmin=-32 pmax=32 dp=16
+suplane nt=77 ntr=7 | sushw key=offset a=100 b=200 | suradon choose=1 ninterp=0 pmula=0 pmulb=0 ltaper=0 pmin=0 pmax=64 dp=16
+suplane nt=5 ntr=3 | sushw key=offset a=100 b=200 | suradon choose=1 ninterp=0 pmula=0 pmulb=400 ltaper=-3 pmin=0 pmax=400 dp=16
+# Odd sizes and the unchanged single-trace path (including header values).
+sunull nt=1 ntr=3 | sushw key=offset a=100 b=100 | suradon ninterp=0 pmin=-16 pmax=16 dp=16
+sunull nt=1 ntr=3 | sushw key=offset a=100 b=100 | suradon ninterp=1 pmin=-16 pmax=16 dp=16
+suplane nt=37 ntr=1 | sushw key=f2,d2 a=7,11 | suradon choose=0 nxmax=1
+suplane nt=37 ntr=1 | suradon choose=4 nxmax=1
+suplane nt=37 ntr=5 | sushw key=cdp a=1 b=1 | suradon choose=1 nxmax=1 ninterp=0
+# Both solvers: narrow underdetermined and wider regularized systems.
+suplane nt=127 ntr=5 | sushw key=offset a=1500 b=100 | suradon ninterp=0 pmin=-200 pmax=400 dp=8 prewhite=0.01
+suplane nt=127 ntr=17 | sushw key=offset a=-1600 b=200 | suradon ninterp=0 igopt=3 pmin=-128 pmax=128 dp=32 prewhite=0.5
+# Full diagnostic comparison for verbose and unknown parameters.
+[stderr] suplane nt=39 ntr=3 | suradon verbose=1 ninterp=0 pmin=-16 pmax=16 dp=16
+[stderr] suplane nt=39 ntr=3 | suradon verbose=0 unexpected=1 ninterp=0 pmin=-16 pmax=16 dp=16
+# Empty input, bad keys, invalid ranges, and parser failures.
+[stderr] suradon
+[stderr] suradon choose=4
+[stderr] suradon cdpkey=bogus
+[stderr] suradon offkey=bogus
+[stderr] suradon pmin=100 pmax=-100 dp=16
+[stderr] suradon pmin=-32 pmax=32 dp=-16
+[stderr] suradon offref=0
+[stderr] suradon nxmax=999999999999999999
+[stderr] suradon freq1=1e-310
+# Interpolation and mute windows together. Spare mute allocation is
+# zero-initialized in Rust; zero input keeps C's untouched mute slots from
+# influencing the samples. Out-of-allocation mute reads are checked separately.
+sunull nt=65 ntr=4 | sushw key=offset,muts a=100,0 b=100,0 | suradon nxmax=8 ninterp=1 nwin=3 pmin=-32 pmax=32 dp=16
+# ninterp=-1 collapses the interpolated gather; both window mute indices are
+# initialized original trace entries, so this exercises nonzero samples too.
+suplane nt=65 ntr=4 | sushw key=offset,muts a=100,0 b=100,24 | suradon nxmax=4 ninterp=-1 nwin=3 pmin=-32 pmax=32 dp=16
+# These panels exceed VND's memory limits: interpolation scratch and result,
+# original/result with no interpolation, and the separate multi-window panel.
+suplane nt=1025 ntr=129 | sushw key=offset a=-6400 b=100 | suradon nxmax=129 ninterp=1 xopt=0 choose=3 igopt=3 pmin=-64 pmax=64 dp=16
+suplane nt=2049 ntr=129 | sushw key=offset a=-6400 b=100 | suradon nxmax=129 ninterp=0 choose=1 pmin=-64 pmax=64 dp=16 pmula=0 pmulb=32
+suplane nt=1025 ntr=25 | sushw key=offset,muts a=100,0 b=100,32 | suradon nxmax=25 ninterp=0 nwin=25 pmin=-128 pmax=128 dp=16

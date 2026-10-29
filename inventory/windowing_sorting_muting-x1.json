@@ -1,0 +1,498 @@
+{
+  "scope": "su/main/windowing_sorting_muting (re-scout batch 1)",
+  "programs": [
+    {
+      "name": "subraid",
+      "path": "su/main/windowing_sorting_muting/subraid.c",
+      "purpose": "Merge ordered traces from multiple files into one ordered stream.",
+      "selfdoc_first_line": " SUBRAID - Braid traces from files together and output.                ",
+      "params": [
+        {
+          "name": "in0 through in99",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Input SU filenames; at least two distinct inMM parameters are required."
+        },
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "",
+          "required": true,
+          "description": "Ordered header keys; prefix a key with - for descending order or + for ascending order."
+        },
+        {
+          "name": "trac",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Set to 1 to renumber tracl and tracr, or 0 to retain them."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "err",
+        "getparstringarray",
+        "GetCase",
+        "getparint",
+        "countparname",
+        "getparstring",
+        "efopen",
+        "ealloc1",
+        "fgettr",
+        "ealloc1double",
+        "fromhead",
+        "checkpars",
+        "puttr",
+        "efclose",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values are converted to double and multiplied by the ordering direction before comparison. NaN header values do not compare in the usual total order. On failure to read a file's first trace, idf[nfiles] is used before initialization.",
+      "c_lines": 241,
+      "difficulty": "medium",
+      "difficulty_reason": "It performs a multiway ordered merge with one buffered trace per input and checks ordering as it writes.",
+      "test_cases": [
+        {
+          "description": "Merge two files by trace number and retain their original trace counters.",
+          "command": "suplane nt=64 ntr=4 > in1.su && suplane nt=64 ntr=3 > in2.su && subraid in1=in1.su in2=in2.su key=tracl trac=0 > out.su"
+        },
+        {
+          "description": "Merge three files using two ascending keys and renumber output traces.",
+          "command": "suplane nt=64 ntr=4 > in1.su && suplane nt=64 ntr=4 > in2.su && suplane nt=64 ntr=2 > in3.su && subraid in0=in1.su in4=in2.su in9=in3.su key=tracl,cdp trac=1 > out.su"
+        }
+      ],
+      "license_note": "Author notes that the program was started by looking at suop2.c.",
+      "related_programs": []
+    },
+    {
+      "name": "sucleave",
+      "path": "su/main/windowing_sorting_muting/sucleave.c",
+      "purpose": "Split an input trace stream into files according to ranges of a header value.",
+      "selfdoc_first_line": " SUCLEAVE - Cleave traces from 1 input into multiple output files.     ",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "offset",
+          "required": false,
+          "description": "Header key used to assign traces to output ranges."
+        },
+        {
+          "name": "abs",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Use the absolute value of the key when 1; use signed values when 0."
+        },
+        {
+          "name": "size",
+          "type": "double",
+          "default": "100",
+          "required": false,
+          "description": "Positive width of each key range."
+        },
+        {
+          "name": "low",
+          "type": "double",
+          "default": "computed: size / 2.0",
+          "required": false,
+          "description": "Center of the lowest magnitude range; code permits zero and requires it to be at most size/2."
+        },
+        {
+          "name": "high",
+          "type": "double",
+          "default": "100000",
+          "required": false,
+          "description": "Upper range reference; must be at least low."
+        },
+        {
+          "name": "outbase",
+          "type": "string",
+          "default": "computed: cleave_ + key + _",
+          "required": false,
+          "description": "Output filename prefix; the rounded range center and .su are appended."
+        },
+        {
+          "name": "print",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to report filenames, trace counts, and mean key values."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "GetCase",
+        "err",
+        "getparint",
+        "getpardouble",
+        "ealloc1",
+        "checkpars",
+        "ealloc1int",
+        "ealloc1double",
+        "warn",
+        "gettr",
+        "fromhead",
+        "efopen",
+        "fputtr",
+        "efclose",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Double arithmetic, small rounding offsets, integer conversion, and lrint determine range and filename boundaries; lrint depends on the floating-point rounding mode. Reported averages accumulate in input order.",
+      "c_lines": 226,
+      "difficulty": "medium",
+      "difficulty_reason": "It assigns traces to computed ranges and manages a variable set of output files.",
+      "test_cases": [
+        {
+          "description": "Split on trace number into narrow ranges and report file statistics.",
+          "command": "suplane nt=64 ntr=8 | sucleave key=tracl size=2 low=1 high=5 abs=1 outbase=part_ print=1"
+        },
+        {
+          "description": "Use signed range handling with an explicitly selected output prefix.",
+          "command": "suplane nt=64 ntr=8 | sucleave key=tracl size=4 low=0 high=8 abs=0 outbase=signed_ print=0"
+        }
+      ],
+      "license_note": "Author notes that the program was started by looking at suop2.c.",
+      "related_programs": []
+    },
+    {
+      "name": "sucommand",
+      "path": "su/main/windowing_sorting_muting/sucommand.c",
+      "purpose": "Send consecutive groups of traces to separate invocations of a shell command.",
+      "selfdoc_first_line": " SUCOMMAND - pipe traces having the same key header word to command\t",
+      "params": [
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print a header value and gather size for each command invocation."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "default": "cdp",
+          "required": false,
+          "description": "Header key used to detect group boundaries."
+        },
+        {
+          "name": "command",
+          "type": "string",
+          "default": "suop nop",
+          "required": false,
+          "description": "Shell command opened as a write pipe for each group; its stdout is inherited."
+        },
+        {
+          "name": "dir",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "0 splits on each value change; -1 or 1 selects the documented decreasing or increasing directional grouping."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "checkpars",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "gethval",
+        "fputtr",
+        "valcmp",
+        "fprintfval",
+        "CWP_Exit"
+      ],
+      "calls_programs": [
+        "suop"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "For empty input, the return value of the first gettr is ignored and the program still writes the static trace object to the pipe. Output format and numerical behavior depend on the selected shell command.",
+      "c_lines": 134,
+      "difficulty": "medium",
+      "difficulty_reason": "It manages subprocess pipes and groups traces based on typed header comparisons.",
+      "test_cases": [
+        {
+          "description": "Run the default no-op command separately for each trace-number group.",
+          "command": "suplane nt=64 ntr=6 | sucommand key=tracl command='suop nop' dir=0 verbose=1 > out.su"
+        },
+        {
+          "description": "Group a monotonic sequence and apply a scale command.",
+          "command": "suplane nt=64 ntr=6 | sucommand key=tracl command='sugain scale=2' dir=1 verbose=0 > out.su"
+        }
+      ],
+      "license_note": "Also copyrighted by Virginia Tech; credits Matthias Imhof.",
+      "related_programs": []
+    },
+    {
+      "name": "sugetgthr",
+      "path": "su/main/windowing_sorting_muting/sugetgthr.c",
+      "purpose": "Read SU files from a directory and concatenate their traces to standard output.",
+      "selfdoc_first_line": " SUGETGTHR - Gets su files from a directory and put them               ",
+      "params": [
+        {
+          "name": "dir",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Directory whose non-dot entries are read as SU files."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print filenames when set to 1."
+        },
+        {
+          "name": "vt",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use raw variable-length trace reads when nonzero."
+        },
+        {
+          "name": "ns",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Output sample count; required only when vt is nonzero."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparint",
+        "checkpars",
+        "err",
+        "ealloc1",
+        "warn",
+        "efopen",
+        "fgettr",
+        "puttr",
+        "efclose",
+        "free1",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Directory iteration order is filesystem-dependent. In vt mode, raw reads are not checked for complete headers or samples, and padding uses the input header's ns before it is replaced; malformed input can cause stale data or out-of-bounds access.",
+      "c_lines": 136,
+      "difficulty": "medium",
+      "difficulty_reason": "It traverses a directory and supports both normal SU reads and raw variable-length trace handling.",
+      "test_cases": [
+        {
+          "description": "Read a directory containing one ordinary SU file.",
+          "command": "mkdir -p gathers && suplane nt=64 ntr=4 > gathers/a.su && sugetgthr dir=gathers verbose=1 vt=0 > out.su"
+        },
+        {
+          "description": "Pad variable-length input traces to the requested output length.",
+          "command": "mkdir -p gathers_vt && suplane nt=32 ntr=4 > gathers_vt/a.su && sugetgthr dir=gathers_vt vt=1 ns=64 verbose=0 > out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sugprfb",
+      "path": "su/main/windowing_sorting_muting/sugprfb.c",
+      "purpose": "Estimate and subtract a sliding pilot first break from GPR traces.",
+      "selfdoc_first_line": "SUGPRFB - SU program to remove First Breaks from GPR data\t\t",
+      "params": [
+        {
+          "name": "nx",
+          "type": "int",
+          "default": "51",
+          "required": false,
+          "description": "Number of traces in the pilot stack; an even value is incremented to make it odd."
+        },
+        {
+          "name": "fbt",
+          "type": "int",
+          "default": "60",
+          "required": false,
+          "description": "Number of initial samples used for first-break estimation and removal."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "warn",
+        "checkpars",
+        "gettr",
+        "err",
+        "ealloc1float",
+        "ealloc1int",
+        "ealloc2float",
+        "ealloc2",
+        "puttr",
+        "free1float",
+        "free1int",
+        "xcor",
+        "max_index",
+        "sqrst",
+        "free2float"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float stack accumulation and incremental updates, cross-correlation, QR least-squares fitting, and ramp multiplication are order-sensitive. A negative fitted shift causes a read before ym in find_p; other shift-dependent indexing can also access outside the intended arrays. The code does not check that enough traces exist or that fbt fits in each trace, and some small fbt values make the ramp denominator zero.",
+      "c_lines": 282,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a sliding trace window and uses cross-correlation and least-squares fitting for each output trace.",
+      "test_cases": [
+        {
+          "description": "Process a small sliding window with an explicit first-break length.",
+          "command": "suplane nt=64 ntr=12 | sugprfb nx=5 fbt=20 > out.su"
+        },
+        {
+          "description": "Exercise automatic adjustment of an even window size.",
+          "command": "suplane nt=64 ntr=12 | sugprfb nx=4 fbt=30 > out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sumatrix",
+      "path": "su/main/windowing_sorting_muting/sumatrix.c",
+      "purpose": "Assemble trace sample zones into a source-by-receiver matrix of output traces.",
+      "selfdoc_first_line": " SUMATRIX - Assemble a Matrix of Trace Sample Zones.                   ",
+      "params": [
+        {
+          "name": "skeyloc",
+          "type": "string array",
+          "default": "fldr",
+          "required": false,
+          "description": "Header keys identifying source locations."
+        },
+        {
+          "name": "sdivider",
+          "type": "double array",
+          "default": "1.0",
+          "required": false,
+          "description": "One nonzero divider per source key; defaults to 1.0 for each key."
+        },
+        {
+          "name": "rkeyloc",
+          "type": "string array",
+          "default": "gaps",
+          "required": false,
+          "description": "Header keys identifying receiver locations."
+        },
+        {
+          "name": "rdivider",
+          "type": "double array",
+          "default": "1.0",
+          "required": false,
+          "description": "One nonzero divider per receiver key; defaults to 1.0 for each key."
+        },
+        {
+          "name": "rfill",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Controls whether missing receiver positions are emitted as zero traces: 0, 1, or 2."
+        },
+        {
+          "name": "lenzone",
+          "type": "float",
+          "default": "400.",
+          "required": false,
+          "description": "Zone length in milliseconds, rounded to samples using the first trace's dt."
+        },
+        {
+          "name": "numzone",
+          "type": "int",
+          "default": "20",
+          "required": false,
+          "description": "Number of zones per output trace."
+        },
+        {
+          "name": "maxsources",
+          "type": "int",
+          "default": "10000",
+          "required": false,
+          "description": "Maximum number of unique source-key combinations."
+        },
+        {
+          "name": "maxreceivers",
+          "type": "int",
+          "default": "20000",
+          "required": false,
+          "description": "Maximum number of unique receiver-key combinations."
+        },
+        {
+          "name": "maxtraces",
+          "type": "int",
+          "default": "1000000",
+          "required": false,
+          "description": "Maximum number of input traces."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "ealloc1",
+        "getparstringarray",
+        "ealloc1int",
+        "GetCase",
+        "err",
+        "getparint",
+        "ealloc1double",
+        "getpardouble",
+        "getparfloat",
+        "checkpars",
+        "gettr",
+        "fromhead",
+        "ealloc1float",
+        "tohead",
+        "puttr",
+        "warn",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Source and receiver identifiers use floor of double header values divided by double dividers, so boundary rounding matters. Zone length uses float input with double arithmetic and rounding. Default key strings are allocated only 3 bytes before copying four characters plus the terminator, causing heap buffer overflows; insertion into the unique-location pointer arrays can also write one element beyond their allocations. Output sample count and input dt are not safely bounded.",
+      "c_lines": 484,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers all input zones, sorts unique multidimensional identifiers, and constructs a sparse matrix of output traces.",
+      "test_cases": [
+        {
+          "description": "Build a small matrix with no empty receiver traces.",
+          "command": "suplane nt=64 ntr=8 | sumatrix skeyloc=tracl rkeyloc=cdp sdivider=1 rdivider=1 lenzone=16 numzone=3 rfill=0 maxsources=16 maxreceivers=16 maxtraces=16 > out.su"
+        },
+        {
+          "description": "Reverse source ordering and request all receiver positions.",
+          "command": "suplane nt=64 ntr=8 | sumatrix skeyloc=tracl rkeyloc=cdp sdivider=-1 rdivider=1 lenzone=20 numzone=2 rfill=2 maxsources=16 maxreceivers=16 maxtraces=16 > out.su"
+        }
+      ],
+      "license_note": "Author states that the program was started from surescsv.c for its shot and receiver identifier code.",
+      "related_programs": []
+    }
+  ]
+}

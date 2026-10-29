@@ -1,0 +1,25 @@
+# Defaults and small inputs
+suplane nt=17 ntr=1 | suacor
+suplane nt=1 ntr=1 | suacor ntout=1
+# One-sided, symmetric, even lengths, and nonzero parameter values
+suplane nt=37 ntr=3 | suacor ntout=14 sym=0 norm=0
+suplane nt=37 ntr=3 | suacor ntout=13 sym=-1 norm=-1
+suplane nt=17 ntr=2 | suacor ntout=1 sym=0 norm=1
+# Zero energy exercises the normalization guard
+sunull nt=19 ntr=2 | suacor ntout=9 norm=1
+# Verbose and unknown parameter diagnostics
+[stderr] suplane nt=25 ntr=1 | suacor ntout=7 verbose=1
+[stderr] suplane nt=25 ntr=1 | suacor ntout=7 extra=1
+# Empty input and numeric overflow
+suacor </dev/null
+suplane nt=10 ntr=1 | suacor ntout=999999999999999999999
+suplane nt=10 ntr=1 | suacor ntout=-1
+suplane nt=10 ntr=1 | suacor ntout=0
+# Trace capacity boundary: largest valid symmetric and one-sided outputs
+# Larger ntout values overrun the original C trace buffer; test rejection separately.
+suplane nt=17 ntr=2 | suacor ntout=65535 norm=1 sym=1
+suplane nt=17 ntr=2 | suacor ntout=65535 norm=0 sym=0
+suplane nt=17 ntr=1 | suacor ntout=65534 norm=0 sym=1
+# Nonzero boundary data: two spikes give zero-lag energy 2 and off-zero lags.
+suspike nt=17 ntr=2 nspk=2 ix1=1 it1=1 ix2=1 it2=9 | suacor ntout=65535 norm=1 sym=1
+suspike nt=17 ntr=2 nspk=2 ix1=1 it1=1 ix2=1 it2=9 | suacor ntout=65535 norm=0 sym=0

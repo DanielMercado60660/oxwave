@@ -1,0 +1,80 @@
+# Disk input is required by gettra; concatenate both native-float output files.
+# Defaults, including ntraces=50, ntpick=50, niter=5, and allocation dimensions.
+[f32] sunull nt=17 ntr=50 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=10,10,10 > in && suresstat < in ssol=s rsol=r && cat s r
+# Smallest trace/gather and odd, non-power-of-two trace lengths.
+[f32] suspike nt=1 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=fldr,tracf,cdp a=1,1,1 > in && suresstat < in ssol=s rsol=r ntraces=1 nshot=1 nr=1 nc=1 ntpick=0 && cat s r
+[f32] suspike nt=17 ntr=1 nspk=1 it1=9 ix1=1 | sushw key=fldr,tracf,cdp a=1,1,1 > in && suresstat < in ssol=s rsol=r ntraces=1 nshot=1 nr=1 nc=1 && cat s r
+# Both peak-picking modes, subtraction, iterations, and diagnostics.
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4  && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=0 sub=0 niter=1 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 sub=1 perc=25 niter=3 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=0 sub=1 niter=2 verbose=1 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 sub=1 perc=0 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 sub=1 perc=100 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 sub=1 perc=-20 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=1 perc=150 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=7 sub=2 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 mode=-1 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 niter=0 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 niter=-2 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 ntpick=0 niter=2 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 ntcc=20 icmpshift=-3 resamp=0 n_o=-2 verbose=1 && cat s r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 ntcc=21 icmpshift=0 resamp=-1 n_o=0 verbose=1 && cat s r
+# Empty input, non-seekable input, missing output filenames, and trace-count errors.
+[stderr] suresstat
+[stderr] suresstat ssol=s rsol=r
+[stderr] suspike nt=9 ntr=1 | suresstat ssol=s rsol=r ntraces=1
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol=s
+[stderr] suspike nt=9 ntr=1 | sushw key=fldr,tracf,cdp a=1,1,1 > in && suresstat < in ssol=s rsol=r ntraces=2 nshot=1 nr=1 nc=1
+# Output open failures and numeric parsing errors.
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol=missing/s rsol=r ntraces=0 niter=0
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol=s rsol=missing/r ntraces=0 niter=0
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol= rsol=r ntraces=0 niter=0
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol=s rsol=r nshot=2147483648
+[stderr] suspike nt=9 ntr=1 > in && suresstat < in ssol=s rsol=r perc=1e-310
+# Header dt fallback is read, but final statics still use the original header dt.
+[stderr] suspike nt=9 ntr=1 | sushw key=dt a=0 > in && suresstat < in ssol=s rsol=r
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 | sushw key=dt a=0 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 dt=2 mode=1 sub=1 && cat s r
+# Unknown arguments and dt= supplied when header dt is already nonzero.
+[f32] [stderr] suplane nt=31 ntr=9 npl=1 dip1=4 ct1=15 len1=9 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=4 strange=1 dt=2 verbose=1 && cat s r
+# An explicit zero input count and negative iteration count are accepted.
+[f32] [stderr] suspike nt=17 ntr=1 > in && suresstat < in ssol=s rsol=r ntraces=0 nshot=0 nr=0 nc=0 niter=-1 sfold=0 rfold=0 cfold=0 && cat s r
+
+# Seeded fractional/noisy data exercises the floating-point correlation sums.
+[f32] [stderr] suplane nt=29 ntr=9 npl=2 dip1=-4 dip2=8 ct1=10 ct2=20 len1=9 len2=9 | suaddnoise seed=73 sn=2 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=6 mode=0 sub=0 && cat s r
+[f32] [stderr] suplane nt=29 ntr=9 npl=2 dip1=-4 dip2=8 ct1=10 ct2=20 len1=9 len2=9 | suaddnoise seed=73 sn=2 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=6 mode=0 sub=1 && cat s r
+[f32] [stderr] suplane nt=29 ntr=9 npl=2 dip1=-4 dip2=8 ct1=10 ct2=20 len1=9 len2=9 | suaddnoise seed=73 sn=2 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=6 mode=1 sub=0 perc=13.75 && cat s r
+[f32] [stderr] suplane nt=29 ntr=9 npl=2 dip1=-4 dip2=8 ct1=10 ct2=20 len1=9 len2=9 | suaddnoise seed=73 sn=2 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=3,3,3 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=3 nr=3 nc=1 sfold=3 rfold=3 cfold=9 ntpick=6 mode=1 sub=1 perc=13.75 verbose=1 && cat s r
+# Sparse shot/receiver numbering, distinct CMPs, and unequal shot/receiver counts.
+[f32] [stderr] suplane nt=23 ntr=9 npl=1 dip1=4 ct1=10 len1=9 | sushw key=fldr,tracf a=1,1 b=0,2 c=2,0 j=3,3 | suchw key1=cdp key2=fldr key3=tracf b=1 c=1 d=2 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=5 nr=5 nc=5 sfold=3 rfold=3 cfold=3 ntpick=3 sub=1 mode=0 verbose=1 && cat s r
+[f32] [stderr] suplane nt=23 ntr=9 npl=1 dip1=4 ct1=10 len1=9 | sushw key=fldr,tracf a=1,1 b=0,2 c=2,0 j=3,3 | suchw key1=cdp key2=fldr key3=tracf b=1 c=1 d=2 > in && suresstat < in ssol=s rsol=r ntraces=9 nshot=5 nr=5 nc=5 sfold=3 rfold=3 cfold=3 ntpick=3 sub=1 mode=1 verbose=1 && cat s r
+[f32] [stderr] suplane nt=27 ntr=8 npl=1 dip1=4 ct1=13 len1=8 | sushw key=fldr,tracf a=1,1 b=0,1 c=1,0 j=4,4 | suchw key1=cdp key2=fldr key3=tracf a=-1 b=1 c=1 > in && suresstat < in ssol=s rsol=r ntraces=8 nshot=2 nr=4 nc=5 sfold=4 rfold=2 cfold=2 ntpick=3 sub=1 mode=0 niter=2 verbose=1 && cat s r
+[f32] [stderr] suplane nt=27 ntr=8 npl=1 dip1=4 ct1=13 len1=8 | sushw key=fldr,tracf a=1,1 b=0,1 c=1,0 j=2,2 | suchw key1=cdp key2=fldr key3=tracf a=-1 b=1 c=1 > in && suresstat < in ssol=s rsol=r ntraces=8 nshot=4 nr=2 nc=5 sfold=2 rfold=4 cfold=2 ntpick=3 sub=1 mode=0 niter=2 verbose=1 && cat s r
+[f32] [stderr] suplane nt=27 ntr=3 npl=1 dip1=4 ct1=13 len1=3 | sushw key=fldr,tracf a=1,1 b=0,1 c=1,0 j=3,3 | suchw key1=cdp key2=fldr key3=tracf a=-1 b=1 c=1 > in && suresstat < in ssol=s rsol=r ntraces=3 nshot=1 nr=3 nc=3 sfold=3 rfold=1 cfold=1 ntpick=3 sub=1 mode=0 niter=2 verbose=1 && cat s r
+[f32] [stderr] suplane nt=27 ntr=3 npl=1 dip1=4 ct1=13 len1=3 | sushw key=fldr,tracf a=1,1 b=0,1 c=1,0 j=1,1 | suchw key1=cdp key2=fldr key3=tracf a=-1 b=1 c=1 > in && suresstat < in ssol=s rsol=r ntraces=3 nshot=3 nr=1 nc=3 sfold=1 rfold=3 cfold=1 ntpick=3 sub=1 mode=0 niter=2 verbose=1 && cat s r
+# Fractional millisecond dt scales the final statics; explicit parameter defaults.
+[f32] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 && cat s r
+[f32] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 ntcc=250 icmpshift=9 resamp=4 n_o=7 mode=0 perc=10 verbose=0 niter=5 && cat s r
+# Shared output paths and the original /dev/stdout open-failure behavior.
+[f32] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 ssol=same rsol=same && cat same
+[f32] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 ssol=/dev/stdout rsol=/dev/stdout
+# Last parameters win, empty numeric entries use defaults, and unused input traces are allowed.
+[f32] [stderr] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 niter=1 niter=2 verbose=2 ntcc= perc= && cat s r
+[f32] suplane nt=19 ntr=4 dt=0.0025 npl=1 dip1=2.5 ct1=9 len1=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 sfold=2 rfold=2 cfold=4 ntpick=2 sub=1 ntraces=3 && cat s r
+# No positive cross-correlation peak in mode 1 preserves its C local-maximum sentinel.
+[f32] [stderr] sunull nt=7 ntr=4 | sushw key=fldr,tracf,cdp a=1,1,1 b=0,1,0 c=1,0,0 j=2,2,2 > in && suresstat < in ssol=s rsol=r ntraces=4 nshot=2 nr=2 nc=1 ntpick=3 mode=1 sub=1 niter=2 verbose=1 && cat s r
+# Headers numbered zero are counted, but their statics are never solved.
+[f32] sunull nt=11 ntr=1 > in && suresstat < in ssol=s rsol=r ntraces=1 nshot=1 nr=1 nc=1 sfold=1 rfold=1 cfold=1 && cat s r
+# A supplied dt=0 passes the MUSTGETPAR presence test.
+[f32] suspike nt=9 ntr=1 | sushw key=dt a=0 > in && suresstat < in ssol=s rsol=r ntraces=0 niter=0 dt=0 && cat s r
+
+# Largest length whose one-based sample copy stays within tr.data.
+[f32] [stderr] suspike nt=65534 ntr=1 nspk=1 it1=65534 ix1=1 | sushw key=fldr,tracf,cdp a=1,1,1 > in && suresstat < in ssol=s rsol=r ntraces=1 nshot=1 nr=1 nc=1 ntpick=0 niter=1 && cat s r
+# The maximum header ns is still accepted when no sample copy is requested.
+[f32] [stderr] sunull nt=65535 ntr=1 > in && suresstat < in ssol=s rsol=r ntraces=0 nshot=1 nr=1 nc=1 ntpick=0 niter=0 && cat s r
+# At ns=65535 the C sample copy reads beyond tr.data (undefined behavior).
+# Accept its observed zero statics or the port's exact clean error, never a panic.
+# Check status, complete stderr, empty stdout, and output-file presence/content.
+[stderr] sunull nt=65535 ntr=1 | sushw key=fldr,tracf,cdp a=1,1,1 > in && { suresstat < in ssol=s rsol=r ntraces=1 nshot=1 nr=1 nc=1 ntpick=0 niter=1 > out 2> err; status=$?; python3 -c 'import pathlib, sys; status = int(sys.argv[1]); out = pathlib.Path("out").read_bytes(); err = pathlib.Path("err").read_bytes(); files = [pathlib.Path("s"), pathlib.Path("r")]; original = status == 0 and err == b"" and all(f.exists() and f.read_bytes() == bytes(8) for f in files); clean = status == 1 and err == b"\nsuresstat: sample index 65535 exceeds trace buffer (65535 samples)\n" and all(not f.exists() for f in files); assert out == b"" and (original or clean), (status, out, err)' "$status"; }

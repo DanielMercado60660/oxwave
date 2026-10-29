@@ -1,0 +1,16 @@
+# Defaults, one trace and one sample.
+suspike nt=1 ntr=1 | sufnzero
+# Odd sample count and multiple spikes.
+suspike nt=17 ntr=2 it=2,10 mag=1,-2 | sufnzero mode=both key=tracl,ns,dt
+# Threshold equality, negative thresholds and all zero data.
+suspike nt=9 ntr=1 it=4 mag=1 | sufnzero mode=both min=1
+sunull nt=7 ntr=1 | sufnzero mode=both min=-1
+sunull nt=7 ntr=2 | sufnzero mode=first min=0
+# Last sample, fractional milliseconds, header types and verbose diagnostics.
+[stderr] suspike nt=11 ntr=1 dt=0.0015 it=11 | sufnzero mode=last key=tracl,dt verbose=1
+# Invalid modes, invalid headers, malformed numeric argument and empty input.
+sufnzero mode=invalid
+sufnzero mode=
+sufnzero min=1e999
+sufnzero mode=both
+suspike nt=5 ntr=1 | sufnzero key=notakey

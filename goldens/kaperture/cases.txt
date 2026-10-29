@@ -1,0 +1,14 @@
+# Raw native floats: defaults, circle and output parameter file.
+[f32] kaperture outpar=params
+[f32] kaperture nshot=3 ngeo=5 x0=230 z0=-120 sxmin=-40 szmin=10 dsx=23 dsz=-7 gxmin=12 gzmin=-8 dgx=-31 dgz=4 fnyq=80 fmin=4 fmax=95 nfreq=5 both=1 nstep=7 c=1800 outpar=params
+[f32] kaperture nshot=1 ngeo=1 nfreq=1 nstep=1 fmin=-25 fnyq=0 both=-1 outpar=params
+[f32] kaperture nstep=0 nfreq=0 outpar=params
+[f32] kaperture nshot=0 nstep=3 outpar=params
+[f32] kaperture x0=0 z0=0 nstep=0 outpar=params
+[f32] kaperture nfreq=2 fmin=0 fmax=0 nstep=0 verbose=1 outpar=params
+[stderr] kaperture outpar=/no/such/directory/params
+[stderr] kaperture nshot=999999999999999999999 outpar=params
+[stderr] kaperture nshot=-1 outpar=params
+[stderr] kaperture
+[stderr] kaperture unknown=1 nstep=0 outpar=params > /dev/null
+kaperture nshot=2 ngeo=3 nfreq=2 both=1 nstep=0 outpar=params > /dev/null && cat params

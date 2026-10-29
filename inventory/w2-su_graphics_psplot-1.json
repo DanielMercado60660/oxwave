@@ -1,0 +1,198 @@
+{
+  "scope": "su/graphics/psplot (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "supscontour",
+      "path": "su/graphics/psplot/supscontour.c",
+      "purpose": "Plot SU traces as PostScript contours using pscontour.",
+      "selfdoc_first_line": " SUPSCONTOUR - PostScript CONTOUR plot of a segy data set\t\t",
+      "params": [
+        {"name": "n2", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Number of traces; takes precedence over ntr."},
+        {"name": "ntr", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Alias for n2."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1, else tr.dt/1000000, else 0.004 for seismic or 1.0 for nonseismic", "required": false, "description": "Fast-axis sample interval."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Slow-axis sample interval."},
+        {"name": "f1", "type": "float", "default": "computed: tr.f1, else tr.delrt/1000, else 0.0", "required": false, "description": "First fast-axis coordinate."},
+        {"name": "f2", "type": "float", "default": "computed: tr.f2, else tr.tracr, else tr.tracl, else 1.0 for seismic or 0.0 for nonseismic", "required": false, "description": "First slow-axis coordinate."},
+        {"name": "key", "type": "string", "default": "", "required": false, "description": "Header key supplying irregular slow-axis coordinates."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "hdtype", "getindex", "emalloc", "ealloc1float", "etmpfile", "temporary_filename", "efopen", "gethval", "fprintfval", "vtof", "efwrite", "efclose", "eftell", "epopen", "efread", "epclose", "eremove"],
+      "calls_programs": ["pscontour"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Axis values are converted to float and formatted with %f before passing them to pscontour. The irregular-coordinate string is read without explicitly adding a terminating NUL and is used with %s, causing undefined behavior; command-buffer and environment-string writes can also overflow. PostScript numerics depend on pscontour.",
+      "c_lines": 352,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers traces and optionally constructs irregular coordinates from headers before invoking a plotting program.",
+      "test_cases": [
+        {"description": "Count traces and plot contours.", "command": "suplane nt=64 ntr=16 | supscontour verbose=1"},
+        {"description": "Use explicit dimensions and axis coordinates.", "command": "suplane nt=64 ntr=16 | supscontour n2=16 d1=0.004 d2=2 f1=0 f2=1"},
+        {"description": "Use trace headers for irregular coordinates.", "command": "suplane nt=64 ntr=16 | supscontour key=tracl verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["supsimage", "supsgraph", "supswigp"]
+    },
+    {
+      "name": "supscube",
+      "path": "su/graphics/psplot/supscube.c",
+      "purpose": "Plot SU traces as a PostScript data cube using pscube.",
+      "selfdoc_first_line": " SUPSCUBE - PostScript CUBE plot of a segy data set\t\t\t",
+      "params": [
+        {"name": "n2", "type": "int", "default": "computed: ntr/n3 if n3 supplied, otherwise ntr", "required": false, "description": "Traces per frame; ntr comes from the first header or a count."},
+        {"name": "n3", "type": "int", "default": "computed: ntr/n2 if n2 supplied, otherwise 1", "required": false, "description": "Number of frames; ntr comes from the first header or a count."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1, else tr.dt/1000000, else 0.004 for seismic or 1.0 for nonseismic", "required": false, "description": "Fast-axis sample interval."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Second-axis sample interval."},
+        {"name": "d3", "type": "float", "default": "1.0", "required": false, "description": "Third-axis sample interval."},
+        {"name": "f1", "type": "float", "default": "computed: tr.f1, else tr.delrt/1000, else 0.0", "required": false, "description": "First fast-axis coordinate."},
+        {"name": "f2", "type": "float", "default": "computed: tr.f2, else tr.tracr, else tr.tracl, else 1.0 for seismic or 0.0 for nonseismic", "required": false, "description": "First second-axis coordinate."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "emalloc", "ealloc1float", "etmpfile", "temporary_filename", "efopen", "efwrite", "epopen", "efread", "epclose", "efclose", "eremove"],
+      "calls_programs": ["pscube"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Axis values are converted to float and formatted with %f before passing them to pscube. f3 is fixed at 0.0; user-supplied f3 is discarded. Command-buffer and environment-string writes can overflow. PostScript numerics depend on pscube.",
+      "c_lines": 280,
+      "difficulty": "medium",
+      "difficulty_reason": "It counts and buffers traces when needed, derives cube dimensions, and invokes a plotting program.",
+      "test_cases": [
+        {"description": "Use explicit frame dimensions.", "command": "suplane nt=64 ntr=16 | supscube n2=4 n3=4 d3=2"},
+        {"description": "Count traces and derive the frame count.", "command": "suplane nt=64 ntr=16 | supscube n2=4 verbose=1 d1=0.004 d2=2"}
+      ],
+      "license_note": "",
+      "related_programs": ["supscubecontour"]
+    },
+    {
+      "name": "supscubecontour",
+      "path": "su/graphics/psplot/supscubecontour.c",
+      "purpose": "Plot SU traces as PostScript cube contours using pscubecontour.",
+      "selfdoc_first_line": " SUPSCUBECONTOUR - PostScript CUBE plot of a segy data set\t\t",
+      "params": [
+        {"name": "n2", "type": "int", "default": "computed: ntr/n3 if n3 supplied, otherwise ntr", "required": false, "description": "Traces per frame; ntr comes from the first header or a count."},
+        {"name": "n3", "type": "int", "default": "computed: ntr/n2 if n2 supplied, otherwise 1", "required": false, "description": "Number of frames; ntr comes from the first header or a count."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1, else tr.dt/1000000, else 0.004 for seismic or 1.0 for nonseismic", "required": false, "description": "Fast-axis sample interval."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Second-axis sample interval."},
+        {"name": "d3", "type": "float", "default": "1.0", "required": false, "description": "Third-axis sample interval."},
+        {"name": "f1", "type": "float", "default": "computed: tr.f1, else tr.delrt/1000, else 0.0", "required": false, "description": "First fast-axis coordinate."},
+        {"name": "f2", "type": "float", "default": "computed: tr.f2, else tr.tracr, else tr.tracl, else 1.0 for seismic or 0.0 for nonseismic", "required": false, "description": "First second-axis coordinate."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "emalloc", "ealloc1float", "etmpfile", "temporary_filename", "efopen", "efwrite", "epopen", "efread", "epclose", "efclose", "eremove"],
+      "calls_programs": ["pscubecontour"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Axis values are converted to float and formatted with %f before passing them to pscubecontour. f3 is fixed at 0.0; user-supplied f3 is discarded. Command-buffer and environment-string writes can overflow. PostScript numerics depend on pscubecontour.",
+      "c_lines": 282,
+      "difficulty": "medium",
+      "difficulty_reason": "It counts and buffers traces when needed, derives cube dimensions, and invokes a plotting program.",
+      "test_cases": [
+        {"description": "Use explicit frame dimensions.", "command": "suplane nt=64 ntr=16 | supscubecontour n2=4 n3=4 d3=2"},
+        {"description": "Count traces and derive the frame count.", "command": "suplane nt=64 ntr=16 | supscubecontour n2=4 verbose=1 d1=0.004 d2=2"}
+      ],
+      "license_note": "",
+      "related_programs": ["supscube"]
+    },
+    {
+      "name": "supsgraph",
+      "path": "su/graphics/psplot/supsgraph.c",
+      "purpose": "Plot SU traces as PostScript graphs using psgraph.",
+      "selfdoc_first_line": " SUPSGRAPH - PostScript GRAPH plot of a segy data set\t\t\t",
+      "params": [
+        {"name": "style", "type": "string", "default": "seismic", "required": false, "description": "Graph style passed to psgraph."},
+        {"name": "nplot", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Number of traces; takes precedence over ntr."},
+        {"name": "ntr", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Alias for nplot."},
+        {"name": "d1", "type": "float", "default": "computed: for seismic, tr.dt/1000000 or 0.004; for nonseismic, tr.d1 or 1.0", "required": false, "description": "Fast-axis sample interval."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Read by the wrapper and forwarded if supplied."},
+        {"name": "f1", "type": "float", "default": "computed: for seismic, tr.delrt/1000 or 0.0; for nonseismic, tr.f1 or 0.0", "required": false, "description": "First fast-axis coordinate."},
+        {"name": "f2", "type": "float", "default": "1.0", "required": false, "description": "Read twice; the second read overrides the header-derived value when absent. Forwarded if supplied."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "emalloc", "ealloc1float", "etmpfile", "temporary_filename", "efopen", "efwrite", "epopen", "efread", "epclose", "efclose", "eremove"],
+      "calls_programs": ["psgraph"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Axis values are converted to float and formatted with %f before passing them to psgraph. Command-buffer and environment-string writes can overflow. PostScript numerics depend on psgraph.",
+      "c_lines": 276,
+      "difficulty": "medium",
+      "difficulty_reason": "It can buffer multiple traces to count them before invoking the graphing program.",
+      "test_cases": [
+        {"description": "Count and graph traces.", "command": "suplane nt=64 ntr=8 | supsgraph verbose=1"},
+        {"description": "Use explicit plot count and normal style.", "command": "suplane nt=64 ntr=8 | supsgraph nplot=8 style=normal d1=0.004 f1=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["supsimage", "supscontour", "supswigp"]
+    },
+    {
+      "name": "supsimage",
+      "path": "su/graphics/psplot/supsimage.c",
+      "purpose": "Plot SU traces as a PostScript image using psimage.",
+      "selfdoc_first_line": " SUPSIMAGE - PostScript IMAGE plot of a segy data set\t\t\t",
+      "params": [
+        {"name": "n2", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Number of traces; takes precedence over ntr."},
+        {"name": "ntr", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Alias for n2."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1, else tr.dt/1000000, else 0.004 for seismic or 1.0 for nonseismic", "required": false, "description": "Fast-axis sample interval."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Slow-axis sample interval."},
+        {"name": "f1", "type": "float", "default": "computed: tr.f1, else tr.delrt/1000, else 0.0", "required": false, "description": "First fast-axis coordinate."},
+        {"name": "f2", "type": "float", "default": "computed: tr.f2, else tr.tracr, else tr.tracl, else 1.0 for seismic or 0.0 for nonseismic", "required": false, "description": "First slow-axis coordinate."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "emalloc", "ealloc1float", "etmpfile", "temporary_filename", "efopen", "efwrite", "epopen", "efread", "epclose", "efclose", "eremove"],
+      "calls_programs": ["psimage"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Axis values are converted to float and formatted with %f before passing them to psimage. Command-buffer and environment-string writes can overflow. PostScript numerics depend on psimage.",
+      "c_lines": 269,
+      "difficulty": "medium",
+      "difficulty_reason": "It can buffer multiple traces to count them before invoking the imaging program.",
+      "test_cases": [
+        {"description": "Count traces and plot an image.", "command": "suplane nt=64 ntr=16 | supsimage verbose=1"},
+        {"description": "Use explicit dimensions and coordinates.", "command": "suplane nt=64 ntr=16 | supsimage n2=16 d1=0.004 d2=2 f1=0 f2=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["supscontour", "supsgraph", "supswigp"]
+    },
+    {
+      "name": "supsmax",
+      "path": "su/graphics/psplot/supsmax.c",
+      "purpose": "Plot the maximum, minimum, or absolute maximum of each SU trace as a PostScript graph.",
+      "selfdoc_first_line": " SUPSMAX - PostScript of the MAX, min, or absolute max value on each trace",
+      "params": [
+        {"name": "mode", "type": "string", "default": "max", "required": false, "description": "sumax mode: max, min, or abs."},
+        {"name": "n2", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Number of traces; takes precedence over ntr."},
+        {"name": "ntr", "type": "int", "default": "computed: first trace ntr header, or count input traces", "required": false, "description": "Alias for n2."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1, else tr.dt/1000000, else 0.004 for seismic or 1.0 for nonseismic", "required": false, "description": "Read by the wrapper and forwarded if supplied."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Read by the wrapper and forwarded if supplied."},
+        {"name": "f1", "type": "float", "default": "computed: tr.f1, else tr.delrt/1000, else 0.0", "required": false, "description": "Read by the wrapper and forwarded if supplied."},
+        {"name": "f2", "type": "float", "default": "computed: tr.f2, else tr.tracr, else tr.tracl, else 1.0 for seismic or 0.0 for nonseismic", "required": false, "description": "Read by the wrapper and forwarded if supplied."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable, otherwise empty string", "required": false, "description": "Temporary-file directory; empty uses tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "warn", "getparstring", "emalloc", "etmpfile", "temporary_filename", "efopen", "efwrite", "epopen", "efread", "fputtr", "epclose", "efclose", "eremove"],
+      "calls_programs": ["sumax", "psgraph"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Numerical output depends on sumax and psgraph. When the trace count is already known, headerfp remains NULL but is unconditionally passed to efclose, causing undefined behavior. Command-buffer and environment-string writes can overflow.",
+      "c_lines": 272,
+      "difficulty": "medium",
+      "difficulty_reason": "It can buffer trace headers and samples separately before piping reconstructed traces through two programs.",
+      "test_cases": [
+        {"description": "Count traces and plot maxima.", "command": "suplane nt=64 ntr=16 | supsmax mode=max verbose=1"},
+        {"description": "Plot minimum values.", "command": "suplane nt=64 ntr=16 | supsmax mode=min"},
+        {"description": "Plot absolute maxima.", "command": "suplane nt=64 ntr=16 | supsmax mode=abs"}
+      ],
+      "license_note": "",
+      "related_programs": ["supsgraph"]
+    }
+  ]
+}

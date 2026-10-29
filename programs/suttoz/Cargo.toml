@@ -1,0 +1,18 @@
+[package]
+name = "suttoz"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suttoz"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-inverse-interp = { path = "../../crates/oxwave-inverse-interp" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }
+oxwave-sinc-interp = { path = "../../crates/oxwave-sinc-interp" }

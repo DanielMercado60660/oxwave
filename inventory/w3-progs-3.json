@@ -1,0 +1,349 @@
+{
+  "scope": "wave 3 programs batch 3",
+  "programs": [
+    {
+      "name": "wptuncomp",
+      "path": "comp/dct/main/wptuncomp.c",
+      "purpose": "Decompress a wavelet-packet-compressed array into binary floats.",
+      "selfdoc_first_line": " WPTUNCOMP - Uncompress  WPT compressed data\t\t\t\t",
+      "params": [],
+      "stdin": "other",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "alloc2float",
+        "alloc1int",
+        "waveGetfilter",
+        "buffAlloc1",
+        "buffRewind",
+        "huffDecompress",
+        "err",
+        "buffRealloc1",
+        "codeDesilence",
+        "pDecode",
+        "uniDequant",
+        "wavePack_2"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inverse wavelet-packet filtering and dequantization depend on floating-point operation order. The compressed header uses native int and float representations. Input reads are unchecked, so truncated input can leave values uninitialized.",
+      "c_lines": 123,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a padded two-dimensional array and reverses several compression stages and a wavelet-packet transform.",
+      "test_cases": [
+        {
+          "description": "Decompress a packet-compressed section with default stages.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wptcomp n1=128 n2=16 error=0.01 | wptuncomp > out.bin"
+        },
+        {
+          "description": "Exercise padding and explicit packet stages.",
+          "command": "suspike nt=100 ntr=9 | sustrip | wptcomp n1=100 n2=9 nstage1=2 nstage2=2 error=0.03 | wptuncomp > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wptcomp",
+        "wtuncomp",
+        "wtcomp"
+      ]
+    },
+    {
+      "name": "wtcomp",
+      "path": "comp/dct/main/wtcomp.c",
+      "purpose": "Compress a binary-float array using a two-dimensional wavelet transform.",
+      "selfdoc_first_line": " WTCOMP - Compression by Wavelet Transform\t\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the fast dimension."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the slow dimension."
+        },
+        {
+          "name": "nstage1",
+          "type": "int",
+          "default": "computed: ceil(log2(n1)), with 0 for n1=1",
+          "required": false,
+          "description": "Number of transform stages in the fast dimension."
+        },
+        {
+          "name": "nstage2",
+          "type": "int",
+          "default": "computed: ceil(log2(n2)), with 0 for n2=1",
+          "required": false,
+          "description": "Number of transform stages in the slow dimension."
+        },
+        {
+          "name": "nfilter",
+          "type": "int",
+          "default": "11",
+          "required": false,
+          "description": "Wavelet filter selection."
+        },
+        {
+          "name": "error",
+          "type": "float",
+          "default": "0.01",
+          "required": false,
+          "description": "Acceptable quantization error."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "err",
+        "checkpars",
+        "alloc2float",
+        "alloc1int",
+        "waveGetfilter",
+        "waveTrans_2",
+        "uniQuant",
+        "pEncode",
+        "buffAlloc1",
+        "buffRewind",
+        "codeSilence",
+        "buffRealloc1",
+        "huffCompress"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Wavelet filtering and quantization depend on floating-point accumulation and rounding; small differences can change encoded integers and the compressed stream. The header uses native int and float representations. Short input reads are unchecked and can leave samples uninitialized.",
+      "c_lines": 151,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers and pads a two-dimensional array, transforms it, and applies several encoding stages.",
+      "test_cases": [
+        {
+          "description": "Compress a section with default transform settings.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wtcomp n1=128 n2=16 error=0.01 > out.wt"
+        },
+        {
+          "description": "Exercise padding and explicit transform stages.",
+          "command": "suspike nt=100 ntr=9 | sustrip | wtcomp n1=100 n2=9 nfilter=11 nstage1=2 nstage2=2 error=0.03 > out.wt"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wtuncomp",
+        "wptcomp",
+        "wptuncomp"
+      ]
+    },
+    {
+      "name": "wtuncomp",
+      "path": "comp/dct/main/wtuncomp.c",
+      "purpose": "Decompress a wavelet-transform-compressed array into binary floats.",
+      "selfdoc_first_line": " WTUNCOMP - UNCOMPression of WT compressed data\t\t\t",
+      "params": [],
+      "stdin": "other",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "alloc2float",
+        "alloc1int",
+        "buffAlloc1",
+        "waveGetfilter",
+        "buffRewind",
+        "huffDecompress",
+        "err",
+        "buffRealloc1",
+        "codeDesilence",
+        "pDecode",
+        "uniDequant",
+        "waveTrans_2"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inverse wavelet filtering and dequantization depend on floating-point operation order. The compressed header uses native int and float representations. Input reads are unchecked, so truncated input can leave values uninitialized.",
+      "c_lines": 124,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a padded two-dimensional array and reverses several compression stages and a wavelet transform.",
+      "test_cases": [
+        {
+          "description": "Decompress a section compressed with default stages.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wtcomp n1=128 n2=16 error=0.01 | wtuncomp > out.bin"
+        },
+        {
+          "description": "Exercise padding and explicit transform stages.",
+          "command": "suspike nt=100 ntr=9 | sustrip | wtcomp n1=100 n2=9 nstage1=2 nstage2=2 error=0.03 | wtuncomp > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wtcomp",
+        "wptuncomp",
+        "wptcomp"
+      ]
+    },
+    {
+      "name": "wpc1comp2",
+      "path": "comp/dwpt/1d/main/wpc1comp2.c",
+      "purpose": "Compress each trace of a binary-float section independently using wavelet packets.",
+      "selfdoc_first_line": " WPC1COMP2 --- COMPress a 2D seismic section trace-by-trace using \t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Number of float samples per trace. The selfdoc calls it required, but the code does not check for its presence; omitting it leaves n1 uninitialized."
+        },
+        {
+          "name": "error",
+          "type": "float",
+          "default": "0.01",
+          "required": false,
+          "description": "Allowed relative RMS compression error."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "alloc1float",
+        "wpc1Compress",
+        "wpc1Write"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Wavelet-packet compression and quantization depend on floating-point calculations and rounding; differences can change the encoded stream. The compressed format is platform dependent. Missing n1 leaves an uninitialized integer, and trailing incomplete traces are ignored.",
+      "c_lines": 74,
+      "difficulty": "medium",
+      "difficulty_reason": "The trace loop delegates wavelet-packet compression and encoding to a substantial compression library.",
+      "test_cases": [
+        {
+          "description": "Compress multiple traces with the default error.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wpc1comp2 n1=128 error=0.01 > out.wpc1"
+        },
+        {
+          "description": "Compress a non-power-of-two trace length with a larger error.",
+          "command": "suspike nt=100 ntr=8 | sustrip | wpc1comp2 n1=100 error=0.05 > out.wpc1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wpc1uncomp2",
+        "wpccompress"
+      ]
+    },
+    {
+      "name": "wpc1uncomp2",
+      "path": "comp/dwpt/1d/main/wpc1uncomp2.c",
+      "purpose": "Decompress a section whose traces were independently compressed using wavelet packets.",
+      "selfdoc_first_line": " WPC1UNCOMP2 --- UNCOMPRESS a 2D seismic section, which has been\t",
+      "params": [],
+      "stdin": "other",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "wpc1Read",
+        "wpc1Numsmp",
+        "alloc1float",
+        "wpc1Uncompress"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inverse wavelet-packet calculations depend on floating-point operation order. The compressed format is platform dependent. The first read is not checked for NULL before obtaining its sample count; subsequent traces are assumed to have the first trace's sample count.",
+      "c_lines": 71,
+      "difficulty": "medium",
+      "difficulty_reason": "It decodes a sequence of independently compressed traces using the wavelet-packet library.",
+      "test_cases": [
+        {
+          "description": "Round-trip multiple traces using the default error.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wpc1comp2 n1=128 error=0.01 | wpc1uncomp2 > out.bin"
+        },
+        {
+          "description": "Round-trip a non-power-of-two trace length with a larger error.",
+          "command": "suspike nt=100 ntr=8 | sustrip | wpc1comp2 n1=100 error=0.05 | wpc1uncomp2 > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wpc1comp2",
+        "wpcuncompress"
+      ]
+    },
+    {
+      "name": "wpccompress",
+      "path": "comp/dwpt/2d/main/wpccompress.c",
+      "purpose": "Compress a two-dimensional binary-float section using wavelet packets in both dimensions.",
+      "selfdoc_first_line": " WPCCOMPRESS --- COMPRESS a 2D section using Wavelet Packets\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the first dimension."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the second dimension."
+        },
+        {
+          "name": "error",
+          "type": "float",
+          "default": "0.01",
+          "required": false,
+          "description": "Allowed relative RMS compression error."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "err",
+        "getparfloat",
+        "checkpars",
+        "alloc2float",
+        "efread",
+        "wpcCompress",
+        "wpcWrite"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional wavelet-packet compression and quantization depend on floating-point calculations and rounding; small differences can change the encoded stream. The compressed format is platform dependent.",
+      "c_lines": 78,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a full two-dimensional section and delegates wavelet-packet compression and encoding to a substantial library.",
+      "test_cases": [
+        {
+          "description": "Compress a section with the default error.",
+          "command": "suplane nt=128 ntr=16 | sustrip | wpccompress n1=128 n2=16 error=0.01 > out.wpc"
+        },
+        {
+          "description": "Compress a section with non-power-of-two dimensions and a larger error.",
+          "command": "suspike nt=100 ntr=9 | sustrip | wpccompress n1=100 n2=9 error=0.05 > out.wpc"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "wpcuncompress",
+        "wpc1comp2"
+      ]
+    }
+  ]
+}

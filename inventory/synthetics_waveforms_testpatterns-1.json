@@ -1,0 +1,280 @@
+{
+  "scope": "su/main/synthetics_waveforms_testpatterns part 1 of 2 — incomplete: only four programs are inventoried below. The remaining ten need source and library-call verification before this inventory can be used to generate builder jobs.",
+  "programs": [
+    {
+      "name": "suaddevent",
+      "path": "su/main/synthetics_waveforms_testpatterns/suaddevent.c",
+      "purpose": "Add a linear or hyperbolic event to each input trace.",
+      "selfdoc_first_line": " SUADDEVENT - add a linear or hyperbolic moveout event to seismic data ",
+      "params": [
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt in microseconds divided by 1000000",
+          "required": false,
+          "description": "Required when the first trace header dt is zero."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "default": "nmo",
+          "required": false,
+          "description": "Use lmo for linear moveout; other values select hyperbolic moveout."
+        },
+        {
+          "name": "t0",
+          "type": "float",
+          "default": "1.",
+          "required": false,
+          "description": "Zero-offset intercept time in seconds."
+        },
+        {
+          "name": "vel",
+          "type": "float",
+          "default": "3000.",
+          "required": false,
+          "description": "Moveout velocity."
+        },
+        {
+          "name": "amp",
+          "type": "float",
+          "default": "1.",
+          "required": false,
+          "description": "Event amplitude."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "alloc1float",
+        "getparfloat",
+        "getparstring",
+        "ints8r",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sinc interpolation and sqrt affect results. The times array is constructed before a missing header dt is replaced by the dt parameter, so that fallback leaves all interpolation times equal to tmin.",
+      "c_lines": 103,
+      "difficulty": "medium",
+      "difficulty_reason": "The program uses sinc interpolation and trace header coordinates to place events.",
+      "test_cases": [
+        {
+          "description": "Hyperbolic event on zero traces.",
+          "command": "sunull nt=128 ntr=8 dt=0.004 | sushw key=offset a=0 b=100 | suaddevent type=nmo t0=0.1 vel=2000 amp=2"
+        },
+        {
+          "description": "Linear event with negative and positive offsets.",
+          "command": "sunull nt=128 ntr=8 dt=0.004 | sushw key=offset a=-300 b=100 | suaddevent type=lmo t0=0.05 vel=1500 amp=-1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sudgwaveform",
+      "path": "su/main/synthetics_waveforms_testpatterns/sudgwaveform.c",
+      "purpose": "Generate a Gaussian derivative waveform as one SU trace.",
+      "selfdoc_first_line": " SUDGWAVEFORM - make Gaussian derivative waveform in SU format\t\t",
+      "params": [
+        {
+          "name": "n",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Derivative order; must be at least one."
+        },
+        {
+          "name": "fpeak",
+          "type": "float",
+          "default": "35",
+          "required": false,
+          "description": "Peak frequency."
+        },
+        {
+          "name": "sign",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Waveform polarity."
+        },
+        {
+          "name": "nfpeak",
+          "type": "int",
+          "default": "computed: n * n",
+          "required": false,
+          "description": "Multiplier of peak frequency used to determine the sample interval."
+        },
+        {
+          "name": "shift",
+          "type": "double",
+          "default": "0",
+          "required": false,
+          "description": "Additional time shift in seconds."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Enable additional diagnostics."
+        },
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "computed: (int)(2 * (shift + sqrt(n) / fpeak) / (0.5 / (nfpeak * fpeak)) + 1)",
+          "required": false,
+          "description": "Number of waveform samples; the code differs from the selfdoc's stated default of 128."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getpardouble",
+        "checkpars",
+        "warn",
+        "err",
+        "ealloc1double",
+        "deriv_n_gauss",
+        "puttr",
+        "free1double",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The waveform is computed in double precision and cast to float; sqrt and the Gaussian derivative implementation can vary across math libraries.",
+      "c_lines": 138,
+      "difficulty": "medium",
+      "difficulty_reason": "The waveform depends on the library implementation of arbitrary-order Gaussian derivatives.",
+      "test_cases": [
+        {
+          "description": "Second derivative with explicit sampling controls.",
+          "command": "sudgwaveform n=2 fpeak=35 nfpeak=4 nt=128 sign=1 shift=0"
+        },
+        {
+          "description": "Higher derivative with reversed polarity and shift.",
+          "command": "sudgwaveform n=4 fpeak=30 nfpeak=8 nt=128 sign=-1 shift=0.01"
+        }
+      ],
+      "license_note": "The header states that parts outside the original CWP/SU code are copyright 2007 Society of Exploration Geophysicists and refers to SEG usage terms.",
+      "related_programs": []
+    },
+    {
+      "name": "suimpedance",
+      "path": "su/main/synthetics_waveforms_testpatterns/suimpedance.c",
+      "purpose": "Convert reflectivity traces to impedance traces using a sample-by-sample recursion.",
+      "selfdoc_first_line": " SUIMPEDANCE - Convert reflection coefficients to impedances.  ",
+      "params": [
+        {
+          "name": "v0",
+          "type": "float",
+          "default": "1500.",
+          "required": false,
+          "description": "Initial velocity."
+        },
+        {
+          "name": "rho0",
+          "type": "float",
+          "default": "1000000.",
+          "required": false,
+          "description": "Initial density."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "gettr",
+        "err",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The initial v0*rho0 multiplication uses float operands; the recursive impedance is double and each output sample is cast to float. Reflectivities are clamped to ±0.9999.",
+      "c_lines": 89,
+      "difficulty": "easy",
+      "difficulty_reason": "Each trace is processed by a simple sequential recursion.",
+      "test_cases": [
+        {
+          "description": "Zero reflectivity produces constant impedance.",
+          "command": "sunull nt=64 ntr=2 dt=0.004 | suimpedance v0=1500 rho0=1000"
+        },
+        {
+          "description": "Impulse reflectivity changes the impedance after the impulse.",
+          "command": "suspike nt=64 ntr=2 dt=0.004 k1=10 mag=0.5 | suimpedance v0=2000 rho0=1200"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sunull",
+      "path": "su/main/synthetics_waveforms_testpatterns/sunull.c",
+      "purpose": "Generate zero-filled SU traces.",
+      "selfdoc_first_line": " SUNULL - create null (all zeroes) traces\t \t\t",
+      "params": [
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples per trace."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "5",
+          "required": false,
+          "description": "Number of traces."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": ".004",
+          "required": false,
+          "description": "Sample interval in seconds."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The sample interval is converted to integer microseconds using NINT.",
+      "c_lines": 78,
+      "difficulty": "easy",
+      "difficulty_reason": "The program fills zero traces and sets a few header fields.",
+      "test_cases": [
+        {
+          "description": "Small default-interval gather.",
+          "command": "sunull nt=64 ntr=3 dt=0.004"
+        },
+        {
+          "description": "Single trace with a different sample interval.",
+          "command": "sunull nt=128 ntr=1 dt=0.002"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

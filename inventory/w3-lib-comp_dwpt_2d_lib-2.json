@@ -1,0 +1,96 @@
+{
+  "scope": "comp/dwpt/2d/lib part 2",
+  "functions": [
+    {
+      "name": "wavePack2",
+      "file": "comp/dwpt/2d/lib/wpcpack2.c",
+      "signature": "void wavePack2(float **x, float **y, void *inconf, int type);",
+      "purpose": "Decompose or reconstruct a two-dimensional signal using wavelet packet transforms and coefficient reordering.",
+      "calls": ["alloc2float", "wavePack1", "wavePack_row", "waveReorder", "free2float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Numerical behavior comes from the ordered one-dimensional and row transforms; the reconstruction path also relies on the functions' directional use of x and y.",
+      "c_lines": 55,
+      "difficulty": "hard",
+      "group": "wavelet-packet-2d",
+      "license_note": ""
+    },
+    {
+      "name": "wavePack1",
+      "file": "comp/dwpt/2d/lib/wpcpack2.c",
+      "signature": "void wavePack1(float *x, float *y, waveFILTER *filter, int twopow, int stage, int type);",
+      "purpose": "Decompose or reconstruct a one-dimensional signal into or from wavelet packet coefficients.",
+      "calls": ["alloc1float", "free1float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Repeated float filter products and sums are accumulated in a fixed loop order across stages; preserve expression grouping and periodic bit-mask indexing. The stage-zero copy does not return early, so subsequent processing is still performed.",
+      "c_lines": 190,
+      "difficulty": "hard",
+      "group": "wavelet-packet-2d",
+      "license_note": ""
+    },
+    {
+      "name": "waveReorder",
+      "file": "comp/dwpt/2d/lib/wpcpack2.c",
+      "signature": "void waveReorder(float **x, float **y, int twopow1, int twopow2, int stage1, int stage2, int type);",
+      "purpose": "Move two-dimensional wavelet coefficients between spatial band layout and flattened block layout.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Copies float values without arithmetic; dimensions and offsets depend on integer shifts.",
+      "c_lines": 60,
+      "difficulty": "easy",
+      "group": "wavelet-packet-2d",
+      "license_note": ""
+    },
+    {
+      "name": "quantFixerror",
+      "file": "comp/dwpt/2d/lib/wpcquant.c",
+      "signature": "void quantFixerror(float **x, float error, void *inconf, void *qstate);",
+      "purpose": "Quantize wavelet coefficient blocks for a specified error level and record their quantization state and deviation order.",
+      "calls": ["alloc1float", "alloc1int", "qkisort"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float sums of squares and the average depend on accumulation order; sqrt uses double precision and is assigned to float, and unsuffixed constants can introduce double intermediates. Rounding through NINT, FLT_MIN and FLT_MAX thresholds, and sorting ties affect encoded output. The all-zero early return leaves the allocated temporary arrays unfreed.",
+      "c_lines": 130,
+      "difficulty": "hard",
+      "group": "wavelet-quantization",
+      "license_note": ""
+    },
+    {
+      "name": "quantDe",
+      "file": "comp/dwpt/2d/lib/wpcquant.c",
+      "signature": "void quantDe(float **x, void *inconf, void *qstate);",
+      "purpose": "Reconstruct floating-point coefficient blocks from their quantized integers and stored average.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The reciprocal uses an unsuffixed double literal before assignment to float; integer-to-float conversion, multiplication, and average addition must retain their order. The reciprocal is computed even when the zero flag is set.",
+      "c_lines": 35,
+      "difficulty": "easy",
+      "group": "wavelet-quantization",
+      "license_note": ""
+    },
+    {
+      "name": "codeSilence",
+      "file": "comp/dwpt/2d/lib/wpcsilence.c",
+      "signature": "void codeSilence (void *inb, void *outb);",
+      "purpose": "Encode runs of at least five zero bytes using a silence marker and run lengths.",
+      "calls": ["silence_run", "end_of_silence"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; preserve byte values, look-ahead behavior, marker substitution, and the 255-byte run limit. Buffer operations are macros rather than function calls.",
+      "c_lines": 55,
+      "difficulty": "medium",
+      "group": "silence-code",
+      "license_note": ""
+    },
+    {
+      "name": "codeDesilence",
+      "file": "comp/dwpt/2d/lib/wpcsilence.c",
+      "signature": "void codeDesilence ( void *inb, void *outb);",
+      "purpose": "Decode silence markers and their run lengths into zero bytes.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; buffer operations are macros, and the implementation does not check whether a marker has a following length byte.",
+      "c_lines": 15,
+      "difficulty": "easy",
+      "group": "silence-code",
+      "license_note": ""
+    }
+  ]
+}

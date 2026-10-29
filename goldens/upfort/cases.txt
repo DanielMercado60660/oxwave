@@ -1,0 +1,13 @@
+# Empty input and blank lines.
+[exact] upfort </dev/null
+[exact] printf '\n\n' | upfort
+# Comment prefixes and lower-case d code-line exception.
+[exact] printf '* MiXeD\nC MiXeD\nc MiXeD\nD MiXeD\nd MiXeD\n' | upfort
+# First column, strings and format strings.
+[exact] printf "xabc 'MiXeD' z\n x '(.abc)' y\n" | upfort
+# Multiple strings, doubled quotes, punctuation and numbers.
+[exact] printf "      a='abc''Def'; b='(xYz)' ! lower 123\n" | upfort
+# Arguments are ignored by the original.
+[exact] printf ' hello world\n' | upfort verbose=1 unknown=2
+# Bytes outside ASCII and carriage returns.
+[exact] printf ' abc\377z\r\n' | upfort

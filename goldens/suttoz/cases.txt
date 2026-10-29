@@ -1,0 +1,20 @@
+# Defaults, odd trace sizes, and nonzero start time.
+suplane nt=73 ntr=3 | suttoz
+suspike nt=1 ntr=1 | suttoz
+suspike nt=19 ntr=1 | suttoz dz=3 fz=12 nz=1
+suspike nt=37 ntr=1 | sushw key=delrt a=20 | suttoz dz=2 fz=10 nz=48
+suplane nt=41 ntr=2 | suttoz t=0,0.04,0.2 v=1400,1800,2200 verbose=1
+[stderr] suspike nt=31 ntr=1 | suttoz dz=2 nz=40 verbose=1
+# Native float velocity file; t and v are ignored when vfile is supplied.
+python3 -c 'import struct; open("vel","wb").write(struct.pack("=17f", *([1800.0]*17)))' && suspike nt=17 ntr=1 | suttoz vfile=vel t=0,1 v=2000 dz=3 nz=17
+python3 -c 'open("vel","wb").write(b"short")' && suspike nt=17 ntr=1 | suttoz vfile=vel
+suspike nt=17 ntr=1 | suttoz t=0,1 v=1500
+suspike nt=17 ntr=1 | suttoz t=0,0 v=1500,1600
+suspike nt=17 ntr=1 | suttoz nz=65536
+suttoz </dev/null
+# Negative first depth samples exercise extrapolation.
+suspike nt=21 ntr=1 | suttoz dz=3 fz=-6 nz=25
+# The original writes outside its allocation in these cases; check only that
+# neither implementation reports a Rust panic, regardless of the original exit.
+[exact] { suspike nt=21 ntr=1 | suttoz dz=3 fz=-6 nz=1; } >/dev/null 2>err || :; if grep -q 'panicked at' err; then exit 1; fi
+[exact] { suspike nt=21 ntr=1 | suttoz dz=3 fz=1000 nz=1; } >/dev/null 2>err || :; if grep -q 'panicked at' err; then exit 1; fi

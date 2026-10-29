@@ -1,0 +1,35 @@
+{
+ "gen": {
+  "plane.su": "suplane nt=64 ntr=8 | sushw key=offset,sx,gx,d2,cdp a=-200,0,100,0.025,1 b=50,10,20,0,1",
+  "spike.su": "suspike nt=100 ntr=6 dt=0.002 | sushw key=f1,scalco,gelev a=0.1,-10,-35 b=0,0,7",
+  "gather.su": "suplane nt=250 ntr=120 dt=0.002 | sushw key=fldr,tracf,offset,sx,gx a=1,1,100,1000,1100 b=0,1,25,0,25 c=1,0,0,50,50 j=24,24,24,24,24 | suchw key1=cdp key2=gx key3=sx b=1 c=1 d=2",
+  "one.su": "suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1"
+ },
+ "derived": {
+  "plane.gethw.txt": "sugethw key=tracl,offset,sx,gx,cdp,d2,dt,ns output=geom < plane.su",
+  "gather.gethw.txt": "sugethw key=fldr,tracf,offset,sx,gx,cdp,trid output=geom < gather.su",
+  "plane.sushw1.su": "sushw key=cdp,fldr,f2 a=10,1,0.5 b=2,0,0.25 c=0,1,0 j=3,3,3 < plane.su",
+  "gather.sushw2.su": "sushw key=ep,offset,d1 a=5,-100,0.004 b=1,10,0 c=100,0,0 d=2,0,0 j=10,7,0 < gather.su",
+  "plane.surange.txt": "surange < plane.su",
+  "spike.surange.txt": "surange < spike.su",
+  "gather.surange.txt": "surange < gather.su",
+  "one.surange.txt": "surange < one.su"
+ },
+ "segy": [
+  "segyhdrs < plane.su > /dev/null",
+  "segywrite tape=plane.sgy < plane.su",
+  "segywrite tape=plane5.sgy format=5 < plane.su",
+  "segyread tape=plane.sgy hfile=plane.sgy.hfile bfile=plane.sgy.bfile > plane.sgy.su",
+  "segyread tape=plane5.sgy hfile=plane5.sgy.hfile bfile=plane5.sgy.bfile > plane5.sgy.su",
+  "suaddhead ns=64 < wild.f32 | sushw key=dt a=4000 > wild.su",
+  "segywrite tape=wild.sgy hfile=header bfile=binary < wild.su",
+  "segyread tape=wild.sgy hfile=wild.sgy.hfile bfile=wild.sgy.bfile > wild.sgy.su"
+ ],
+ "selfdoc": [
+  "sugain",
+  "suplane",
+  "sufilter",
+  "surange",
+  "sushw"
+ ]
+}

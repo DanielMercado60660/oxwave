@@ -1,0 +1,22 @@
+# Defaults and header dt; multiple input traces.
+suspike nt=128 ntr=2 | sugabor
+# All filter parameters, verbose diagnostics.
+[stderr] suspike nt=127 ntr=1 | sugabor dt=0.002 fmin=3 fmax=60 band=8 beta=2 alpha=0.04 verbose=1
+# Both regularity modes.
+suspike nt=128 ntr=1 | sugabor holder=1 fmin=0 fmax=80 band=10
+suspike nt=128 ntr=1 | sugabor holder=2 fmin=0 fmax=80 band=10
+# Single sample and non-power-of-two sizes.
+suspike nt=1 ntr=1 | sugabor dt=0.004 band=25 fmax=100
+suspike nt=73 ntr=1 | sugabor dt=0.004 fmin=10 fmax=70 band=12
+# Empty input and missing or zero dt.
+sugabor
+suspike nt=32 | sushw key=dt a=0 | sugabor
+suspike nt=32 | sugabor dt=0
+# Invalid mode and nonseismic data warning.
+suspike nt=64 | sugabor holder=3 band=20 fmax=100
+[stderr] suspike nt=64 | sushw key=trid a=118 | sugabor band=25 fmax=100
+# Zero filters and negative frequency limits.
+suspike nt=32 | sugabor fmin=40 fmax=20 band=10
+suspike nt=64 | sugabor fmin=-10 fmax=30 band=10
+# Many filters with a small bandwidth in the default output mode.
+suspike nt=1 ntr=1 | sugabor dt=0.004 fmax=1 band=0.001

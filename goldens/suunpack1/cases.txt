@@ -1,0 +1,14 @@
+# Packed traces with square, identity, and general inverse powers.
+suplane nt=63 ntr=3 | suaddnoise seed=123 sn=2 | supack1 | suunpack1
+suplane nt=31 ntr=2 | suaddnoise seed=42 sn=2 | supack1 gpow=1 | suunpack1
+suplane nt=65 ntr=3 | suaddnoise seed=7 sn=2 | supack1 gpow=0.7 | suunpack1
+# Single sample and zero-valued samples.
+suspike nt=1 ntr=1 | supack1 gpow=1 | suunpack1
+sunull nt=7 ntr=1 | supack1 | suunpack1
+# First exponent controls later traces; per-trace scales vary.
+(suplane nt=21 ntr=1 | supack1 gpow=1; suplane nt=21 ntr=1 | supack1 gpow=0.5) | suunpack1
+# Missing input and an unpacked trace.
+suunpack1
+sunull nt=3 ntr=1 | suunpack1
+# Arguments are ignored because the program does not call checkpars.
+suplane nt=5 ntr=1 | supack1 | suunpack1 verbose=1 unknown=1

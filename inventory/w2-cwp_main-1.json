@@ -1,0 +1,173 @@
+{
+  "scope": "cwp/main (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "conjtest",
+      "path": "cwp/main/conjtest.c",
+      "purpose": "Solve a fixed five-equation system and print the matrix, input vector, and calculated solution.",
+      "selfdoc_first_line": "compute solution for x in Ax=b using conjugate gradients",
+      "params": [],
+      "stdin": "none",
+      "stdout": "ascii",
+      "lib_calls": ["alloc1float", "alloc2float", "simple_conj_gradient"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The solver performs ten conjugate-gradient iterations using float matrix products, sequential dot-product accumulations, divisions, and a small determinant adjustment. Rounding, contraction, and evaluation precision can affect the printed result.",
+      "c_lines": 77,
+      "difficulty": "hard",
+      "difficulty_reason": "The program depends on an iterative conjugate-gradient solver whose floating-point behavior must be reproduced.",
+      "test_cases": [
+        {
+          "description": "Run the fixed conjugate-gradient example.",
+          "command": "conjtest"
+        },
+        {
+          "description": "Confirm the program does not consume standard input.",
+          "command": "sunull nt=8 ntr=2 | conjtest"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "ctrlstrip",
+      "path": "cwp/main/ctrlstrip.c",
+      "purpose": "Copy printable input characters, tabs, and newlines while discarding other characters.",
+      "selfdoc_first_line": "CTRLSTRIP - Strip non-graphic characters",
+      "params": [],
+      "stdin": "other",
+      "stdout": "other",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Character classification depends on the active C locale.",
+      "c_lines": 37,
+      "difficulty": "easy",
+      "difficulty_reason": "It filters input one character at a time using the C character-classification function.",
+      "test_cases": [
+        {
+          "description": "Keep printable text, tabs, and newlines while stripping control characters.",
+          "command": "printf 'A\\001B\\tC\\nD\\rE\\n' | ctrlstrip"
+        },
+        {
+          "description": "Pass an empty input stream.",
+          "command": "printf '' | ctrlstrip"
+        }
+      ],
+      "license_note": "Credits the Masscomp RTU Programming Manual.",
+      "related_programs": []
+    },
+    {
+      "name": "downfort",
+      "path": "cwp/main/downfort.c",
+      "purpose": "Convert Fortran source to lowercase while preserving comment lines and most quoted strings.",
+      "selfdoc_first_line": "DOWNFORT - change Fortran programs to lower case, preserving strings",
+      "params": [],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Character classification and case conversion depend on the active C locale. Inner loops do not check EOF, so an unterminated line or quoted string can loop indefinitely.",
+      "c_lines": 60,
+      "difficulty": "easy",
+      "difficulty_reason": "It transforms source text with simple line and quote handling.",
+      "test_cases": [
+        {
+          "description": "Convert code while preserving a comment and a quoted string.",
+          "command": "printf 'C COMMENT\\n      PRINT *, '\\''HELLO'\\''\\n      END\\n' | downfort"
+        },
+        {
+          "description": "Exercise the special quoted-parenthesis case and a blank line.",
+          "command": "printf '\\n      FORMAT '\\''(I5, A)'\\''\\n' | downfort"
+        }
+      ],
+      "license_note": "Credits Brian Sumner, circa 1984.",
+      "related_programs": []
+    },
+    {
+      "name": "fcat",
+      "path": "cwp/main/fcat.c",
+      "purpose": "Concatenate named files to standard output using one read and one write per file.",
+      "selfdoc_first_line": "FCAT - fast cat with 1 read per file",
+      "params": [],
+      "stdin": "none",
+      "stdout": "other",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The file size is converted to int before the 8 MiB limit check; a failed open is followed by fstat on an invalid descriptor and use of an uninitialized stat structure. Short reads or writes fail instead of being retried.",
+      "c_lines": 62,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads and writes each named file with a fixed-size buffer.",
+      "test_cases": [
+        {
+          "description": "Concatenate two small SU files.",
+          "command": "sunull nt=8 ntr=2 > in1.su && sunull nt=16 ntr=1 > in2.su && fcat in1.su in2.su"
+        },
+        {
+          "description": "Copy one small SU file.",
+          "command": "sunull nt=8 ntr=1 > in.su && fcat in.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "isatty",
+      "path": "cwp/main/isatty.c",
+      "purpose": "Report whether a supplied file descriptor refers to a terminal.",
+      "selfdoc_first_line": "ISATTY - pass on return from isatty(2)",
+      "params": [],
+      "stdin": "none",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The reported value depends on whether the supplied descriptor is attached to a terminal.",
+      "c_lines": 41,
+      "difficulty": "easy",
+      "difficulty_reason": "It parses one positional argument and reports the result of a system call.",
+      "test_cases": [
+        {
+          "description": "Check standard input when connected to a pipe.",
+          "command": "sunull nt=8 ntr=1 | isatty 0"
+        },
+        {
+          "description": "Check an invalid file descriptor.",
+          "command": "isatty 999"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "maxints",
+      "path": "cwp/main/maxints.c",
+      "purpose": "Calculate and print minimum and maximum values for several C integer types.",
+      "selfdoc_first_line": "MAXINTS - Compute maximum and minimum sizes for integer types",
+      "params": [],
+      "stdin": "none",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The signed left shifts overflow and have undefined behavior; the signed minimum expressions also overflow. Results and termination depend on integer widths, compiler, and optimization.",
+      "c_lines": 114,
+      "difficulty": "easy",
+      "difficulty_reason": "It uses small integer loops and prints their results, although reproducing its undefined behavior is platform-dependent.",
+      "test_cases": [
+        {
+          "description": "Print the integer limits.",
+          "command": "maxints"
+        },
+        {
+          "description": "Confirm the program does not consume standard input.",
+          "command": "sunull nt=8 ntr=1 | maxints"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

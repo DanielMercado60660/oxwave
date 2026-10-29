@@ -1,0 +1,18 @@
+# Defaults and single, odd-sized traces.
+sunull nt=1 ntr=1 | sushw
+sunull nt=7 ntr=5 | sushw key=cdp
+sunull nt=7 ntr=5 | sushw key=cdp,offset,dt,d1 a=3,-7,4000,1.5 b=2,1,0,0.25 c=4,-3,0,1 d=-2,1,0,0 j=3,2,0,3
+sunull nt=3 ntr=5 | sushw key=offset a=-5 b=2 c=-3 d=-2 j=-3
+sunull nt=3 ntr=3 | sushw key=offset b=2 j=0
+[stderr] sunull nt=3 ntr=1 | sushw key=cdp verbose=1
+sunull nt=3 ntr=1 | sushw key=badkey
+sushw key=cdp
+sushw key=cdp,offset a=1
+sushw key=cdp,offset b=1
+sushw key=cdp,offset c=1
+sushw key=cdp,offset d=1
+sushw key=cdp,offset j=1
+sushw key=cdp infile=missing.bin
+sunull nt=3 ntr=1 | sushw key=cdp infile=
+python3 -c 'import struct; open("values.bin","wb").write(struct.pack("=4f",1.5,-2,3,4))' && sunull nt=3 ntr=2 | sushw key=cdp,offset infile=values.bin
+python3 -c 'import struct; open("values.bin","wb").write(struct.pack("=2f",1,2))' && sunull nt=3 ntr=3 | sushw key=cdp infile=values.bin

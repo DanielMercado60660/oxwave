@@ -1,0 +1,17 @@
+# Positional descriptor parsing, non-terminal descriptors, and argument errors.
+[stderr] isatty
+[stderr] isatty 0 extra
+isatty 0
+isatty 1
+isatty 2
+isatty -1
+isatty +2
+isatty abc
+isatty ''
+isatty '  12junk'
+isatty 4294967296
+isatty 99999999999999999999999999999
+isatty 3 3</dev/null
+isatty 3 3>&-
+# Open a pseudo-terminal and pass its slave as descriptor 0.
+python3 -c 'import os,pty,subprocess; m,s=pty.openpty(); p=subprocess.run(" isatty 0",shell=True,stdin=s); os.close(m); os.close(s); raise SystemExit(p.returncode)'

@@ -1,0 +1,423 @@
+{
+  "scope": "su/main/statics part 1 of 1",
+  "programs": [
+    {
+      "name": "suaddstatics",
+      "path": "su/main/statics/suaddstatics.c",
+      "purpose": "Assign random surface-consistent source and receiver statics to trace headers.",
+      "selfdoc_first_line": " SUADDSTATICS - ADD random STATICS on seismic data\t\t\t",
+      "params": [
+        {
+          "name": "shift",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Maximum magnitude of each random component; the code reports the missing value as a time shift in seconds, while the selfdoc says milliseconds."
+        },
+        {
+          "name": "sources",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of source locations."
+        },
+        {
+          "name": "receivers",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of receiver locations."
+        },
+        {
+          "name": "cmps",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of CMP locations."
+        },
+        {
+          "name": "maxfold",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Maximum CMP fold."
+        },
+        {
+          "name": "datafile",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Input SU trace file."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt divided by 1000.0 when parameter is zero or absent",
+          "required": false,
+          "description": "Sampling interval in milliseconds."
+        },
+        {
+          "name": "seed",
+          "type": "int",
+          "default": "getpid()",
+          "required": false,
+          "description": "Random generator seed."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print progress information when nonzero."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "getparfloat",
+        "err",
+        "warn",
+        "checkpars",
+        "fgettr",
+        "alloc3int",
+        "alloc1float",
+        "alloc1int",
+        "alloc3float",
+        "efwrite",
+        "erewind",
+        "free1int",
+        "sranuni",
+        "franuni",
+        "efread",
+        "puttr"
+      ],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "Random values use franuni and mixed float/double arithmetic before rounding into the short tstat header. The program assumes the supplied CMP count and fold bounds match the input; unused fold entries can be uninitialized.",
+      "c_lines": 265,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers an entire CMP-sorted dataset and builds source and receiver mappings.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "surandstat"
+      ]
+    },
+    {
+      "name": "sufarldcsv",
+      "path": "su/main/statics/sufarldcsv.c",
+      "purpose": "Compute a smoothed floating datum from source and receiver statics in Q-files.",
+      "selfdoc_first_line": " SUFARLDCSV - Floating Approximate Robust Local Datum From Q-files.         ",
+      "params": [],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The complete parameter inventory, indirect grid parameters, library calls, and executable test cases have not been verified. The program explicitly requires stdin and stdout to be terminals.",
+      "c_lines": 2083,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines grid handling, spatial searches, edge compensation, averaging, and smoothing in more than 1500 lines.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sushiftcsv"
+      ]
+    },
+    {
+      "name": "sugetqcsv",
+      "path": "su/main/statics/sugetqcsv.c",
+      "purpose": "Write selected trace headers and samples to a Q-file.",
+      "selfdoc_first_line": " SUGETQCSV - Write Trace Header Key Values and Sample Values to a Q-file    ",
+      "params": [
+        {
+          "name": "qout",
+          "type": "string",
+          "default": "qhed.csv",
+          "required": false,
+          "description": "Output Q-file."
+        },
+        {
+          "name": "keys",
+          "type": "string array",
+          "default": "",
+          "required": true,
+          "description": "Trace-header or supported derived key names."
+        },
+        {
+          "name": "formxy",
+          "type": "string",
+          "default": "%.20g",
+          "required": false,
+          "description": "C format for header values."
+        },
+        {
+          "name": "formsv",
+          "type": "string",
+          "default": "%.10g",
+          "required": false,
+          "description": "C format for sample values."
+        },
+        {
+          "name": "fsamp",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "First sample index to output."
+        },
+        {
+          "name": "lsamp",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "Last sample index; -1 disables sample output."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "getparstring",
+        "err",
+        "ealloc1",
+        "ealloc1int",
+        "ealloc1double",
+        "getparstringarray",
+        "GetCase",
+        "getparint",
+        "gettr",
+        "fromhead"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Formatting depends on C printf; coordinate scaling uses floating-point arithmetic. The code allocates format strings without space for their terminating null byte and permits lsamp equal to tr.ns, causing out-of-bounds access.",
+      "c_lines": 317,
+      "difficulty": "easy",
+      "difficulty_reason": "It extracts and formats headers and samples one trace at a time.",
+      "test_cases": [
+        {
+          "description": "Write selected headers and samples to a Q-file.",
+          "command": "suplane nt=64 ntr=8 | sugetqcsv keys=cdp,sx,gx fsamp=0 lsamp=7 qout=qhed.csv"
+        },
+        {
+          "description": "Write derived midpoint coordinates with an explicit format.",
+          "command": "suplane nt=64 ntr=8 | sugetqcsv keys=cdp,mx,my formxy=%.6g qout=midpoints.csv"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sunszonecsv",
+      "path": "su/main/statics/sunszonecsv.c",
+      "purpose": "Compute and optionally apply near-surface travel-time shifts using a layered model in a Q-file.",
+      "selfdoc_first_line": " SUNSZONECSV - Near Surface Zone computations using a Q-file.              ",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, selfdoc first line, and executable test cases have not been fully verified; ray-path calculations mix floating-point operations and square roots.",
+      "c_lines": 961,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines spatial model lookup, layered ray-path calculations, and trace interpolation.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sushiftcsv"
+      ]
+    },
+    {
+      "name": "surandstat",
+      "path": "su/main/statics/surandstat.c",
+      "purpose": "Apply a random integer sample shift to each seismic trace.",
+      "selfdoc_first_line": " SURANDSTAT - Add RANDom time shifts STATIC errors to seismic traces\t",
+      "params": [
+        {
+          "name": "seed",
+          "type": "uint",
+          "default": "computed: time(NULL)",
+          "required": false,
+          "description": "Random seed."
+        },
+        {
+          "name": "max",
+          "type": "int",
+          "default": "computed: (int)(tr.dt / 1000000.0) * 1000.0",
+          "required": false,
+          "description": "Maximum shift parameter; the cast occurs before multiplication, so typical seismic sampling intervals produce zero by default."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Multiplier for the generated shift."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparfloat",
+        "getparuint",
+        "checkpars",
+        "sranuni",
+        "franuni",
+        "puttr"
+      ],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "The generator is reseeded with the same seed for every trace. The shift loop can access beyond the trace sample range, including tr.data[nt], and does not clear vacated samples.",
+      "c_lines": 98,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies a simple integer shift independently to each trace.",
+      "test_cases": [],
+      "license_note": "Credits include U Houston: Chris Liner, circa 2009.",
+      "related_programs": [
+        "suaddstatics"
+      ]
+    },
+    {
+      "name": "surescsv",
+      "path": "su/main/statics/surescsv.c",
+      "purpose": "Estimate surface-consistent residual source and receiver statics and write them as Q-files.",
+      "selfdoc_first_line": " SURESCSV - Surface Consistent Residual Statics Determination.         ",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, and executable test cases have not been fully verified. Iterative stack accumulation, correlation, peak interpolation, and sinc interpolation are sensitive to numerical ordering.",
+      "c_lines": 1462,
+      "difficulty": "hard",
+      "difficulty_reason": "It performs iterative surface-consistent statics estimation with buffered traces and spatial searches.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "suresstat"
+      ]
+    },
+    {
+      "name": "suresstat",
+      "path": "su/main/statics/suresstat.c",
+      "purpose": "Estimate surface-consistent source and receiver statics and write binary float files.",
+      "selfdoc_first_line": " SURESSTAT - Surface consistent source and receiver statics calculation",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, and executable test cases have not been fully verified. The estimator uses iterative stacking and correlation; stdin must support the random trace access used by gettra.",
+      "c_lines": 529,
+      "difficulty": "hard",
+      "difficulty_reason": "It iteratively estimates shifts from multiple shot, receiver, and CMP gathers.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "surescsv"
+      ]
+    },
+    {
+      "name": "sushiftcsv",
+      "path": "su/main/statics/sushiftcsv.c",
+      "purpose": "Apply source, receiver, and CDP shifts from Q-files to traces.",
+      "selfdoc_first_line": " SUSHIFTCSV - Shift traces using values from Q-files.                       ",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, selfdoc first line, and executable test cases have not been fully verified. Nearest-location searches and sinc interpolation are floating-point sensitive.",
+      "c_lines": 1180,
+      "difficulty": "medium",
+      "difficulty_reason": "It parses multiple Q-files, performs multidimensional nearest-location searches, and interpolates traces.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sufarldcsv",
+        "sunszonecsv"
+      ]
+    },
+    {
+      "name": "sustatic",
+      "path": "su/main/statics/sustatic.c",
+      "purpose": "Calculate or read static corrections and apply them to traces.",
+      "selfdoc_first_line": " SUSTATIC - Elevation STATIC corrections, apply corrections from\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, selfdoc first line, and executable test cases have not been fully verified. Corrections use log10, pow, mixed precision, and sinc interpolation.",
+      "c_lines": 243,
+      "difficulty": "medium",
+      "difficulty_reason": "It supports several correction sources and interpolates each trace.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sustaticB",
+        "sustaticrrs"
+      ]
+    },
+    {
+      "name": "sustaticB",
+      "path": "su/main/statics/sustaticB.c",
+      "purpose": "Calculate or read static corrections and apply them to traces.",
+      "selfdoc_first_line": " SUSTATIC - Elevation STATIC corrections, apply corrections from\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, selfdoc first line, and executable test cases have not been fully verified. Corrections use log10, pow, mixed precision, and sinc interpolation.",
+      "c_lines": 240,
+      "difficulty": "medium",
+      "difficulty_reason": "It supports several correction sources and interpolates each trace.",
+      "test_cases": [],
+      "license_note": "",
+      "related_programs": [
+        "sustatic",
+        "sustaticrrs"
+      ]
+    },
+    {
+      "name": "sustaticrrs",
+      "path": "su/main/statics/sustaticrrs.c",
+      "purpose": "Apply elevation or file-based statics and compute or apply residual refraction statics.",
+      "selfdoc_first_line": " SUSTATICRRS - Elevation STATIC corrections, apply corrections from\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parameter inventory, library calls, and executable test cases have not been fully verified. Velocity integration, CMP accumulation, log10, pow, and sinc interpolation affect numerical reproducibility; several conditional parameters are read without checking whether they were supplied.",
+      "c_lines": 412,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines multiple statics modes with velocity-model integration and cross-run intermediate files.",
+      "test_cases": [],
+      "license_note": "The file references Cox, Static corrections for seismic reflection surveys, Society of Exploration Geophysicists, 1999.",
+      "related_programs": [
+        "sustatic",
+        "sustaticB"
+      ]
+    }
+  ]
+}

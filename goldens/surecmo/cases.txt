@@ -1,0 +1,18 @@
+# Defaults, including zero denominator and dt from the trace header.
+suplane nt=17 ntr=5 | surecmo
+suplane nt=17 ntr=5 | surecmo dx=25
+suplane nt=17 ntr=5 | surecmo vb=2.5 dx=25
+# Explicit and negative acquisition parameters; weights above one and two.
+suplane nt=31 ntr=5 | surecmo vb=20 dx=0.1 dt=4000
+suplane nt=19 ntr=4 | surecmo vb=-2 dx=3 dt=2000
+suplane nt=19 ntr=4 | surecmo vb=2 dx=-3 dt=-2000
+suplane nt=19 ntr=4 | surecmo vb=2 dx=3 dt=0
+# Single sample and single trace.
+suspike nt=1 ntr=1 | surecmo vb=2 dx=3 dt=4000
+suspike nt=13 ntr=1 | surecmo vb=2 dx=3
+# Documented but unread parameters, and verbose diagnostics.
+[stderr] suplane nt=9 ntr=3 | surecmo vb=2 dx=3 fill=7 tmax=2 verbose=1
+# Empty input and invalid numeric values.
+surecmo vb=2 dx=3 </dev/null
+suplane nt=9 ntr=2 | surecmo vb=1e999 dx=3
+suplane nt=9 ntr=2 | surecmo vb=2 dx=3 dt=999999999999999999999

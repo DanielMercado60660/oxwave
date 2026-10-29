@@ -1,0 +1,23 @@
+# Defaults and odd trace/sample counts.
+suspike nt=17 ntr=3 | sushift
+suspike nt=1 ntr=1 | sushift
+# Crop, pad on either or both sides, and completely disjoint windows.
+suspike nt=17 ntr=2 | sushift tmin=0.008 tmax=0.04
+suspike nt=17 ntr=2 | sushift tmin=-0.012 tmax=0.04 fill=-3
+suspike nt=17 ntr=2 | sushift tmin=0.04 tmax=0.09 fill=2
+suspike nt=17 ntr=2 | sushift tmin=-0.012 tmax=0.09 fill=1.5
+suspike nt=17 ntr=2 | sushift tmin=0.1 tmax=0.12 fill=9
+suspike nt=17 ntr=2 | sushift tmin=-0.04 tmax=-0.02 fill=9
+# Different input delays, fractional milliseconds, and independent bounds.
+[stderr] suspike nt=17 ntr=3 | sushw key=delrt a=-8 b=8 | sushift tmin=-0.004 tmax=0.08 verbose=1
+suspike nt=17 ntr=1 | sushift tmin=0.0014
+suspike nt=17 ntr=1 | sushift tmax=0.032
+suspike nt=17 ntr=1 | sushift dt=2000 tmin=-0.004 tmax=0.04 fill=2 verbose=1
+# Error exits and parameter checking.
+sushift tmin=0
+suspike nt=17 ntr=1 | sushift tmin=0.1 tmax=0.1
+suspike nt=17 ntr=1 | sushift tmin=33 tmax=34
+suspike nt=17 ntr=1 | sushift dt=-1 tmin=0 tmax=0.01
+suspike nt=17 ntr=1 | sushift dt=1 tmin=0 tmax=0.1
+suspike nt=17 ntr=1 | sushift dt=0
+[stderr] suspike nt=17 ntr=1 | sushift unused=1 verbose=1

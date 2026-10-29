@@ -1,0 +1,95 @@
+# Required parameters, empty input, count mismatches, numeric parsing.
+[stderr] sufdmod2
+[stderr] sufdmod2 nx=5
+[stderr] sufdmod2 nx=5 nz=7
+[stderr] sufdmod2 nx=5 nz=7 tmax=0.01
+[stderr] sufdmod2 nx=5 nz=7 tmax=0.01 xs=1,2 zs=1
+[stderr] sufdmod2 nx=0 nz=-1
+[stderr] sufdmod2 nx=9999999999999999
+[stderr] sufdmod2 nx=5 nz=7 tmax=0.01 xs=2 zs=3 nt=1
+# Default options, odd grid, auto nt, explicit default values.
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=2 zs=3
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=2 zs=3 pw=0 sstrength=1 nt=0 mt=1 dx=1 fx=0 dz=1 fz=0 pwt=20 mono=0 hsz=0 vsx=0 verbose=0 abs=1,1,1,1 dfile= hsfile= vsfile= ssfile= fmax=150 fpeak=75
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.02 xs=2 zs=3 nt=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.02 xs=2 zs=3 nt=-1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=-1 xs=2 zs=3 nt=3
+# Full wave propagation and both constant-density stars; receiver outputs are cat'ed.
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.08 xs=30 zs=40 verbose=1
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=8 dz=12 fx=-3 fz=-5 tmax=0.06 xs=20 zs=31 fmax=80 fpeak=30 sstrength=-2 mt=3 verbose=2
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.1 xs=30 zs=40 mono=1 fpeak=22 mt=4 abs=0,1,1,1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.01 xs=2 zs=3 abs=0,0,0,0 sstrength=0 verbose=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.01 xs=2 zs=3 abs=1,0,1,0
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.01 xs=2 zs=3 abs=0,1 verbose=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=2 zs=3 mt=0
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=2 zs=3 mt=-2
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=-20 zs=-30 nt=3
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 fmax=0 fpeak=0 nt=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 fmax=-10 fpeak=-5 nt=3
+sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=7 nz=9 dx=10 dz=12 fx=10 fz=12 tmax=0.04 xs=30 zs=48 hsfile=h hsz=36 < v > w && cat h
+sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=7 nz=9 dx=10 dz=12 fx=10 fz=12 tmax=0.04 xs=30 zs=48 vsfile=vout vsx=40 < v > w && cat vout
+sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=7 nz=9 dx=10 dz=12 fx=10 fz=12 tmax=0.04 xs=30 zs=48 ssfile=s < v > w && cat s
+sunull nt=7 ntr=5 | sugain bias=1 | sustrip outpar=/dev/null > v; sufdmod2 nx=5 nz=7 tmax=1 xs=2 zs=3 nt=1 ssfile=s < v > w && cat s
+sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 nt=1 hsfile=h vsfile=vv ssfile=s < v > w && cat w h vv s
+# Source coordinate files, including malformed content.
+printf '1\n2 3\n' > sources; sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0.001 xs=sources
+[stderr] printf 'bad\n' > sources; sufdmod2 nx=5 nz=7 tmax=0.01 xs=sources
+[stderr] printf '1\n2\n' > sources; sufdmod2 nx=5 nz=7 tmax=0.01 xs=sources
+[stderr] printf '0\n' > sources; sufdmod2 nx=5 nz=7 tmax=0.01 xs=sources
+# Density: constant is normalized to one; variable equal/unequal spacing stars.
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null > v; sunull nt=7 ntr=5 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=5 nz=7 tmax=0.005 xs=2 zs=3 dfile=d verbose=1 < v
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > v; suplane nt=9 ntr=7 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.08 xs=30 zs=40 dfile=d verbose=2 < v
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > v; suplane nt=9 ntr=7 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=7 nz=9 dx=8 dz=12 tmax=0.08 xs=24 zs=48 dfile=d verbose=1 < v
+# Open/read errors use each original diagnostic verbatim.
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 hsfile=absent/h
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 vsfile=absent/v
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 ssfile=absent/s
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 dfile=absent
+[stderr] touch d; sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 dfile=d
+# Extended / plane-wave paths: compare diagnostics as well as numerical output.
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.04 xs=10,50 zs=30,40 pwt=2 mt=2
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.04 xs=0 zs=30 pw=1 pwt=2 mono=1
+[stderr] printf '3\n10 20\n30 40\n50 30\n' > sources; sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.04 xs=sources pwt=0
+# Additional boundary cases: minimal grid, signed spacing, zero velocity, late-time cutoff.
+[stderr] sunull nt=2 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=2 nz=2 tmax=0 xs=0 zs=0 nt=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 dx=-1 dz=-2 tmax=0.001 xs=-2 zs=-6 nt=7
+[stderr] sunull nt=7 ntr=5 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 nt=1 verbose=1
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 nt=3 dx=0 fmax=150 fpeak=75
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=7 tmax=0 xs=2 zs=3 nt=3 dz=0 fmax=150 fpeak=75
+[stderr] sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.2 xs=30 zs=40 fpeak=100 mt=7
+# getpar uses the last occurrence, accepts par files, and there is no checkpars call.
+[stderr] sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=3 nx=5 nz=7 tmax=0 xs=2 zs=3 nt=1 unknown=ignored
+[stderr] printf 'nx=5 nz=7 tmax=0 xs=2 zs=3 nt=1 verbose=2\n' > params; sunull nt=7 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 par=params
+# One-cell dimensions are defined when all absorbing boundaries are disabled.
+[stderr] sunull nt=1 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=1 nz=1 tmax=0 xs=0 zs=0 nt=1 abs=0,0,0,0 hsfile=h vsfile=vv ssfile=s < v > w && cat w h vv s
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=1 nz=7 tmax=0 xs=0 zs=3 nt=3 abs=0,0,0,0
+[stderr] sunull nt=1 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=5 nz=1 tmax=0 xs=2 zs=0 nt=3 abs=0,0,0,0
+# Inventory scenarios with sustrip's tty output disabled and receiver files compared.
+sunull nt=32 ntr=32 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin; sufdmod2 nx=32 nz=32 dx=10 dz=10 tmax=0.04 xs=160 zs=160 fpeak=25 mt=4 hsz=100 hsfile=hs.su < vel.bin > wave.su && cat hs.su
+[stderr] sunull nt=32 ntr=32 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin; sufdmod2 nx=32 nz=32 dx=10 dz=10 tmax=0.04 xs=120,200 zs=150,150 abs=0,1,1,1 sstrength=2 mono=1 fpeak=20 mt=4 ssfile=ss.su < vel.bin > wave.su && cat ss.su
+# Source-file precedence and a malformed record after a valid coordinate pair.
+[stderr] printf '1\n30 40\n' > 15; sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=7 nz=9 dx=10 dz=10 tmax=0.04 xs=15 zs=1,2 verbose=1
+[stderr] printf '2\n10 20\n30 bad\n' > sources; sufdmod2 nx=7 nz=9 tmax=0.04 xs=sources
+# A one-column plane wave takes the point-source path; disabled boundaries make this grid defined.
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=1 nz=7 dx=10 dz=10 tmax=0.01 xs=0 zs=30 pw=1 nt=3 abs=0,0,0,0 ssfile=s verbose=2 < v > w && cat s
+# Extended sources now use the supplied cmonot library. Exercise both
+# zero-derivative branches, curved geometry, and coincident source endpoints.
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=9 nz=11 dx=10 dz=10 tmax=0.05 xs=40,40 zs=15,85 pwt=0 fmax=60 mt=2 verbose=1
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=9 nz=11 dx=10 dz=10 tmax=0.05 xs=70,10 zs=40,40 pwt=-2 fmax=60 nt=13
+[stderr] sunull nt=13 ntr=11 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=11 nz=13 dx=8 dz=12 fx=-5 fz=7 tmax=0.06 xs=3,43,19,67,75 zs=19,67,115,43,91 pwt=3 fmax=70 mt=3 verbose=2
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=9 nz=11 dx=10 dz=10 tmax=0 xs=30,30 zs=40,40 pwt=0 nt=3
+# Default taper overlaps on a small grid; a wider grid has distinct tapered ends.
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=9 nz=11 dx=10 dz=10 tmax=0.06 xs=0 zs=40 pw=1 verbose=1
+[stderr] sunull nt=15 ntr=47 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=47 nz=15 dx=10 dz=10 tmax=0 xs=0 zs=60 pw=1 pwt=20 mono=1 fmax=50 nt=17 mt=2
+# Extended Ricker sources stop after 2/fpeak; exsrc derives fpeak from fmax and
+# does not use the separately supplied point-source fpeak or sstrength.
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2 nx=9 nz=11 dx=10 dz=10 tmax=0 xs=10,60 zs=30,70 pwt=2 fmax=120 fpeak=13 sstrength=-3 nt=41 mt=4 verbose=2
+# Source files with curved coordinates and unequal spacing; compare receiver samples.
+[stderr] printf '4\n-2.0e0 1.0e1\n2.2e1 3.4e1\n4.6e1 7.0e1\n6.2e1 4.6e1\n' > sources; sunull nt=11 ntr=9 | sugain bias=1700 | sustrip outpar=/dev/null > v; suplane nt=11 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=9 nz=11 dx=8 dz=12 fx=-2 fz=-2 tmax=0.06 xs=sources dfile=d pwt=1 ssfile=s verbose=1 < v > w && cat s
+# All plane-wave receiver modes, nonzero origins, fractional depth, and odd nt.
+[stderr] sunull nt=11 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=9 nz=11 dx=8 dz=12 fx=3 fz=5 tmax=0 xs=0 zs=49 pw=1 pwt=2 mono=1 fmax=55 nt=13 hsfile=h hsz=41 vsfile=vv vsx=27 ssfile=s verbose=2 < v > w && cat h vv s
+# Plane waves read nx source-file records before replacing their coordinates.
+[stderr] printf '2\n1 20\n11 21\n21 22\n31 23\n41 24\n' > sources; sunull nt=9 ntr=5 | sugain bias=1500 | sustrip outpar=/dev/null > v; sufdmod2 nx=5 nz=9 dx=10 dz=10 tmax=0 xs=sources pw=1 pwt=0 nt=9 ssfile=s < v > w && cat s
+[stderr] printf '2\n1 20\n11 21\n' > sources; sufdmod2 nx=5 nz=9 dx=10 dz=10 tmax=0 xs=sources pw=1
+# Extended and plane-wave forcing through both variable-density finite-difference stars.
+[stderr] suplane nt=13 ntr=11 | sugain bias=1500 scale=1.1 | sustrip outpar=/dev/null > v; suplane nt=13 ntr=11 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=11 nz=13 dx=10 dz=10 tmax=0 xs=10,40,80 zs=30,70,40 dfile=d pwt=3 fmax=60 nt=41 mt=5 abs=0,1,1,1 verbose=1 < v
+[stderr] sunull nt=13 ntr=11 | sugain bias=1500 | sustrip outpar=/dev/null > v; suplane nt=13 ntr=11 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2 nx=11 nz=13 dx=8 dz=12 tmax=0 xs=0 zs=48 dfile=d pw=1 pwt=3 mono=1 fmax=60 nt=31 mt=3 abs=1,0,1,0 < v

@@ -1,0 +1,100 @@
+# Defaults, including plot=3, anenv=1, sts=1, rgt=2, c=0.05 and depthref=0.
+# Read the side files back: suharlan itself has no stdout.
+suplane nt=128 ntr=8 | suharlan seed=123 && cat out_signal out_noise
+# Both output files independently, disabled outputs, and custom names.
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 noise= && cat out_signal
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 signal= && cat out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 signal= noise=
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 signal=custom_signal noise=custom_noise && cat custom_signal custom_noise
+# Gaussian and uniform generators; negative and zero seeds.
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 rgt=1 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=0 plot=0 verbose=0 np=8 nintlh=20 sditer=2 rgt=2 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=-7 plot=0 verbose=0 np=8 nintlh=20 sditer=2 rgt=1 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 rgt=0 && cat out_signal out_noise
+# All six envelope variants and no envelope, normalization and smoothing flags.
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=0 sts=0 norm=0 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=2 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=3 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=4 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=5 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 anenv=6 && cat out_signal out_noise
+# Scaling modes: traces, time slices, both, and special -1 noise behavior.
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 scl=1 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 scl=2 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 scl=3 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 scl=-1 && cat out_signal out_noise
+# Both extraction passes, then the C code's third-pass state reuse.
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 niter=2 rel1=0.1 rel2=0.6 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 niter=3 && cat out_signal out_noise
+# Transform options and every transform / extraction / smoothing parameter.
+suplane nt=129 ntr=7 | suharlan seed=321 plot=0 verbose=0 np=9 nintlh=21 sditer=3 dx=25 fx=-75 dt=0.002 gopt=2 depthref=500 offref=1800 interoff=10 pmin1=-300 pmax1=500 pmin2=-300 pmax2=500 prewhite=0.1 ninterp=1 pmula=250 pmulb=400 c=0.08 rel1=0.2 rel2=0.7 r1=5 r2=1 niter=2 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 gopt=3 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 gopt=4 fx=-80 && cat out_signal out_noise
+suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=0 np=8 nintlh=20 sditer=2 gopt=5 depthref=500 && cat out_signal out_noise
+# Verbose stderr is part of the behavior, not just successful exit.
+[stderr] suplane nt=128 ntr=8 | suharlan seed=123 plot=0 verbose=1 np=8 nintlh=20 sditer=2 && cat out_signal out_noise
+# Plot=1,2,3: native float side files; dimensions keep np >= ntr to avoid C overreads.
+[f32] suplane nt=128 ntr=8 | suharlan seed=123 plot=1 verbose=0 np=8 nintlh=20 sditer=2 && cat pd1 pn1 ps1 pspn1 Esd1 rel1
+[f32] suplane nt=128 ntr=8 | suharlan seed=123 plot=2 verbose=0 np=8 nintlh=20 sditer=2 scl=3 && cat input input_taup rand1 rtaup1 signal1 staup1 s1scaled noise1
+[f32] suplane nt=128 ntr=8 | suharlan seed=123 plot=3 verbose=0 np=8 nintlh=20 sditer=2 niter=2 && cat pd1 pn1 ps1 pspn1 Esd1 rel1 pd2 pn2 ps2 pspn2 Esd2 rel2 input input_taup rand1 rtaup1 signal1 staup1 noise1 rand2 rtaup2 signal2 staup2 noise2
+# Odd lengths, a single trace, a single time sample, and all-zero input.
+suplane nt=127 ntr=7 | suharlan seed=123 plot=0 verbose=0 np=9 nintlh=19 sditer=2 && cat out_signal out_noise
+sunull nt=129 ntr=1 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 && cat out_signal out_noise
+sunull nt=1 ntr=1 | suharlan seed=123 plot=0 verbose=0 np=3 nintlh=9 sditer=1 && cat out_signal out_noise
+sunull nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 && cat out_signal out_noise
+# Zero and negative iteration counts preserve input noise; disable uninitialized signal.
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 niter=0 signal= && cat out_noise
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 niter=-1 signal= && cat out_noise
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=0 c=0 rel1=0 r1=0 r2=0 && cat out_signal out_noise
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=-1 c=-0.1 rel1=-1 sts=0 && cat out_signal out_noise
+# tmpdir argument and environment fallback; invalid argument overrides environment.
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 tmpdir=. && cat out_signal out_noise
+suplane nt=65 ntr=3 | CWP_TMPDIR=. suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 && cat out_signal out_noise
+[stderr] suplane nt=65 ntr=3 | CWP_TMPDIR=. suharlan seed=123 verbose=0 tmpdir=/oxwave-no-such-directory
+# Output open errors occur after processing.
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 signal=/oxwave-no-such-directory/signal
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 signal= noise=/oxwave-no-such-directory/noise
+# First-trace and parameter errors, including parse order and overflow diagnostics.
+[stderr] suharlan
+[stderr] suharlan seed=123 plot=0
+[stderr] printf 'short header' | suharlan seed=123
+[stderr] sunull nt=3 ntr=1 | dd bs=1 count=240 2>/dev/null | suharlan seed=123
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 plot=-1
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 plot=4
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 plot=4 tmpdir=/oxwave-no-such-directory
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 tmpdir=/dev/null
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 anenv=9999999999999999999999
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 dx=1e-310
+[stderr] suplane nt=65 ntr=3 | suharlan seed=9999999999999999999999 verbose=0
+# No checkpars() in this program: unknown args remain quiet; last plot wins.
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 plot=0 plot=4 unknown=1
+[stderr] suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 plot=4 plot=bad
+# Explicit stdout output filenames, in addition to reading named side files.
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 signal=/dev/stdout noise=
+suplane nt=65 ntr=3 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 signal= noise=/dev/stdout
+# A second trace with a different ns must fail before any transform.
+[stderr] { sunull nt=3 ntr=1; sunull nt=5 ntr=1; } | suharlan seed=123 plot=0 verbose=0
+# Permission preflight and explicit empty tmpdir overriding the environment.
+[stderr] mkdir locked && chmod 555 locked && suplane nt=65 ntr=3 | suharlan seed=123 verbose=0 tmpdir=locked
+[stderr] suplane nt=65 ntr=3 | CWP_TMPDIR=/oxwave-no-such-directory suharlan seed=123 verbose=1 tmpdir= plot=4
+# Preserve populated headers when writing both output files.
+suplane nt=65 ntr=3 | sushw key=cdp,offset,dt a=123,-75,2000 b=1,25,0 | suharlan seed=123 plot=0 verbose=0 np=5 nintlh=9 sditer=1 && cat out_signal out_noise
+# Seeded noisy spikes exercise histograms beyond the plane-wave input above.
+suspike nt=257 ntr=9 | suaddnoise seed=456 sn=2 | suharlan seed=789 plot=0 verbose=0 np=11 nintlh=31 sditer=3 gopt=3 niter=2 pmin1=-250 pmax1=350 pmin2=-150 pmax2=250 rel1=0.2 rel2=0.6 && cat out_signal out_noise
+# Explicit implementation defaults (c and depthref differ from the selfdoc).
+suplane nt=65 ntr=3 | suharlan seed=123 anenv=1 scl=0 plot=0 norm=1 verbose=0 rgt=2 sts=1 gopt=1 dx=20 fx=0 nintlh=50 sditer=5 c=0.05 rel1=0.5 rel2=0.75 niter=1 dt=0.004 r1=10 r2=2 pmin1=-400 pmax1=400 pmin2=-400 pmax2=400 np=100 prewhite=0.01 offref=2000 interoff=0 depthref=0 pmula=400 pmulb=400 ninterp=0 signal=out_signal noise=out_noise tmpdir= && cat out_signal out_noise
+# access(WRITE_OK) must select the owner's permission class even when group
+# and others have write bits. These fail before plot validation or transforms.
+[stderr] mkdir locked && chmod 577 locked && sunull nt=3 ntr=1 | suharlan seed=123 verbose=0 plot=4 tmpdir=locked
+[stderr] mkdir locked && chmod 577 locked && sunull nt=3 ntr=1 | CWP_TMPDIR=locked suharlan seed=123 verbose=0 plot=4
+# An owner-writable directory passes access and reaches plot validation.
+[stderr] mkdir writable && chmod 700 writable && sunull nt=3 ntr=1 | suharlan seed=123 verbose=1 plot=4 tmpdir=writable
+# Complete zero/negative seed coverage for both supplied generators; compare
+# randomized traces and their transforms directly, in addition to final outputs.
+[f32] suplane nt=128 ntr=8 | suharlan seed=0 rgt=1 plot=2 verbose=0 np=8 nintlh=20 sditer=2 && cat rand1 rtaup1
+[f32] suplane nt=128 ntr=8 | suharlan seed=-7 rgt=2 plot=2 verbose=0 np=8 nintlh=20 sditer=2 && cat rand1 rtaup1
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" ref="1:0,600;4000,640" | suaddnoise seed=11 sn=4 | suharlan seed=5 plot=0 verbose=0 dx=40 offref=440 np=21 nintlh=25 sditer=3 r1=4 r2=1 niter=2 pmin1=-100 pmax1=300 && cat out_signal out_noise
+susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" ref="1:0,600;4000,640" | suaddnoise seed=12 sn=3 | suharlan seed=6 plot=0 verbose=0 dx=40 offref=440 depthref=400 gopt=2 ninterp=2 np=15 nintlh=21 sditer=2 pmula=150 pmulb=200 norm=0 && cat out_signal out_noise
+susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" | suaddnoise seed=13 sn=2 | suharlan seed=7 plot=0 verbose=0 dx=40 gopt=4 np=13 nintlh=21 sditer=2 pmin1=-200 pmax1=400 pmin2=-50 pmax2=300 prewhite=0.1 rel1=0.9 rel2=0.95 && cat out_signal out_noise

@@ -1,0 +1,68 @@
+# Direct trace output checks: the inventory redirects its outputs to a file.
+[stderr] suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 verbose=1
+[stderr] suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vndmo=1500,1800 vdmo=1450,1700 etadmo=0.1,0.15 speed=0.8 smute=2 fmax=80 verbose=1
+# Explicit defaults and constant model parameters.
+[stderr] suspike nt=129 ntr=7 | sushw key=cdp,offset a=1,120 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=20 noffmix=1 tdmo=0 vndmo=1500 vdmo=1500 etadmo=0 fmax=125 smute=1.5 speed=1 verbose=0
+# One trace, odd time length, and an odd number of CDPs.
+[stderr] suspike nt=127 ntr=1 | sushw key=cdp,offset a=5,100 | sudmotivz cdpmin=5 cdpmax=5 dxcdp=25 noffmix=1
+[stderr] suplane nt=131 ntr=9 | sushw key=cdp,offset a=-4,-160 b=1,0 | sudmotivz cdpmin=-4 cdpmax=4 dxcdp=17 noffmix=1 speed=1.3 fmax=90 smute=1.8
+# Offset mixes, incomplete last mix, repeated CDPs, and windowed CDP range.
+[stderr] suplane nt=151 ntr=15 | sushw key=cdp,offset a=1,100 b=1,0 c=0,80 j=5,5 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=2 verbose=1
+[stderr] suplane nt=149 ntr=20 | sushw key=cdp,offset a=1,-100 b=1,0 c=0,-40 j=5,5 | sudmotivz cdpmin=2 cdpmax=4 dxcdp=30 noffmix=2 verbose=1
+[stderr] suplane nt=151 ntr=15 | sushw key=cdp,offset a=1,100 b=1,0 c=0,80 j=5,5 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 verbose=1
+# No CDPs in requested window.
+[stderr] sunull nt=64 ntr=3 | sushw key=cdp,offset a=100,80 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+# File-based models, mixed file/array models, and vdmo count fallback.
+[stderr] python3 -c 'import struct; open("vn","wb").write(struct.pack("=129f",*[1500+i for i in range(129)])); open("vv","wb").write(struct.pack("=129f",*[1450+i for i in range(129)])); open("eta","wb").write(struct.pack("=129f",*[0.1+i*0.0002 for i in range(129)]))'; suplane nt=129 ntr=7 | sushw key=cdp,offset a=1,140 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vnfile=vn vfile=vv etafile=eta verbose=1
+[stderr] python3 -c 'import struct; open("vn","wb").write(struct.pack("=127f",*[1600+i for i in range(127)]))'; suspike nt=127 ntr=3 | sushw key=cdp,offset a=1,120 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vnfile=vn tdmo=0,0.5 vdmo=1500,1800 etadmo=0.05,0.15
+[stderr] suspike nt=127 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 tdmo=0,0.2,0.6 vndmo=1500,1700,2000 etadmo=0,0.1,0.2 vdmo=1200,1300
+# Anisotropic time-varying model on noisy input.
+[stderr] suplane nt=201 ntr=11 | suaddnoise seed=17 sn=10 | sushw key=cdp,offset a=1,240 b=1,0 | sudmotivz cdpmin=1 cdpmax=11 dxcdp=22 noffmix=1 tdmo=0,0.3,0.8 vndmo=1600,1900,2300 vdmo=1500,1750,2100 etadmo=0.02,0.13,0.2 fmax=70 speed=0.7 smute=2 verbose=1
+# Empty input and each required parameter validation.
+[stderr] sudmotivz
+[stderr] sunull nt=16 | sudmotivz
+[stderr] sunull nt=16 | sudmotivz cdpmin=1
+[stderr] sunull nt=16 | sudmotivz cdpmin=3 cdpmax=2
+[stderr] sunull nt=16 | sudmotivz cdpmin=1 cdpmax=2
+[stderr] sunull nt=16 | sudmotivz cdpmin=1 cdpmax=2 dxcdp=25
+# Nonzero first time is rejected before parameter checks.
+[stderr] sunull nt=16 | sushw key=delrt a=20 | sudmotivz
+# Model validation in the original order.
+[stderr] sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tdmo=0,1
+[stderr] sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tdmo=0,1 vndmo=1500,1800
+[stderr] sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tdmo=0,0 vndmo=1500,1800 etadmo=0,0.1
+[stderr] sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 tdmo=1,0 vndmo=1500,1800 etadmo=0,0.1
+# Short files must report the requested number of samples and filename.
+[stderr] printf '' > short; sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vnfile=short
+[stderr] printf '' > short; sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 etafile=short
+[stderr] printf '' > short; sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vfile=short
+# Small records and stretch mute failure.
+[stderr] sunull nt=1 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=3 ntr=1 | sushw key=offset a=100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=63 ntr=1 | sushw key=offset a=2000 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=63 ntr=1 | sushw key=offset a=100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 smute=0
+[stderr] sunull nt=63 ntr=1 | sushw key=offset a=100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 smute=-1
+# Zero/negative controls that the C accepts, including unknown arguments.
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,0 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=0
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=-1
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 fmax=0
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 dxcdp=-25
+[stderr] suspike nt=129 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 unused=1
+# Regression: one-sample inverse mappings read the preceding contiguous row.
+[stderr] suplane nt=65 ntr=16 dt=0.003 | suaddnoise seed=17 sn=3 | sushw key=cdp,offset a=1,450 b=1,0 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.096,0.192 vndmo=2100,2200,2500 vdmo=2100,2300,2400 etadmo=0.5,0.55,0.6 fmax=166.66666666666666 speed=2 smute=3
+[stderr] suplane nt=127 ntr=16 dt=0.002 | suaddnoise seed=17 sn=3 | sushw key=cdp,offset a=1,700 b=1,0 | sudmotivz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 vndmo=3000 vdmo=3300 etadmo=0.5 fmax=250 speed=0.5 smute=1.5
+# Zero mute time at a nonzero offset overflows the requested slope count.
+[stderr] sunull nt=301 ntr=7 dt=0.008 | sushw key=cdp,offset a=1,10 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vndmo=1500 vdmo=1425 etadmo=0.5 fmax=40 speed=5 smute=3
+[stderr] suspike nt=129 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 speed=0
+[stderr] suspike nt=129 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 speed=-1
+[stderr] suspike nt=129 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 fmax=-80
+# File NMO model supplies the default interval-velocity model as well.
+[stderr] python3 -c 'import struct; open("vn","wb").write(struct.pack("=129f",*[1600+i for i in range(129)]))'; suspike nt=129 ntr=3 | sushw key=cdp,offset a=1,120 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vnfile=vn
+# Mixed model sources exercise later monotonicity checks.
+[stderr] python3 -c 'import struct; open("vn","wb").write(struct.pack("=16f",*([1500]*16)))'; sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vnfile=vn tdmo=1,0 etadmo=0,0
+[stderr] python3 -c 'import struct; open("vn","wb").write(struct.pack("=16f",*([1500]*16))); open("eta","wb").write(struct.pack("=16f",*([0]*16)))'; sunull nt=16 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vnfile=vn etafile=eta tdmo=1,0 vdmo=1500,1600
+# Parameter parser errors and inconsistent input headers.
+[stderr] sunull nt=16 | sudmotivz cdpmin=2147483648
+[stderr] sunull nt=16 | sushw key=delrt a=-20 | sudmotivz
+[stderr] (sunull nt=16 ntr=1; sunull nt=17 ntr=1) | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1

@@ -1,0 +1,75 @@
+# Defaults, verbose diagnostics and explicit documented but unread dt.
+[stderr] suspike nt=64 ntr=1 | sucepstrum
+[stderr] suspike nt=63 ntr=1 | sucepstrum verbose=1 dt=0.002
+suspike nt=63 ntr=2 | sucepstrum verbose=0 mode=suphase trend=0 zeromean=1 unwrap=0.5
+suspike nt=31 ntr=1 | sucepstrum verbose=0 mode=ouphase trend=0 zeromean=1 sign1=-1 sign2=-1
+suspike nt=1 ntr=1 | sucepstrum verbose=0 unwrap=0
+sunull nt=33 ntr=1 | sucepstrum verbose=0 unwrap=0 smooth=1 r=-2
+suspike nt=64 ntr=1 | sucepstrum verbose=0 smooth=1 r=5
+# Exercise smoothing with nontrivial phase and zero/negative damping.
+suplane nt=63 ntr=3 | sucepstrum verbose=0 mode=suphase trend=0 smooth=1 r=0
+suplane nt=63 ntr=3 | sucepstrum verbose=0 mode=ouphase trend=0 smooth=1 r=-2
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 mode=bad
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 sign1=0
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 sign2=0
+[stderr] sucepstrum verbose=0
+[stderr] suspike nt=64 ntr=1 | sushw key=dt a=0 | sucepstrum verbose=1
+[stderr] suspike nt=64 ntr=1 | sushw key=trid,d1 a=30,0.002 | sucepstrum verbose=1
+# Explicit defaults with nonzero phase and odd transform input lengths.
+[stderr] suplane nt=127 ntr=3 | sucepstrum verbose=1 mode=ouphase sign1=1 sign2=-1 trend=1 zeromean=0 unwrap=1 smooth=0 r=10
+suplane nt=67 ntr=3 | sucepstrum verbose=0 mode=suphase trend=1 zeromean=1
+suplane nt=67 ntr=3 | sucepstrum verbose=0 mode=ouphase trend=1 zeromean=1
+suplane nt=67 ntr=3 | sucepstrum verbose=0 mode=suphase unwrap=-1 sign1=-1 sign2=1
+suplane nt=67 ntr=3 | suaddnoise seed=17 | sucepstrum verbose=0 mode=ouphase trend=0 zeromean=1 sign1=-1 sign2=1
+suplane nt=67 ntr=3 | suaddnoise seed=17 | sucepstrum verbose=0 mode=suphase unwrap=0.8 trend=1 zeromean=0 sign1=-1 sign2=-1
+# Smallest input, zero signal, and unwrapping bypass in both modes.
+suspike nt=1 ntr=1 | sucepstrum verbose=0
+suspike nt=1 ntr=1 | sucepstrum verbose=0 mode=suphase
+sunull nt=17 ntr=2 | sucepstrum verbose=0 mode=suphase
+sunull nt=17 ntr=2 | sucepstrum verbose=0 mode=ouphase
+suplane nt=63 ntr=3 | sucepstrum verbose=0 mode=suphase unwrap=0 smooth=1 r=0
+suplane nt=63 ntr=3 | sucepstrum verbose=0 mode=ouphase unwrap=0 smooth=1 r=-2
+# Header-dependent sampling and unknown parameter diagnostics.
+[stderr] suplane nt=63 ntr=1 | sushw key=trid,d1 a=30,0 | sucepstrum verbose=1
+suplane nt=63 ntr=3 | sushw key=d1 a=0.002 | sucepstrum verbose=0
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 unknown=1
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 mode=
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 sign1=2 sign2=2
+[stderr] sucepstrum verbose=1 sign1=0
+[stderr] suspike nt=64 ntr=1 | sucepstrum verbose=0 sign1=2147483648
+# Smoothing's default damping in each mode.
+suplane nt=65 ntr=3 | suaddnoise seed=23 | sucepstrum verbose=0 mode=suphase smooth=1
+suplane nt=65 ntr=3 | suaddnoise seed=23 | sucepstrum verbose=0 mode=ouphase smooth=1
+# Empty numeric parameters retain defaults; the last repeated value wins.
+[stderr] suplane nt=65 ntr=3 | sucepstrum verbose= trend= zeromean= sign1= sign2= unwrap= smooth= r=
+suplane nt=65 ntr=3 | sucepstrum verbose=0 mode=bad mode=suphase sign1=0 sign1=1 sign2=0 sign2=-1 unwrap=0 unwrap=1
+# Nonseismic negative sampling and the seismic autocorrelation trace ID.
+[stderr] suplane nt=65 ntr=3 | sushw key=trid,d1 a=30,-0.002 | sucepstrum verbose=1
+[stderr] suplane nt=65 ntr=3 | sushw key=trid,d1 a=109,0.002 | sucepstrum verbose=1
+# Remaining input/FFT size errors and float parsing before reading traces.
+[stderr] sunull nt=65535 ntr=1 | sucepstrum verbose=0
+[stderr] sunull nt=0 ntr=1 | sucepstrum verbose=0
+[stderr] (sunull nt=63 ntr=1; sunull nt=64 ntr=1) | sucepstrum verbose=0
+[stderr] sucepstrum verbose=0 r=1e-310
+# Smoothing on the smallest transforms and on zero-valued traces in both modes.
+suspike nt=1 ntr=1 | sucepstrum verbose=0 mode=suphase smooth=1
+suspike nt=1 ntr=1 | sucepstrum verbose=0 mode=ouphase smooth=1
+suspike nt=3 ntr=1 | suaddnoise seed=29 | sucepstrum verbose=0 mode=suphase smooth=1 r=0.25 trend=0 zeromean=1 sign1=1 sign2=1
+suspike nt=3 ntr=1 | suaddnoise seed=29 | sucepstrum verbose=0 mode=ouphase smooth=1 r=0.25 trend=0 zeromean=1 sign1=1 sign2=1
+sunull nt=33 ntr=2 | sucepstrum verbose=0 mode=suphase smooth=1 r=10
+sunull nt=33 ntr=2 | sucepstrum verbose=0 mode=ouphase smooth=1 r=10
+# Smoothing combined with reversed transforms, trend removal and zero-mean phase.
+suplane nt=257 ntr=3 | suaddnoise seed=31 | sucepstrum verbose=0 mode=suphase smooth=1 r=25.5 unwrap=0.8 trend=1 zeromean=0 sign1=-1 sign2=-1
+suplane nt=257 ntr=3 | suaddnoise seed=31 | sucepstrum verbose=0 mode=ouphase smooth=1 r=0 trend=0 zeromean=1 sign1=-1 sign2=1
+# Any nonzero smooth flag enables smoothing; diagnostics and header sampling remain intact.
+[stderr] suplane nt=63 ntr=3 | suaddnoise seed=37 | sushw key=trid,d1 a=30,0.002 | sucepstrum verbose=1 mode=suphase smooth=-1 r=-5 trend=0 sign1=-1 sign2=-1
+[stderr] suplane nt=67 ntr=3 | suaddnoise seed=37 | sushw key=d1 a=0.002 b=0.001 | sucepstrum verbose=1 mode=ouphase smooth=1 r=10 trend=1 zeromean=1
+# Selfdoc regression: communicate() waits for process exit after the PTY closes.
+# tools/oxharness.py run_selfdoc can label EOF followed by poll() == None a timeout.
+[stderr] python3 -c 'import os,pty,subprocess,sys; master,slave=pty.openpty(); p=subprocess.Popen(sys.argv[1:],stdin=slave,stdout=slave,stderr=subprocess.PIPE,start_new_session=True); os.close(slave); _,err=p.communicate(timeout=5); os.close(master); sys.stderr.buffer.write(err); sys.exit(p.returncode)' sucepstrum
+# Verify that selfdoc still honors the selected pager.
+[stderr] PAGER="sed -n 2p" python3 -c 'import os,pty,subprocess,sys; master,slave=pty.openpty(); p=subprocess.Popen(sys.argv[1:],stdin=slave,stdout=slave,stderr=subprocess.PIPE,start_new_session=True); os.close(slave); _,err=p.communicate(timeout=5); os.close(master); sys.stderr.buffer.write(err); sys.exit(p.returncode)' sucepstrum
+# An explicit parameter suppresses selfdoc even on a terminal.
+[stderr] python3 -c 'import os,pty,subprocess,sys; master,slave=pty.openpty(); p=subprocess.Popen(sys.argv[1:],stdin=slave,stdout=slave,stderr=subprocess.PIPE,start_new_session=True); os.close(slave); _,err=p.communicate(timeout=5); os.close(master); sys.stderr.buffer.write(err); sys.exit(p.returncode)' sucepstrum verbose=0
+# No arguments with nonterminal empty input follows the trace error path.
+[stderr] sucepstrum

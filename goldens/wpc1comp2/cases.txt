@@ -1,0 +1,55 @@
+# Raw compressed output, default and explicit error, multiple and odd trace sizes.
+[exact] suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128
+[exact] suspike nt=100 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=100 error=0.05
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=1 error=0.01
+[exact] suspike nt=33 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=33 error=0.1
+# Incomplete and empty input are ignored.
+[exact] suspike nt=33 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=100
+[exact] wpc1comp2 n1=64 </dev/null
+[exact] wpc1comp2 n1=-1 </dev/null
+[exact] wpc1comp2 n1=64 error=0 </dev/null
+[exact] wpc1comp2 n1=64 error=-0.1 </dev/null
+[stderr] wpc1comp2 n1=64 verbose=1 </dev/null
+[stderr] wpc1comp2 n1=64 unknown=1 </dev/null
+[stderr] wpc1comp2 n1=999999999999999999999 </dev/null
+[stderr] wpc1comp2 n1=64 error=1e-310 </dev/null
+
+# Explicit default, smallest nonzero trace, and the untransformed odd tail.
+[exact] suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128 error=0.01
+[exact] printf '1\n' | a2b n1=1 | wpc1comp2 n1=1
+# This trace's encoded size equals its input size, so realloc need not shrink.
+[exact] printf '0\n1\n' | a2b n1=2 | wpc1comp2 n1=2 error=0.01
+
+# Exercise padding (>128), a complete transform tile, and a tile plus tail.
+[exact] sunull nt=129 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=129
+[exact] sunull nt=256 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=256
+[exact] sunull nt=257 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=257
+[exact] suplane nt=129 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=129
+[exact] suplane nt=256 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=256
+
+# Parameter parsing, default error through an empty value, and quiet missing n1.
+[exact] wpc1comp2 </dev/null
+[exact] wpc1comp2 error=0.05 </dev/null
+[exact] wpc1comp2 n1= </dev/null
+[exact] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 error=
+[exact] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 error=0
+[exact] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 error=-0.1
+[exact] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=32 n1=17
+[stderr] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 verbose=1
+[stderr] wpc1comp2 n1=-999999999999999999999 </dev/null
+[stderr] wpc1comp2 n1=64 error=9999999999999999999999999999999999999999 </dev/null
+
+# Zero n1 loops forever in C. Bound the output; pipefail also checks SIGPIPE.
+[exact] wpc1comp2 n1=0 | head -c 48
+[stderr] wpc1comp2 n1=0 verbose=1 | head -c 48
+[exact] wpc1comp2 n1=0 error=-0.1 | head -c 17
+[exact] wpc1comp2 n1=abc | head -c 48
+
+# Discard an incomplete final trace after writing the preceding complete trace.
+[exact] printf '0\n1\n2\n' | a2b n1=1 | wpc1comp2 n1=2
+# Discard partial float bytes as well as partial sample blocks.
+[exact] printf '\000\000\000' | wpc1comp2 n1=1
+
+# Parameter files and command-line precedence; unknown arguments with data.
+[exact] printf 'n1=2 error=0.1\n' > params; printf '0\n1\n' | a2b n1=1 | wpc1comp2 par=params error=0.01
+[stderr] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 unknown=1

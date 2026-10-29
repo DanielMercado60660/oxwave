@@ -1,0 +1,16 @@
+# Strip run-dependent PostScript headers.
+suplane nt=16 ntr=5 | supsmovie | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=6 | supsmovie n2=3 n3=2 d1=.002 d2=2 f1=-.1 f2=4 verbose=1 title='Movie test' | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=6 | supsmovie n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=6 | supsmovie n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | sushw key=ntr a=3 | supsmovie verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | supsmovie tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | env CWP_TMPDIR=. supsmovie | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | sushw key=d1,d2,f1,f2 a=.002,3,2,4 | supsmovie | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=1 ntr=1 | supsmovie | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=5 ntr=3 | sushw key=trid,dt a=30,0 | supsmovie | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | supsmovie tmpdir=/no/such/directory
+supsmovie < /dev/null
+suplane nt=8 ntr=3 | env -u CWPROOT -u CWPBIN supsmovie
+suplane nt=8 ntr=3 | supsmovie n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | supsmovie n3=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

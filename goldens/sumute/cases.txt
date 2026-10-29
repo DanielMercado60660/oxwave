@@ -1,0 +1,34 @@
+# Defaults, interpolation, taper and trace delay
+suplane nt=101 ntr=5 | sushw key=offset a=-20 b=10 | sumute xmute=-20,20 tmute=0.02,0.08 ntaper=3
+suplane nt=99 ntr=3 | sumute key=tracl xmute=1,3 tmute=0.04,0.2 mode=1 ntaper=4
+# A mute before the trace starts also clears the trailing header bytes in C.
+suplane nt=33 ntr=1 | sushw key=mark a=123 | sumute xmute=0 tmute=-0.04 mode=1
+suplane nt=128 ntr=4 | sushw key=offset a=10 b=10 | sumute xmute=0,50 tmute=0.04,0.06 mode=2 linvel=1000 tm0=0.04 ntaper=3
+suplane nt=128 ntr=4 | sushw key=offset a=-10 b=2 | sumute xmute=-20,20 tmute=0.04,0.04 mode=3 absolute=0 linvel=1000 tm0=0.08 ntaper=3
+suplane nt=128 ntr=3 | sumute key=tracl xmute=1,3 tmute=0.06,0.08 twindow=0.02,0.02 mode=4
+suplane nt=51 ntr=2 | sushw key=muts a=30 b=10 | sumute hmute=muts mode=1
+[stderr] suplane nt=51 ntr=2 | sumute xmute=0 tmute=0.03 below=1 verbose=1
+suplane nt=1 ntr=1 | sumute xmute=0 tmute=0
+suplane nt=33 ntr=1 | sumute xmute=0 tmute=0 mode=7
+suplane nt=33 ntr=1 | sushw key=trid,d1 a=130,0.01 | sumute key=tracl xmute=1 tmute=0.1
+python3 -c 'import struct;open("x", "wb").write(struct.pack("ff",0,100));open("t", "wb").write(struct.pack("ff",.02,.06))' && suplane nt=80 ntr=3 | sumute xfile=x tfile=t nmute=2
+python3 -c 'import struct;open("x", "wb").write(struct.pack("f",0));open("t", "wb").write(b"")' && sumute xfile=x tfile=t nmute=1 </dev/null
+sumute xmute=0 tmute=0 </dev/null
+sumute </dev/null
+sumute xmute=1 </dev/null
+sumute xmute=1,2 tmute=1 </dev/null
+sumute xmute=1 tmute=1 mode=4 </dev/null
+sumute xmute=1 tmute=1 mode=4 twindow=1,2 </dev/null
+sumute xmute=1 tmute=1 linvel=0 </dev/null
+sumute xmute=0 tmute=0 ntaper=-1 </dev/null
+sumute xfile=missing tfile=missing nmute=1 </dev/null
+sumute xfile=missing tfile=missing </dev/null
+suplane nt=20 ntr=1 | sushw key=dt a=0 | sumute xmute=0 tmute=0
+suplane nt=20 ntr=1 | sushw key=trid a=30 | sumute xmute=0 tmute=0
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+suplane nt=64 ntr=5 | suaddnoise seed=2 sn=3 | sushw key=delrt,offset a=40,-200 b=0,100 | sumute xmute=-150,0,150 tmute=0.1,0.05,0.1 ntaper=5
+suplane nt=64 ntr=4 | suaddnoise seed=2 sn=3 | sushw key=trid,d1 a=130,5 | sumute key=tracl xmute=1,4 tmute=120,250 mode=1 ntaper=3
+suplane nt=64 ntr=4 | suaddnoise seed=2 sn=3 | sushw key=muts,delrt a=40,20 b=30,0 | sumute hmute=muts ntaper=4
+suplane nt=128 ntr=5 | suaddnoise seed=2 sn=3 | sushw key=offset,delrt a=-200,8 b=100,0 | sumute xmute=-200,200 tmute=0.02,0.03 mode=3 linvel=2000 tm0=0.1 ntaper=4
+suplane nt=128 ntr=5 | suaddnoise seed=2 sn=3 | sushw key=sx a=0 b=150 | sumute key=sx xmute=0,600 tmute=0.02,0.06 mode=2 linvel=3000 tm0=0.05 ntaper=3

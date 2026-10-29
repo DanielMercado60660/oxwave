@@ -1,0 +1,23 @@
+//
+// Portions of this file are a Rust translation of code that is
+// Copyright (c) 2007 by the Society of Exploration Geophysicists.
+// For more information, go to http://software.seg.org/2007/0004 .
+// You must read and accept usage terms at:
+// http://software.seg.org/disclaimer.txt before use.
+//
+// Original code: Werner M. Heigl, Apache Corporation, E&P Technology, 2006-2007,
+// accompanying: Heigl, W. M., 2007, Computing Gaussian derivative waveforms of
+// any order: Geophysics, 72(4), H39-H42, doi:10.1190/1.2716624.
+// The SEG-derived code is marked below between `SEG-BEGIN` and `SEG-END` comments.
+//
+// Modification notice (SEG terms of use, item 4):
+//   Nature:      translated from C to Rust; same algorithm, statement order and
+//                floating-point precision as the C; no functional change intended.
+//   Extent:      the SEG-BEGIN/SEG-END blocks in this file.
+//   Purpose:     OxWave, a Rust port of CWP/SU (Seismic Un*x).
+//   When:        October 2026.
+//   Who:         the OxWave project, maintained by Daniel Mercado;
+//                translation produced with AI coding agents and checked against the
+//                original C by differential tests.
+//   Affiliation: OxWave project (independent open-source project).
+// Keep this notice in all redistributions.

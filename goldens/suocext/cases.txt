@@ -1,0 +1,70 @@
+# Default optional values; explicit defaults; non-power-of-two time and CDP axes.
+suplane nt=97 ntr=7 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=0
+suplane nt=97 ntr=7 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=0 tdmo=0 vdmo=1500 sdmo=1 fmax=125 verbose=0 tmpdir=
+# Real nonzero data through stretch, mute and spectral amplitude reconstruction.
+suspike nt=129 ntr=9 dt=0.002 nspk=2 ix1=3 it1=5 ix2=6 it2=90 | sushw key=cdp,offset a=10,400 b=1,0 | suocext cdpmin=10 cdpmax=18 dxcdp=12.5 noffmix=1 offextr=100 fmax=100 sdmo=0.6 vdmo=2200
+suplane nt=133 ntr=5 | sushw key=cdp,offset,delrt a=1,200,20 b=1,0,0 | suocext cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 offextr=50
+suplane nt=65 ntr=7 | sushw key=cdp,offset,delrt a=1,200,-20 b=1,0,0 | suocext cdpmin=1 cdpmax=7 dxcdp=20 noffmix=1 offextr=50
+# Single CDP, zero input, and very short records.
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=10 | sushw key=cdp,offset a=1,200 | suocext cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 offextr=80.9
+sunull nt=1 ntr=1 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 offextr=0
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 offextr=0
+suspike nt=2 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=0
+suspike nt=3 ntr=3 nspk=1 ix1=1 it1=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=0
+sunull nt=31 ntr=3 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=100
+# Offset signs, equal offsets, negative/zero noffmix, partial mix at EOF.
+suplane nt=91 ntr=5 | sushw key=cdp,offset a=1,-200 b=1,0 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=-80
+suplane nt=91 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=200
+suplane nt=91 ntr=5 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=0 offextr=0
+suplane nt=91 ntr=5 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=-1 offextr=0
+suplane nt=91 ntr=15 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=2 offextr=50
+suplane nt=91 ntr=15 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=50
+suplane nt=91 ntr=10 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=4 offextr=50
+# CDP selection and repeated CDPs (last trace wins, all headers emitted).
+suplane nt=83 ntr=9 | sushw key=cdp,offset a=1,150 b=1,0 | suocext cdpmin=3 cdpmax=7 dxcdp=25 noffmix=1 offextr=0
+suplane nt=83 ntr=9 | sushw key=cdp,offset a=1,150 b=0,0 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=0
+suplane nt=83 ntr=9 | sushw key=cdp,offset a=1,150 b=1,0 | suocext cdpmin=20 cdpmax=23 dxcdp=25 noffmix=1 offextr=0
+# Frequency, spatial spacing, and stretch extremes.
+suplane nt=87 ntr=7 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=-25 noffmix=1 offextr=50 fmax=30
+suplane nt=87 ntr=7 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 fmax=0
+suplane nt=87 ntr=7 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 fmax=-10
+suplane nt=87 ntr=7 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 sdmo=0
+suplane nt=87 ntr=7 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 sdmo=-0.1
+# Nonconstant cubic velocity: includes two, three, and nonmonotone velocities.
+suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=8 dxcdp=25 noffmix=1 offextr=50 tdmo=0,0.2,0.4 vdmo=1500,1900,1800
+suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=8 dxcdp=25 noffmix=1 offextr=50 tdmo=0.02,0.1 vdmo=1500,1800
+# Verbose and directory branches, including environment fallback/override.
+[stderr] suplane nt=65 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=50 verbose=1
+[stderr] suplane nt=65 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=50 verbose=1 tmpdir=.
+suplane nt=65 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | CWP_TMPDIR=. suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=50
+suplane nt=65 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | CWP_TMPDIR=/nonexistent suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=50 tmpdir=
+# Errors occur in the original's parameter-reading order, after reading input.
+suocext cdpmin=1 cdpmax=8 dxcdp=25 noffmix=1 offextr=50
+sunull nt=16 ntr=1 | suocext
+sunull nt=16 ntr=1 | suocext cdpmin=1
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2
+sunull nt=16 ntr=1 | suocext cdpmin=2 cdpmax=1 offextr=0
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tdmo=0,1
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tdmo=0,0 vdmo=1500,1800
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tdmo=1,0 vdmo=1500,1800
+sunull nt=16 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tmpdir=/nonexistent
+sunull nt=16 ntr=1 | CWP_TMPDIR=/nonexistent suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=16 ntr=1 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 unknown=1 verbose=1
+sunull nt=16 ntr=1 | suocext cdpmin=2147483648 cdpmax=2 offextr=0 dxcdp=25 noffmix=1
+sunull nt=16 ntr=1 | suocext cdpmin= cdpmax=2 offextr=0 dxcdp=25 noffmix=1
+# Zero interval/spacing on zero data and signed CDP coordinates.
+sunull nt=3 ntr=1 | sushw key=cdp,dt a=1,0 | suocext cdpmin=1 cdpmax=1 dxcdp=0 noffmix=1 offextr=0
+suplane nt=81 ntr=5 | sushw key=cdp,offset a=-4,200 b=1,0 | suocext cdpmin=-4 cdpmax=0 dxcdp=25 noffmix=1 offextr=300
+suplane nt=81 ntr=5 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 offextr=0 vdmo=0
+# Seeded broadband input exercises samples throughout the stretch interval.
+sunull nt=127 ntr=11 | suaddnoise sn=1 seed=271828 | sushw key=cdp,offset a=1,300 b=1,0 | suocext cdpmin=1 cdpmax=11 dxcdp=15 noffmix=1 offextr=30 fmax=70
+# Multi-knot velocity coefficients, including flat and decreasing slopes.
+sunull nt=127 ntr=7 | suaddnoise sn=1 seed=314159 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 tdmo=0,0.1,0.25,0.5 vdmo=1500,1600,1900,2200
+suplane nt=129 ntr=7 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 tdmo=0,0.08,0.25,0.4 vdmo=1800,1800,1800,1800
+suplane nt=129 ntr=7 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 offextr=50 tdmo=0,0.1,0.3,0.6 vdmo=1900,1800,1750,1700
+# Times before the first velocity knot and after the last use endpoint cubics.
+sunull nt=131 ntr=5 | suaddnoise sn=1 seed=161803 | sushw key=cdp,offset,delrt a=1,200,-20 b=1,0,0 | suocext cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 offextr=50 tdmo=0.04,0.15,0.4 vdmo=1500,1700,1800 sdmo=0.6 fmax=80
+# Multi-knot interpolation with multiple gathers and complete verbose stderr.
+[stderr] suplane nt=133 ntr=15 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=2 offextr=50 tdmo=0,0.1,0.25,0.4 vdmo=1500,1800,1750,2100 verbose=1 tmpdir=.

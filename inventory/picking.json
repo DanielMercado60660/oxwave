@@ -1,0 +1,324 @@
+{
+  "scope": "su/main/picking part 1 of 1",
+  "programs": [
+    {
+      "name": "sufbpickw",
+      "path": "su/main/picking/sufbpickw.c",
+      "purpose": "Pick first breaks using the ratio of forward and backward amplitude windows.",
+      "selfdoc_first_line": " SUFBPICKW - First break auto picker\t\t\t\t",
+      "params": [
+        {
+          "name": "keyg",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Header word used to group traces into gathers."
+        },
+        {
+          "name": "window",
+          "type": "float",
+          "default": "0.02",
+          "required": false,
+          "description": "Length in seconds of each forward and backward window; the selfdoc says 0.03."
+        },
+        {
+          "name": "test",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "When nonzero, replace trace samples with the characteristic function."
+        },
+        {
+          "name": "o",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Offsets defining the pick template; required with t and must have the same number of values."
+        },
+        {
+          "name": "t",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Times defining the pick template; when omitted, the whole trace is searched and o is ignored."
+        },
+        {
+          "name": "tdv",
+          "type": "float",
+          "default": "-1.0",
+          "required": false,
+          "description": "Half-length of the template search window in seconds; -1 selects nt samples. The selfdoc says 0.05."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "ealloc1float",
+        "getparfloat",
+        "err",
+        "getparstring",
+        "getparint",
+        "checkpars",
+        "get_gather",
+        "ealloc1int",
+        "intlin",
+        "sasum",
+        "smooth_segmented_array",
+        "isamax",
+        "free1float",
+        "free1int",
+        "put_gather"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sliding absolute-amplitude sums accumulate float rounding error; interpolation, smoothing, division and rounding affect picks. The smoothing call and isamax search can access beyond the characteristic-function array for some window or template values, so behavior can depend on undefined memory accesses.",
+      "c_lines": 201,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers gathers and combines interpolation, moving-window sums, smoothing and peak picking.",
+      "test_cases": [
+        {
+          "description": "Pick across the full trace and output the characteristic function.",
+          "command": "suplane nt=128 ntr=8 | sufbpickw window=0.016 test=1"
+        },
+        {
+          "description": "Use an offset-time template and retain the original samples.",
+          "command": "suplane nt=128 ntr=8 | sufbpickw keyg=ep window=0.016 t=0.08,0.12 o=0,1000 tdv=0.02 test=0"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sufnzero",
+      "path": "su/main/picking/sufnzero.c",
+      "purpose": "Print the times of the first and/or last samples exceeding a threshold for each trace.",
+      "selfdoc_first_line": " SUFNZERO - get Time of First Non-ZERO sample by trace              ",
+      "params": [
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "first",
+          "required": false,
+          "description": "Select first, last or both nonzero sample times."
+        },
+        {
+          "name": "min",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "A sample is selected when its absolute value is strictly greater than this threshold."
+        },
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "",
+          "required": false,
+          "description": "Header words printed before the selected times."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "err",
+        "getparfloat",
+        "countparval",
+        "getparstringarray",
+        "checkpars",
+        "gettr",
+        "getindex",
+        "gethval",
+        "hdtype",
+        "printfval",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Times are computed using integer arithmetic in i*tr.dt/1000 before conversion to float, yielding integer milliseconds and potentially overflowing for sufficiently large values. Threshold comparisons and ASCII formatting depend on floating-point values.",
+      "c_lines": 108,
+      "difficulty": "easy",
+      "difficulty_reason": "It scans each trace for threshold crossings and prints optional header values.",
+      "test_cases": [
+        {
+          "description": "Print the first nonzero time for each trace.",
+          "command": "suspike nt=128 ntr=4 dt=0.004 it=20 | sufnzero mode=first min=0"
+        },
+        {
+          "description": "Print both endpoints with trace headers and a nonzero threshold.",
+          "command": "suplane nt=128 ntr=8 | sufnzero mode=both min=0.1 key=tracl,offset"
+        },
+        {
+          "description": "Exercise the last-sample mode on zero traces.",
+          "command": "sunull nt=64 ntr=3 | sufnzero mode=last min=0"
+        }
+      ],
+      "license_note": "Credits Geocon's Garry Perratt and says it is based on surms, itself based on sugain and sumax.",
+      "related_programs": []
+    },
+    {
+      "name": "supickamp",
+      "path": "su/main/picking/supickamp.c",
+      "purpose": "Resample a time window on each trace and output selected amplitude, time, energy or position picks.",
+      "selfdoc_first_line": " SUPICKAMP - pick amplitudes within user defined and resampled window\t",
+      "params": [
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Lateral sampling interval; a nonzero value is required when key is absent, and key forces d2 to zero."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Header word supplying lateral position; required when d2 is absent or zero."
+        },
+        {
+          "name": "x_above",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Lateral positions for the upper window boundary; must have the same number of values as t_above."
+        },
+        {
+          "name": "t_above",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Times for the upper window boundary; must have the same number of values as x_above."
+        },
+        {
+          "name": "t_xabove",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "File containing time and lateral-position pairs for the upper boundary."
+        },
+        {
+          "name": "t_xbelow",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "File containing time and lateral-position pairs for the lower boundary; requires t_xabove."
+        },
+        {
+          "name": "wl",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Window width; zero uses the trace end unless a lower-boundary file is supplied."
+        },
+        {
+          "name": "dt_resamp",
+          "type": "float",
+          "default": "computed: from first trace header dt when the supplied value is zero or omitted",
+          "required": false,
+          "description": "Time sampling interval within the pick window."
+        },
+        {
+          "name": "tmin",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Input trace start time; overridden by the first trace's nonzero delrt header."
+        },
+        {
+          "name": "x2beg",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "First lateral position when using d2."
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "default": "ascii",
+          "required": false,
+          "description": "Output format: ascii or binary; binary writes arg2 then arg1 as native floats."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Controls per-trace output to outpar: 1 is descriptive, 2 is tabular, and 0 omits per-trace information."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving per-trace and global pick information."
+        },
+        {
+          "name": "arg1",
+          "type": "string",
+          "default": "max",
+          "required": false,
+          "description": "First ASCII output value; choices are max, tmax, min, tmin, abs, tabs, energy, x2 and i2."
+        },
+        {
+          "name": "arg2",
+          "type": "string",
+          "default": "x2",
+          "required": false,
+          "description": "Second ASCII output value; accepts the same choices as arg1. The selfdoc says i2."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "emalloc",
+        "getparfloat",
+        "getparstring",
+        "err",
+        "getparint",
+        "efopen",
+        "hdtype",
+        "getindex",
+        "ealloc1float",
+        "countparval",
+        "checkpars",
+        "warn",
+        "gettr",
+        "gethval",
+        "vtof",
+        "intlin",
+        "ints8r",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sinc and linear interpolation, repeated float time increments, and ordered float energy accumulation affect results. ints8r is called with itime+1 although only itime time values were initialized, which can read uninitialized memory or exceed the allocated array. The two boundary files share nx, so differing lengths can also cause out-of-bounds access. Global maximum starts at FLT_MIN, producing an incorrect global maximum for all-nonpositive data.",
+      "c_lines": 682,
+      "difficulty": "medium",
+      "difficulty_reason": "It interpolates window boundaries and trace samples while tracking per-trace and global picks.",
+      "test_cases": [
+        {
+          "description": "Pick maxima over full traces using a regular lateral interval.",
+          "command": "suplane nt=128 ntr=8 | supickamp d2=25 x2beg=100 arg1=max arg2=i2 verbose=0 outpar=/dev/null format=ascii"
+        },
+        {
+          "description": "Use header positions, a vector-defined window and finer resampling.",
+          "command": "suplane nt=128 ntr=8 | supickamp key=offset x_above=0,1000 t_above=0.04,0.08 wl=0.04 dt_resamp=0.002 arg1=energy arg2=x2 verbose=2 outpar=/dev/null format=ascii"
+        },
+        {
+          "description": "Write binary pick pairs using a fixed-width window.",
+          "command": "suspike nt=128 ntr=4 dt=0.004 it=20 | supickamp d2=1 x_above=0,3 t_above=0.04,0.04 wl=0.08 arg1=tmax arg2=i2 verbose=0 outpar=/dev/null format=binary"
+        }
+      ],
+      "license_note": "Credits MTU's David Forel for the verbose=2 option.",
+      "related_programs": []
+    }
+  ]
+}

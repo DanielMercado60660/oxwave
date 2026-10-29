@@ -1,0 +1,80 @@
+# Input, parameter, model, and geometry errors. Compare all diagnostics.
+[stderr] suinvvxzco
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dt=0
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dt=-0.004
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=0
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=-1
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3 nxm=1
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3 nxm=1 vfile=vel fxo=-1
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3 nxm=1 vfile=vel offs=20
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3 nxm=1 vfile=vel fxm=101
+[stderr] printf '2000\n' | a2b n1=1 > vel; sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=3 nz=3 nxm=1 vfile=vel
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=vel pert=1
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; : > vp; sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=vel pert=1 vpfile=vp
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=vel nxb=0 offs=10 fxm=25
+# The small 2x2 model only requires the source-region initialization.
+# Covers every default (including the 101x101 output) and default verbose=1.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | sushw key=d2 a=10 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel
+# Explicit defaults, single input/output trace, and nonzero samples.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | suaddnoise seed=17 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dt=.004 dxm=10 offs=0 fxm=0 nxd=5 dx=50 fx=0 dz=50 nxb=1 nxc=0 nzc=0 fxo=0 dxo=15 nxo=1 fzo=0 dzo=15 nzo=5 fmax=62.5 ang=180 ls=0 pert=0 verbose=0
+# Line source, dip/antialias filters, nonuniform velocity, corner modification.
+[stderr] printf '1900 2100 2050 2200\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | suaddnoise seed=23 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=7.5 nxd=1 nxo=3 nzo=7 dzo=7 dxo=12 ls=1 ang=70 fmax=25 nxc=4 nzc=4 verbose=1
+# Perturbation branch with a nonzero correction and shifted output depth.
+[stderr] printf '2000 2100 2050 2200\n' | a2b n1=4 > vel; printf '.00001 .00002 -.00001 .00003\n' | a2b n1=4 > vp; sunull nt=65 ntr=1 | suaddnoise seed=29 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 pert=1 vpfile=vp nxo=3 nzo=5 fzo=5 dzo=9 verbose=0
+# Odd time length, ntr=1 and nt=1; no interpolable time sample.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=1 ntr=1 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=1 nzo=1 verbose=0
+# No midpoints, zero output traces, negative midpoint count and unknown args.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=9 ntr=1 | suinvvxzco nx=2 nz=2 nxm=0 vfile=vel dxm=10 nxo=0 verbose=0
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=9 ntr=1 | suinvvxzco nx=2 nz=2 nxm=-1 vfile=vel dxm=10 nxo=1 nzo=3 mystery=1
+# Signed offsets from header and parameters, fractional midpoint and shifted model.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | sushw key=d2,offset a=10,-10 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel fxm=20 nxo=3 nzo=5 verbose=0
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | suaddnoise seed=11 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel fx=-25 fxo=-20 fxm=-10 dxm=5 offs=10 dx=50 dz=50 nxo=3 nzo=5 verbose=0
+# Zero filter frequency and zero/negative output spacing.
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 fmax=0 ang=0 dxo=0 dzo=0 nxo=3 nzo=3 verbose=0
+[stderr] printf '2000 2000 2000 2000\n' | a2b n1=4 > vel; sunull nt=65 ntr=1 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 dxo=-15 fxo=30 nxo=3 nzo=5 verbose=0
+# Midpoint interpolation (including final skip adjustment) and no interpolation.
+[stderr] printf '2000 2100 2000 2100 2000 2100\n' | a2b n1=6 > vel; sunull nt=65 ntr=7 | suaddnoise seed=31 | suinvvxzco nx=3 nz=2 nxm=7 vfile=vel dxm=10 nxb=1 nxo=5 nzo=5 verbose=1
+[stderr] printf '2000 2100 2000 2100 2000 2100\n' | a2b n1=6 > vel; sunull nt=65 ntr=3 | suaddnoise seed=31 | suinvvxzco nx=3 nz=2 nxm=3 vfile=vel dxm=10 nxb=1 nxd=1 nxo=5 nzo=5 verbose=0
+# Full-depth grids exercise the upweik solver, ray amplitudes and perturbations.
+[stderr] awk 'BEGIN {for(i=0;i<63;i++) print 2000}' | a2b n1=7 > vel; sunull nt=129 ntr=3 | suaddnoise seed=37 | suinvvxzco nx=9 nz=7 nxm=3 vfile=vel dxm=10 fxm=100 nxd=1 nxo=5 nzo=11 fxo=80 dxo=10 dzo=20 verbose=0
+[stderr] awk 'BEGIN {for(i=0;i<63;i++) print 2000}' | a2b n1=7 > vel; sunull nt=129 ntr=7 | suaddnoise seed=41 | suinvvxzco nx=9 nz=7 nxm=7 vfile=vel dxm=10 fxm=100 nxd=3 nxo=5 nzo=11 fxo=80 dxo=10 dzo=20 verbose=1
+[stderr] awk 'BEGIN {for(i=0;i<63;i++) print 2000}' | a2b n1=7 > vel; awk 'BEGIN {for(i=0;i<63;i++) print .00001}' | a2b n1=7 > vp; sunull nt=129 ntr=3 | suaddnoise seed=43 | suinvvxzco nx=9 nz=7 nxm=3 vfile=vel dxm=10 fxm=100 nxd=1 nxo=5 nzo=11 pert=1 vpfile=vp ls=1 nxc=2 nzc=3 ang=80 fmax=40 verbose=0
+# Nondefault model sampling and shifted model/output coordinates.
+[stderr] printf '1900 2100 2050 2200\n' | a2b n1=4 > vel; sunull nt=33 ntr=1 | suaddnoise seed=47 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=5 dx=25 dz=25 fx=-50 fxm=-50 fxo=-50 dxo=4 dzo=3 nxo=5 nzo=7 nxd=1 verbose=0
+# Parameter-file parsing, a repeated parameter, and negative perturbations.
+[stderr] printf '2000 2100 2050 2200\n' | a2b n1=4 > vel; printf '.00001 -.00002 .00003 -.00004\n' | a2b n1=4 > vp; printf 'nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=3 nzo=5 verbose=0\n' > params; sunull nt=33 ntr=1 | suaddnoise seed=53 | suinvvxzco par=params dt=-1 dt=.002 pert=1 vpfile=vp ls=1
+# Invalid header-derived sampling and overflowing integer parameter.
+[stderr] sunull nt=9 ntr=1 | sushw key=dt a=0 | suinvvxzco dxm=10
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=9999999999999999
+# Midpoint loop continues with the last trace when input ends early.
+[stderr] printf '2000 2100 2000 2100 2000 2100\n' | a2b n1=6 > vel; sunull nt=33 ntr=1 | suaddnoise seed=59 | suinvvxzco nx=3 nz=2 nxm=3 vfile=vel dxm=10 nxb=1 nxd=1 nxo=3 nzo=7 verbose=1
+# A changed sample count must fail on the second trace, before any output.
+[stderr] printf '2000 2100 2000 2100 2000 2100\n' | a2b n1=6 > vel; { sunull nt=33 ntr=1; sunull nt=35 ntr=1; } | suinvvxzco nx=3 nz=2 nxm=2 vfile=vel dxm=10 nxb=1 nxd=1 nxo=3 nzo=7 verbose=0
+# Partial first header and an empty numeric required parameter.
+[stderr] printf 'short header' | suinvvxzco dxm=10
+[stderr] sunull nt=9 ntr=1 | suinvvxzco dxm=10 nx=
+# Nonzero flag semantics: negative ls/pert, and negative corner ranges.
+[stderr] printf '2000 2100 2050 2200\n' | a2b n1=4 > vel; printf '.00001 -.00002 .00003 -.00004\n' | a2b n1=4 > vp; sunull nt=33 ntr=1 | suaddnoise seed=61 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=3 nzo=7 dzo=5 ls=-1 pert=-1 vpfile=vp nxc=-1 nzc=-1 verbose=0
+# Interpolation across a lateral velocity gradient, fractional offset,
+# and a final shortened midpoint step. The shallow grid uses source initialization.
+[stderr] printf '1800 2000 2200 2400 2600 2800\n' | a2b n1=6 > vel; sunull nt=67 ntr=4 | suaddnoise seed=67 | suinvvxzco nx=3 nz=2 nxm=4 vfile=vel dxm=7.5 fxm=10 offs=6.5 nxb=1 nxd=2 nxo=5 nzo=9 fxo=5 dxo=8.5 fzo=2.5 dzo=5.5 verbose=1
+# Same interpolation with line-source amplitudes and nonuniform perturbations.
+[stderr] printf '1800 2000 2200 2400 2600 2800\n' | a2b n1=6 > vel; printf '.00001 -.00001 .00002 -.00002 .00003 -.00003\n' | a2b n1=6 > vp; sunull nt=67 ntr=4 | suaddnoise seed=71 | suinvvxzco nx=3 nz=2 nxm=4 vfile=vel dxm=7.5 fxm=10 offs=-6.5 nxb=1 nxd=2 nxo=5 nzo=9 fxo=5 dxo=8.5 fzo=2.5 dzo=5.5 pert=1 vpfile=vp ls=1 verbose=0
+# Radial extrapolation on odd nonuniform models with unequal dx/dz.
+# Point source, positive fractional offset, shifted origin, and no interpolation.
+[stderr] awk 'BEGIN {for(x=0;x<11;x++) for(z=0;z<9;z++) print 1800+35*x+45*z}' | a2b n1=9 > vel; sunull nt=257 ntr=5 | suaddnoise seed=73 | suinvvxzco nx=11 nz=9 nxm=5 vfile=vel dx=25 dz=30 fx=-50 dxm=7.5 fxm=75 offs=22.5 nxb=4 nxd=1 fxo=40 dxo=12.5 nxo=9 fzo=12.5 dzo=17 nzo=17 verbose=1
+# Default nxd=5 with a shortened last step, negative offset and signed corrections.
+# Perturbations keep total traveltimes nonnegative; large negative corrections
+# make C read before tr.data and produce nondeterministic output.
+[stderr] awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<11;z++) print 1700+9*x+35*z}' | a2b n1=11 > vel; awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<11;z++) print .000002*(x-6)+.000001*(z-5)}' | a2b n1=11 > vp; sunull nt=255 ntr=8 | suaddnoise seed=79 | suinvvxzco nx=13 nz=11 nxm=8 vfile=vel dx=25 dz=20 fx=-50 dxm=7.5 fxm=50 offs=-17.5 nxb=4 nxc=3 nzc=5 fxo=25 dxo=7.5 nxo=13 fzo=22 dzo=7.5 nzo=17 pert=1 vpfile=vp verbose=1
+# Line source, independent midpoint stride, dip and antialias filtering.
+[stderr] awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<11;z++) print 1700+9*x+35*z}' | a2b n1=11 > vel; awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<11;z++) print .000002*(x-6)+.000001*(z-5)}' | a2b n1=11 > vp; sunull nt=255 ntr=8 | suaddnoise seed=83 | suinvvxzco nx=13 nz=11 nxm=8 vfile=vel dx=25 dz=20 fx=-50 dxm=7.5 fxm=50 offs=-17.5 nxb=4 nxc=3 nzc=5 nxd=3 fxo=25 dxo=7.5 nxo=13 fzo=22 dzo=7.5 nzo=17 pert=1 vpfile=vp ls=1 ang=65 fmax=90 verbose=0
+# Source on the left edge of the calculation band uses a quarter-circle grid.
+[stderr] awk 'BEGIN {for(x=0;x<11;x++) for(z=0;z<9;z++) print 1900+15*x+20*z}' | a2b n1=9 > vel; sunull nt=129 ntr=1 | suaddnoise seed=89 | suinvvxzco nx=11 nz=9 nxm=1 vfile=vel dx=25 dz=25 dxm=10 fxm=50 offs=100 nxb=2 nxd=1 nxo=9 dxo=12.5 nzo=13 dzo=15 verbose=1
+# Band extending beyond the right model boundary, and output deeper than model.
+[stderr] awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<9;z++) print 2000+12*x+30*z}' | a2b n1=9 > vel; sunull nt=129 ntr=5 | suaddnoise seed=97 | suinvvxzco nx=13 nz=9 nxm=5 vfile=vel dx=25 dz=20 dxm=5 fxm=220 offs=10 nxb=4 nxd=3 fxo=200 dxo=15 nxo=9 fzo=5 dzo=12 nzo=17 verbose=1
+# Abrupt velocity jump must retain the upweik curvature error and exit status.
+[stderr] awk 'BEGIN {for(x=0;x<9;x++) for(z=0;z<9;z++) print (z<4 ? 1500 : 8000)}' | a2b n1=9 > vel; sunull nt=129 ntr=1 | suinvvxzco nx=9 nz=9 nxm=1 vfile=vel dxm=10 fxm=200 nxo=5 nzo=11 verbose=1

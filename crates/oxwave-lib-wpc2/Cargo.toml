@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-lib-wpc2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-sort = { path = "../oxwave-sort" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

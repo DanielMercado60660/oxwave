@@ -1,0 +1,19 @@
+[package]
+name = "sufarldcsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sufarldcsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-taup = { path = "../../crates/oxwave-f-taup" }
+oxwave-grid-geometry = { path = "../../crates/oxwave-grid-geometry" }
+oxwave-grid-parameters = { path = "../../crates/oxwave-grid-parameters" }
+oxwave-q-file = { path = "../../crates/oxwave-q-file" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

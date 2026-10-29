@@ -1,0 +1,12 @@
+# Strip run-specific PostScript metadata.
+suplane nt=17 ntr=9 | supscube n2=3 n3=3 d1=.002 d2=2 d3=3 f1=-1 f2=4 f3=9 title=Cube | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=17 ntr=9 | sushw key=ntr a=0 | supscube n2=3 verbose=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=17 ntr=9 | sushw key=ntr a=0 | supscube n3=3 tmpdir=. | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=17 ntr=9 | supscube | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=17 ntr=9 | sushw key=trid,dt,d1,d2,f1,f2 a=130,0,2,3,4,5 | supscube n2=3 n3=3 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=1 ntr=1 | supscube n2=1 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+supscube </dev/null
+suplane nt=8 ntr=4 | supscube tmpdir=/no/such/directory
+suplane nt=8 ntr=4 | env -u CWPROOT -u CWPBIN supscube
+suplane nt=8 ntr=4 | supscube n2=0 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=8 ntr=4 | supscube n2=-1 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d

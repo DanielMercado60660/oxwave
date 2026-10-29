@@ -1,0 +1,77 @@
+# Deterministic and seeded cases cover both distributions and header types.
+suplane nt=1 ntr=1 | surandhw seed=42
+suplane nt=7 ntr=5 | surandhw seed=1 noise=flat key=offset a=0 min=-20 max=30
+suplane nt=7 ntr=5 | surandhw seed=123 noise=gauss key=d1 a=0.5 min=-2 max=3
+suplane nt=1 ntr=1 | surandhw seed=7 min=4 max=4 key=tracl a=0
+suplane nt=3 ntr=3 | surandhw seed=0 noise=flat min=-2 max=-2 key=tstat a=-1 verbose=1
+suplane nt=1 ntr=1 | surandhw seed=1 noise=bad
+suplane nt=1 ntr=1 | surandhw seed=1 key=notakey
+surandhw seed=1
+
+# Actual defaults: a=1 (despite the selfdoc), key=tstat, noise=gauss.
+suplane nt=3 ntr=3 | sushw key=tstat a=11 b=-3 | surandhw seed=42 min=0 max=0
+suplane nt=1 ntr=1 | surandhw min=0 max=0
+suplane nt=1 ntr=1 | surandhw seed=42 a= min=0 max=0
+suplane nt=1 ntr=1 | surandhw seed=42 a=0 max=0
+suplane nt=1 ntr=1 | surandhw seed=42 a=0 min=1
+
+# Both distributions, scaling an existing value, reversed endpoints, long streams.
+suplane nt=5 ntr=7 | sushw key=d1 a=2.25 b=-0.5 | surandhw key=d1 a=-0.75 noise=flat min=3 max=-2 seed=0
+suplane nt=5 ntr=7 | sushw key=f1 a=-3.5 b=0.125 | surandhw key=f1 a=2 noise=gauss min=7 max=-4 seed=4294967295
+suplane nt=1 ntr=4097 | surandhw key=d1 a=0 noise=gauss min=-4 max=9 seed=17
+suplane nt=1 ntr=257 | surandhw key=f1 a=0 noise=flat min=-8 max=4 seed=2147483647
+
+# Constant ranges exercise short conversion through the 32-bit C register.
+suplane nt=1 ntr=1 | surandhw seed=42 key=tstat a=0 min=40000 max=40000
+suplane nt=1 ntr=1 | surandhw seed=42 key=tstat a=0 min=-40000 max=-40000
+suplane nt=1 ntr=1 | surandhw seed=42 key=tstat a=0 min=65536 max=65536
+suplane nt=1 ntr=1 | surandhw seed=42 key=tstat a=0 min=2147483648 max=2147483648
+suplane nt=1 ntr=1 | surandhw seed=42 key=dt a=0 min=65536 max=65536
+suplane nt=1 ntr=1 | surandhw seed=42 key=dt a=0 min=-1 max=-1
+suplane nt=1 ntr=1 | surandhw seed=42 key=dt a=0 min=4294967295 max=4294967295
+suplane nt=7 ntr=5 | sushw key=d1 a=1.25 b=0.5 | surandhw seed=42 key=d1 a=-2 min=-3.25 max=-3.25
+suplane nt=1 ntr=1 | surandhw seed=42 key=tstat a=0 min=inf max=inf
+suplane nt=1 ntr=1 | surandhw seed=42 key=dt a=0 noise=flat min=-inf max=-inf
+
+# Check complete diagnostics, including verbose and the unknown-argument warning.
+[stderr] suplane nt=3 ntr=3 | surandhw seed=0 noise=flat min=0 max=0 verbose=1
+[stderr] suplane nt=1 ntr=1 | surandhw seed=1 min=0 max=0 unknown=1
+[stderr] surandhw seed=1
+[stderr] surandhw seed=1 key=notakey
+[stderr] surandhw seed=1 key=
+[stderr] surandhw seed=1 noise=
+[stderr] surandhw seed=1 noise=GAUSS
+[stderr] surandhw seed=4294967296
+[stderr] surandhw seed=1 a=1e-310
+
+# Command-line values override parameter-file values; last occurrence wins.
+[stderr] printf 'key=d1 a=2 min=3 max=3 noise=flat seed=7\n' > params; suplane nt=5 ntr=3 | surandhw par=params a=0 min=-2 max=-2 verbose=1
+[stderr] suplane nt=3 ntr=1 | surandhw key=notakey key=tracl noise=bad noise=gauss seed=1 a=7 a=0 min=9 min=4 max=4
+
+# Parameter validation precedes header lookup and input reads.
+[stderr] surandhw noise=bad key=notakey seed=4294967296
+[stderr] surandhw seed=1 min=1e309
+[stderr] surandhw seed=1 max=1e-310
+
+# Truncated first header and truncated first trace data.
+[stderr] printf x | surandhw seed=1 min=0 max=0
+[stderr] suplane nt=3 ntr=1 | head -c 240 | surandhw seed=1 min=0 max=0
+
+# Seeds are parsed as uint but passed to the C generators as signed int.
+# Float header fields expose each draw without integer truncation.
+suplane nt=3 ntr=257 | surandhw key=d1 a=0 noise=flat seed=2147483648
+suplane nt=3 ntr=257 | surandhw key=d1 a=0 noise=gauss seed=2147483648
+suplane nt=1 ntr=257 | surandhw key=f1 a=0 noise=flat seed=4294967295
+suplane nt=1 ntr=257 | surandhw key=f1 a=0 noise=gauss seed=0
+
+# Equal negative-zero endpoints still require the full noise arithmetic.
+[exact] suplane nt=1 ntr=3 | surandhw seed=42 a=-1 key=d1 noise=flat min=-0 max=-0
+[exact] suplane nt=1 ntr=3 | surandhw seed=42 a=-1 key=d1 noise=gauss min=-0 max=-0
+
+# Nonconstant noise with default a=1, unsigned headers, and verbose output.
+suplane nt=3 ntr=7 | sushw key=tstat a=11 b=-3 | surandhw seed=42
+suplane nt=7 ntr=5 | surandhw seed=17 key=dt a=0 noise=flat min=100 max=1000
+[stderr] suplane nt=5 ntr=7 | surandhw seed=42 key=d1 a=0 noise=gauss min=-3 max=2 verbose=1
+
+# A long uniform sequence complements the long Gaussian sequence above.
+suplane nt=1 ntr=4097 | surandhw seed=17 key=d1 a=0 noise=flat min=-4 max=9

@@ -1,0 +1,18 @@
+[package]
+name = "sugprfb"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sugprfb"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-array-extrema = { path = "../../crates/oxwave-array-extrema" }
+oxwave-correlation = { path = "../../crates/oxwave-correlation" }
+oxwave-qr = { path = "../../crates/oxwave-qr" }

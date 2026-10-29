@@ -1,0 +1,32 @@
+python3 -c 'import sys,struct; b=bytearray(128); [(struct.pack_into("<f",b,i,v)) for i,v in [(0,2),(4,1.25),(8,3),(12,-2),(20,2),(24,4),(28,5),(56,111),(60,222),(64,333),(68,-44),(72,55),(76,66),(80,7),(84,1),(88,9),(92,3661)]]; sys.stdout.buffer.write((b+struct.pack("<hhh",-32768,10,32767))*2)' | dt1tosu outpar=out
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu outpar=out dt=1.25 swap=0
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into(">f",b,0,1); struct.pack_into(">f",b,8,3); struct.pack_into(">f",b,92,3601); sys.stdout.buffer.write(b+struct.pack(">hhh",1,-2,3))' | dt1tosu outpar=out swap=1
+python3 -c 'import sys,struct; b=bytearray(128); [(struct.pack_into("<f",b,i,v)) for i,v in [(0,2),(4,1.25),(8,3),(12,-2),(20,2),(24,4),(28,5),(56,111),(60,222),(64,333),(68,-44),(72,55),(76,66),(80,7),(84,1),(88,9),(92,3661)]]; sys.stdout.buffer.write((b+struct.pack("<hhh",-32768,10,32767))*2)' | dt1tosu outpar=out ns=3 dt=0 list=1
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); [(struct.pack_into("<f",b,i,v)) for i,v in [(0,2),(4,1.25),(8,3),(12,-2),(20,2),(24,4),(28,5),(56,111),(60,222),(64,333),(68,-44),(72,55),(76,66),(80,7),(84,1),(88,9),(92,3661)]]; sys.stdout.buffer.write((b+struct.pack("<hhh",-32768,10,32767))*2)' | dt1tosu outpar=out list=1
+python3 -c 'import sys,struct; b=bytearray(128); [(struct.pack_into("<f",b,i,v)) for i,v in [(0,2),(4,1.25),(8,3),(12,-2),(20,2),(24,4),(28,5),(56,111),(60,222),(64,333),(68,-44),(72,55),(76,66),(80,7),(84,1),(88,9),(92,3661)]]; sys.stdout.buffer.write((b+struct.pack("<hhh",-32768,10,32767))*2)' | dt1tosu outpar=out verbose=1 > data; cat out
+python3 -c 'import sys,struct; b=bytearray(128); [(struct.pack_into("<f",b,i,v)) for i,v in [(0,2),(4,1.25),(8,3),(12,-2),(20,2),(24,4),(28,5),(56,111),(60,222),(64,333),(68,-44),(72,55),(76,66),(80,7),(84,1),(88,9),(92,3661)]]; sys.stdout.buffer.write((b+struct.pack("<hhh",-32768,10,32767))*2)' | dt1tosu outpar=out verbose=2 > data; cat out
+dt1tosu outpar=out </dev/null
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(128))' | dt1tosu outpar=out
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu outpar=/no/such/dir/out
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu outpar=out ns=0
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu outpar=out dt=-1
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+struct.pack("<h",-3))' | dt1tosu outpar=out strange=1
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,3); sys.stdout.buffer.write(b+struct.pack("<h",42))' | dt1tosu outpar=out ns=1
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); struct.pack_into("<f",b,96,1); b[100:128]=b"abcdefghijklmnopqrstuvwxyz12"; sys.stdout.buffer.write(b+struct.pack("<h",1))' | dt1tosu outpar=out verbose=1 > data; cat out
+# Negative ns skips samples; size_t arithmetic yields positive, zero, or huge record sizes.
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+b[:126])' | dt1tosu outpar=out ns=-1
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+bytes(3))' | dt1tosu outpar=out ns=-63
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+b)' | dt1tosu outpar=out ns=-64
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b)' | dt1tosu outpar=out ns=-65
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+bytes(1))' | dt1tosu outpar=out ns=-65
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+b)' | dt1tosu outpar=out ns=-65
+# A huge requested read may fill exactly sizeof(ssdt1), including its tail padding, then reach EOF safely.
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+b+bytes(131072))' | dt1tosu outpar=out ns=-65
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b)' | dt1tosu outpar=out ns=-2147483648
+# The maximum valid sample count remains accepted.
+python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,65535); sys.stdout.buffer.write(b+struct.pack("<h",-7)*65535)' | dt1tosu outpar=out
+# Wrapped reads also preserve swapped headers and the verbose=2 path.
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into(">f",b,8,1); sys.stdout.buffer.write(b+b)' | dt1tosu outpar=out ns=-65 swap=1 verbose=2
+# A wrapped read ending one byte below the padded allocation is safe too.
+[stderr] python3 -c 'import sys,struct; b=bytearray(128); struct.pack_into("<f",b,8,1); sys.stdout.buffer.write(b+b+bytes(131071))' | dt1tosu outpar=out ns=-65

@@ -1,0 +1,17 @@
+# Defaults, single sample and odd transform sizes
+suspike nt=1 ntr=1 | suacorfrac
+suspike nt=31 ntr=2 | suacorfrac a=1 b=1
+suplane nt=75 ntr=3 | suacorfrac a=0.5 b=-0.5 sym=1
+suplane nt=63 ntr=2 | suacorfrac a=-0.5 b=2 sym=-1 ntout=0
+sunull nt=17 ntr=1 | suacorfrac a=1 b=1
+# b has no effect when a is zero; ntout is read but unused
+suspike nt=33 ntr=1 | suacorfrac a=0 b=3 ntout=-1
+# Nonseismic headers use d1, and documented but unconsumed arguments are reported
+[stderr] suplane nt=32 ntr=1 | sushw key=trid,d1 a=110,0.004 | suacorfrac verbose=1 dt=0.002 power=2
+[stderr] suplane nt=32 ntr=1 | suacorfrac verbose=1
+# Empty input and zero sampling interval errors
+suacorfrac a=1 </dev/null
+suplane nt=32 ntr=1 | sushw key=dt a=0 | suacorfrac
+suplane nt=32 ntr=1 | sushw key=trid,d1 a=110,0 | suacorfrac verbose=1
+suplane nt=32 ntr=1 | suacorfrac a=1e999
+sunull nt=65535 ntr=1 | suacorfrac

@@ -1,0 +1,77 @@
+# Raw native floats; use SU generators for deterministic velocity models.
+# All defaults, including nx=nz=101 and one source.
+[f32] [stderr] sunull nt=101 ntr=101 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d
+# Minimum grid and nt=1; default eikonal filling and ek=0.
+[f32] [stderr] sunull nt=3 ntr=3 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=3 nz=3 nt=1
+[f32] [stderr] sunull nt=3 ntr=3 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=3 nz=3 nt=1 ek=0
+# Odd dimensions, several sources, verbose, altered emergence/takeoff angles.
+[f32] [stderr] sunull nt=9 ntr=11 | suop op=exp | sugain scale=2000 | sustrip outpar=/dev/null | rayt2d nx=11 nz=9 nxs=3 fxs=200 dxs=250 nt=173 dt=0.006 fa=-75 da=3 na=51 amin=5 amax=100 fac=0.02 aperx=350 ms=1 verbose=1
+# Output grid resampling, nonzero model origins, nonflat spline topography.
+[f32] [stderr] sunull nt=13 ntr=15 | suop op=exp | sugain scale=1800 | sustrip outpar=/dev/null | rayt2d nx=15 nz=13 fx=-100 fz=-100 dx=80 dz=70 nxo=9 nzo=11 fxo=-60 fzo=-30 dxo=110 dzo=65 nxs=5 fxs=20 dxs=150 nt=203 dt=0.005 'surf=-100,0;300,60;600,20;1020,80' ek=0
+# Spatially varying velocity exercises finite differences and Runge-Kutta.
+[f32] [stderr] makevel nx=17 nz=15 dx=60 dz=50 v000=1600 dvdx=0.15 dvdz=0.5 | rayt2d nx=17 nz=15 dx=60 dz=50 nxs=3 fxs=240 dxs=180 nt=301 dt=0.003 fa=-80 na=81 da=2 fac=0.03
+# Curved velocity with mixed derivatives, multiple surfaces (only first is used).
+[f32] [stderr] makevel nx=13 nz=11 dx=50 dz=50 v000=1700 dvdx=0.3 dvdz=0.7 xlens=300 zlens=250 dlens=350 tlens=300 vlens=100 | rayt2d nx=13 nz=11 dx=50 dz=50 nxs=3 fxs=150 dxs=100 nt=151 dt=0.004 'surf=0,0;300,10;600,0' 'surf=0,10;600,10'
+# Source at right boundary, wide takeoff angles trigger angle limiting.
+[f32] [stderr] sunull nt=7 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=9 nz=7 fxs=800 fa=-120 da=4 na=61 amax=180 nt=101
+# Two sources follows the original's unconditional endpoint extrapolation.
+[f32] [stderr] sunull nt=7 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=9 nz=7 fxs=200 nxs=2 dxs=100 nt=101
+# Explicit parameter defaults and file output, compared by cat.
+[f32] [stderr] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v tfile=t nx=9 nz=9 fx=0 fz=0 dx=100 dz=100 nxo=9 nzo=9 fxo=0 fzo=0 dxo=100 dzo=100 fxs=0 nxs=1 dxs=200 aperx=400 nt=401 dt=0.008 fa=-60 na=61 da=2 amin=0 amax=90 fac=0.01 ek=1 ms=10 restart=n npv=0 'surf=0,0;99999,0'; cat t
+# All three output modes: time, time variation, cosine; named auxiliary files.
+[f32] [stderr] makevel nx=11 nz=9 dx=100 dz=100 v000=1800 dvdz=0.3 > v; sunull nt=9 ntr=11 | suop op=exp | sustrip outpar=/dev/null > pv; rayt2d vfile=v tfile=t nx=11 nz=9 nxs=3 fxs=200 dxs=200 nt=151 dt=0.005 npv=1 pvfile=pv tvfile=tv csfile=cs; cat t tv cs
+# Default auxiliary filenames, nonflat topography and nonzero perturbation.
+[f32] [stderr] sunull nt=9 ntr=11 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; sunull nt=9 ntr=11 | suop op=exp | sugain scale=0.25 | sustrip outpar=/dev/null > pvfile; rayt2d vfile=v tfile=t nx=11 nz=9 nxs=3 fxs=100 dxs=250 npv=2 'surf=0,0;400,40;1000,10' npv=1 ek=0; cat t tvfile csfile
+# Zero perturbation and output-grid interpolation.
+[f32] [stderr] sunull nt=11 ntr=13 | suop op=exp | sugain scale=2000 | sustrip outpar=/dev/null > v; sunull nt=11 ntr=13 | sustrip outpar=/dev/null > pv; rayt2d vfile=v nx=13 nz=11 nxo=9 nzo=7 fxo=50 fzo=50 dxo=125 dzo=125 nxs=3 fxs=200 dxs=200 npv=1 pvfile=pv nt=201 dt=0.003 tfile=t; cat t tvfile csfile
+# jpfile captures parameter listing, progress messages and all ms=1 reports.
+[exact] sunull nt=5 ntr=7 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v nx=7 nz=5 nxs=3 dxs=200 ms=1 jpfile=log tfile=t nt=51 verbose=1; cat log
+# Restart from a full table and from a partial table (discard trailing bytes).
+[f32] sunull nt=7 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v nx=9 nz=7 nxs=3 fxs=100 dxs=200 tfile=base nt=101; dd if=base of=t bs=252 count=1 2>/dev/null; rayt2d vfile=v nx=9 nz=7 nxs=3 fxs=100 dxs=200 tfile=t nt=101 restart=yes; cat t
+[f32] sunull nt=7 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v nx=9 nz=7 nxs=3 fxs=100 dxs=200 tfile=base nt=101; dd if=base of=t bs=1 count=259 2>/dev/null; rayt2d vfile=v nx=9 nz=7 nxs=3 fxs=100 dxs=200 tfile=t nt=101 restart=y; cat t
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v nx=5 nz=5 tfile=t nt=51; rayt2d vfile=v nx=5 nz=5 tfile=t nt=51 restart=y; cat t
+# Existing tfile is truncated with restart=n; empty tfile resumes at source 0.
+[f32] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; cp v t; rayt2d vfile=v nx=5 nz=5 tfile=t nt=51 restart=n; cat t
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2d vfile=v nx=5 nz=5 tfile=t nt=51 restart=y; cat t
+# Zero and negative time steps; no rays; zero extrapolation radius.
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=5 nz=5 dt=0 nt=3
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=5 nz=5 dt=-0.01 nt=7
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=5 nz=5 na=0
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=5 nz=5 fa=0 na=1 da=0 fac=0 ek=0 nt=21
+# Required geometry validation and range failures (whole stderr).
+[stderr] rayt2d nx=1 nz=3
+[stderr] rayt2d nx=3 nz=0
+[stderr] rayt2d nx=-1
+[stderr] rayt2d nx=3 nz=3 nxo=2
+[stderr] rayt2d nx=3 nz=3 nzo=-1
+[stderr] rayt2d amin=-1
+[stderr] rayt2d amax=181
+[stderr] rayt2d nx=3 nz=3 fxs=-1
+[stderr] rayt2d nx=3 nz=3 nxs=3 dxs=200
+[stderr] rayt2d nx=3 nz=3 fz=1
+[stderr] rayt2d nx=3 nz=3 fxo=-1
+[stderr] rayt2d nx=3 nz=3 dxo=101
+[stderr] rayt2d nx=3 nz=3 fzo=-1
+[stderr] rayt2d nx=3 nz=3 dzo=101
+# Empty and truncated input, invalid surface, unknown parameter.
+[stderr] rayt2d nx=3 nz=3
+[stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | rayt2d nx=3 nz=3
+[stderr] sunull nt=3 ntr=3 | suop op=exp | sustrip outpar=/dev/null | rayt2d nx=3 nz=3 'surf=0,0;100'
+[stderr] sunull nt=3 ntr=3 | suop op=exp | sustrip outpar=/dev/null | rayt2d nx=3 nz=3 'surf=0,0'
+[stderr] sunull nt=3 ntr=3 | suop op=exp | sustrip outpar=/dev/null | rayt2d nx=3 nz=3 'surf='
+[f32] [stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=5 nz=5 nt=51 unknown=7 verbose=1
+# Invalid allocations and missing files retain the original exit behavior.
+makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nt=0
+makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nt=-1
+[stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nxs=-1
+[stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 dxs=-100
+rayt2d nx=5 nz=5 vfile=missing
+[stderr] rayt2d nx=1 vfile=missing
+rayt2d nx=5 nz=5 jpfile=missing/directory
+makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 npv=1 pvfile=missing
+# Zero sources, negative rays and zero reporting interval.
+[f32] [stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nxs=0
+[f32] [stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 na=-1
+[f32] [stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nt=51 nxs=3 ms=0
+# Empty perturbation file has the C error text and exit status.
+[stderr] makevel nx=5 nz=5 v000=1500 > v; touch pv; rayt2d vfile=v nx=5 nz=5 npv=1 pvfile=pv

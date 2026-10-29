@@ -1,0 +1,81 @@
+# Full defaults (stdin is empty); the clock seed is unused with ic=1.
+[exact] [stderr] cellauto
+[exact] [stderr] cellauto n1=31 rule=30 ic=1 nc=20 tc=1 fill=0 f0=330 f1=3000 seed=123 verbose=0
+# Actual image bytes for the three inventory scenarios (inventory redirects them).
+[exact] [stderr] cellauto n1=31 rule=30 ic=1 fill=0 seed=123
+[exact] [stderr] cellauto n1=32 rule=110 ic=2 nc=8 tc=1 fill=1 f0=330 f1=3000 seed=123
+[exact] [stderr] cellauto n1=33 rule=225 ic=2 nc=6 tc=2 fill=0 seed=456
+# Every supported rule, including undocumented 260, with overlapping random seeds.
+[exact] [stderr] cellauto n1=23 rule=30 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=54 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=60 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=62 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=90 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=94 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=102 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=110 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=122 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=126 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=150 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=158 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=182 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=188 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=190 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=220 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=222 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=225 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=226 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=250 ic=2 nc=60 tc=2 seed=98765
+[exact] [stderr] cellauto n1=23 rule=260 ic=2 nc=60 tc=2 seed=98765
+# Small, zero, odd, and even image dimensions; nz differs from n1 when even.
+[exact] [stderr] cellauto n1=0 seed=123
+[exact] [stderr] cellauto n1=1 seed=123
+[exact] [stderr] cellauto n1=2 seed=123
+[exact] [stderr] cellauto n1=3 seed=123
+[exact] [stderr] cellauto n1=4 seed=123
+[exact] [stderr] cellauto n1=5 seed=123
+[exact] [stderr] cellauto n1=17 seed=123
+[exact] [stderr] cellauto n1=18 seed=123
+# Filled and raw output, defaults and custom/zero/negative fill values.
+[exact] [stderr] cellauto n1=19 fill=1 seed=123
+[exact] [stderr] cellauto n1=19 fill=1 f0=-12.25 f1=3.125 seed=123
+[exact] [stderr] cellauto n1=19 fill=-1 f0=-0.0 f1=0 seed=123
+[exact] [stderr] cellauto n1=19 fill=2 f0=0.125 f1=-3000 seed=123
+[exact] [stderr] cellauto n1=19 fill=0 f0=-99 f1=12 seed=123
+# Initial conditions, nc default and nonpositive values, tc fallthrough.
+[exact] [stderr] cellauto n1=21 ic=2 seed=123
+[exact] [stderr] cellauto n1=21 ic=2 nc=1 tc=1 seed=123
+[exact] [stderr] cellauto n1=21 ic=2 nc=0 tc=2 seed=123
+[exact] [stderr] cellauto n1=21 ic=2 nc=-3 tc=2 seed=123
+[exact] [stderr] cellauto n1=21 ic=2 nc=9 tc=0 seed=123
+[exact] [stderr] cellauto n1=21 ic=2 nc=9 tc=-1 seed=123
+[exact] [stderr] cellauto n1=21 ic=0 seed=123
+[exact] [stderr] cellauto n1=21 ic=-1 rule=225 seed=123
+[exact] [stderr] cellauto n1=1 ic=2 nc=10 tc=2 seed=123
+# Seed conversions and documented-but-ignored verbosity, no checkpars in C.
+[exact] [stderr] cellauto n1=27 ic=2 nc=19 tc=2 seed=0
+[exact] [stderr] cellauto n1=27 ic=2 nc=19 tc=2 seed=2147483647
+[exact] [stderr] cellauto n1=27 ic=2 nc=19 tc=2 seed=2147483648
+[exact] [stderr] cellauto n1=27 ic=2 nc=19 tc=2 seed=4294967295
+[exact] [stderr] cellauto n1=27 ic=2 nc=19 tc=2 seed=-1
+[exact] [stderr] cellauto n1=15 verbose=1 seed=123
+[exact] [stderr] cellauto n1=15 verbose=abc unknown=123 seed=123
+# Invalid rules are checked only when there is an evolution step.
+[exact] [stderr] cellauto n1=9 rule=0 seed=123
+[exact] [stderr] cellauto n1=9 rule=-1 seed=123
+[exact] [stderr] cellauto n1=9 rule=256 seed=123
+[exact] [stderr] cellauto n1=9 rule=abc seed=123
+[exact] [stderr] cellauto n1=1 rule=999 seed=123
+[exact] [stderr] cellauto n1=0 rule=999 seed=123
+# Allocation errors and getpar conversion errors.
+[exact] [stderr] cellauto n1=-1 seed=123
+[exact] [stderr] cellauto n1=-2 seed=123
+[exact] [stderr] cellauto n1=-3 seed=123
+[exact] [stderr] cellauto n1=2147483648 seed=123
+[exact] [stderr] cellauto n1=9 seed=4294967296
+[exact] [stderr] cellauto n1=9 f0=1e-310 seed=123
+[exact] [stderr] cellauto n1=9 rule=2147483648 seed=123
+# Empty numeric parameters select defaults; last occurrence wins.
+[exact] [stderr] cellauto n1=15 n1=17 rule= fill= ic= tc= nc= f0= f1= seed=123
+[exact] [stderr] cellauto n1=abc seed=123
+[exact] [stderr] cellauto par=missing.par

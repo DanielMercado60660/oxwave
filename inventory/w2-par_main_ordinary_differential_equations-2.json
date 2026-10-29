@@ -1,0 +1,267 @@
+{
+  "scope": "par/main/ordinary_differential_equations (wave 2, batch 2)",
+  "programs": [
+    {
+      "name": "verhulst",
+      "path": "par/main/ordinary_differential_equations/verhulst.c",
+      "purpose": "Solve the Verhulst logistic population growth equation and output the sampled results as binary floats.",
+      "selfdoc_first_line": " VERHULST - solve the VERHULST logistic equation\t\t",
+      "params": [
+        {
+          "name": "a1",
+          "type": "double",
+          "default": "1.0",
+          "required": false,
+          "description": "Population reproduction rate."
+        },
+        {
+          "name": "a2",
+          "type": "double",
+          "default": "2000",
+          "required": false,
+          "description": "Population carrying capacity."
+        },
+        {
+          "name": "y0",
+          "type": "double",
+          "default": "10",
+          "required": false,
+          "description": "Initial population."
+        },
+        {
+          "name": "h",
+          "type": "double",
+          "default": ".01",
+          "required": false,
+          "description": "Time increment between output samples."
+        },
+        {
+          "name": "tol",
+          "type": "double",
+          "default": "0.00000001",
+          "required": false,
+          "description": "Runge-Kutta-England error bias."
+        },
+        {
+          "name": "stepmax",
+          "type": "int",
+          "default": "2000",
+          "required": false,
+          "description": "Number of output samples and solver advances."
+        },
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "x",
+          "required": false,
+          "description": "Output x, y, z, xy, xz, or yz components. The selfdoc also lists xyz, but the parser rejects it."
+        },
+        {
+          "name": "toutfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "If nonempty, write output times as binary floats to this file."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report solver step counts and error tolerance."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "filestat",
+        "warn",
+        "pagedoc",
+        "getparint",
+        "getpardouble",
+        "getparstring",
+        "err",
+        "rke_init",
+        "efwrite",
+        "rke_solve",
+        "rke_term",
+        "efclose"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The adaptive Runge-Kutta-England solver uses iterative double-precision calculations and converts output to float. Its derivative callback mutates y[1] even though the solver is initialized for one equation; the reported y component reflects callback side effects rather than a separately integrated variable. The z component remains zero. Solver step acceptance and floating-point evaluation order can affect results.",
+      "c_lines": 257,
+      "difficulty": "hard",
+      "difficulty_reason": "Porting requires reproducing an adaptive iterative ODE solver and the callback's state mutation.",
+      "test_cases": [
+        {
+          "description": "Sample population with explicitly chosen initial conditions and time step.",
+          "command": "verhulst stepmax=32 mode=x y0=10 a1=1.0 a2=2000 h=0.01 tol=1e-8 > population.bin"
+        },
+        {
+          "description": "Output population and callback-derived growth rate, plus sample times.",
+          "command": "verhulst stepmax=24 mode=xy y0=20 a1=0.8 a2=500 h=0.05 tol=1e-7 toutfile=times.bin > population_rate.bin"
+        },
+        {
+          "description": "Exercise the zero-valued z component in paired output.",
+          "command": "verhulst stepmax=16 mode=yz y0=5 a1=0.5 a2=100 h=0.1 > rate_zero.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "voltlotka"
+      ]
+    },
+    {
+      "name": "voltlotka",
+      "path": "par/main/ordinary_differential_equations/voltlotka.c",
+      "purpose": "Solve a predator-prey population model with a prey carrying capacity and output the sampled populations as binary floats.",
+      "selfdoc_first_line": " VOLTLOTKA -  VOLTerra-LOTKA predator-prey model, modified \t",
+      "params": [
+        {
+          "name": "a",
+          "type": "double",
+          "default": "0.5",
+          "required": false,
+          "description": "Prey increase rate."
+        },
+        {
+          "name": "b",
+          "type": "double",
+          "default": "0.02",
+          "required": false,
+          "description": "Prey reduction rate due to predation."
+        },
+        {
+          "name": "c",
+          "type": "double",
+          "default": "0.75",
+          "required": false,
+          "description": "Predator reduction rate."
+        },
+        {
+          "name": "d",
+          "type": "double",
+          "default": "",
+          "required": false,
+          "description": "Documented as the predator increase coefficient, but never read by the code; use p instead."
+        },
+        {
+          "name": "p",
+          "type": "double",
+          "default": "0.005",
+          "required": false,
+          "description": "Predator increase coefficient; the selfdoc calls this parameter d."
+        },
+        {
+          "name": "K",
+          "type": "double",
+          "default": "1000000",
+          "required": false,
+          "description": "Prey carrying capacity."
+        },
+        {
+          "name": "x0",
+          "type": "double",
+          "default": "500",
+          "required": false,
+          "description": "Initial prey population."
+        },
+        {
+          "name": "y0",
+          "type": "double",
+          "default": "25",
+          "required": false,
+          "description": "Initial predator population."
+        },
+        {
+          "name": "thresh",
+          "type": "double",
+          "default": "1.0",
+          "required": false,
+          "description": "The derivative callback sets either population to zero when it is at or below this threshold."
+        },
+        {
+          "name": "h",
+          "type": "double",
+          "default": "1.0",
+          "required": false,
+          "description": "Time increment between output samples."
+        },
+        {
+          "name": "stepmax",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of output samples and solver advances."
+        },
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "PP",
+          "required": false,
+          "description": "PP outputs all prey samples followed by all predator samples; R outputs prey only and Y outputs predator only. The selfdoc reverses these component labels."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report solver step counts and error tolerance."
+        },
+        {
+          "name": "tol",
+          "type": "double",
+          "default": "0.00000001",
+          "required": false,
+          "description": "Runge-Kutta-England error bias."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "filestat",
+        "warn",
+        "pagedoc",
+        "getparint",
+        "getpardouble",
+        "getparstring",
+        "err",
+        "ealloc2float",
+        "rke_init",
+        "rke_solve",
+        "ealloc1float",
+        "efwrite",
+        "rke_term"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The adaptive Runge-Kutta-England solver uses iterative double-precision calculations and converts output to float; threshold comparisons and callback mutation of the populations affect subsequent solver steps. The code initializes the solver for three equations but supplies a two-element state array and initializes only two derivative components, causing out-of-bounds access and use of an uninitialized derivative. Results therefore rely on undefined behavior and may vary by platform or build.",
+      "c_lines": 253,
+      "difficulty": "hard",
+      "difficulty_reason": "Porting requires an adaptive iterative ODE solver and a decision about the original program's undefined behavior.",
+      "test_cases": [
+        {
+          "description": "Output both population series with explicit model parameters.",
+          "command": "voltlotka stepmax=32 mode=PP x0=500 y0=25 a=0.5 b=0.02 c=0.75 p=0.005 K=1000000 h=0.1 tol=1e-8 thresh=1 > populations.bin"
+        },
+        {
+          "description": "Output the prey series with a smaller carrying capacity.",
+          "command": "voltlotka stepmax=24 mode=R x0=100 y0=10 a=0.4 b=0.01 c=0.6 p=0.004 K=1000 h=0.05 > prey.bin"
+        },
+        {
+          "description": "Exercise the extinction threshold and predator-only output.",
+          "command": "voltlotka stepmax=16 mode=Y x0=2 y0=0.5 thresh=1 h=0.1 > predator.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "verhulst"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+# Default header name and C data, including one sample and one trace.
+suplane nt=1 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=1 < data
+suplane nt=7 ntr=3 | sustrip head=hdr outpar=strip.par > data && supaste ns=7 head=hdr ftn=0 verbose=1 < data
+[stderr] suplane nt=7 ntr=3 | sustrip head=hdr outpar=strip.par > data && supaste ns=7 head=hdr verbose=1 < data
+# Fortran record markers.
+suplane nt=7 ntr=3 | sustrip head=hdr outpar=strip.par ftn=1 > data && supaste ns=7 head=hdr ftn=1 verbose=1 < data
+# Parameter and file errors.
+supaste
+supaste ns=1 ftn=2
+supaste ns=1 ftn=-1
+supaste ns=1 head=missing
+# Empty and incomplete data and headers.
+touch headers && supaste ns=1 verbose=1
+touch headers && supaste ns=0 verbose=1
+touch headers && supaste ns=-1 verbose=1
+suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=3 < /dev/null
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=3 verbose=0 < /dev/null
+suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && head -c 4 data | supaste ns=3
+# Zero samples with a header and a truncated header.
+suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=0 < data
+suplane nt=3 ntr=1 | sustrip head=full outpar=strip.par > data && head -c 100 full > headers && supaste ns=3 verbose=1 < data
+# Missing Fortran data after the record marker.
+suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par ftn=1 > data && head -c 4 data | supaste ns=3 ftn=1
+# Complete headers must reach the data read for out-of-range ns. EOF and
+# short reads are defined in C while actual writes beyond its buffer are not.
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-1 < /dev/null
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65536 < /dev/null
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && head -c 3 data | supaste ns=-1
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && head -c 3 data | supaste ns=65536
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-1 verbose=1 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-2 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-2147483648 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65536 verbose=1 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65537 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=2147483647 < data
+# Fortran marker handling still precedes the out-of-range data read.
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par ftn=1 > data && supaste ns=-1 ftn=1 < data
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par ftn=1 > data && head -c 4 data | supaste ns=65536 ftn=1
+# Exact capacity and a partial final float, with both valid and oversized ns.
+[stderr] sunull nt=65535 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65535 < data
+[stderr] sunull nt=65535 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-1 < data
+[stderr] sunull nt=65535 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65536 < data
+[stderr] sunull nt=65535 ntr=1 | sustrip head=headers outpar=strip.par > data && head -c 262139 data | supaste ns=-1
+# Stream errors preserve efread's requested count, including its sign.
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-1 < .
+[stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65536 < .

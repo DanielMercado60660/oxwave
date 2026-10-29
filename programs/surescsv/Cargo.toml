@@ -1,0 +1,17 @@
+[package]
+name = "surescsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "surescsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-header-case = { path = "../../crates/oxwave-header-case" }
+oxwave-sinc-interp = { path = "../../crates/oxwave-sinc-interp" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

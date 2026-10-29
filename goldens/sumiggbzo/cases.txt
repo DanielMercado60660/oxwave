@@ -1,0 +1,45 @@
+# Actual stdout migrations (inventory cases redirect their results).
+sunull nt=16 ntr=16 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suplane nt=128 ntr=16 dt=0.004 | sumiggbzo vfile=vel.bin nz=16 dz=10 dx=10 dt=0.004
+[stderr] sunull nt=16 ntr=16 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suplane nt=128 ntr=16 npl=1 dip1=4 dt=0.004 | sumiggbzo vfile=vel.bin nz=16 dz=10 dx=10 dt=0.004 fmin=8 fmax=40 amin=-30 amax=45 bwh=80 verbose=1
+# All defaults except required vfile/nz/dz; missing d2 defaults to 1.
+[stderr] sunull nt=9 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=65 ntr=9 dt=0.004 | sumiggbzo vfile=vel.bin nz=9 dz=1 verbose=1
+# Header d2 and dt; zero dt invokes the 4-ms fallback.
+[stderr] sunull nt=11 ntr=7 | sugain bias=1600 | sustrip outpar=/dev/null > vel.bin && suspike nt=63 ntr=7 | sushw key=dt,d2 a=0,12 | sumiggbzo vfile=vel.bin nz=11 dz=8 verbose=1
+sunull nt=11 ntr=7 | sugain bias=1600 | sustrip outpar=/dev/null > vel.bin && suspike nt=63 ntr=7 dt=0.002 | sushw key=d2 a=12 | sumiggbzo vfile=vel.bin nz=11 dz=8
+# Explicit documented defaults (bwh = vavg/fmin = 120).
+sunull nt=16 ntr=16 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suplane nt=128 ntr=16 dt=0.004 | sumiggbzo vfile=vel.bin nz=16 dz=10 dx=10 dt=0.004 fmin=6.25 fmax=62.5 amin=-60 amax=60 bwh=120 verbose=0
+# Reversed angle limits are swapped; zero angle has a single vertical beam.
+sunull nt=17 ntr=13 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=97 ntr=13 dt=0.002 | sumiggbzo vfile=vel.bin nz=17 dz=6 dx=8 amin=40 amax=-20 fmin=10 fmax=60 bwh=50
+sunull nt=17 ntr=13 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=97 ntr=13 dt=0.002 | sumiggbzo vfile=vel.bin nz=17 dz=6 dx=8 amin=0 amax=0 fmin=10 fmax=60 bwh=50
+# One trace, one time sample, one depth sample, and odd sizes.
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=33 ntr=1 | sumiggbzo vfile=vel.bin nz=9 dz=10 dx=10
+sunull nt=9 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=1 ntr=7 | sugain bias=1 | sumiggbzo vfile=vel.bin nz=9 dz=10 dx=10
+sunull nt=1 ntr=7 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=33 ntr=7 | sumiggbzo vfile=vel.bin nz=1 dz=10 dx=10
+sunull nt=13 ntr=11 | sugain bias=2000 | sustrip outpar=/dev/null > vel.bin && sunull nt=57 ntr=11 | sumiggbzo vfile=vel.bin nz=13 dz=7 dx=9
+# Seeded noise, longer rays and several beam centers.
+sunull nt=25 ntr=25 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && suspike nt=127 ntr=25 dt=0.002 | suaddnoise seed=1729 sn=3 | sumiggbzo vfile=vel.bin nz=25 dz=8 dx=10 bwh=35 fmin=12 fmax=60 amin=-45 amax=50
+# Negative width results in no beam centers and a zero image.
+[stderr] sunull nt=9 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=33 ntr=9 | sumiggbzo vfile=vel.bin nz=9 dz=10 dx=10 bwh=-30 verbose=1
+# Missing parameters, empty input, file failures, and numeric errors.
+sumiggbzo
+sumiggbzo vfile=absent nz=8 dz=10
+sunull nt=9 ntr=3 | sumiggbzo
+sunull nt=9 ntr=3 | sumiggbzo vfile=absent
+sunull nt=9 ntr=3 | sumiggbzo vfile=absent nz=8
+sunull nt=9 ntr=3 | sumiggbzo vfile=absent nz=8 dz=10
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null > short.bin && sunull nt=9 ntr=3 | sumiggbzo vfile=short.bin nz=8 dz=10
+sunull nt=9 ntr=3 | sumiggbzo vfile=absent nz=999999999999999999999 dz=10
+sunull nt=9 ntr=3 | sumiggbzo vfile=absent nz=8 dz=1e-310
+# Unknown parameters and repeated parameter precedence.
+[stderr] sunull nt=9 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=33 ntr=9 | sumiggbzo vfile=vel.bin nz=9 dz=10 dx=10 strange=1 verbose=1
+sunull nt=9 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && suspike nt=33 ntr=9 | sumiggbzo vfile=vel.bin nz=9 dz=5 dz=10 dx=10 amin=0 amax=0
+
+# Varying velocities exercise Hermite derivatives and all Runge-Kutta stages.
+makevel nx=29 nz=37 dx=12 dz=9 v000=1600 dvdx=0.3 dvdz=1.2 > vel.bin && suspike nt=193 ntr=29 dt=0.002 it1=35 ix1=15 | sumiggbzo vfile=vel.bin nz=37 dz=9 dx=12 bwh=45 fmin=10 fmax=55 amin=-50 amax=55
+makevel nx=41 nz=49 dx=10 dz=8 v000=1700 dvdx=-0.2 dvdz=0.5 vlens=250 xlens=200 zlens=150 dlens=200 tlens=100 > vel.bin && suplane nt=257 ntr=41 dt=0.002 npl=1 dip1=2 | sumiggbzo vfile=vel.bin nz=49 dz=8 dx=10 bwh=60 fmin=9 fmax=65 amin=-55 amax=65
+# Fractional samplings and inherited last-trace header fields.
+makevel nx=17 nz=19 dx=7.25 dz=6.5 v000=1450 dvdx=0.4 dvdz=0.8 > vel.bin && suspike nt=103 ntr=17 dt=0.003 it1=20 ix1=9 | sushw key=offset,cdp,delrt,f1 a=50,100,12,3 b=7,1,0,0 | sumiggbzo vfile=vel.bin nz=19 dz=6.5 dx=7.25 bwh=27 fmin=11 fmax=77 amin=-40 amax=50
+# Read parameters from a file; match the final command-line occurrence.
+printf 'nz=9\ndz=10\ndx=10\namin=-20\namax=30\nbwh=50\n' > mig.par && makevel nx=9 nz=9 v000=1500 > vel.bin && suspike nt=65 ntr=9 it1=10 | sumiggbzo par=mig.par vfile=vel.bin amax=40
+# Negative trace sampling is accepted and produces no beam centers.
+[stderr] makevel nx=9 nz=9 v000=1500 > vel.bin && suspike nt=33 ntr=9 | sumiggbzo vfile=vel.bin nz=9 dz=10 dx=-10 verbose=1

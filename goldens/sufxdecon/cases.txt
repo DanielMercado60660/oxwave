@@ -1,0 +1,88 @@
+# Default parameters, ordinary filtering, and explicitly specified defaults.
+suplane nt=256 ntr=20 | sufxdecon
+suplane nt=256 ntr=20 | sufxdecon dt=0.004 taper=0.1 fmin=6 fmax=75 twlen=1.02 ntrw=10 ntrf=4 verbose=0 tmpdir=
+# Non-power-of-two sample/trace counts, incomplete space windows, seeded noise.
+suplane nt=251 ntr=23 | suaddnoise seed=17 sn=4 | sufxdecon ntrw=7 ntrf=2 fmin=0 fmax=125
+suplane nt=257 ntr=11 | sufxdecon ntrw=10 ntrf=1
+# Compare every singular-row diagnostic across multiple time/space windows.
+[stderr] suplane nt=401 ntr=30 | sufxdecon twlen=0.4 taper=0.052 ntrw=10 ntrf=3
+# Full diagnostic stream, zero parameters, fallback header dt, short time window.
+[stderr] suplane nt=256 ntr=20 | sufxdecon verbose=1
+[stderr] suplane nt=101 ntr=3 | sufxdecon verbose=1 dt=0 taper=0 fmin=0 fmax=0 twlen=0 ntrw=0 ntrf=0
+[stderr] suplane nt=81 ntr=2 | sushw key=dt a=0 | sufxdecon verbose=1
+suplane nt=101 ntr=12 | sufxdecon ntrf=0
+# Degenerate sizes and no spatial windows produce zero output in C.
+sunull nt=1 ntr=1 | sufxdecon
+sunull nt=1 ntr=10 | sufxdecon
+suplane nt=101 ntr=1 | sufxdecon
+suplane nt=101 ntr=1 | sufxdecon ntrw=1 ntrf=0
+suplane nt=37 ntr=7 | sufxdecon
+# Empty/negative frequency band and zero filter length are distinct paths.
+suplane nt=101 ntr=20 | sufxdecon fmin=100 fmax=10
+suplane nt=101 ntr=20 | sufxdecon fmin=-10 fmax=-1
+suplane nt=101 ntr=20 | sufxdecon fmin=-10 fmax=30 ntrf=0
+[stderr] suplane nt=101 ntr=3 | sufxdecon twlen=-1 verbose=1
+# Named files, environment path, explicit empty path override, and cleanup.
+[stderr] suplane nt=101 ntr=2 | sufxdecon tmpdir=. verbose=1
+suplane nt=101 ntr=2 | CWP_TMPDIR=. sufxdecon
+suplane nt=101 ntr=2 | CWP_TMPDIR=/nonexistent/oxwave-sufxdecon sufxdecon tmpdir=
+suplane nt=101 ntr=2 | sufxdecon tmpdir=. > output.su; cat output.su; find . -name 'cmgui*' -print
+# Empty/malformed input, invalid path, parser overflow/underflow, FFT size error.
+[stderr] sufxdecon
+[stderr] printf bad | sufxdecon
+[stderr] suplane nt=101 ntr=2 | sufxdecon tmpdir=/nonexistent/oxwave-sufxdecon
+[stderr] suplane nt=101 ntr=2 | CWP_TMPDIR=/nonexistent/oxwave-sufxdecon sufxdecon
+[stderr] suplane nt=101 ntr=2 | sufxdecon ntrw=2147483648
+[stderr] suplane nt=101 ntr=2 | sufxdecon dt=1e-310
+[stderr] suplane nt=101 ntr=2 | sufxdecon twlen=2000
+# Unknown parameter diagnostics and repeated/empty getpar values.
+[stderr] suplane nt=101 ntr=2 | sufxdecon unknown=3
+[stderr] suplane nt=101 ntr=2 | sufxdecon verbose=2 taper= ntrw=3 ntrw=0
+printf 'ntrf=0\nfmin=0\nfmax=125\n' > params; suplane nt=101 ntr=12 | sufxdecon par=params
+# Negative sampling/taper values and non-default sampling from the header.
+[stderr] suplane nt=101 ntr=2 | sufxdecon dt=-0.004 verbose=1
+[stderr] suplane nt=101 ntr=2 | sufxdecon taper=-0.1 verbose=1
+[stderr] suplane nt=101 ntr=2 | sushw key=dt a=2000 | sufxdecon verbose=1
+# Exercise a one-trace spatial window and the solver's singular-matrix diagnostics.
+[stderr] suplane nt=151 ntr=1 | sufxdecon ntrw=1 ntrf=1
+[stderr] sunull nt=101 ntr=10 | sufxdecon fmin=6 fmax=7
+# Exercise intermediate temporal and spatial windows without a nonempty solve.
+[stderr] suplane nt=601 ntr=23 | sufxdecon twlen=0.4 taper=0.052 ntrw=7 ntrf=0 verbose=1
+# Filter-length parsing must fail before allocation or processing.
+[stderr] suplane nt=101 ntr=2 | sufxdecon ntrf=2147483648
+# Nonzero solves in first, intermediate, and final time/space windows.
+# Seeded noise keeps the autocorrelation nonzero even in otherwise quiet windows.
+[stderr] suplane nt=512 ntr=24 | suaddnoise seed=31 sn=3 | sufxdecon dt=0.004 twlen=0.8 taper=0.08 ntrw=8 ntrf=3 fmin=4 fmax=80 verbose=1
+suplane nt=601 ntr=23 | suaddnoise seed=19 sn=4 | sufxdecon twlen=0.4 taper=0.052 ntrw=7 ntrf=3
+# One spatial window with an incomplete tail, and a one-trace nonzero solve.
+suplane nt=251 ntr=15 | suaddnoise seed=23 sn=4 | sufxdecon ntrw=10 ntrf=4
+suplane nt=151 ntr=1 | suaddnoise seed=7 sn=3 | sufxdecon ntrw=1 ntrf=1
+# Explicit zero taper, frequency endpoints, and Nyquist processing.
+[stderr] suplane nt=401 ntr=21 | suaddnoise seed=29 sn=5 | sufxdecon taper=0 twlen=0.4 fmin=0 fmax=125 ntrw=6 ntrf=2 verbose=1
+[stderr] suplane nt=251 ntr=13 | suaddnoise seed=37 sn=4 | sufxdecon fmin=0 fmax=0 verbose=1
+suplane nt=251 ntr=13 | suaddnoise seed=41 sn=4 | sufxdecon fmin=125 fmax=125
+# Header sampling, preserved headers, and successful named-file filtering.
+[stderr] suplane nt=401 ntr=17 | suaddnoise seed=43 sn=4 | sushw key=dt,cdp,offset,d1 a=2000,123,-50,0.002 | sufxdecon twlen=0.3 taper=0.04 ntrw=5 ntrf=2 tmpdir=. verbose=1
+# Exactly singular matrices must emit every diagnostic and continue successfully.
+[stderr] sunull nt=101 ntr=10 | sufxdecon ntrw=10 ntrf=1 fmin=6 fmax=7 verbose=1
+# Controls for the singular case: an empty system or a band between FFT bins
+# produces zero samples without singular diagnostics, even for all-zero input.
+[stderr] sunull nt=101 ntr=10 | sufxdecon ntrw=10 ntrf=0 fmin=6 fmax=7 verbose=1
+[stderr] sunull nt=101 ntr=10 | sufxdecon ntrw=10 ntrf=1 fmin=6.3 fmax=6.4 verbose=1
+# Also check selfdoc with an explicit process wait: run_selfdoc can see EOF
+# before the child is reapable and incorrectly report an immediate timeout.
+# Keep @selfdoc unchanged; this independently compares the full stderr and exit.
+[stderr] python3 -c 'import os,pty,subprocess,sys; master,slave=pty.openpty(); child=subprocess.Popen(sys.argv[1:],stdin=slave,stdout=slave); os.close(slave); status=child.wait(timeout=10); os.close(master); sys.exit(status)' sufxdecon
+# This inventory regression also compares every singular-row diagnostic.
+# This covers the remaining failure whose inventory case omits stderr.
+[stderr] suplane nt=512 ntr=24 | sufxdecon dt=0.004 twlen=0.8 taper=0.08 ntrw=8 ntrf=3 fmin=4 fmax=80 verbose=0
+# H1 (audits/claude-wave3-misc.md): rounded time windows cross the end of the last trace.
+suplane nt=2064 ntr=12 | suaddnoise seed=3 sn=4 | sufxdecon twlen=0.3
+suplane nt=2976 ntr=12 | suaddnoise seed=3 sn=4 | sufxdecon twlen=0.3
+# M1 (audits/claude-wave3-misc.md): negative allocation dimensions must give C's error, not panic.
+[stderr] suplane nt=101 ntr=2 | sufxdecon ntrw=-3
+[stderr] suplane nt=101 ntr=2 | sufxdecon ntrf=-1
+# M2 (audits/claude-wave3-misc.md): slack is allowed for C's undersized pivot array.
+# Single spatial windows avoid the separate C negative-source-index path.
+suplane nt=151 ntr=3 | suaddnoise seed=7 sn=3 | sufxdecon ntrw=2 ntrf=5
+suplane nt=151 ntr=1 | suaddnoise seed=7 sn=3 | sufxdecon ntrw=1 ntrf=3

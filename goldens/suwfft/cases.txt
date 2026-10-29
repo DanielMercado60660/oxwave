@@ -1,0 +1,14 @@
+# Defaults, multiple traces, odd and singleton trace lengths.
+suplane nt=127 ntr=3 | suwfft
+suspike nt=1 ntr=1 | suwfft verbose=0
+suspike nt=17 ntr=1 | suwfft verbose=0 sign=-1 w0=0 w1=1 w2=0
+suplane nt=75 ntr=2 | suwfft verbose=0 w0=0.2 w1=2 w2=1.3
+suplane nt=64 ntr=1 | suwfft verbose=0 w0=-1 w1=2 w2=0
+# Seismic and non-seismic sampling interval and advisory messages.
+[stderr] suspike nt=32 ntr=1 | sushw key=dt a=0 | suwfft verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=trid,d1 a=130,0.002 | suwfft verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=trid,d1 a=130,0 | suwfft verbose=1
+# Invalid sign and missing input.
+suplane nt=32 ntr=1 | suwfft sign=0 verbose=0
+suplane nt=32 ntr=1 | suwfft sign=2 verbose=0
+suwfft verbose=0

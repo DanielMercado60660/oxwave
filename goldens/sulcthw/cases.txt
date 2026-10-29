@@ -1,0 +1,19 @@
+# Defaults, one sample and one trace.
+suspike nt=1 ntr=1 | sulcthw
+# Translation in each dimension with elevations and ancillary depth headers.
+suspike nt=7 ntr=3 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,gdel,sdel,swdep,gwdep a=123,-456,789,321,34,-45,10,20,-30,40,50 | sulcthw xt=12.5 yt=-3 zt=4
+# All rotations, mixed scalars, and changing coordinates.
+suspike nt=5 ntr=3 | sushw key=sx,sy,gx,gy,selev,gelev,scalco,scalel a=100,-200,300,400,50,-60,-100,10 b=10,20,-30,40,0,0,0,0 | sulcthw xr=10 yr=-20 zr=30
+# Each axis independently and zero coordinates.
+suspike nt=3 ntr=1 | sulcthw xr=90
+suspike nt=3 ntr=1 | sushw key=sx,selev a=-100,200 | sulcthw yr=45
+suspike nt=3 ntr=1 | sushw key=sx,sy a=100,50 | sulcthw zr=-90
+# Positive scalars and selected scalar differing between coordinates and elevations.
+suspike nt=9 ntr=2 | sushw key=sx,sy,gx,gy,selev,gelev,scalco,scalel a=100000,200000,-300000,400000,3,-5,100,1 | sulcthw xt=-1 zt=2
+# Verbose and unknown argument diagnostics.
+[stderr] suspike nt=1 ntr=1 | sulcthw verbose=1 unknown=3
+# Empty input and numeric parsing overflow.
+sulcthw xt=0
+sulcthw xt=1e999
+# Numeric parsing accepts invalid text as zero.
+suspike nt=1 ntr=1 | sulcthw xt=abc yt=0 zr=0

@@ -1,0 +1,21 @@
+# Required parameter, default trace count and sampling interval.
+sunull nt=7
+# Smallest and non-power-of-two trace sizes, explicit parameters.
+sunull nt=1 ntr=1 dt=0.0012345
+sunull nt=17 ntr=4 dt=0.008
+# Zero and negative values that have defined behavior.
+sunull nt=0 ntr=1
+sunull nt=3 ntr=0
+sunull nt=3 ntr=-1
+sunull nt=3 ntr=1 dt=0
+sunull nt=3 ntr=1 dt=-0.001
+# Bound check and missing or invalid required parameters.
+sunull nt=65536
+sunull
+sunull nt=
+sunull nt=abc ntr=1
+sunull nt=2147483648
+# No checkpars in the original; verbose and unknown arguments are ignored.
+sunull nt=3 ntr=1 verbose=1 unused=1
+# Last repeated argument wins.
+sunull nt=3 nt=5 ntr=2 dt=0.002 dt=0.003

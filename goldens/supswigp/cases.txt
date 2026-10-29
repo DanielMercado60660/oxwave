@@ -1,0 +1,24 @@
+# Strip variable PostScript metadata for deterministic comparisons.
+suspike ntr=5 nt=31 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=5 nt=31 | supswigp n2=5 d1=0.002 d2=2 f1=-0.1 f2=4 fill=-1 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=25 | supswigp ntr=3 verbose=1 title=Example | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=21 | sushw key=offset a=100 b=25 | supswigp key=offset verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=21 | sushw key=gelev,scalel a=100,-1 b=20,0 | supswigp key=gelev style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=21 | sushw key=sx,scalco a=100,1 b=10,0 | supswigp key=sx | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=15 | supswigp key=offset style=vsp tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=15 | supswigp style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=1 nt=1 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=19 | sushw key=trid,dt,d1 a=30,0,0 | supswigp d2=-2 f2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+supswigp </dev/null
+suspike ntr=2 nt=10 | supswigp key=badkey
+suspike ntr=2 nt=10 | supswigp tmpdir=/nonexistent/oxwave
+[stderr] suspike ntr=4 nt=21 | sushw key=offset a=100 b=25 | supswigp key=offset verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suspike ntr=3 nt=15 | supswigp key=offset style=vsp tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=23 | sushw key=ntr,dt,delrt,tracr a=3,2000,50,7 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=23 | sushw key=d1,d2,f1,f2 a=0.003,2,0.1,4 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=13 | env -u CWPROOT -u CWPBIN supswigp
+
+suspike ntr=4 nt=17 | env CWP_TMPDIR=. supswigp verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=17 | supswigp n2=4 ntr=2 style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=17 | sushw key=offset a=-100 b=50 | supswigp key=offset style=vsp fill=0 clip=2 label1=Time label2=Offset | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=11 | supswigp n2=2 d1=0 d2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

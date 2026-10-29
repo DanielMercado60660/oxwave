@@ -1,0 +1,11 @@
+# All three decoding branches with visible output and odd trace sizes.
+suplane nt=63 ntr=3 | supack2 | suunpack2
+suplane nt=63 ntr=3 | supack2 gpow=1 | suunpack2
+suplane nt=63 ntr=3 | supack2 gpow=0.7 | suunpack2
+suspike nt=1 ntr=1 | supack2 gpow=1 | suunpack2
+sunull nt=7 ntr=1 | supack2 | suunpack2
+suplane nt=31 ntr=2 | suaddnoise seed=123 | supack2 gpow=0.7 | suunpack2
+# The program has no parameters and does not call checkpars.
+suplane nt=7 ntr=1 | supack2 | suunpack2 verbose=1
+suunpack2
+suplane nt=7 ntr=1 | suunpack2

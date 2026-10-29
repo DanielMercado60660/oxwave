@@ -1,0 +1,19 @@
+# Strip volatile PostScript metadata for all successful plots.
+psgraph n=5 d1=1 d2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n=1 d1=1 d2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n=0 d1=1 d2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("6f",1,2,3,4,5,6))' | psgraph n=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("6f",1,2,3,4,5,6))' | psgraph n=3 pairs=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("3f",1,2,3))' | psgraph n=3 d1=0.5 f1=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("3f",1,2,3))' | psgraph n=3 d2=-0.5 f2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n1=3 n2=3 d1=1,2 d2=2,3 f1=-2 f2=1 reverse=1 mark=1,4,8 marksize=5 linewidth=2,0 linecolor=red,blue lineon=3 lineoff=2 linegray=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n=5 d1=1 d2=2 style=seismic xbox=2 ybox=1 wbox=4 hbox=5 x1beg=-1 x1end=6 x2beg=-2 x2end=10 d1num=1 f1num=0 n1tic=2 grid1=dot d2num=2 f2num=0 n2tic=3 grid2=dash label1=Distance label2=Time labelfont=Courier labelsize=12 title=Graph titlefont=Times-Bold titlesize=20 titlecolor=red axescolor=blue gridcolor=green axeswidth=2 ticwidth=3 gridwidth=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n=3 d1=1 d2=1 grid1=solid grid2=solid linegray=0.5 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psgraph n=3
+psgraph
+psgraph n=1 nplot=5001
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+python3 -c 'import math,struct,sys; sys.stdout.buffer.write(b"".join(struct.pack("2f",i*0.5,math.sin(i)*3+k) for k,n in enumerate((4,5,6)) for i in range(n)))' | psgraph nplot=3 n=4,5,6 mark=0,2,5 marksize=4 linecolor=red,green,blue x1beg=0.2 x1end=2 x2beg=-2 x2end=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("10f",-3,-120,-1,40,0.5,-7,2,300,4.25,-55))' | psgraph n=5 style=normal reverse=1 grid1=dot grid2=none | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("7f",12345,23000,9000.5,-4000,15000,250000,-125000))' | psgraph nplot=2 n=4,3 pairs=0 d1=0.25,2 f1=100,90 linewidth=0,1 mark=3,6 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

@@ -1,0 +1,14 @@
+# Raw IBM output for both byte orders, including zero, negative values and odd counts.
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=7f",0.0,-0.0,1.0,-1.0,0.125,123.5,-118.625))' | float2ibm outpar=count
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=5f",1.0,-2.0,0.0,1e-30,1e30))' | float2ibm endian=1 outpar=count
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | float2ibm endian=0 outpar=count
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6I",1,0x80000000,0x7f800000,0xff800000,0x7fc12345,0x007fffff))' | float2ibm endian=0 outpar=count
+# Test count output separately, including empty input and a partial final word.
+[exact] float2ibm outpar=count </dev/null >data; cat count
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes.fromhex("0000803f0102"))' | float2ibm outpar=count >data && cat count
+[stderr] float2ibm outpar=/dev/stderr </dev/null
+[stderr] float2ibm outpar=/dev/null verbose=1 </dev/null
+[stderr] float2ibm outpar=/dev/null unknown=1 </dev/null
+float2ibm </dev/null
+float2ibm outpar=/nonexistent-directory/count </dev/null
+float2ibm endian=999999999999999999999 outpar=/dev/null </dev/null

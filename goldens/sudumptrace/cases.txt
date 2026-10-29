@@ -1,0 +1,17 @@
+# Defaults, trace limits, headers, formats
+suspike ntr=5 nt=7 dt=0.004 | sudumptrace
+suspike ntr=3 nt=5 dt=0.002 | sushw key=offset,delrt a=-10,-25 b=5,0 | sudumptrace num=2 key=tracl,offset,delrt
+suspike ntr=2 nt=3 dt=0.004 | sudumptrace num=8 key=ns,dt hpf=1
+suspike ntr=1 nt=1 dt=0.004 | sudumptrace num=1 key=tracl hpf=-1 verbose=1
+suspike ntr=2 nt=3 dt=0.004 | sudumptrace num=0
+suspike ntr=2 nt=3 dt=0.004 | sudumptrace num=-1
+# Sample interval fallback and missing interval
+suspike ntr=1 nt=3 | sushw key=dt a=0 | sudumptrace dt=0.002
+suspike ntr=1 nt=3 | sushw key=dt a=0 | sudumptrace
+# Named temporary files and invalid directory
+suspike ntr=1 nt=3 | sudumptrace tmpdir=.
+suspike ntr=1 nt=3 | env CWP_TMPDIR=. sudumptrace key=tracl
+sudumptrace tmpdir=/no/such/directory
+# Empty input and unknown header
+sudumptrace num=1
+suspike ntr=1 nt=3 | sudumptrace key=notakey

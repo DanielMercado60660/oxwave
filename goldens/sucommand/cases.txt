@@ -1,0 +1,19 @@
+# Defaults, single trace and odd sample count.
+suplane nt=1 ntr=1 | sucommand
+suplane nt=13 ntr=5 | sucommand
+# Each group is processed by a separate shell command.
+suplane nt=7 ntr=5 | sucommand key=tracl command='sugain scale=2'
+[stderr] suplane nt=7 ntr=5 | sucommand key=tracl command='suop nop' verbose=1
+[stderr] suplane nt=7 ntr=5 | sucommand key=tracl dir=1 verbose=1
+[stderr] suplane nt=7 ntr=5 | sucommand key=tracl dir=-1 verbose=1
+[stderr] suplane nt=7 ntr=5 | sucommand key=cdp dir=1 verbose=1
+[stderr] suplane nt=7 ntr=5 | sushw key=cdp a=3 b=-1 | sucommand dir=-1 verbose=1
+[stderr] suplane nt=7 ntr=5 | sucommand key=tracl dir=2 verbose=1
+# Child command can emit text or fail; its exit status is ignored.
+[exact] suplane nt=3 ntr=3 | sucommand key=tracl command='sugethw key=tracl'
+suplane nt=3 ntr=1 | sucommand command='false'
+# Parameter and input errors.
+sucommand key=notakey
+sucommand verbose=999999999999999999999
+sucommand </dev/null
+suplane nt=3 ntr=1 | sucommand bogus=1

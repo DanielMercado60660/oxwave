@@ -1,0 +1,82 @@
+# Compressed output has one binary mode: compare every byte, including headers.
+# Defaults and explicit defaults; stderr includes quantizer and coder diagnostics.
+[exact] [stderr] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=32 n2=4
+[exact] [stderr] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=32 n2=4 nfilter1=11 nfilter2=11 nstage1=3 nstage2=2 error=0.01
+[exact] [stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | wptcomp n1=31 n2=5 nfilter1=11 nfilter2=11 nstage1=2 nstage2=1 error=0.05
+# Degenerate dimensions, both padding directions, and all automatic stage branches.
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=1 n2=1
+[exact] [stderr] sunull nt=1 ntr=7 | sustrip outpar=/dev/null | wptcomp n1=1 n2=7
+[exact] [stderr] sunull nt=7 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=7 n2=1
+[exact] [stderr] suplane nt=2 ntr=2 | sustrip outpar=/dev/null | wptcomp n1=2 n2=2
+[exact] [stderr] suplane nt=3 ntr=3 | sustrip outpar=/dev/null | wptcomp n1=3 n2=3
+[exact] [stderr] suplane nt=17 ntr=33 | sustrip outpar=/dev/null | wptcomp n1=17 n2=33
+# Explicit stages, including copying with no transform and full decomposition.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=0 nstage2=0
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=1 nstage2=0
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=0 nstage2=1
+[exact] [stderr] suspike nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=4 nstage2=3
+# Alternate filters at the low, middle, and high ends of the table.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=0 nfilter2=1
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=4 nfilter2=9
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=10 nfilter2=14
+# Error values and seeded nontrivial data exercise prefix, RLE, and Huffman coding.
+[exact] [stderr] sunull nt=32 ntr=8 | suaddnoise seed=37 | sustrip outpar=/dev/null | wptcomp n1=32 n2=8 error=0.001
+[exact] [stderr] sunull nt=32 ntr=8 | suaddnoise seed=37 | sustrip outpar=/dev/null | wptcomp n1=32 n2=8 error=0.5
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 error=0
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 error=-0.1
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 error=abc
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 verbose=1 unknown=3
+# Last occurrence wins and parameter files supply defaults.
+[exact] [stderr] suplane nt=8 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=3 n1=8 n2=4 nfilter1=0 nfilter1=11
+[exact] [stderr] printf 'n1=8 n2=4 nstage1=1 nstage2=0 error=0.1\n' > settings.par; suplane nt=8 ntr=4 | sustrip outpar=/dev/null | wptcomp par=settings.par
+# Required and invalid numeric parameters: preserve complete error messages.
+[stderr] wptcomp
+[stderr] wptcomp n2=4
+[stderr] wptcomp n1=4
+[stderr] wptcomp n1= n2=4
+[stderr] wptcomp n1=4 n2=
+[stderr] wptcomp n1=2147483648 n2=4
+[stderr] wptcomp n1=4 n2=4 error=1e-310
+[stderr] wptcomp n1=4 n2=4 nstage1=2147483648
+# Empty and short input: C ignores fread counts (uninitialized data may be unstable).
+[exact] [stderr] wptcomp n1=8 n2=4
+[exact] [stderr] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=8 n2=4
+# Unsupported filters fault when used, but remain harmless in a copied dimension.
+[exact] [stderr] sunull nt=4 ntr=4 | sustrip outpar=/dev/null > input.bin; exec wptcomp n1=4 n2=4 nfilter1=15 < input.bin
+[exact] [stderr] sunull nt=4 ntr=4 | sustrip outpar=/dev/null > input.bin; exec wptcomp n1=4 n2=4 nfilter2=15 < input.bin
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=1 n2=1 nfilter1=15 nfilter2=15
+
+# Every supported filter identifier is usable independently in each direction.
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=0 nfilter2=14 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=1 nfilter2=13 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=2 nfilter2=12 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=3 nfilter2=11 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=4 nfilter2=10 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=5 nfilter2=9 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=6 nfilter2=8 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=7 nfilter2=7 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=8 nfilter2=6 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=9 nfilter2=5 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=10 nfilter2=4 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=11 nfilter2=3 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=12 nfilter2=2 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=13 nfilter2=1 error=0.1
+[exact] [stderr] sunull nt=16 ntr=8 | suaddnoise seed=43 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nfilter1=14 nfilter2=0 error=0.1
+# A stage beyond the dimension power returns without transforming.
+[exact] [stderr] sunull nt=4 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=4 n2=4 nstage1=3
+[exact] [stderr] sunull nt=4 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=4 n2=4 nstage2=3
+# Nonpositive dimensions loop forever in C: bound the probe and compare termination.
+[exact] [stderr] { wptcomp n1=0 n2=1 & wp=$!; sleep 0.05; kill "$wp"; wait "$wp"; } 2>/dev/null
+[exact] [stderr] { wptcomp n1=1 n2=0 & wp=$!; sleep 0.05; kill "$wp"; wait "$wp"; } 2>/dev/null
+[exact] [stderr] { wptcomp n1=-1 n2=1 & wp=$!; sleep 0.05; kill "$wp"; wait "$wp"; } 2>/dev/null
+[exact] [stderr] { wptcomp n1=1 n2=-1 & wp=$!; sleep 0.05; kill "$wp"; wait "$wp"; } 2>/dev/null
+
+# Negative stages are C undefined behavior; Rust rejection is covered by the
+# subprocess unit test reject_negative_stages, rather than a C-output golden.
+# Only the final occurrence is used, so an overridden negative stage is valid.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=-1 nstage1=0 nstage2=3
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=4 nstage2=-1 nstage2=0
+# Numeric underflow/overflow fails in getpar before stage validation.
+[stderr] wptcomp n1=16 n2=8 nstage1=-2147483649
+[stderr] wptcomp n1=16 n2=8 nstage2=-2147483649
+[stderr] wptcomp n1=16 n2=8 nstage2=2147483648

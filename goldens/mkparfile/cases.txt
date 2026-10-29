@@ -1,0 +1,16 @@
+# Default names, one row, zero and negative values.
+printf '0 -1\n' | mkparfile
+# Both names, odd number of rows, and float formatting.
+printf '1.23456789 2000\n-2.5 0.0000123\n3 4\n' | mkparfile string1=tnmo string2=vnmo
+printf '1 2\n' | mkparfile string1=first
+printf '1 2\n' | mkparfile string2=second
+printf '1 2\n' | mkparfile string1= string2=
+# Whitespace, ignored extra columns, and no final newline.
+printf '  1\t2 99\n3 4' | mkparfile
+# Empty input and malformed first and later lines.
+printf '' | mkparfile
+printf 'bad\n' | mkparfile
+printf '1 2\n3\n' | mkparfile
+printf '1 2\n\n' | mkparfile
+[stderr] printf '1 2\n' | mkparfile verbose=1
+[stderr] printf '1 2\n' | mkparfile unknown=1

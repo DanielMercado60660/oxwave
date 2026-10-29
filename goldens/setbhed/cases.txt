@@ -1,0 +1,13 @@
+# The program writes its header to a file; expose it for byte comparison.
+[exact] setbhed && cat binary
+[exact] setbhed bfile=out jobid=123456 lino=-123456 reno=17 ntrpr=3 nart=4 hdt=2000 dto=4000 hns=7 nso=9 format=5 fold=2 tsort=3 vscode=4 hsfs=10 hsfe=11 hslen=12 hstyp=13 schn=14 hstas=15 hstae=16 htatyp=17 hcorr=18 bgrcv=19 rcvm=20 mfeet=21 polyt=22 vpol=23 && cat out
+[exact] setbhed jobid=-2147483648 lino=2147483647 ntrpr=65535 nart=-32769 hdt=-1 dto=65536 hns=1 nso=0 format=-2 vpol=99999 && cat binary
+[exact] printf 'jobid=7 hns=3 hdt=500 format=5\n' > params && setbhed par=params jobid=8 && cat binary
+[stderr] setbhed verbose=1 unknown=2
+[stderr] setbhed bfile=/missing-directory/binary
+[stderr] setbhed jobid=2147483648
+[exact] setbhed jobid=abc hns= format=-1 && cat binary
+# Repeated parameters and file failures.
+[exact] printf 'jobid=3\n' > params && setbhed par=params jobid=4 jobid=5 bfile=out && cat out
+[stderr] setbhed bfile=
+[stderr] setbhed par=missing-params

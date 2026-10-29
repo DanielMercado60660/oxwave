@@ -1,0 +1,113 @@
+# Deterministic signed reflectivity, with a nonzero free surface and dt=5 ms.
+# Exercise all surface/buried source and receiver branches and both parities.
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=1 pV=1 verbose=0
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=12 l=1 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=2 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=3 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=4 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=5 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=4 l=2 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=5 l=2 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=2 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=3 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=8 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=9 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=3 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=12 l=3 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=9 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=9 pV=1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=12 l=1 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=2 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=3 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=4 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=5 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=4 l=2 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=5 l=2 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=2 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=3 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=8 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=9 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=3 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=12 l=3 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=9 pV=-1 tmax=17
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=9 pV=-1 tmax=17
+# Defaults for tmax: inside, on, and below the bottom interface.
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 l=1
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=3 l=2
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=8 l=5
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=9 l=2
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=12 l=3
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=1 l=9
+# One output sample, empty output trace, verbose stderr, unknown arguments.
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=1
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=1 k=2 l=3
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=0
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=0 k=12 l=3
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=3 k=8 l=9
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud verbose=1 k=3 l=3
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud verbose=-1 pV=-1 k=12 l=3
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud unused=99
+printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2 k=3 l=2
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k= l= pV= tmax= verbose=
+# Sparse and zero polynomials, odd input lengths, single trace processing.
+sunull nt=7 ntr=1 | sugoupillaud 
+sunull nt=7 ntr=1 | sugoupillaud k=2
+sunull nt=7 ntr=1 | sugoupillaud k=6
+sunull nt=7 ntr=1 | sugoupillaud k=9 l=3
+sunull nt=7 ntr=1 | sugoupillaud k=2 l=4
+sunull nt=7 ntr=1 | sugoupillaud k=3 l=3 pV=-1
+suspike nt=15 ntr=1 nspk=1 ix1=1 it1=6 | sugain scale=0.25 | sugoupillaud tmax=19
+sunull nt=5 ntr=3 | sugoupillaud
+# Minimum valid model and exact reflection coefficient bounds.
+printf -- '0.5 0.25\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud 
+printf -- '0.5 0.25\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2
+printf -- '0.5 0.25\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=3 l=2 pV=-1 tmax=5
+printf -- '0.5 0.25\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2 l=2 tmax=3
+printf -- '-1 1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud 
+printf -- '-1 1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2
+printf -- '-1 1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=3 l=2 pV=-1 tmax=5
+printf -- '-1 1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2 l=2 tmax=3
+printf -- '1 -1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud 
+printf -- '1 -1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2
+printf -- '1 -1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=3 l=2 pV=-1 tmax=5
+printf -- '1 -1\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud k=2 l=2 tmax=3
+# Input and parameter errors (including validation order).
+[stderr] sugoupillaud
+[stderr] sunull nt=1 ntr=1 | sugoupillaud
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=0
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=-3
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud l=0
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud l=-2
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud l=10
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud tmax=-1
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud pV=0
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud pV=2
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud pV=-2
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=0 l=0 tmax=-1 pV=0
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud k=2147483648
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud l=abc
+[stderr] printf -- '0.8 0.1 -0.2 0.3 -0.1 0.05 0.2 -0.15 0.1\n' | a2b n1=9 | suaddhead ns=9 | sushw key=dt a=5000 | sugoupillaud pV=abc
+[stderr] printf -- '0 1.01\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud
+[stderr] printf -- '-1.01 0.2\n' | a2b n1=2 | suaddhead ns=2 | sugoupillaud
+# Sparse model with nonzero first interface: successful polynomial recursion.
+suspike nt=15 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud tmax=19
+suspike nt=15 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud k=5 l=3 pV=-1 tmax=19
+suspike nt=7 ntr=3 nspk=2 ix1=1 it1=2 ix2=2 it2=3 | sugain scale=0.3 | sugoupillaud
+# One-interface zero reflectivity does not reverse the zero polynomial at surface.
+sunull nt=2 ntr=1 | sugoupillaud
+sunull nt=2 ntr=1 | sugoupillaud k=4
+[stderr] sunull nt=2 ntr=1 | sugoupillaud k=2 l=2
+# Header preservation and parity delay overwrite.
+printf -- '0.5 0.2 -0.3 0.1 0.2\n' | a2b n1=5 | suaddhead ns=5 | sushw key=dt,delrt,trid,fldr,offset a=3999,123,5,7,-300 | sugoupillaud k=2
+printf -- '0.5 0.2 -0.3 0.1 0.2\n' | a2b n1=5 | suaddhead ns=5 | sushw key=dt,delrt,trid,fldr,offset a=3999,123,5,7,-300 | sugoupillaud k=3

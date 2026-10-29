@@ -1,0 +1,16 @@
+[package]
+name = "sumigpreffd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sumigpreffd"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

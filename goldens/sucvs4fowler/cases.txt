@@ -1,0 +1,11 @@
+# Defaults, single trace, and odd sample counts
+[stderr] suplane nt=31 ntr=1 | sushw key=cdp a=1 | sucvs4fowler ncdps=1
+[stderr] suplane nt=1 ntr=1 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=7
+# Multiple gathers and offsets, mute and both tapers
+[stderr] suplane nt=101 ntr=9 | sushw key=cdp a=1 b=1 j=3 | sushw key=offset a=0 b=80 | sucvs4fowler ncdps=3 nvstack=9 mxfold=4 vminstack=1700 vhyp=2200 lmute=7 lbtaper=20 lstaper=2 dtout=0.003 salias=0.5 nonhyp=1
+[stderr] suplane nt=63 ntr=4 | sushw key=cdp a=1 | sushw key=offset a=30 b=30 | sucvs4fowler ncdps=1 nvstack=8 nonhyp=0 salias=2 lmute=0 verbose=1
+# Error paths and zero/negative options
+sucvs4fowler ncdps=1
+suplane nt=32 ntr=1 | sucvs4fowler nvstack=8
+suplane nt=32 ntr=3 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=8 mxfold=1
+[stderr] suplane nt=31 ntr=1 | sucvs4fowler ncdps=0 nvstack=7 lmute=-1 nonhyp=0

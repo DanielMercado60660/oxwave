@@ -1,0 +1,17 @@
+# Raw bytes exercise the default float size and explicit odd dimensions.
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp n1=3 n2=2
+[exact] printf 'abcdefghijklmnopqrstuvwx' > in.bin && transp n1=3 < in.bin
+[exact] printf 'abcdefghijklmno' | transp n1=5 n2=3 nbpe=1
+[exact] [stderr] printf 'abcdefghijklmnopqrstuvwx' | transp n1=2 n2=3 nbpe=4 verbose=1
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp n1=3 n2=2 nbpe=4 | transp n1=2 n2=3 nbpe=4
+[exact] printf 'abcdef' | transp n1=1 n2=3 nbpe=2
+[exact] printf 'abcdef' | transp n1=3 n2=1 nbpe=2
+[exact] printf 'abcdefghijklmnopqr' | transp n1=3 n2=2 nbpe=3
+[stderr] transp n2=1 </dev/null
+[stderr] printf 'abcd' | transp n1=1
+[stderr] printf 'abcd' | transp n1=2 n2=1
+[stderr] transp n1=-1 n2=1 </dev/null
+[exact] transp n1=0 n2=1 </dev/null
+[exact] transp n1=1 n2=0 </dev/null
+[exact] transp n1=1 n2=1 nbpe=0 </dev/null
+[stderr] transp n1=1 n2=1 extra=1 </dev/null

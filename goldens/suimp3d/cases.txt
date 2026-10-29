@@ -1,0 +1,19 @@
+# Default trace and explicit non-default geometry, including all coordinates and steps.
+suimp3d
+suimp3d nt=199 nshot=2 nrec=3 c=1800 dt=0.002 x0=80 y0=30 z0=100 sxmin=-20 symin=10 szmin=5 gxmin=25 gymin=-10 gzmin=20 dsx=-12 dsy=7 dsz=4 dgx=13 dgy=8 dgz=-3
+# Direct arrival and signed offsets along each axis.
+suimp3d nt=127 nrec=3 dir=1 gxmin=20 dgx=10
+suimp3d nt=71 nshot=2 nrec=3 dsx=0 dsy=-10 dgx=0 dgy=15 gymin=25
+suimp3d nt=73 nshot=2 nrec=3 dsx=0 dsz=10 dgx=0 dgz=15 gzmin=25
+suimp3d nt=1 nrec=1
+suimp3d nt=0
+suimp3d nt=-1
+suimp3d nt=32 dt=0
+suimp3d nt=32 c=0
+suimp3d nt=32 c=0 dir=1 gxmin=20
+suimp3d nt=32 dir=2
+suimp3d nshot=0
+suimp3d nrec=-1
+suimp3d nt=65535
+suimp3d nt=999999999999999999999
+suimp3d nt=64 verbose=1 unknown=1

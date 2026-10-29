@@ -1,0 +1,58 @@
+# Required parameters, in the order the original requests them.
+[stderr] sumigpreffd
+[stderr] sumigpreffd nz=3
+[stderr] sumigpreffd nz=3 nxo=5
+[stderr] sumigpreffd nz=3 nxo=5 nxshot=1
+[stderr] sumigpreffd nz=3 nxo=5 nxshot=1 dz=10
+[stderr] sumigpreffd nz= nxo=5 nxshot=1 dz=10 vfile=v
+[stderr] sumigpreffd nz=2147483648
+[stderr] sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=missing
+[stderr] sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=
+# Empty stdin after a complete, native-endian velocity model.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=v
+# Defaults; the only output mode is migrated SU traces.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=63f",*([1500.0]*63)))'; suspike nt=64 ntr=9 | sushw key=sx,gx a=0,0 b=0,25 | sumigpreffd nz=7 nxo=9 nxshot=1 dz=10 dx=25 vfile=v
+# All optional values explicitly set to their actual C defaults (f1/f2 differ from selfdoc).
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=63f",*([1500.0]*63)))'; suspike nt=64 ntr=9 | sushw key=sx,gx a=0,0 b=0,25 | sumigpreffd nz=7 nxo=9 nxshot=1 dz=10 dx=25 dt=0.004 vfile=v fmax=25 f1=10 f2=20 f3=40 f4=50 lpad=9999 rpad=9999 dip=45 verbose=0
+# Odd time, trace and depth dimensions, variable velocity, nondefault frequency window and dip=65.
+[stderr] python3 -c 'import struct; a=[1500+50*x+20*z for z in range(11) for x in range(9)]; open("v","wb").write(struct.pack("=99f",*a))'; suplane nt=65 ntr=9 | sushw key=sx,gx a=0,0 b=0,25 | sumigpreffd nz=11 nxo=9 nxshot=1 dz=12.5 dx=25 dt=0.005 vfile=v fmax=30 f1=6 f2=18 f3=44 f4=60 dip=65 verbose=1
+# Verbose=2 exposes gather, aperture and frequency bookkeeping.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=35f",*([1800.0]*35)))'; suspike nt=96 ntr=5 | sushw key=sx,gx a=25,0 b=0,25 | sumigpreffd nz=5 nxo=7 nxshot=1 dz=8 dx=25 vfile=v verbose=2
+# Header d2 and dt; omitted dx and dt use the first trace.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=35f",*([1500.0]*35)))'; suspike nt=64 ntr=5 dt=0.002 | sushw key=sx,gx,d2 a=0,0,25 b=0,25,0 | sumigpreffd nz=5 nxo=7 nxshot=1 dz=10 vfile=v verbose=1
+# Both header sampling intervals unset; warning paths and dx=1 default.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; suspike nt=64 ntr=5 | sushw key=dt,d2,sx,gx a=0,0,0,0 b=0,0,0,1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=v verbose=1
+# Single input trace; full aperture still provides >=3 samples to fdmig.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=25f",*([1600.0]*25)))'; suspike nt=63 ntr=1 nspk=1 ix1=1 it1=16 | sumigpreffd nz=5 nxo=5 nxshot=1 dz=10 dx=25 vfile=v
+# nt=1: short wavelet avoids the original's negative wavelet-buffer indices.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=3f",1500,1500,1500))'; sunull nt=1 ntr=1 | sumigpreffd nz=1 nxo=3 nxshot=1 dz=10 dx=25 vfile=v fmax=1000 f1=0 f2=125 f3=125 f4=125
+# Minimum well-defined finite-difference aperture is three columns.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=9f",*([1500.0]*9)))'; suspike nt=64 ntr=3 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=3 nxshot=1 dz=10 dx=25 vfile=v
+# Zero padding and asymmetric aperture; source lies inside the aperture.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=3 | sushw key=sx,gx a=50,0 b=0,25 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v lpad=0 rpad=0 verbose=2
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=4 | sushw key=sx,gx a=50,0 b=0,25 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v lpad=1 rpad=2
+# Positive and negative scalco, including nonzero sy/gy radial mapping.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=35f",*([1500.0]*35)))'; suspike nt=64 ntr=5 | sushw key=sx,gx,scalco a=0,0,5 b=0,5,0 | sumigpreffd nz=5 nxo=7 nxshot=1 dz=10 dx=25 vfile=v
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=35f",*([1500.0]*35)))'; suspike nt=64 ntr=5 | sushw key=sx,gx,scalco a=0,0,-10 b=0,250,0 | sumigpreffd nz=5 nxo=7 nxshot=1 dz=10 dx=25 vfile=v
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=5 | sushw key=sx,sy,gx,gy,scalco a=-30,-40,0,0,1 b=0,0,15,20,0 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v verbose=2
+# Two shots: retain the original gather-boundary read order.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=8 | sushw key=sx,gx a=0,0 b=0,25 c=50,0 j=4,4 | sumigpreffd nz=5 nxo=9 nxshot=2 dz=10 dx=25 vfile=v verbose=2
+# Zero-valued source parameters have private ricker fallbacks.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=25f",*([1500.0]*25)))'; suspike nt=64 ntr=5 | sushw key=gx a=0 b=25 | sumigpreffd nz=5 nxo=5 nxshot=1 dz=10 dx=25 vfile=v fmax=0
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sunull nt=64 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 dx=25 dt=0 vfile=v
+# Zero and negative dz, negative dip option, DC frequency, null traces.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sunull nt=64 ntr=5 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=0 dx=25 vfile=v dip=-1
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; suspike nt=64 ntr=5 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=-10 dx=25 vfile=v f1=0 f2=15 f3=40 f4=60
+# Unknown argument warning occurs after header sampling parameters have been read.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sunull nt=64 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 dx=25 vfile=v unexpected=3 verbose=1
+# Source and receiver ordering errors (before entering the FFT/migration).
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sunull nt=64 ntr=2 | sushw key=sx,gx a=25,0 b=-25,25 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 dx=25 vfile=v
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15)))'; sunull nt=64 ntr=2 | sushw key=sx,gx a=0,25 b=0,-25 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 dx=25 vfile=v
+# Seventeen columns require spatial FFT padding; 257 time samples also pad.
+[stderr] python3 -c 'import struct; a=[1200+45*x+13*z for z in range(33) for x in range(17)]; open("v","wb").write(struct.pack("=561f",*a))'; suspike nt=257 ntr=17 | suaddnoise seed=302 sn=5 | sushw key=sx,gx a=200,0 b=0,25 | sumigpreffd nz=33 nxo=17 nxshot=1 dz=9 dx=25 vfile=v fmax=22 f1=3 f2=8 f3=55 f4=70 dip=65
+# Even aperture and a strong lateral velocity contrast exercise both fdmig dip branches.
+[stderr] python3 -c 'import struct; a=[1000+100*x+5*z for z in range(21) for x in range(16)]; open("v","wb").write(struct.pack("=336f",*a))'; suplane nt=128 ntr=16 | sushw key=sx,gx a=175,0 b=0,25 | sumigpreffd nz=21 nxo=16 nxshot=1 dz=7.5 dx=25 vfile=v fmax=35 f1=0 f2=15 f3=65 f4=95 dip=45
+# Nonzero sy/gy with increasing radial distance (3-4-5 geometry).
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=5 | sushw key=sx,sy,gx,gy,scalco a=30,40,0,0,1 b=0,0,20,15,0 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v verbose=2
+# A source left of zero tests the sign branch in radial coordinate mapping.
+[stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=5 | sushw key=sx,sy,gx,gy a=-40,-30,0,0 b=0,0,20,15 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v

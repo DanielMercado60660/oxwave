@@ -1,0 +1,17 @@
+# Default, odd length, and one trace
+suplane nt=31 ntr=1 | suzerophase
+suspike nt=1 ntr=1 | suzerophase t0=0
+suspike nt=101 ntr=3 | suzerophase t0=0.012
+suplane nt=75 ntr=2 | suzerophase t0=-0.01
+# Header interval, nonseismic interval, and explicit or fallback dt
+suplane nt=40 ntr=2 | sushw key=dt a=0 | suzerophase dt=0.002 t0=0.01
+suplane nt=40 ntr=1 | sushw key=dt a=0 | suzerophase t0=0
+suplane nt=40 ntr=1 | sushw key=trid,d1 a=110,0.002 | suzerophase t0=0.01
+[stderr] suplane nt=32 ntr=1 | suzerophase verbose=1
+[stderr] suplane nt=32 ntr=1 | sushw key=dt a=0 | suzerophase verbose=1 t0=0
+[stderr] suplane nt=32 ntr=1 | sushw key=trid,d1 a=110,0.002 | suzerophase verbose=1
+# Error exits
+suzerophase </dev/null
+suplane nt=32 ntr=1 | suzerophase t0=1e999
+suplane nt=32 ntr=1 | sushw key=dt a=0 | suzerophase dt=-0.002 t0=0.01
+sunull nt=65535 ntr=1 | suzerophase

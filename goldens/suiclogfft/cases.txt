@@ -1,0 +1,16 @@
+# Signs, centering, small and non-power-of-two inputs
+suspike nt=1 ntr=1 | suclogfft | suiclogfft
+suspike nt=31 ntr=1 | suclogfft | suiclogfft sign=1
+suspike nt=63 ntr=3 | suclogfft | suiclogfft sym=1
+suspike nt=37 ntr=2 | suclogfft | suiclogfft sym=-1 sign=-1
+# Sampling fallbacks and shifted start time
+suspike nt=32 | suclogfft | sushw key=d1,dt,delrt a=0,2000,10 | suiclogfft sym=1
+suspike nt=32 | suclogfft | sushw key=d1,dt a=0,0 | suiclogfft
+suspike nt=32 | suclogfft | suiclogfft verbose=1
+# Invalid sign, invalid trace type, empty input
+suspike nt=32 | suclogfft | suiclogfft sign=0
+suspike nt=32 | suclogfft | suiclogfft sign=2
+suspike nt=32 | suiclogfft
+suiclogfft
+suspike nt=127 ntr=2 | suaddnoise seed=17 sn=2 | suclogfft | suiclogfft
+suspike nt=125 ntr=2 | suaddnoise seed=42 sn=3 | suclogfft | suiclogfft sign=1 sym=1

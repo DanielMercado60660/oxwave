@@ -1,0 +1,21 @@
+# Cargo workspace for OxWave phase 2 integrations.
+# Separate from the main OxWave workspace (../Cargo.toml); depends on the frozen
+# ../crates/oxwave-core by path. `py` needs a Python interpreter: build it only
+# through maturin (tools/build_ext.py).
+[workspace]
+resolver = "2"
+members = ["py"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "BSD-3-Clause"
+publish = false
+
+[workspace.dependencies]
+oxwave-core = { path = "../crates/oxwave-core" }
+pyo3 = { version = "=0.30.1", features = ["extension-module", "abi3-py310"] }
+
+[profile.release]
+opt-level = 3
+debug = false

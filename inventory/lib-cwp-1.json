@@ -1,0 +1,70 @@
+{
+  "scope": "cwp/lib part 1 of 3",
+  "functions": [
+    {
+      "name": "abelalloc",
+      "file": "cwp/lib/abel.c",
+      "signature": "void *abelalloc (int n);",
+      "purpose": "Allocate an Abel transformer and precompute its coefficients.",
+      "calls": ["alloc2float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Coefficient loops use float intermediates and double-valued constants and pow; cancellation can affect coefficients.",
+      "c_lines": 57,
+      "difficulty": "medium",
+      "group": "abel",
+      "license_note": ""
+    },
+    {
+      "name": "abelfree",
+      "file": "cwp/lib/abel.c",
+      "signature": "void abelfree (void *at);",
+      "purpose": "Free an Abel transformer and its coefficient arrays.",
+      "calls": ["free2float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic.",
+      "c_lines": 7,
+      "difficulty": "easy",
+      "group": "abel",
+      "license_note": ""
+    },
+    {
+      "name": "abel",
+      "file": "cwp/lib/abel.c",
+      "signature": "void abel (void *at, float f[], float g[]);",
+      "purpose": "Compute the Abel transform using a precomputed transformer.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Preserve the recurrence, traversal order and float accumulation order; input and output may alias.",
+      "c_lines": 32,
+      "difficulty": "medium",
+      "group": "abel",
+      "license_note": ""
+    },
+    {
+      "name": "antialias",
+      "file": "cwp/lib/antialias.c",
+      "signature": "void antialias (float frac, int phase, int n, float p[], float q[]);",
+      "purpose": "Apply a Butterworth anti-alias filter before subsampling.",
+      "calls": ["bfdesign", "bflowpass", "alloc1float", "free1float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Recursive filtering and the forward-reverse zero-phase path depend on operation order and float rounding.",
+      "c_lines": 48,
+      "difficulty": "medium",
+      "group": "butterworth",
+      "license_note": ""
+    },
+    {
+      "name": "hilbert",
+      "file": "cwp/lib/hilbert.c",
+      "signature": "void hilbert (int n, float x[], float y[]);",
+      "purpose": "Approximate the Hilbert transform by convolution with a windowed filter.",
+      "calls": ["convolve_cwp"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Filter coefficients use cos and float storage; convolution accumulation order affects results. The filter is initialized in static mutable state.",
+      "c_lines": 18,
+      "difficulty": "medium",
+      "group": "hilbert",
+      "license_note": ""
+    }
+  ]
+}

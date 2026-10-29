@@ -1,0 +1,28 @@
+# Defaults and odd trace sizes
+sunull nt=1 ntr=1 dt=0.004 | supickamp d2=1 outpar=/dev/null
+suspike nt=37 ntr=3 dt=0.004 it=8 | supickamp d2=-2 x2beg=3 tmin=0.01 verbose=0 outpar=/dev/null
+# Pick fields and interpolation
+suplane nt=75 ntr=5 | supickamp d2=1 x_above=0,4 t_above=0.01,0.03 wl=0.04 dt_resamp=0.001 arg1=min arg2=tmin outpar=/dev/null
+suplane nt=75 ntr=5 | supickamp d2=1 x_above=4,0 t_above=0.03,0.01 arg1=abs arg2=tabs verbose=0 outpar=/dev/null
+suplane nt=75 ntr=5 | supickamp d2=1 arg1=energy arg2=tmax verbose=0 outpar=/dev/null
+suplane nt=75 ntr=5 | supickamp d2=1 arg1=i2 arg2=max format=binary verbose=0 outpar=/dev/null
+# Trace headers and verbose output files
+sunull nt=9 ntr=3 dt=0.004 | sushw key=offset,delrt a=10,20 b=5,0 | supickamp key=offset verbose=1 outpar=report > /dev/null; cat report
+sunull nt=9 ntr=2 dt=0.004 | supickamp d2=1 verbose=2 format=binary outpar=report > /dev/null; cat report
+# Window files
+printf '0.004 0\n0.008 2\n' > above; printf '0.020 0\n0.024 2\n' > below; suplane nt=32 ntr=3 | supickamp d2=1 t_xabove=above t_xbelow=below verbose=0 outpar=/dev/null
+# The original uses the lower file's count for the upper interpolation too.
+printf '0.004 0\n0.008 2\n0.016 4\n' > above; printf '0.020 0\n0.024 2\n' > below; suplane nt=32 ntr=5 | supickamp d2=1 t_xabove=above t_xbelow=below verbose=0 outpar=/dev/null
+printf '0.004 0\n0.008 2\n' > above; suplane nt=32 ntr=3 | supickamp d2=1 t_xabove=above wl=0.02 verbose=0 outpar=/dev/null
+printf '0.004 0\n0.008 2\n' > above; suplane nt=32 ntr=3 | supickamp d2=1 t_xabove=above verbose=0 outpar=/dev/null
+# Errors
+supickamp
+supickamp d2=0 outpar=/dev/null
+supickamp d2=1 x_above=1,2 t_above=1 outpar=/dev/null
+supickamp d2=1 t_xbelow=missing outpar=/dev/null
+supickamp d2=1 wl=1 outpar=/dev/null
+supickamp d2=1 arg1=no outpar=/dev/null
+supickamp d2=1 arg2=no outpar=/dev/null
+supickamp d2=1 format=no outpar=/dev/null
+supickamp d2=1 outpar=/dev/null
+sunull nt=4 ntr=1 | sushw key=dt a=0 | supickamp d2=1 outpar=/dev/null

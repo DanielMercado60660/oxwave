@@ -1,0 +1,73 @@
+# REMOVED (2026-10-28): undefined behaviour in SU's C (pfacc on a length that is not a valid
+# complex prime-factor length reads/writes past its buffer). The original binary's output depends on heap layout,
+# so these cannot be compared with goldens; OxWave rejects such lengths by design.
+# Default and both phase algorithms with varied trace lengths and data.
+suspike nt=64 ntr=1 | succepstrum
+suplane nt=127 ntr=3 | succepstrum mode=ouphase trend=0 zeromean=1
+suspike nt=128 ntr=1 | suaddnoise seed=123 | succepstrum mode=suphase unwrap=2 trend=1 zeromean=1
+suspike nt=128 ntr=2 | succepstrum mode=suphase unwrap=-1 trend=0 zeromean=0 sign1=-1 sign2=1
+sunull nt=128 ntr=1 | succepstrum
+suspike nt=128 ntr=1 | succepstrum sign1=0 sign2=0 verbose=1
+suspike nt=1 ntr=1 | succepstrum
+suspike nt=32 ntr=1 | succepstrum mode=suphase
+succepstrum mode=invalid
+[stderr] succepstrum
+suspike nt=128 ntr=1 | succepstrum mode=suphase unwrap=0
+[stderr] suspike nt=65535 ntr=1 | succepstrum
+
+# All defaults explicitly, and empty numeric values falling back to defaults.
+suspike nt=128 ntr=2 | succepstrum sign1=1 sign2=-1 mode=ouphase unwrap=1 trend=1 zeromean=0
+suspike nt=128 ntr=1 | succepstrum sign1= sign2= unwrap= trend= zeromean=
+
+# Exercise both phase algorithms with nontrivial phases and every trend/mean pair.
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=ouphase trend=0 zeromean=0
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=ouphase trend=1 zeromean=1 sign1=-1
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=suphase trend=0 zeromean=0 unwrap=1
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=suphase trend=0 zeromean=1 unwrap=0.5
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=suphase trend=1 zeromean=0 unwrap=3 sign2=1
+suplane nt=127 ntr=2 | suaddnoise seed=427 | succepstrum mode=suphase trend=1 zeromean=1 unwrap=1.5
+
+# No validation of signs or boolean flags; unwrap is ignored for ouphase.
+suspike nt=128 ntr=1 | succepstrum sign1=2 sign2=-2 trend=-1 zeromean=-1
+suspike nt=128 ntr=1 | succepstrum mode=ouphase unwrap=0
+suspike nt=128 ntr=1 | sushw key=dt a=0 | succepstrum
+
+# Full stderr checks for diagnostics on successful runs and library failures.
+[stderr] suspike nt=128 ntr=1 | succepstrum verbose=1
+[stderr] suspike nt=128 ntr=1 | succepstrum unused=1
+[stderr] suspike nt=128 ntr=1 | succepstrum mode=suphase unwrap=-0
+[stderr] succepstrum mode=
+[stderr] suspike nt=128 ntr=1 | succepstrum mode=invalid
+[stderr] succepstrum sign1=2147483648
+[stderr] succepstrum unwrap=1e-310
+
+# Parameter-file defaults and command-line precedence.
+printf 'mode=suphase unwrap=2 trend=0 zeromean=1\n' > params; suspike nt=128 ntr=1 | succepstrum par=params trend=1 sign1=-1 sign2=1
+
+# Odd FFT regressions with nonzero samples: npfao selects 3 and 35.
+# Keep the original lengths and C-compatible odd-length pfarc packing.
+suspike nt=1 ntr=1 it1=1 | succepstrum mode=suphase trend=0
+suspike nt=3 ntr=1 it1=2 | succepstrum sign1=-1 trend=0 zeromean=1
+suspike nt=33 ntr=2 it1=17 | suaddnoise seed=427 | succepstrum mode=ouphase
+suspike nt=33 ntr=2 it1=17 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1
+
+# Zero samples and a non-default sample interval.
+sunull nt=127 ntr=2 | succepstrum mode=suphase
+suspike nt=127 ntr=1 dt=0.002 it1=17 | succepstrum mode=ouphase
+
+# Other odd npfao results: 15, 45, and 105, with nontrivial phases.
+suspike nt=15 ntr=2 it1=7 | suaddnoise seed=427 | succepstrum mode=ouphase
+suspike nt=45 ntr=2 it1=23 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1 trend=0 zeromean=1
+suspike nt=105 ntr=2 it1=53 | suaddnoise seed=427 | succepstrum mode=ouphase sign1=-1
+
+# Regressions: nf=25 and nf=64 have repeated factors. The original
+# pfacc reads/writes beyond nf; the Rust FFT kernel exits 1 with
+# "pfafft.c: pfacc: invalid transform length" at its modular-inverse check.
+# These cases were removed (UB, see below): zero-filled overflow storage changes the samples.
+# In the original, overflow reaches neighboring xr/xi buffers;
+# which buffer follows w changes as allocations are reused across traces.
+# pfamcc with a nonzero sample stride also rejects them despite spare storage.
+# UB-removed: suspike nt=46 ntr=1 it1=2 | succepstrum
+# UB-removed: suspike nt=48 ntr=2 it1=23 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1
+# UB-removed: suspike nt=121 ntr=1 it1=2 | succepstrum
+# UB-removed: suspike nt=126 ntr=2 it1=63 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1

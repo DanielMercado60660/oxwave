@@ -1,0 +1,20 @@
+# Default bins, boundaries, multiple picks and singleton sigma.
+printf '1 1\n2 2\n2 3\n2 4\n2 5\n2 6\n0 0\n10 10\n' | cpftrend ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10
+printf '9 2 4\n8 3 5\n7 4 6\n6 5 7\n5 6 8\n' | cpftrend ix=2 iy=3 min_x=0 max_x=10 min_y=0 max_y=10 nx=3 ny=7
+printf '2 2 1\n2 3 2\n2 4 3\n2 5 4\n' | cpftrend ix=1 iy=2 ir=3 rmin=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=9
+printf '2 2 1\n2 3 2\n2 4 3\n2 5 4\n' | cpftrend ix=1 iy=2 ir=3 rmax=3 rmin=1 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=9
+printf '2 2 1\n2 4 2\n' | cpftrend ix=1 iy=2 ir=3 rmax=0 min_x=0 max_x=10 min_y=0 max_y=10
+printf '2 2\n3 4\n10 20\n30 40\n' | cpftrend ix=1 iy=2 min_x=1 max_x=100 min_y=1 max_y=100 nx=5 ny=7 logx=1 logy=1
+printf '2 2\n2 3\n' | cpftrend ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=1 ny=1 verbose=1
+cpftrend ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10
+cpftrend iy=2
+cpftrend ix=1
+cpftrend ix=1 iy=2 ir=3
+cpftrend ix=1 iy=2
+cpftrend ix=1 iy=2 min_x=0
+cpftrend ix=1 iy=2 min_x=0 max_x=1
+cpftrend ix=1 iy=2 min_x=0 max_x=1 min_y=0
+cpftrend ix=1 iy=2 min_x=-1 max_x=1 min_y=0 max_y=1 logx=1
+cpftrend ix=1 iy=2 min_x=0 max_x=1 min_y=-1 max_y=1 logy=1
+[stderr] printf '2 2\n2 3\n' | cpftrend ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=7 verbose=1
+printf '%s\n' '-4 -3' '-3 -2' '-2 -1' '-1 0' '0 1' | cpftrend ix=1 iy=2 min_x=-5 max_x=1 min_y=-5 max_y=2 nx=7 ny=9

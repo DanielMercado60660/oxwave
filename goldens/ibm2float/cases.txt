@@ -1,0 +1,16 @@
+# Empty input and output count, including verbose checkpars output.
+[stderr] ibm2float outpar=count verbose=1 </dev/null
+[exact] ibm2float outpar=count </dev/null; cat count
+# Default outpar fails when no controlling terminal is available.
+ibm2float </dev/null
+ibm2float outpar=/no/such/directory/count </dev/null
+ibm2float endian=999999999999999999999 outpar=count </dev/null
+# Single and odd numbers of IBM words; zero, negative, extremes and partial trailing bytes.
+[f32] suspike nt=7 ntr=1 | sustrip outpar=strip.par | float2ibm outpar=ibm.par | ibm2float outpar=count
+[f32] printf '\x41\x10\x00\x00' | ibm2float outpar=count
+[f32] printf '\x00\x00\x00\x00\xc1\x10\x00\x00\x7f\xff\xff\xff\x01\x00\x00\x01\x01\x02' | ibm2float endian=0 outpar=count
+[f32] printf '\x00\x00\x10\x41\x00\x00\x10\xc1\xff\xff\xff\x7f' | ibm2float endian=1 outpar=count
+[f32] printf '\x00\x00\x10\x41' | ibm2float endian=-1 outpar=count
+# Confirm the count file is written after processing and unknown arguments warn.
+[exact] printf '\x41\x10\x00\x00\x41\x20\x00\x00\xff' | ibm2float outpar=count > floats; cat count
+[stderr] ibm2float outpar=count unexpected=1 </dev/null

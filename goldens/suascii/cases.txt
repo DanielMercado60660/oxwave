@@ -1,0 +1,26 @@
+# Defaults, all modes, odd sample and trace counts.
+[exact] suplane nt=5 ntr=3 | suascii
+[exact] suspike nt=1 ntr=1 | suascii bare=1
+[exact] suplane nt=5 ntr=2 | suascii bare=2
+[exact] suplane nt=7 ntr=3 | suascii bare=3 ntr=2 verbose=1
+[exact] suplane nt=5 ntr=1 | suascii bare=4 index=1 verbose=1
+[exact] suplane nt=5 ntr=3 | suascii bare=4 index=-1 ntr=2
+[exact] suplane nt=5 ntr=3 | suascii bare=5 sep='>'
+[exact] suplane nt=5 ntr=3 | sushw key=cdp a=-4 b=2 | suascii bare=5 key=cdp sep=END
+[exact] suplane nt=5 ntr=2 | suascii option=1
+[stderr] suplane nt=3 ntr=1 | suascii bare=1 option=2 verbose=1
+# Nonseismic and seismic fallback sampling; absent sampling errors.
+[stderr] suplane nt=3 ntr=1 | sushw key=trid,d1,f1 a=30,0.25,-1 | suascii bare=5 verbose=1
+[stderr] suplane nt=3 ntr=1 | sushw key=dt a=0 | suascii bare=4 dt=0.125 index=1 verbose=1
+[stderr] suplane nt=3 ntr=1 | sushw key=trid,d1 a=30,0 | suascii bare=5 dt=0.25 verbose=1
+[stderr] suplane nt=3 ntr=1 | sushw key=dt a=0 | suascii bare=1
+[stderr] suplane nt=3 ntr=1 | sushw key=trid,d1 a=30,0 | suascii bare=1
+[stderr] suascii bare=-1
+[stderr] suascii bare=6
+[stderr] suascii ntr=0
+[stderr] suascii ntr=-1
+[stderr] suascii bare=1 </dev/null
+[stderr] suplane nt=3 ntr=1 | suascii bare=5 key=notakey
+[exact] suplane nt=7 ntr=3 | sushw key=d2,f2,delrt a=2.5,-3,-123 | suascii bare=5
+[exact] suspike nt=7 ntr=3 k1=2,4 mag=-2.25,3.5 | suascii bare=3
+[stderr] suplane nt=5 ntr=2 | suascii bare=4 ntr=5 index=1 verbose=1

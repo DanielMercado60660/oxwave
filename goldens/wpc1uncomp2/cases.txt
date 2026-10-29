@@ -1,0 +1,14 @@
+# This program has no parameters; verbose and unknown arguments are ignored.
+[f32] suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128 | wpc1uncomp2
+[f32] suspike nt=100 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=100 error=0.05 | wpc1uncomp2 verbose=1
+[f32] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=1 | wpc1uncomp2
+[f32] suplane nt=257 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 | wpc1uncomp2 ignored=1
+[f32] suplane nt=257 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 > data; cat data data data | wpc1uncomp2
+[f32] suplane nt=1024 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=1024 | wpc1uncomp2
+[stderr] wpc1uncomp2 < /dev/null
+[stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("iiff",0,0,0,0))' | wpc1uncomp2
+# These compressed streams and decoded outputs match with MallocScribble=1.
+[f32] sunull nt=100 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=100 | wpc1uncomp2
+[f32] sunull nt=257 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 | wpc1uncomp2 verbose=1
+[f32] sunull nt=512 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=512 error=0.1 | wpc1uncomp2 ignored=1
+[f32] suplane nt=1 ntr=2 | suaddnoise seed=123 | sustrip outpar=/dev/null | wpc1comp2 n1=1 | wpc1uncomp2

@@ -1,0 +1,15 @@
+# Defaults, multiple ensembles, headers and phase-stack mode
+suplane nt=75 ntr=7 | sushw key=cdp a=1 b=1 | supws
+suplane nt=75 ntr=7 | sushw key=cdp a=1 b=1 | supws ps=1
+suplane nt=33 ntr=5 | sushw key=offset a=10 b=10 | supws key=offset pwr=0 sl=-0.012 dt=0.004 verbose=1
+[stderr] suplane nt=31 ntr=3 | supws dt=0 sl=0.012 verbose=1
+suplane nt=1 ntr=1 | supws
+suplane nt=1 ntr=1 | supws ps=1 pwr=2
+sunull nt=17 ntr=3 | supws ps=1 pwr=0
+suplane nt=17 ntr=2 | supws sl=1 dt=0.004
+supws </dev/null
+suplane nt=17 ntr=2 | supws key=badkey
+suplane nt=17 ntr=2 | supws pwr=-1 ps=1
+suplane nt=17 ntr=2 | supws dt=-0.004 sl=0.008
+suplane nt=127 ntr=9 | suaddnoise seed=17 | sushw key=cdp a=2 | supws pwr=1.5 sl=0.02 dt=0.004
+suplane nt=127 ntr=9 | suaddnoise seed=17 | sushw key=cdp a=2 | supws ps=1 pwr=1.5 sl=0.02 dt=0.004

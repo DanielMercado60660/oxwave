@@ -1,0 +1,20 @@
+# Defaults, odd lengths, single trace, signs, and spectral floor
+suspike nt=1 ntr=1 | suminphase
+suspike nt=31 ntr=1 | suminphase
+suplane nt=127 ntr=3 | suminphase sign1=-2 sign2=3 pnoise=0.01
+suspike nt=41 ntr=2 | suminphase sign1=1 sign2=1 pnoise=0
+suspike nt=33 ntr=1 | suminphase sign1=-1 sign2=-1 pnoise=-1
+# Sampling header and parameter paths; verbose messages
+[stderr] suspike nt=32 ntr=1 | suminphase verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=dt a=0 | suminphase verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=dt a=0 | suminphase dt=0.002 verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=trid,d1 a=30,0.002 | suminphase verbose=1
+[stderr] suspike nt=32 ntr=1 | sushw key=trid,d1 a=30,0 | suminphase dt=0.003 verbose=1
+# Input and parameter errors
+suminphase
+suminphase sign1=0
+suminphase sign2=0
+suminphase sign1=abc
+# Broadband input and FFT size limit
+suspike nt=97 ntr=2 | suaddnoise seed=123 | suminphase pnoise=0.00001
+sunull nt=65535 ntr=1 | suminphase

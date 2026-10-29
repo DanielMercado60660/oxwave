@@ -1,0 +1,83 @@
+# Single-trace suspike fixtures set ix1/it1 explicitly: default ix values are zero.
+# Filter modes and odd lengths
+suplane nt=127 ntr=1 dt=0.004 | subfilt
+[exact] [stderr] suplane nt=1 ntr=1 dt=0.004 | subfilt locut=0 hicut=0
+suplane nt=129 ntr=2 dt=0.002 | subfilt locut=0 zerophase=0
+suplane nt=129 ntr=2 dt=0.002 | subfilt hicut=0
+suplane nt=127 ntr=1 dt=0.004 | subfilt npoleslo=3 npoleshi=4 f3dblo=15 f3dbhi=45 zerophase=0
+suplane nt=127 ntr=1 dt=0.004 | subfilt npoleslo=2 npoleshi=2
+[stderr] suplane nt=127 ntr=1 dt=0.004 | subfilt verbose=1 fstoplo=5 fpasslo=10 fpasshi=35 fstophi=55 astoplo=0.1 apasslo=0.9 apasshi=0.9 astophi=0.1 dt=0.004
+[stderr] subfilt
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt dt=0
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt fstoplo=0
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt fstoplo=30 fpasslo=20
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt fpasshi=60 fstophi=50
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt fstophi=200
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt astoplo=0.9 apasslo=0.1
+[stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt apasshi=0.1 astophi=0.9
+[exact] [stderr] suplane nt=10 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 dt=-0.004
+[stderr] suplane nt=10 ntr=1 dt=0.004 | sushw key=trid a=30 | subfilt locut=0 hicut=0
+
+# Single sample, zero header interval, and diagnostics
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | subfilt
+[stderr] suplane nt=10 ntr=1 dt=0.004 | sushw key=dt a=0 | subfilt
+[stderr] suplane nt=64 ntr=1 dt=0.004 | subfilt zerophase=0 npoleslo=3 npoleshi=4 f3dblo=12 f3dbhi=40 verbose=1
+[stderr] suplane nt=10 ntr=1 dt=0.004 | sushw key=trid a=30 | subfilt locut=0 hicut=0
+
+# Explicit defaults, causal bandpass, and zero-phase high-cut only.
+[stderr] suspike nt=255 ntr=3 dt=0.004 | subfilt dt=0.004 verbose=0 zerophase=1 locut=1 hicut=1 fstoplo=12.5 fpasslo=18.75 fpasshi=50 fstophi=68.75 astoplo=0.05 apasslo=0.95 apasshi=0.95 astophi=0.05
+[stderr] suspike nt=255 ntr=2 dt=0.004 | subfilt zerophase=0 verbose=1
+[stderr] suspike nt=63 ntr=2 dt=0.004 | subfilt locut=0 verbose=1
+[stderr] suspike nt=65 ntr=2 dt=0.004 | subfilt hicut=0 zerophase=0 verbose=1
+[stderr] suspike nt=255 ntr=2 dt=0.004 | subfilt npoleslo=1 npoleshi=1 verbose=1
+[stderr] suspike nt=255 ntr=2 dt=0.004 | subfilt npoleslo=4 npoleshi=3 f3dblo=10 f3dbhi=60 verbose=1
+# Nontrivial seeded input and the required explicit dt for a zero header.
+sunull nt=513 ntr=2 dt=0.002 | suaddnoise seed=2026 | subfilt
+[stderr] suspike nt=65 ntr=1 nspk=1 ix1=1 it1=33 dt=0.004 | sushw key=dt a=0 | subfilt dt=0.002 verbose=1
+# Bypass still validates amplitudes, but skips frequency bounds and diagnostics.
+[stderr] suplane nt=33 ntr=2 dt=0.004 | subfilt locut=0 hicut=0 verbose=1 zerophase=0 unknown=1
+[stderr] suplane nt=33 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 fstoplo=-1 fpasslo=-2 fpasshi=200 fstophi=150 npoleslo=2 npoleshi=3 f3dblo=12 f3dbhi=60 verbose=1
+[stderr] suplane nt=33 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 astoplo=0.9 apasslo=0.1
+# Trace-type boundary values: first-trace classification only.
+[stderr] suplane nt=9 ntr=1 dt=0.004 | sushw key=trid a=17 | subfilt locut=0 hicut=0
+[stderr] suplane nt=9 ntr=1 dt=0.004 | sushw key=trid a=18 | subfilt locut=0 hicut=0
+[stderr] suplane nt=9 ntr=1 dt=0.004 | sushw key=trid a=109 | subfilt locut=0 hicut=0
+[stderr] suplane nt=9 ntr=1 dt=0.004 | sushw key=trid a=-1 | subfilt locut=0 hicut=0
+# Negative bounds and numeric conversion errors, including conditional f3db parsing.
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt fstoplo=-1
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt locut=0 dt=-0.004
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 npoleslo=2147483648
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 npoleslo=2 f3dblo=1e-310
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 npoleshi=2 f3dbhi=1e-310
+[stderr] suplane nt=9 ntr=1 dt=0.004 | subfilt locut=0 hicut=0 f3dblo=1e-310 f3dbhi=1e-310
+# Zero and negative explicit pole counts, and zero cutoff frequencies.
+suspike nt=33 ntr=1 nspk=1 ix1=1 it1=17 dt=0.004 | subfilt npoleslo=0 npoleshi=0
+suspike nt=33 ntr=1 nspk=1 ix1=1 it1=17 dt=0.004 | subfilt npoleslo=-2 npoleshi=-2
+suspike nt=33 ntr=1 nspk=1 ix1=1 it1=17 dt=0.004 | subfilt npoleslo=1 npoleshi=1 f3dblo=0 f3dbhi=0
+
+# Mixed automatic/explicit band design: each side is selected independently.
+[stderr] suspike nt=127 ntr=2 dt=0.004 | subfilt npoleslo=3 f3dblo=15 verbose=1
+[stderr] suspike nt=129 ntr=2 dt=0.004 | subfilt npoleshi=4 f3dbhi=45 zerophase=0 verbose=1
+# The C filter still runs its first-order section for negative odd pole counts.
+[stderr] suspike nt=33 ntr=1 nspk=1 ix1=1 it1=17 dt=0.004 | subfilt npoleslo=-1 npoleshi=-1 verbose=1
+
+# Two/three samples exercise reversal endpoints and first-order causal sections.
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 dt=0.004 | subfilt verbose=1
+[stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=1 dt=0.004 | subfilt zerophase=0 npoleslo=1 npoleshi=1 verbose=1
+# A spike at the final sample retains the original zero-phase edge behavior.
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=101 dt=0.004 | subfilt npoleslo=3 npoleshi=2 verbose=1
+# Negative cutoffs are passed through to the library's absolute-value handling.
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt npoleslo=3 npoleshi=4 f3dblo=-15 f3dbhi=-45 verbose=1
+# Nonzero seeded data, independent traces, and a less usual header interval.
+[stderr] suspike nt=257 ntr=3 dt=0.003 | suaddnoise seed=6821 sn=2 | subfilt verbose=1
+[stderr] suspike nt=257 ntr=3 dt=0.003 | suaddnoise seed=6821 sn=2 | subfilt locut=0 zerophase=0 npoleshi=5 f3dbhi=75 verbose=1
+# Explicit dt overrides a nonzero header; later dt/trid fields do not redesign.
+[stderr] suspike nt=101 ntr=2 dt=0.004 | subfilt dt=0.0025 verbose=1
+[stderr] suspike nt=101 ntr=3 dt=0.004 | sushw key=dt,trid a=4000,1 b=1000,20 | subfilt verbose=1
+# Trace-type warnings also precede active filtering and filter design messages.
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | sushw key=trid a=30 | subfilt hicut=0 verbose=1
+# Empty values use defaults; unselected f3db and unknown parameters are ignored.
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt dt= verbose=1 zerophase= locut= hicut= fstoplo= fpasslo= fpasshi= fstophi= astoplo= apasslo= apasshi= astophi= npoleslo= npoleshi=
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt f3dblo=1e-310 f3dbhi=1e-310 unknown=1 verbose=1
+# Last occurrence wins; any nonzero mode flag enables that mode.
+[stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt zerophase=0 zerophase=-1 locut=-1 hicut=2 npoleslo=2 npoleshi=3 f3dblo=5 f3dblo=17 verbose=-1

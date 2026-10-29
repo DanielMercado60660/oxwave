@@ -1,0 +1,82 @@
+# All defaults and the defaults spelled out (code defaults differ from selfdoc).
+[f32] [stderr] sird_epidemic
+[f32] [stderr] sird_epidemic stepmax=40 verbose=0 normalize=1 scale=0 N=1000 s0=1000 i0=1 r0=0 d0=0.01 b=0.5 k=0.333 nu=0 gamma=0 h=1 tol=1e-8 mode=SIRD
+
+# Each output mode, odd output lengths, and both supported scaling factors.
+[f32] sird_epidemic stepmax=7 mode=S
+[f32] sird_epidemic stepmax=7 mode=I
+[f32] sird_epidemic stepmax=7 mode=R
+[f32] sird_epidemic stepmax=7 mode=D
+[f32] sird_epidemic stepmax=7 mode=SIRD
+[f32] sird_epidemic stepmax=9 h=0.25 N=762 s0=750 i0=12 r0=3 d0=2 b=2 k=0.5 nu=0.1 gamma=4 scale=1
+[f32] sird_epidemic stepmax=9 h=0.25 N=762 s0=750 i0=12 r0=3 d0=2 b=2 k=0.5 nu=0.1 gamma=4 scale=2
+[f32] sird_epidemic stepmax=5 scale=1 mode=S N=1234.56789 s0=987.654321
+[f32] sird_epidemic stepmax=5 scale=2 mode=I N=1234.56789 s0=987.654321
+[f32] sird_epidemic stepmax=5 scale=1 mode=R r0=2.5
+[f32] sird_epidemic stepmax=5 scale=2 mode=D d0=3 nu=0.07 s0=900
+[f32] sird_epidemic stepmax=5 scale=3
+[f32] sird_epidemic stepmax=5 scale=-1
+
+# Every initial compartment, normalization disabled/noncanonical, zero infection.
+[f32] sird_epidemic stepmax=11 normalize=0 N=10 s0=9 i0=1 r0=2 d0=3 b=0.02 k=0.3 nu=0.1 gamma=0.2 h=0.1
+[f32] sird_epidemic stepmax=11 normalize=0 N=10 s0=9 i0=1 b=0.02 scale=1 h=0.1
+[f32] sird_epidemic stepmax=11 normalize=0 N=10 s0=9 i0=1 b=0.02 scale=2 h=0.1
+[f32] sird_epidemic stepmax=3 normalize=-2 N=200 s0=180 i0=10 r0=7 d0=3
+[f32] sird_epidemic stepmax=5 i0=0 r0=12 d0=9
+[f32] sird_epidemic stepmax=5 s0=0 i0=10 r0=12 d0=9
+[f32] sird_epidemic stepmax=5 N=0
+[f32] sird_epidemic stepmax=5 N=-1000
+[f32] sird_epidemic stepmax=5 s0=-10 i0=-1 r0=-2 d0=-3
+
+# Zero and negative coefficients, mortality, distancing, and adaptive rejection.
+[f32] sird_epidemic stepmax=9 b=0 k=0 nu=0 gamma=0
+[f32] sird_epidemic stepmax=9 b=-0.2 k=-0.1 nu=-0.01 gamma=-0.5
+[f32] sird_epidemic stepmax=17 h=0.5 N=200 s0=190 i0=10 b=0.8 k=0.2 nu=0.05 gamma=10 tol=1e-10
+[f32] [stderr] sird_epidemic stepmax=7 h=3 b=2 k=0.5 nu=0.1 gamma=2 tol=1e-12 verbose=1
+[f32] [stderr] sird_epidemic stepmax=3 verbose=2 tol=0.0001
+[f32] [stderr] sird_epidemic stepmax=3 verbose=-1 tol=0
+[f32] [stderr] sird_epidemic stepmax=3 h=-0.25 verbose=1
+[f32] [stderr] sird_epidemic stepmax=3 h=0 verbose=1
+[f32] [stderr] sird_epidemic stepmax=3 h=1e-8 verbose=1
+[f32] sird_epidemic stepmax=3 tol=-1
+[f32] sird_epidemic stepmax=3 h=nan
+[f32] sird_epidemic stepmax=3 gamma=nan
+
+# Smallest/empty output sizes and errors from allocation and mode selection.
+[f32] [stderr] sird_epidemic stepmax=1 verbose=1
+[f32] sird_epidemic stepmax=1 mode=S
+[f32] sird_epidemic stepmax=1 mode=I
+[f32] sird_epidemic stepmax=1 mode=R
+[f32] sird_epidemic stepmax=1 mode=D
+[exact] [stderr] sird_epidemic stepmax=0 verbose=1
+[exact] [stderr] sird_epidemic stepmax=0 mode=D
+[exact] [stderr] sird_epidemic stepmax=-1
+[exact] [stderr] sird_epidemic stepmax=-7
+[exact] [stderr] sird_epidemic mode=SIR
+[exact] [stderr] sird_epidemic mode=sird
+[exact] [stderr] sird_epidemic mode=
+[exact] [stderr] sird_epidemic stepmax=-1 mode=bogus
+
+# getpar syntax, repeated options, parameter files, and deliberately unchecked args.
+[f32] [stderr] sird_epidemic stepmax=3 ignored=17
+[f32] sird_epidemic stepmax=1 stepmax=3 N=200 N=300 mode=I mode=D
+[f32] sird_epidemic stepmax= normalize= scale= N= s0= i0= r0= d0= h= tol= b= k= nu= gamma= verbose=
+[f32] sird_epidemic stepmax=3 N=1000junk s0=800junk i0=2junk b=0.5junk
+[exact] [stderr] sird_epidemic stepmax=abc
+[f32] sird_epidemic stepmax=3 b=abc k=abc nu=abc gamma=abc
+[f32] printf 'stepmax=7 N=200 s0=180 i0=10 r0=7 d0=3 b=.6 k=.2 nu=.05 gamma=3 mode=D scale=1\n' > model.par; sird_epidemic par=model.par stepmax=5
+[exact] [stderr] sird_epidemic stepmax=2147483648
+[exact] [stderr] sird_epidemic normalize=2147483648
+[exact] [stderr] sird_epidemic N=1e999
+[exact] [stderr] sird_epidemic tol=1e-310
+[exact] [stderr] sird_epidemic stepmax=1 b=1e999
+[exact] [stderr] sird_epidemic stepmax=1 k=1e999
+[exact] [stderr] sird_epidemic stepmax=1 nu=1e999
+[exact] [stderr] sird_epidemic stepmax=1 gamma=1e999
+# Callback parameters are not parsed when there are no steps or no time advance.
+[exact] [stderr] sird_epidemic stepmax=0 b=1e999
+[f32] [stderr] sird_epidemic stepmax=3 h=0 gamma=1e999
+
+# The inventory redirects outputs; also check the resulting file contents.
+[f32] sird_epidemic stepmax=32 h=0.25 N=200 i0=2 b=0.6 k=0.2 nu=0.05 gamma=5 scale=1 mode=SIRD > sird_all.bin; cat sird_all.bin
+[f32] sird_epidemic stepmax=32 h=0.1 normalize=0 N=10 s0=9 i0=1 d0=0 b=0.02 nu=0.1 scale=2 mode=D > sird_d.bin; cat sird_d.bin

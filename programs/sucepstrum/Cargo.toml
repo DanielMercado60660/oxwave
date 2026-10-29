@@ -1,0 +1,18 @@
+[package]
+name = "sucepstrum"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sucepstrum"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-smooth = { path = "../../crates/oxwave-f-smooth" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-phase-unwrap = { path = "../../crates/oxwave-phase-unwrap" }

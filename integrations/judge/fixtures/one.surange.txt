@@ -1,0 +1,5 @@
+1 traces:
+tracl    1
+offset   400
+ns       1
+dt       4000

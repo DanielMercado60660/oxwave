@@ -1,0 +1,96 @@
+# Required parameter errors, including empty standard input.
+[stderr] sufdmod2_pml
+[stderr] sufdmod2_pml nx=7
+[stderr] sufdmod2_pml nx=7 nz=9
+[stderr] sufdmod2_pml nx=7 nz=9 tmax=0.01
+[stderr] sufdmod2_pml nx=7 nz=9 tmax=0.01 xs=3,4 zs=4
+[stderr] sufdmod2_pml nx=7 nz=9 tmax=0.01 xs=3 zs=4,5
+[stderr] sufdmod2_pml nx=abc nz=9 tmax=0.01
+[stderr] sufdmod2_pml nx=2147483648
+# Defaults, explicit defaults, and odd model/time dimensions.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.004 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.004 xs=4 zs=3 nt=0 mt=1 dx=1 fx=0 dz=1 fz=0 abs=1,1,1,1 pml_thick=0 pml_max=1000 hsz=0 vsx=0 verbose=0
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.1 nt=1 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.01 nt=21 mt=3 xs=4 zs=3 fmax=80 fpeak=30
+# Both verbosity levels, abs fallback, unknown argument handling (no checkpars).
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.001 xs=4 zs=3 verbose=1
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.001 xs=4 zs=3 verbose=2 pml_thick=1
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.001 xs=4 zs=3 abs=0,1,0 unknown=ignored
+# All four absorbing boundaries and the free-surface alternatives.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=4 zs=2 abs=0,1,1,1
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=1 zs=2 abs=1,0,1,0
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=4 zs=3 abs=0,0,0,0
+# Unequal spacing (star3), translated grid, fractional source coordinates.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 dx=2 dz=3 fx=10 fz=20 tmax=0.04 xs=17.5 zs=28.5 mt=7
+# PML state, multiple layer sizes, unequal spacing, zero damping, source tail.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.04 xs=4 zs=3 pml_thick=1 mt=5
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.04 xs=4 zs=3 pml_thick=4 pml_max=200 mt=7
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 dx=2 dz=3 tmax=0.06 xs=7 zs=9 pml_thick=2 pml_max=0 fpeak=80 mt=9
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.04 xs=4 zs=3 pml_thick=2 abs=0,0,0,0 mt=7
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.04 xs=4 zs=3 pml_thick=2 abs=0,1,1,0 mt=7
+# Variable density (star2/star1) and density corrections in PML.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; suspike nt=7 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=4 zs=3 dfile=d mt=3 < v
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; suspike nt=7 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 dx=2 dz=3 tmax=0.04 xs=8 zs=9 dfile=d mt=3 < v
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; suspike nt=7 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=4 zs=3 dfile=d pml_thick=2 mt=3 verbose=1 < v
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; suspike nt=7 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 dx=2 dz=3 tmax=0.04 xs=8 zs=9 dfile=d pml_thick=3 mt=3 < v
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; sunull nt=7 ntr=9 | sugain bias=8 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 tmax=0.01 xs=4 zs=3 dfile=d pml_thick=1 < v
+# Read every output file back to stdout so the harness checks samples and headers.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.01 xs=4 zs=3 hsfile=h hsz=2 > w; cat h
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.01 xs=4 zs=3 vsfile=v vsx=2 > w; cat v
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.01 xs=4 zs=3 ssfile=s > w; cat s
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 nt=1 xs=4 zs=3 hsfile=h vsfile=v ssfile=s > w; cat h v s
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.03 xs=4 zs=3 hsfile=h vsfile=v ssfile=s hsz=6 vsx=8 pml_thick=2 > w; cat h v s
+# Variable velocities and all output modes with translated fractional geometry.
+suspike nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 dx=2 dz=3 fx=1 fz=2 tmax=0.02 xs=7.5 zs=8.5 hsfile=h vsfile=v ssfile=s hsz=8 vsx=7 > w; cat h v s
+# File failures happen after the model read and before stepping.
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3 dfile=missing
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3 dfile=/dev/null
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3 hsfile=missing/h
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3 vsfile=missing/v
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 xs=4 zs=3 ssfile=missing/s
+# Negative duration/nt produces no time steps; negative spacings remain valid.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=-1 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.1 nt=-1 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 dx=-1 dz=-1 tmax=0.01 xs=-4 zs=-3 mt=-2
+sunull nt=2 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=2 nz=2 tmax=0.002 xs=0 zs=0
+# Out-of-model sources contribute zero; default and explicit empty filenames.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=-50 zs=100 hsfile= vsfile= ssfile= dfile=
+# Extended horizontal source (regression; exercises library cmonot).
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=2,6 zs=3,3
+# Inventory scenarios with a usable sustrip outpar and observable wave/gather output.
+sunull nt=32 ntr=32 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin; sufdmod2_pml nx=32 nz=32 dx=10 dz=10 tmax=0.04 xs=160 zs=160 fpeak=25 mt=4 hsz=100 hsfile=hs.su < vel.bin > wave.su; cat wave.su hs.su
+sunull nt=32 ntr=32 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin; sufdmod2_pml nx=32 nz=32 dx=10 dz=10 tmax=0.04 xs=160 zs=160 pml_thick=4 pml_max=500 fpeak=20 mt=4 vsx=100 vsfile=vs.su < vel.bin > wave.su; cat wave.su vs.su
+# Spatially varying velocities and densities, larger odd dimensions and many time steps.
+suplane nt=11 ntr=13 | sugain scale=500 bias=1500 | sustrip outpar=/dev/null > v; suplane nt=11 ntr=13 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=13 nz=11 dx=4 dz=3 nt=501 tmax=0.1 xs=25 zs=16 pml_thick=3 pml_max=120 dfile=d fpeak=70 mt=31 < v
+suplane nt=11 ntr=13 | sugain scale=500 bias=1500 | sustrip outpar=/dev/null > v; suplane nt=11 ntr=13 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=13 nz=11 dx=4 dz=4 nt=501 tmax=0.1 xs=25 zs=16 dfile=d fpeak=70 mt=31 < v
+# Minimal dimensions with no time steps; zero sampling and arm64 mt=0 semantics.
+sunull nt=1 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=1 nz=1 tmax=0 nt=-1 xs=0 zs=0
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 dx=0 tmax=0 nt=-1 xs=4 zs=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=4 zs=3 mt=0
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=4 zs=3 pml_thick=1 pml_max=-100
+# Unchecked velocity fread on empty input, with explicit source frequency.
+sufdmod2_pml nx=9 nz=7 tmax=0 nt=1 xs=4 zs=3 fpeak=30
+
+# Extended vertical, reversed diagonal, curved, and repeated coordinates.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.012 xs=4,4 zs=1,5 fmax=300 mt=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.012 xs=7,1 zs=5,1 fmax=300 mt=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.012 xs=1,4,7 zs=1,5,2 fmax=300 mt=3
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.012 xs=1,4,4,7 zs=2,4,4,2 fmax=300 mt=3
+# Degenerate stationary extended source and one-step verbose diagnostics.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=4,4 zs=3,3
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0 nt=1 xs=2,6 zs=3,3 verbose=2
+# Extended sources with all receiver files, unequal spacing, translated grid,
+# variable density, and PML; concatenate wavefield and receiver outputs.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null > v; suplane nt=7 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=9 nz=7 dx=2 dz=3 fx=10 fz=20 tmax=0.025 xs=12.5,18,23.5 zs=23,29,26 fmax=200 mt=5 pml_thick=2 pml_max=500 dfile=d hsz=26 vsx=18 hsfile=h vsfile=r ssfile=s < v > w && cat w h r s
+
+# Longer curves with turning points and flat endpoint slopes,
+# variable velocity/density, and propagation beyond the extended-source cutoff.
+suplane nt=11 ntr=13 | sugain scale=0.5 bias=1500 | sustrip outpar=/dev/null > v; suplane nt=11 ntr=13 | sugain scale=0.001 bias=2 | sustrip outpar=/dev/null > d; sufdmod2_pml nx=13 nz=11 dx=4 dz=3 tmax=0.06 xs=4,4,20,36,44 zs=3,12,24,12,12 fmax=180 fpeak=35 mt=11 dfile=d pml_thick=3 pml_max=120 abs=0,1,1,1 < v
+# Extended sources use fmax rather than fpeak, including fpeak=0.
+# Check source-point receiver samples and headers independently of wavefield ns.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=1,3,5,7 zs=1,4,2,5 fmax=250 fpeak=0 ssfile=s > w && cat s
+# Zero-length three-point curve exercises the general cmonot branch and all receivers.
+[stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=4,4,4 zs=3,3,3 hsfile=h vsfile=v ssfile=s verbose=1 pml_thick=1 > w && cat w h v s
+# Source endpoints on model boundaries with all absorbing sides disabled.
+sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=0,4,8 zs=0,6,0 fmax=200 mt=5 abs=0,0,0,0

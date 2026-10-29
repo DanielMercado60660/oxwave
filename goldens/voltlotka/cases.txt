@@ -1,0 +1,88 @@
+# Raw native-endian float output; PP stores the entire prey series first.
+[f32] voltlotka
+[f32] voltlotka stepmax=100 verbose=0 x0=500 y0=25 h=1 tol=1e-8 mode=PP a=0.5 b=0.02 c=0.75 p=0.005 K=1000000 thresh=1
+# Inventory cases redirect their output; repeat them with observable floats.
+[f32] voltlotka stepmax=32 mode=PP x0=500 y0=25 a=0.5 b=0.02 c=0.75 p=0.005 K=1000000 h=0.1 tol=1e-8 thresh=1
+[f32] voltlotka stepmax=24 mode=R x0=100 y0=10 a=0.4 b=0.01 c=0.6 p=0.004 K=1000 h=0.05
+[f32] voltlotka stepmax=16 mode=Y x0=2 y0=0.5 thresh=1 h=0.1
+[f32] voltlotka stepmax=1
+[f32] voltlotka stepmax=1 mode=R x0=17 y0=9
+[f32] voltlotka stepmax=1 mode=Y x0=17 y0=9
+[f32] voltlotka stepmax=7 h=0.125 mode=PP
+[f32] voltlotka stepmax=7 h=0.125 mode=R
+[f32] voltlotka stepmax=7 h=0.125 mode=Y
+[f32] voltlotka stepmax=31 h=0.1 a=0.4
+[f32] voltlotka stepmax=31 h=0.1 b=0.01
+[f32] voltlotka stepmax=31 h=0.1 c=0.6
+[f32] voltlotka stepmax=31 h=0.1 p=0.004
+[f32] voltlotka stepmax=31 h=0.1 K=1000
+[f32] voltlotka stepmax=31 h=0.1 x0=100
+[f32] voltlotka stepmax=31 h=0.1 y0=10
+[f32] voltlotka stepmax=31 h=0.1 tol=1e-5
+[f32] voltlotka stepmax=31 h=0.1 thresh=0
+# The documented d is unused; the actual parameter is p. No checkpars in C.
+[f32] [stderr] voltlotka stepmax=7 h=0.1 d=100 ignored=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 verbose=1
+[f32] [stderr] voltlotka stepmax=3 h=0.1 verbose=-1 tol=1e-6
+[exact] [stderr] voltlotka stepmax=0 verbose=1 a=1e999
+[exact] [stderr] voltlotka stepmax=-1
+[exact] [stderr] voltlotka stepmax=-3
+[f32] voltlotka stepmax=5 h=0 x0=-4 y0=0.5
+[f32] voltlotka stepmax=5 h=0.0000001 x0=0.5 y0=0.5
+[f32] voltlotka stepmax=7 h=-0.1
+[f32] voltlotka stepmax=7 h=0.1 x0=-4 y0=0
+[f32] voltlotka stepmax=7 h=0.1 x0=1 y0=1
+[f32] voltlotka stepmax=7 h=0.1 x0=2 y0=0.5
+# Thresholds crossed inside an integration step must mutate solver stages.
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=1.001 y0=100 verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=100 y0=1.001 p=0 verbose=1
+# Preserve main-state mutation at every internal step, in each output mode.
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=1.001 y0=100 mode=R verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=1.001 y0=100 mode=Y verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=100 y0=1.001 p=0 mode=R verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 x0=100 y0=1.001 p=0 mode=Y verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=1 x0=1.001 y0=100 verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=1 x0=100 y0=1.001 p=0 verbose=1
+# Loose tolerance accepts a trial whose midpoint is mutated by the callback.
+# Regressions for preserving that mutation through the remaining solver stages.
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=1.001 y0=100 verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=100 y0=1.001 p=0 verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.001 tol=1 x0=100 y0=1.001 p=0 verbose=1
+[f32] voltlotka stepmax=7 h=0.1 thresh=100
+[f32] voltlotka stepmax=7 h=0.1 thresh=-1 x0=-0.5 y0=0
+[f32] voltlotka stepmax=7 h=0.1 a=0 b=0 c=0 p=0
+[f32] voltlotka stepmax=7 h=0.1 a=-0.1 b=-0.001 c=-0.1 p=-0.0001
+[f32] voltlotka stepmax=3 h=0.1 K=0
+[f32] voltlotka stepmax=3 h=0.1 K=-1000
+[f32] [stderr] voltlotka stepmax=3 tol=-1 verbose=1
+[f32] voltlotka stepmax=3 tol=0 h=0.1
+# Parser behavior: last value, empty numeric defaults, and malformed numbers.
+[f32] voltlotka stepmax=2 stepmax=5 h=0.1
+[f32] voltlotka stepmax= h=0 x0= y0= tol= verbose=
+[f32] voltlotka stepmax=abc
+[f32] voltlotka stepmax=5 h=0.1 a=abc
+[f32] voltlotka stepmax=5 h=0.1 x0=nan y0=inf
+printf 'stepmax=5 h=0.1 x0=75 y0=12 mode=R\n' > params; voltlotka par=params > out; cat out
+# All explicit error paths and numeric overflow/underflow diagnostics.
+[exact] [stderr] voltlotka mode=invalid
+[exact] [stderr] voltlotka mode=r
+[exact] [stderr] voltlotka mode=
+[exact] [stderr] voltlotka stepmax=2147483648
+[exact] [stderr] voltlotka verbose=2147483648
+[exact] [stderr] voltlotka x0=1e999
+[exact] [stderr] voltlotka y0=1e-310
+[exact] [stderr] voltlotka h=1e999
+[exact] [stderr] voltlotka tol=1e-310
+[exact] [stderr] voltlotka stepmax=1 a=1e999
+[exact] [stderr] voltlotka stepmax=1 b=1e999
+[exact] [stderr] voltlotka stepmax=1 c=1e999
+[exact] [stderr] voltlotka stepmax=1 p=1e999
+[exact] [stderr] voltlotka stepmax=1 K=1e999
+[exact] [stderr] voltlotka stepmax=1 thresh=1e999
+# Midpoint extinction regressions in each single-population output mode.
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=1.001 y0=100 mode=R verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=1.001 y0=100 mode=Y verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=100 y0=1.001 p=0 mode=R verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=100 y0=1.001 p=0 mode=Y verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.001 tol=1 x0=100 y0=1.001 p=0 mode=R verbose=1
+[f32] [stderr] voltlotka stepmax=7 h=0.001 tol=1 x0=100 y0=1.001 p=0 mode=Y verbose=1

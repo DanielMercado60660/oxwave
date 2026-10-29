@@ -1,0 +1,315 @@
+{
+  "scope": "par/main/resampling (wave 2, batch 2)",
+  "programs": [
+    {
+      "name": "unisam2",
+      "path": "par/main/resampling/unisam2.c",
+      "purpose": "Resample a two-dimensional array of floats onto a uniform grid using linear or cubic interpolation.",
+      "selfdoc_first_line": " UNISAM2 - UNIformly SAMple a 2-D function f(x1,x2)\t\t\t",
+      "params": [
+        {
+          "name": "x1",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Input coordinates in the first dimension; when supplied, their count determines nx1 and nx1, dx1, and fx1 are not read."
+        },
+        {
+          "name": "nx1",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of input samples in the first dimension when x1 is absent."
+        },
+        {
+          "name": "dx1",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Input coordinate interval in the first dimension when x1 is absent."
+        },
+        {
+          "name": "fx1",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First input coordinate in the first dimension when x1 is absent."
+        },
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of output samples in the first dimension."
+        },
+        {
+          "name": "d1",
+          "type": "float",
+          "default": "computed: 0.0 if n1 is 1, otherwise (max(x1)-min(x1))/(n1-1)",
+          "required": false,
+          "description": "Output coordinate interval in the first dimension."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "computed: min(x1)",
+          "required": false,
+          "description": "First output coordinate in the first dimension."
+        },
+        {
+          "name": "x2",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Input coordinates in the second dimension; when supplied, their count determines nx2 and nx2, dx2, and fx2 are not read."
+        },
+        {
+          "name": "nx2",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of input samples in the second dimension when x2 is absent."
+        },
+        {
+          "name": "dx2",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Input coordinate interval in the second dimension when x2 is absent."
+        },
+        {
+          "name": "fx2",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First input coordinate in the second dimension when x2 is absent."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of output samples in the second dimension."
+        },
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "computed: 0.0 if n2 is 1, otherwise (max(x2)-min(x2))/(n2-1)",
+          "required": false,
+          "description": "Output coordinate interval in the second dimension."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "computed: min(x2)",
+          "required": false,
+          "description": "First output coordinate in the second dimension."
+        },
+        {
+          "name": "method1",
+          "type": "string",
+          "default": "linear",
+          "required": false,
+          "description": "Interpolation method selected by its first character: linear, mono, akima, or spline. The code applies this method along the second dimension."
+        },
+        {
+          "name": "method2",
+          "type": "string",
+          "default": "linear",
+          "required": false,
+          "description": "Interpolation method selected by its first character: linear, mono, akima, or spline. The code applies this method along the first dimension."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "ealloc1float",
+        "getparfloat",
+        "getparint",
+        "getparstring",
+        "checkpars",
+        "err",
+        "ealloc2float",
+        "intlin",
+        "cmonot",
+        "intcub",
+        "cakima",
+        "csplin",
+        "free1float",
+        "free2float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation is performed first along dimension 2 and then dimension 1, using float coordinates and library linear or cubic interpolation. Arithmetic order and the cubic coefficient calculations affect bitwise results. The method parameter names are applied to the opposite dimensions from their numbering.",
+      "c_lines": 224,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers a two-dimensional array and supports four interpolation methods in each pass.",
+      "test_cases": [
+        {
+          "description": "Resample a regular input grid with linear interpolation.",
+          "command": "suspike nt=8 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=7 | sustrip outpar=/dev/null | unisam2 nx1=8 nx2=4 n1=12 n2=6 method1=linear method2=linear > out.bin"
+        },
+        {
+          "description": "Exercise irregular coordinates and monotonic and Akima interpolation.",
+          "command": "suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sustrip outpar=/dev/null | unisam2 x1=0,1,3,6 x2=0,2,3,7 n1=7 n2=6 method1=mono method2=akima > out.bin"
+        },
+        {
+          "description": "Exercise spline interpolation and explicit output coordinates.",
+          "command": "suspike nt=4 ntr=4 nspk=2 ix1=1 it1=1 ix2=4 it2=4 | sustrip outpar=/dev/null | unisam2 nx1=4 nx2=4 n1=5 d1=0.5 f1=0 n2=5 d2=0.5 f2=0 method1=spline method2=spline > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "xy2z",
+      "path": "par/main/resampling/xy2z.c",
+      "purpose": "Convert binary float coordinate pairs into spikes on a uniformly scaled two-dimensional float grid.",
+      "selfdoc_first_line": " XY2Z - converts (X,Y)-pairs to spike Z values on a uniform grid\t",
+      "params": [
+        {
+          "name": "npairs",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of binary float pairs to read."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Value assigned to grid cells containing pairs."
+        },
+        {
+          "name": "nx1",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Size of the fast output dimension."
+        },
+        {
+          "name": "nx2",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Size of the slow output dimension."
+        },
+        {
+          "name": "x1pad",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Padding used when scaling coordinates in the fast dimension."
+        },
+        {
+          "name": "x2pad",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Padding used when scaling coordinates in the slow dimension."
+        },
+        {
+          "name": "yx",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, the first float is assigned to x1 and the second to x2; when zero, the assignments are reversed."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "err",
+        "ealloc1float",
+        "ealloc2float",
+        "efread",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Coordinates are scaled with float arithmetic and rounded with NINT; rounding near cell boundaries can change the selected cell. A zero coordinate range causes division by zero, and insufficient or unsuitable padding can permit out-of-bounds indices. Repeated pairs overwrite rather than accumulate.",
+      "c_lines": 131,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers coordinate pairs and a two-dimensional grid and scales and rounds coordinates into grid indices.",
+      "test_cases": [
+        {
+          "description": "Grid four pairs with the default coordinate ordering.",
+          "command": "suspike nt=8 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | sustrip outpar=/dev/null | xy2z npairs=4 nx1=8 nx2=8 x1pad=2 x2pad=2 scale=1 yx=0 > out.bin"
+        },
+        {
+          "description": "Reverse coordinate assignments and use a different spike value and padding.",
+          "command": "suspike nt=8 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | sustrip outpar=/dev/null | xy2z npairs=4 nx1=10 nx2=12 x1pad=1 x2pad=3 scale=2.5 yx=1 > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "z2xyz",
+      "path": "par/main/resampling/z2xyz.c",
+      "purpose": "Convert a binary float grid into ASCII triples containing row index, column index, and value.",
+      "selfdoc_first_line": " Z2XYZ - convert binary floats representing Z-values to ascii\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of floats in each input row."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File to receive the number of input rows as n2."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "efopen",
+        "getparint",
+        "checkpars",
+        "ealloc1float",
+        "efread",
+        "err",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Values are formatted with printf using %11.4e, so textual rounding and locale can affect output. The error path formats a size_t argument with %d, which is undefined behavior.",
+      "c_lines": 93,
+      "difficulty": "easy",
+      "difficulty_reason": "The program reads one row of floats at a time and formats each value with its indices.",
+      "test_cases": [
+        {
+          "description": "Convert a small stripped spike panel to ASCII triples.",
+          "command": "suspike nt=8 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=7 | sustrip outpar=/dev/null | z2xyz n1=8 outpar=/dev/null > out.txt"
+        },
+        {
+          "description": "Interpret the same kind of float stream using shorter output rows.",
+          "command": "suspike nt=8 ntr=2 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | z2xyz n1=4 outpar=/dev/null > out.txt"
+        }
+      ],
+      "license_note": "The credits say the program is based on b2a by Jack Cohen.",
+      "related_programs": [
+        "b2a"
+      ]
+    }
+  ]
+}

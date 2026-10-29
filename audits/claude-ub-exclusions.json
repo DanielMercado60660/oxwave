@@ -1,0 +1,56 @@
+{
+ "wpc1uncomp2": {
+  "exclude": [
+   "suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128 | wpc1uncomp2",
+   "suspike nt=100 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=100 error=0.05 | wpc1uncomp2 verbose=1",
+   "suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=1 | wpc1uncomp2",
+   "suplane nt=257 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 | wpc1uncomp2 ignored=1",
+   "suplane nt=257 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 > data; cat data data data | wpc1uncomp2",
+   "suplane nt=1024 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=1024 | wpc1uncomp2"
+  ],
+  "reason": "# Cases excluded because their golden bytes depend on undefined behaviour in the original SU C.\n# n1=128 / n1=100 / n1=1024 pipelines: the upstream wpc1comp2 writes freed memory (wpc1.c:230 stale pointer after realloc);\n# with the one-line fix (code = wpc1->code = realloc(...)) the decoded output changes (n1=1024 is also environment-dependent).\n# n1=100, n1=1 and n1=257 cases: wpc1Decoder (wpc1coding.c:250-311) never sets quant[i]->ave when maxave <= FLT_MIN; output changes when fresh malloc memory is scribbled."
+ },
+ "wpcuncompress": {
+  "exclude": [
+   "suplane nt=128 ntr=128 | sustrip outpar=/dev/null | wpccompress n1=128 n2=128 error=0.05 | wpcuncompress",
+   "suplane nt=257 ntr=259 | sustrip outpar=/dev/null | wpccompress n1=257 n2=259 | wpcuncompress",
+   "sunull nt=33 ntr=5 | sustrip outpar=/dev/null | wpccompress n1=33 n2=5 | wpcuncompress"
+  ],
+  "reason": "# Cases excluded because their golden bytes depend on undefined behaviour in the original SU C.\n# 128x128 and 33x5 cases: the upstream wpccompress writes freed memory (wpc.c:209/261/280 stale pointer after realloc);\n# with the one-line fix (code = wpc->code = realloc(...)) the decoded output changes (128x128: all-NaN -> real data; 33x5: zeros -> NaN).\n# 257x259 and 33x5 cases: codeDecoder (wpccoding.c:373-383) never stores the tile zero flag/average, so quantDe reads uninitialised memory (all-zero tile -> NaN)."
+ },
+ "sufctanismod": {
+  "exclude": [
+   "sufctanismod nx=15 nz=17 nt=23 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 order=4 dofct=1",
+   "sufctanismod nx=15 nz=17 nt=23 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 order=0 dofct=1 eta0=0.015 eta=0.02 deta0dx=0.01 deta0dz=-0.02 detadx=-0.01 detadz=0.02 fctxbeg=3 fctzbeg=4 fctxend=8 fctzend=9",
+   "sufctanismod nx=11 nz=13 nt=13 source=1 indexux=1 wavelet=4 isurf=0",
+   "sufctanismod nx=51 nz=101 nt=23 source=1 indexux=1 wavelet=3 movebc=1 impulse=1 dofct=1",
+   "sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 dt=-0.001 eta=-0.01 eta0=-0.02 dofct=1",
+   "sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 suhead=0 vspxfile=vx vspnx=-1 > final; cat vx final",
+   "sunull nt=11 ntr=9 | sugain bias=2 | sustrip > grid; sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 sfile=grid dfile=grid afile=grid cfile=grid ffile=grid lfile=grid nfile=grid",
+   "sunull nt=11 ntr=9 | sugain bias=1 | sustrip > grid; sufctanismod nx=9 nz=11 nt=7 indexux=1 wavelet=4 dfile=grid"
+  ],
+  "reason": "# Cases excluded because their golden bytes depend on uninitialised heap memory in the original SU C.\n# dofct=1 and isurf=0 cases: anis_solver2 never zeroes u1/f0/f1; fct2d1o and the isurf=0 surface row read cells nothing wrote (movebc=1 dofct=1 also changes when they are memset to 0).\n# vspnx=-1: vsp_x is written out but never filled. dfile=grid cases: grid is empty (sustrip has no outpar), so fread leaves rho uninitialised.\n# Rule: output changes when fresh malloc memory is scribbled (0xAA)."
+ },
+ "dctcomp": {
+  "exclude": [
+   "dctcomp n1=1 n2=1",
+   "printf '\\000\\000' | dctcomp n1=3 n2=2"
+  ],
+  "reason": "# Cases excluded because their golden bytes depend on uninitialised heap memory in the original SU C.\n# The input is shorter than n1*n2 floats; fread leaves the rest of the alloc2float buffer uninitialised and dctcomp compresses it.\n# Rule: output changes when fresh malloc memory is scribbled (0xAA); zero-filling the buffer reproduces the golden."
+ },
+ "wptcomp": {
+  "exclude": [
+   "wptcomp n1=8 n2=4",
+   "sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=8 n2=4",
+   "sunull nt=4 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=4 n2=4 nstage1=3",
+   "sunull nt=4 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=4 n2=4 nstage2=3"
+  ],
+  "reason": "# Cases excluded because their golden bytes depend on uninitialised heap memory in the original SU C.\n# 35, 36: short input, fread leaves the alloc2float buffer uninitialised. 55, 56: nstage > npow, wavePack_2 returns without\n# writing g and wptcomp.c:116-120 quantises the uninitialised g. Rule: output changes when fresh malloc memory is scribbled (0xAA)."
+ },
+ "wtcomp": {
+  "exclude": [
+   "wtcomp n1=1 n2=1 </dev/null"
+  ],
+  "reason": "# Case excluded because its golden bytes depend on uninitialised heap memory in the original SU C.\n# Empty input: fread leaves the alloc2float buffer uninitialised and wtcomp compresses it.\n# Rule: output changes when fresh malloc memory is scribbled (0xAA); zero-filling the buffer reproduces the golden."
+ }
+}

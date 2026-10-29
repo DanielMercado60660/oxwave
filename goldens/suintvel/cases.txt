@@ -1,0 +1,22 @@
+# Check output files, defaults, both modes, and single and odd layer counts.
+suintvel vs=5000,5523,6339,7264 t0=.4,.8,1.125,1.425 outpar=result && cat result
+suintvel vs=1500 t0=0 outpar=result && cat result
+suintvel vs=1500,1800,2200 t0=.2,.5,1 mode=1 outpar=result && cat result
+suintvel vs=1500,1800 t0=.2,.5 mode=-1 outpar=result && cat result
+suintvel vs=1500,1800 t0=.2,.5 mode=0 outpar=/dev/stdout
+# Zero time intervals, decreasing times and decreasing velocity can yield infinities or NaNs.
+suintvel vs=1500,1800 t0=.2,.2 outpar=result && cat result
+suintvel vs=3000,1000 t0=.4,.8 outpar=result && cat result
+suintvel vs=1500,1800 t0=.5,.2 outpar=result && cat result
+# Parameter file and verbose diagnostics.
+[stderr] printf 'vs=1500,1800\nt0=.2,.5\n' > model; suintvel par=model outpar=result verbose=1 && cat result
+[stderr] suintvel vs=1500 t0=.2 outpar=result extra=1 && cat result
+# Errors and default output path when no terminal is available.
+suintvel
+suintvel vs=1500 outpar=result
+suintvel t0=.2 outpar=result
+suintvel vs=1500 t0=.2,.4 outpar=result
+suintvel vs=0 t0=.2 outpar=result
+suintvel vs=-1 t0=.2 outpar=result
+suintvel vs=1500 t0=-.2 outpar=result
+suintvel vs=1500 t0=.2 outpar=/nonexistent/path/result

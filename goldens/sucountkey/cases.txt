@@ -1,0 +1,17 @@
+# Default key omission and both default and non-default verbosity.
+[stderr] suplane nt=7 ntr=3 | sucountkey
+suplane nt=7 ntr=3 | sucountkey verbose=0
+[stderr] suplane nt=7 ntr=3 | sucountkey key=tracl,cdp
+[stderr] suplane nt=7 ntr=3 | sucountkey key=tracl,cdp verbose=1
+suplane nt=7 ntr=3 | sucountkey key=tracl,cdp verbose=2
+suplane nt=7 ntr=3 | sucountkey key=tracl,cdp verbose=-1
+# Single trace, repeated values, negative and zero integer and floating headers.
+sunull nt=1 ntr=1 | sucountkey key=tracl,ns,d1 verbose=0
+sunull nt=3 ntr=7 | sushw key=cdp a=-2 b=1 | sucountkey key=cdp,offset verbose=0
+sunull nt=3 ntr=7 | sushw key=d1 a=-2 b=1 | sucountkey key=d1 verbose=0
+suplane nt=7 ntr=3 | sucountkey key=cdp,cdp verbose=0
+# Invalid header, empty input, invalid parameter value, and unknown argument.
+[stderr] sucountkey key=cdp verbose=0 < /dev/null
+[stderr] sucountkey key=not_a_header < /dev/null
+[stderr] sucountkey key=cdp verbose=999999999999999999999 < /dev/null
+[stderr] suplane nt=7 ntr=3 | sucountkey key=cdp verbose=0 unknown=1

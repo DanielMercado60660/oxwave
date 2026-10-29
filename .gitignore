@@ -1,0 +1,19 @@
+# Build output
+target/
+/.targets/
+/.grade/
+
+# Reference SU, built locally (see vendor/BUILD_NOTES.md)
+/vendor/su-original
+/vendor/su-build
+
+# Goldens recorded from your SU build by tools/make_goldens.py
+# (cases.txt, EXCLUDE.txt and DATA_EXEMPT.txt are tracked)
+/goldens/*/*.out
+/goldens/*/*.err
+/goldens/*/*.json
+
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

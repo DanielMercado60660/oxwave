@@ -1,0 +1,17 @@
+[package]
+name = "suminphase"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suminphase"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-complexf = { path = "../../crates/oxwave-f-complexf" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }

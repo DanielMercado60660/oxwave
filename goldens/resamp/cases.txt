@@ -1,0 +1,12 @@
+# Raw native floats, default spacing and unlimited rows.
+[f32] suspike nt=9 ntr=3 | sustrip head=hdr outpar=par | resamp n1=9
+[f32] suspike nt=9 ntr=3 | sustrip head=hdr outpar=par | resamp n1=9 n2=2 d1=0.5 f1=-1 n1r=17 d1r=0.25 f1r=-2
+[f32] suspike nt=1 ntr=1 | sustrip head=hdr outpar=par | resamp n1=1 n1r=5 d1r=0.5 f1r=0
+[f32] suspike nt=7 ntr=2 | sustrip head=hdr outpar=par | resamp n1=7 n2=-2 n1r=11 d1r=-0.4 f1r=5
+[f32] suspike nt=7 ntr=2 | sustrip head=hdr outpar=par | resamp n1=7 n2=0
+[f32] suspike nt=7 ntr=2 | sustrip head=hdr outpar=par | resamp n1=7 n2=2 n1r=0
+[f32] suspike nt=7 ntr=2 | sustrip head=hdr outpar=par > in.bin && resamp n1r=9 d1r=0.5 < in.bin
+[stderr] suspike nt=7 ntr=1 | sustrip head=hdr outpar=par | resamp n1=7 verbose=1
+[stderr] printf '' | resamp n1=3
+[stderr] printf '' | resamp n2=1
+[stderr] resamp n1=99999999999999999999

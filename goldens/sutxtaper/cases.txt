@@ -1,0 +1,29 @@
+# Defaults and single-trace/single-sample panel
+suplane nt=31 ntr=7 | sutxtaper
+sunull nt=1 ntr=1 | sutxtaper
+# All shapes and time/trace taper combinations
+suplane nt=31 ntr=7 | sutxtaper tr1=2 low=0.3 taper=1 tbeg=8 tend=8
+suplane nt=31 ntr=7 | sutxtaper tr1=3 tr2=1 taper=2
+suplane nt=31 ntr=7 | sutxtaper tr1=2 taper=3 tbeg=12 tend=12
+suplane nt=31 ntr=7 | sutxtaper tr1=2 taper=4 tbeg=12 tend=12
+suplane nt=31 ntr=7 | sutxtaper tr1=2 taper=5 tbeg=12 tend=12
+# Header taper, explicit trace counts, and verbose diagnostics
+[stderr] suplane nt=31 ntr=7 | sushw key=offset a=0 b=10 | sutxtaper key=offset min=20 max=40 dx=20 low=0.1 taper=3 verbose=1 n2=7
+[stderr] suplane nt=31 ntr=7 | sutxtaper ntr=7 tr1=2 tr2=3 verbose=2
+suplane nt=31 ntr=7 | sutxtaper n2=3
+suplane nt=31 ntr=7 | sutxtaper low=-0.5 tr1=2 tr2=0
+suplane nt=31 ntr=7 | sutxtaper key=offset min=0 max=0 dx=0
+# Errors
+sutxtaper low=2
+sutxtaper
+suplane nt=31 ntr=7 | sutxtaper tbeg=1000
+suplane nt=31 ntr=7 | sutxtaper tr1=2 taper=9
+suplane nt=31 ntr=7 | sutxtaper key=notakey
+suplane nt=31 ntr=7 | sutxtaper ntr=9
+# Exercise temporary-file storage across a larger panel with distinct headers.
+suplane nt=63 ntr=257 | sushw key=offset a=-128 b=1 | sutxtaper key=offset min=-40 max=40 dx=30 tbeg=16 tend=12 taper=2 ntr=257
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+suplane nt=31 ntr=7 | suaddnoise seed=7 sn=2 | sushw key=sx,scalco a=1000,-1 b=500,0 | sutxtaper key=sx min=150 max=350 dx=100 taper=4
+suplane nt=31 ntr=7 | suaddnoise seed=7 sn=2 | sushw key=gelev,scalel a=100,1 b=50,0 | sutxtaper key=gelev min=1500 max=3500 dx=1500 taper=5 low=0.2 tend=40
+suplane nt=40 ntr=9 | suaddnoise seed=7 sn=2 | sutxtaper tr1=3 tr2=2 taper=4 tbeg=20 low=0.25

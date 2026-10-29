@@ -1,0 +1,423 @@
+{
+  "scope": "su/main/windowing_sorting_muting (re-scout batch 3)",
+  "programs": [
+    {
+      "name": "susplit",
+      "path": "su/main/windowing_sorting_muting/susplit.c",
+      "purpose": "Split input traces into files named according to a selected header value.",
+      "selfdoc_first_line": " SUSPLIT - Split traces into different output files by keyword value\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "cdp",
+          "required": false,
+          "description": "Header word whose integer-converted value determines the output file."
+        },
+        {
+          "name": "stem",
+          "type": "string",
+          "default": "split_",
+          "required": false,
+          "description": "Output filename prefix."
+        },
+        {
+          "name": "middle",
+          "type": "string",
+          "default": "computed: the value of key",
+          "required": false,
+          "description": "Text between the filename prefix and numeric header value."
+        },
+        {
+          "name": "suffix",
+          "type": "string",
+          "default": ".su",
+          "required": false,
+          "description": "Output filename suffix."
+        },
+        {
+          "name": "numlength",
+          "type": "int",
+          "default": "7",
+          "required": false,
+          "description": "Minimum width of the zero-padded numeric filename component."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report the key and output filenames."
+        },
+        {
+          "name": "close",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "If nonzero, close the previous output file when the key value changes."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparint",
+        "checkpars",
+        "gettr",
+        "err",
+        "hdtype",
+        "getindex",
+        "warn",
+        "gethval",
+        "vtoi",
+        "efclose",
+        "efopen",
+        "fputtr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values are converted to int before comparison and filename generation. With close=0, each key change opens another file without closing the previous stream, which can exhaust file descriptors; filenames are built with unchecked sprintf into fixed-size buffers.",
+      "c_lines": 114,
+      "difficulty": "easy",
+      "difficulty_reason": "The program routes individual traces to append-mode files using a header value.",
+      "test_cases": [
+        {
+          "description": "Split a small generated dataset using the default key and custom filenames.",
+          "command": "suplane nt=64 ntr=8 | susplit key=tracl stem=split_a_ middle=trace suffix=.su numlength=3"
+        },
+        {
+          "description": "Exercise verbose reporting and repeated key values without closing streams between key changes.",
+          "command": "suplane nt=64 ntr=8 | susplit key=cdp stem=split_b_ middle=cdp suffix=.su numlength=4 verbose=1 close=0"
+        }
+      ],
+      "license_note": "Credits attribute the program to Garry Perratt of Geocon, hacked together from various other codes.",
+      "related_programs": []
+    },
+    {
+      "name": "suwind",
+      "path": "su/main/windowing_sorting_muting/suwind.c",
+      "purpose": "Select traces by header values and optionally window their samples.",
+      "selfdoc_first_line": " SUWIND - window traces by key word\t\t\t\t\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "tracl",
+          "required": false,
+          "description": "Header word used for trace selection."
+        },
+        {
+          "name": "min",
+          "type": "long",
+          "default": "INT_MIN",
+          "required": false,
+          "description": "Minimum accepted integer-converted key value."
+        },
+        {
+          "name": "max",
+          "type": "long",
+          "default": "INT_MAX",
+          "required": false,
+          "description": "Maximum accepted integer-converted key value."
+        },
+        {
+          "name": "j",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Select values for which (key - s) modulo j is zero."
+        },
+        {
+          "name": "s",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Base value for the j selection."
+        },
+        {
+          "name": "count",
+          "type": "unsigned long",
+          "default": "ULONG_MAX",
+          "required": false,
+          "description": "Stop after this many selected traces."
+        },
+        {
+          "name": "abs",
+          "type": "short",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, take the absolute value of the key before range and modulo selection."
+        },
+        {
+          "name": "verbose",
+          "type": "short",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report parameters and key-range statistics."
+        },
+        {
+          "name": "skip",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Skip this many initial traces using random-access disk input."
+        },
+        {
+          "name": "ordered",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 or -1 for increasing or decreasing keys to stop when the range is passed."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: seismic tr.dt / 1000000.0; otherwise tr.d1 if nonzero, else tr.dt",
+          "required": false,
+          "description": "Sample interval; the program errors if the applicable header-derived interval is zero."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "computed: seismic tr.delrt / 1000.0; otherwise tr.f1",
+          "required": false,
+          "description": "Coordinate of the first input sample."
+        },
+        {
+          "name": "itmin",
+          "type": "int",
+          "default": "computed: NINT((tmin - f1) / dt) if tmin is supplied; otherwise 0",
+          "required": false,
+          "description": "First sample index to pass; takes precedence over tmin."
+        },
+        {
+          "name": "tmin",
+          "type": "float",
+          "default": "computed: itmin * dt + f1 if itmin is supplied; otherwise f1",
+          "required": false,
+          "description": "First sample coordinate to pass, rounded to the nearest sample."
+        },
+        {
+          "name": "itmax",
+          "type": "int",
+          "default": "computed: NINT((tmax - f1) / dt) if tmax is supplied; otherwise itmin + nt - 1 if nt is supplied; otherwise first trace ns - 1",
+          "required": false,
+          "description": "Last sample index to pass; takes precedence over tmax and nt."
+        },
+        {
+          "name": "tmax",
+          "type": "float",
+          "default": "computed: itmax * dt + f1 when itmax is supplied, or when derived from nt or first trace ns",
+          "required": false,
+          "description": "Last sample coordinate to pass, rounded to the nearest sample; takes precedence over nt."
+        },
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "computed: itmax - itmin + 1",
+          "required": false,
+          "description": "Number of samples to pass when neither itmax nor tmax is supplied."
+        },
+        {
+          "name": "reject",
+          "type": "header-type array",
+          "default": "",
+          "required": false,
+          "description": "Values to reject, parsed using the selected header word's type."
+        },
+        {
+          "name": "accept",
+          "type": "header-type array",
+          "default": "",
+          "required": false,
+          "description": "Values to accept even if normal range, modulo, or reject tests would exclude them, subject to ordered and count stopping."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparlong",
+        "getparint",
+        "getparulong",
+        "getparshort",
+        "fgettra",
+        "err",
+        "gettr",
+        "warn",
+        "getparfloat",
+        "hdtype",
+        "getindex",
+        "countparval",
+        "ealloc1",
+        "getparval",
+        "checkpars",
+        "fprintfval",
+        "gethval",
+        "valcmp",
+        "valtoabs",
+        "vtoi",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Time-to-index conversion uses float arithmetic and NINT, while seismic header defaults are computed using double division before assignment to float. The sample-copy loop can read beyond the input samples when itmax exceeds the input length; padding is calculated from nt rather than itmax, so some requested windows can retain stale or uninitialized samples. j=0 causes division by zero, and the unsigned count underflows if initialized to zero.",
+      "c_lines": 471,
+      "difficulty": "medium",
+      "difficulty_reason": "The program combines typed header selection, random-access skipping, and sample-window and padding logic.",
+      "test_cases": [
+        {
+          "description": "Select a header range and every second trace while gating by sample index.",
+          "command": "suplane nt=128 ntr=16 | suwind key=tracl min=3 max=14 j=2 s=0 itmin=10 itmax=60 ordered=1"
+        },
+        {
+          "description": "Exercise accept and reject lists, absolute key selection, and time-based gating.",
+          "command": "suplane nt=128 ntr=16 | suwind key=tracl min=2 max=10 reject=4,6 accept=12 abs=1 dt=0.004 f1=0 tmin=0.04 tmax=0.2 verbose=1"
+        },
+        {
+          "description": "Exercise random-access skipping and explicit output length.",
+          "command": "suplane nt=128 ntr=16 > in.su && suwind < in.su skip=3 count=5 itmin=4 nt=40"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suwindpoly",
+      "path": "su/main/windowing_sorting_muting/suwindpoly.c",
+      "purpose": "Write traces near a polyline or inside or outside polygons defined by header coordinates.",
+      "selfdoc_first_line": " SUWINDPOLY - WINDow data to extract traces on or within a respective\t",
+      "params": [
+        {
+          "name": "x",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "X coordinates of vertices; repeat x= for multiple polygons."
+        },
+        {
+          "name": "y",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Y coordinates of vertices; repeat y= for multiple polygons and match each x list."
+        },
+        {
+          "name": "file",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Output filename; repeat file= for each polygon in pass=1. Pass=2 requires one file; pass=0 uses the first file."
+        },
+        {
+          "name": "xkey",
+          "type": "string",
+          "default": "fldr",
+          "required": false,
+          "description": "Header word containing the X coordinate."
+        },
+        {
+          "name": "ykey",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Header word containing the Y coordinate."
+        },
+        {
+          "name": "ilkey",
+          "type": "string",
+          "default": "tracl",
+          "required": false,
+          "description": "Header word receiving the integer-converted along-line coordinate in polyline mode."
+        },
+        {
+          "name": "xlkey",
+          "type": "string",
+          "default": "tracr",
+          "required": false,
+          "description": "Header word receiving the integer-converted cross-line coordinate in polyline mode."
+        },
+        {
+          "name": "dw",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Maximum absolute cross-line distance accepted in polyline mode."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "X coordinate scale used in polyline mode."
+        },
+        {
+          "name": "dy",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Y coordinate scale used in polyline mode."
+        },
+        {
+          "name": "pass",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use 0 for polyline, 1 for polygon interiors, or 2 for polygon exteriors."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparfloat",
+        "getparint",
+        "checkpars",
+        "countparname",
+        "err",
+        "getnparstring",
+        "countnparval",
+        "getnparfloat",
+        "warn",
+        "fgettr",
+        "hdtype",
+        "getindex",
+        "gethval",
+        "vtof",
+        "puthval",
+        "fputtr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Polyline and polygon calculations use float intermediates, exact float comparisons, and sqrt, pow and fabs; rounding can change boundary classification or integer-converted output coordinates. Polyline slope calculations can divide by zero and produce infinities or NaNs. Polygon scaling depends on whether the supplied polygon was already closed. Missing files in pass=0 and empty or malformed vertex lists can lead to invalid memory access instead of a clean error.",
+      "c_lines": 741,
+      "difficulty": "medium",
+      "difficulty_reason": "The program implements geometric selection, per-segment coordinate transforms, and multiple output streams.",
+      "test_cases": [
+        {
+          "description": "Extract traces near a scaled polyline and write transformed coordinates to custom headers.",
+          "command": "suplane nt=64 ntr=16 | suwindpoly xkey=tracl ykey=tracr x=1,16 y=1,16 dx=2 dy=1 dw=4 ilkey=cdp xlkey=offset pass=0 file=line.su"
+        },
+        {
+          "description": "Write traces inside two polygons to separate files.",
+          "command": "suplane nt=64 ntr=16 | suwindpoly xkey=tracl ykey=tracr x=0,8,8,0 y=0,0,20,20 x=8,20,20,8 y=0,0,20,20 pass=1 file=inside1.su file=inside2.su"
+        },
+        {
+          "description": "Write traces outside a polygon.",
+          "command": "suplane nt=64 ntr=16 | suwindpoly xkey=tracl ykey=tracr x=3,10,10,3 y=0,0,20,20 pass=2 file=outside.su"
+        }
+      ],
+      "license_note": "Credits state that Reginald H. Beardsley's code was originally suxarb.c adapted from the SLT/SU package; the polygon routine cites Joseph O'Rourke's Computational Geometry in C as the basis of its algorithm.",
+      "related_programs": []
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Global histogram, outliers and defaults.
+[exact] suspike nt=7 ntr=3 k1=3 | suhistogram min=-0.5 max=0.5 bins=5
+[exact] sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=3 trend=0 clip=0 dt=2
+# Per-sample text and trace outputs, clip, datum and explicit sample spacing.
+[exact] suplane nt=17 ntr=5 | suhistogram min=-2 max=2 bins=7 trend=1
+[exact] suspike nt=7 ntr=1 k1=3 | suhistogram min=-1 max=2 bins=5 trend=1 clip=0.5 dt=4
+suplane nt=17 ntr=5 | sushw key=delrt a=4 | suhistogram min=-2 max=2 bins=7 trend=2 datum=delrt dt=4
+sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=3 trend=2
+suplane nt=7 ntr=3 | suhistogram min=-1 max=1 bins=5 trend=3 clip=0
+[stderr] suplane nt=7 ntr=3 | suhistogram min=-1 max=1 bins=5 verbose=1
+# Missing arguments and empty input.
+[stderr] suhistogram min=-1 max=1 bins=3 </dev/null
+[stderr] sunull nt=3 ntr=1 | suhistogram max=1 bins=3
+[stderr] sunull nt=3 ntr=1 | suhistogram min=-1 bins=3
+[stderr] sunull nt=3 ntr=1 | suhistogram min=-1 max=1
+[stderr] sunull nt=3 ntr=1 | suhistogram min=-1 max=1 bins=3 trend=1 datum=notakey
+# Negative bins fail allocation in the original; zero bins are defined in trend modes.
+[stderr] sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=-1
+[stderr] sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=-1 trend=1
+[exact] sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=0 trend=1
+[exact] sunull nt=1 ntr=1 | suhistogram min=-1 max=1 bins=0 trend=2

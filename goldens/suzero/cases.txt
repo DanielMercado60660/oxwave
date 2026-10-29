@@ -1,0 +1,15 @@
+# Inclusive windows, default values, and odd sizes.
+suspike ntr=1 nt=1 | suzero itmax=0
+suspike ntr=3 nt=7 | suzero itmax=6
+suspike ntr=2 nt=7 | suzero itmin=3 itmax=3 value=2.5
+suspike ntr=2 nt=7 | suzero itmin=5 itmax=7 value=-1.25
+suspike ntr=1 nt=1 | suzero itmin=1 itmax=1 value=4
+suspike ntr=2 nt=9 | suzero itmin=0 itmax=0 value=0
+# Missing and invalid parameters, empty input, and diagnostics.
+[stderr] suzero itmax=1
+[stderr] suspike ntr=1 nt=7 | suzero
+[stderr] suspike ntr=1 nt=7 | suzero itmax=8
+[stderr] suspike ntr=1 nt=7 | suzero itmin=-1 itmax=2
+[stderr] suspike ntr=1 nt=7 | suzero itmin=4 itmax=3
+[stderr] suspike ntr=1 nt=7 | suzero itmax=-1
+[stderr] suspike ntr=1 nt=7 | suzero itmax=2 verbose=1 extra=3

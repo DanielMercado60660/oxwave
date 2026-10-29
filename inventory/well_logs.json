@@ -1,0 +1,652 @@
+{
+  "scope": "su/main/well_logs part 1 of 1",
+  "programs": [
+    {
+      "name": "las2su",
+      "path": "su/main/well_logs/las2su.c",
+      "purpose": "Convert LAS well-log curves into SU traces and save the LAS header.",
+      "selfdoc_first_line": " LAS2SU - convert las2 format well log curves to su traces\t",
+      "params": [
+        {
+          "name": "ncurve",
+          "type": "int",
+          "default": "computed: count lines in the LAS ~C block",
+          "required": false,
+          "description": "Number of curves; overrides automatic counting."
+        },
+        {
+          "name": "dz",
+          "type": "float",
+          "default": "0.5",
+          "required": false,
+          "description": "Input depth interval in feet."
+        },
+        {
+          "name": "m",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to express output depth headers in meters."
+        },
+        {
+          "name": "ss",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to subsample; the implementation applies both subsampling passes, yielding every fourth sample."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print curve count and subsampling diagnostics."
+        },
+        {
+          "name": "outhdr",
+          "type": "string",
+          "default": "las_header.asc",
+          "required": false,
+          "description": "Output file for LAS header lines."
+        },
+        {
+          "name": "nskip",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Appears in the usage line but is ignored and is not read by the implementation."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "efclose",
+        "warn",
+        "ealloc2float",
+        "puttr"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "ASCII values are converted with atof and stored as floats; depth headers mix float and double arithmetic and dt is converted to an integer header. fgets requests 400 bytes into a 300-byte array, input can overrun the allocated depth array before subsampling, and missing tokens can cause undefined behavior.",
+      "c_lines": 289,
+      "difficulty": "medium",
+      "difficulty_reason": "It parses a stateful LAS header and buffers and transposes all curves before output.",
+      "test_cases": [
+        {
+          "description": "Explicit curve count and metric depth headers; LAS input must be constructed because SU trace generators do not emit LAS.",
+          "command": "printf '~C\\nDEPT .FT\\nVP .M/S\\n~P\\n~A\\n100 2000\\n101 2100\\n102 2200\\n103 2300\\n' | las2su ncurve=2 dz=1 m=1 outhdr=las_header.asc > out.su"
+        },
+        {
+          "description": "Automatic curve count and requested subsampling.",
+          "command": "printf '~C\\nDEPT .FT\\nVP .M/S\\n~P\\n~A\\n100 2000\\n101 2100\\n102 2200\\n103 2300\\n104 2400\\n105 2500\\n106 2600\\n107 2700\\n' | las2su dz=1 ss=1 verbose=1 outhdr=las_header.asc > out.su"
+        }
+      ],
+      "license_note": "Credits state that Chris Liner's code was released with Saudi Aramco permission and was based on code by Ferhan Ahmed and a2b.c; lasstrip by Werner Heigl is also credited.",
+      "related_programs": []
+    },
+    {
+      "name": "subackus",
+      "path": "su/main/well_logs/subackus.c",
+      "purpose": "Calculate Backus-averaged anisotropy and optional elastic properties from velocity and density logs.",
+      "selfdoc_first_line": " SUBACKUS - calculate Thomsen anisotropy parameters from \t",
+      "params": [
+        {
+          "name": "navg",
+          "type": "int",
+          "default": "201",
+          "required": false,
+          "description": "Averaging window in samples; nondefault values are rounded up to an odd integer."
+        },
+        {
+          "name": "all",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to output additional elastic and input-log traces."
+        },
+        {
+          "name": "ang",
+          "type": "float",
+          "default": "30",
+          "required": false,
+          "description": "Angle in degrees for the phase-velocity ratio."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "gettr",
+        "err",
+        "alloc1float",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Window sums accumulate in float order; formulas mix float values with double literals and use sin, cos and sqrt. Zero or invalid elastic properties can produce nonfinite values; oversized windows can access outside arrays.",
+      "c_lines": 555,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers three logs and computes several coupled window averages and optional output traces.",
+      "test_cases": [
+        {
+          "description": "Three positive synthetic logs with a short averaging window.",
+          "command": "suplane nt=128 ntr=3 | suop op=abs | suop2 op=sum2 in2=<(sunull nt=128 ntr=3 | suaddhead ns=128) | sugain bias=2000 | subackus navg=11 all=0 ang=25 > out.su"
+        },
+        {
+          "description": "All output properties and an even window rounded to odd.",
+          "command": "suplane nt=128 ntr=3 | suop op=abs | sugain bias=2000 | subackus navg=10 all=1 ang=45 > out.su"
+        }
+      ],
+      "license_note": "Chris Liner credits Saudi Aramco permission to release the code and cites Thomsen's SEG DISC Notes.",
+      "related_programs": [
+        "subackush",
+        "sulprime"
+      ]
+    },
+    {
+      "name": "subackush",
+      "path": "su/main/well_logs/subackush.c",
+      "purpose": "Calculate Backus-averaged elastic and anisotropy logs with optional gamma-ray-based shale anisotropy.",
+      "selfdoc_first_line": " SUBACKUSH - calculate Thomsen anisotropy parameters from \t",
+      "params": [
+        {
+          "name": "navg",
+          "type": "int",
+          "default": "101",
+          "required": false,
+          "description": "Averaging window in samples; values other than 201 are rounded up to an odd integer."
+        },
+        {
+          "name": "gr",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to read a fourth gamma-ray trace."
+        },
+        {
+          "name": "grs",
+          "type": "float",
+          "default": "100.0",
+          "required": false,
+          "description": "Pure-shale gamma-ray value."
+        },
+        {
+          "name": "grc",
+          "type": "float",
+          "default": "10.0",
+          "required": false,
+          "description": "Zero-shale gamma-ray value."
+        },
+        {
+          "name": "smode",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Use shale anisotropy proportional to shale volume; 0 applies it to pure shale only."
+        },
+        {
+          "name": "se",
+          "type": "float",
+          "default": "0.209",
+          "required": false,
+          "description": "Shale epsilon."
+        },
+        {
+          "name": "sd",
+          "type": "float",
+          "default": "0.033",
+          "required": false,
+          "description": "Shale delta."
+        },
+        {
+          "name": "sg",
+          "type": "float",
+          "default": "0.203",
+          "required": false,
+          "description": "Shale gamma."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "gettr",
+        "err",
+        "alloc1float",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float window accumulation and mixed float/double expressions use pow and sqrt. The shale-volume array is not initialized when gr=0, and oversized windows can access outside arrays.",
+      "c_lines": 457,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers multiple logs and computes coupled window averages with optional shale-dependent stiffnesses.",
+      "test_cases": [
+        {
+          "description": "Backus averaging without gamma-ray input.",
+          "command": "suplane nt=128 ntr=3 | suop op=abs | sugain bias=2000 | subackush navg=11 gr=0 > out.su"
+        },
+        {
+          "description": "Gamma-ray input with pure-shale-only anisotropy.",
+          "command": "suplane nt=128 ntr=4 | suop op=abs | sugain bias=100 | subackush navg=10 gr=1 grc=10 grs=100 smode=0 se=0.2 sd=0.03 sg=0.19 > out.su"
+        }
+      ],
+      "license_note": "Chris Liner credits Saudi Aramco permission to release the code and cites Thomsen's SEG DISC Notes.",
+      "related_programs": [
+        "subackus",
+        "sulprime"
+      ]
+    },
+    {
+      "name": "sugassmann",
+      "path": "su/main/well_logs/sugassmann.c",
+      "purpose": "Generate a synthetic trace of reflectivity sensitivity to reservoir fluid and rock properties.",
+      "selfdoc_first_line": " SUGASSMAN - Model reflectivity change with rock/fluid properties\t",
+      "params": [
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "500",
+          "required": false,
+          "description": "Requested sample count; mode 0 replaces it with 200."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "200",
+          "required": false,
+          "description": "Requested trace count; mode 0 replaces it with 1."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "0.004",
+          "required": false,
+          "description": "Time sampling interval in seconds."
+        },
+        {
+          "name": "mode",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Only 0 and 1 survive validation; mode 0 produces a sensitivity trace, mode 1 produces no traces, and the mode 2 branch is unreachable."
+        },
+        {
+          "name": "it1",
+          "type": "int",
+          "default": "computed: nt/2",
+          "required": false,
+          "description": "Nominal spike index; read but unused."
+        },
+        {
+          "name": "temp",
+          "type": "float",
+          "default": "140",
+          "required": false,
+          "description": "Temperature in degrees Celsius."
+        },
+        {
+          "name": "pres",
+          "type": "float",
+          "default": "200",
+          "required": false,
+          "description": "Pressure in MPa; selfdoc says 20."
+        },
+        {
+          "name": "v1",
+          "type": "float",
+          "default": "3300",
+          "required": false,
+          "description": "Caprock P-wave velocity; selfdoc gives a different default."
+        },
+        {
+          "name": "r1",
+          "type": "float",
+          "default": "2.6",
+          "required": false,
+          "description": "Caprock density; selfdoc gives a different default."
+        },
+        {
+          "name": "g",
+          "type": "float",
+          "default": "0.56",
+          "required": false,
+          "description": "Gas specific gravity."
+        },
+        {
+          "name": "api",
+          "type": "float",
+          "default": "50",
+          "required": false,
+          "description": "Oil API gravity."
+        },
+        {
+          "name": "s",
+          "type": "float",
+          "default": ".35",
+          "required": false,
+          "description": "Brine salinity fraction; selfdoc says 35."
+        },
+        {
+          "name": "so",
+          "type": "float",
+          "default": ".7",
+          "required": false,
+          "description": "Oil saturation."
+        },
+        {
+          "name": "sg",
+          "type": "float",
+          "default": ".2",
+          "required": false,
+          "description": "Gas saturation."
+        },
+        {
+          "name": "kmin",
+          "type": "float",
+          "default": "37900",
+          "required": false,
+          "description": "Mineral bulk modulus in MPa."
+        },
+        {
+          "name": "mumin",
+          "type": "float",
+          "default": "44300",
+          "required": false,
+          "description": "Mineral shear modulus in MPa."
+        },
+        {
+          "name": "rmin",
+          "type": "float",
+          "default": "2.67",
+          "required": false,
+          "description": "Mineral density."
+        },
+        {
+          "name": "phi",
+          "type": "float",
+          "default": "0.24",
+          "required": false,
+          "description": "Porosity."
+        },
+        {
+          "name": "a",
+          "type": "float",
+          "default": "1",
+          "required": false,
+          "description": "Frame stiffness fitting coefficient."
+        },
+        {
+          "name": "b",
+          "type": "float",
+          "default": "15",
+          "required": false,
+          "description": "Frame stiffness fitting coefficient."
+        },
+        {
+          "name": "c",
+          "type": "float",
+          "default": "1",
+          "required": false,
+          "description": "Frame stiffness fitting exponent."
+        },
+        {
+          "name": "h",
+          "type": "float",
+          "default": "20",
+          "required": false,
+          "description": "Reservoir thickness; used only in unreachable mode 2."
+        },
+        {
+          "name": "p",
+          "type": "float",
+          "default": ".15",
+          "required": false,
+          "description": "Fractional sensitivity range used by mode 0."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "puttr",
+        "CWP_Exit",
+        "err"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Long empirical expressions mix float intermediates and double constants with many pow and sqrt calls; platform math and evaluation order affect results. Invalid fluid properties can produce nonfinite values. Mode 2 is reset to 0 before its branch and mode 1 has no output branch.",
+      "c_lines": 760,
+      "difficulty": "medium",
+      "difficulty_reason": "Its lengthy coupled empirical rock and fluid formulas require careful numerical transcription.",
+      "test_cases": [
+        {
+          "description": "Sensitivity trace with modified rock and fluid parameters.",
+          "command": "sugassmann nt=128 ntr=2 mode=0 p=0.1 phi=0.2 so=0.6 sg=0.2 pres=20 > out.su"
+        },
+        {
+          "description": "Mode 1 exercises the implemented empty-output path.",
+          "command": "sugassmann nt=128 ntr=2 mode=1 dt=0.002 it1=30 > out.su"
+        },
+        {
+          "description": "Mode 2 is coerced to mode 0.",
+          "command": "sugassmann nt=128 ntr=2 mode=2 p=0.05 s=0.1 > out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sulprime",
+      "path": "su/main/well_logs/sulprime.c",
+      "purpose": "Search odd Backus averaging lengths for the one closest to a target Backus number.",
+      "selfdoc_first_line": " SULPRIME - find appropriate Backus average length for  \t",
+      "params": [
+        {
+          "name": "b",
+          "type": "float",
+          "default": "2.0",
+          "required": false,
+          "description": "Target Backus number."
+        },
+        {
+          "name": "dz",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Input depth interval in feet."
+        },
+        {
+          "name": "f",
+          "type": "float",
+          "default": "60.0",
+          "required": false,
+          "description": "Frequency in Hz."
+        },
+        {
+          "name": "nmax",
+          "type": "int",
+          "default": "301",
+          "required": false,
+          "description": "Maximum averaging window length in samples."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 for intermediate results; selfdoc incorrectly gives the default as 1."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "getparint",
+        "checkpars",
+        "warn",
+        "gettr",
+        "err",
+        "alloc1float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The search repeatedly accumulates float window sums and uses sqrt and fabs with mixed float and double arithmetic; small numerical differences can change the selected window. Results are written to stderr.",
+      "c_lines": 209,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers logs and searches many averaging windows using repeated numerical calculations.",
+      "test_cases": [
+        {
+          "description": "Search a small range and print intermediate results.",
+          "command": "suplane nt=128 ntr=3 | suop op=abs | sugain bias=2000 | sulprime b=0.3 dz=0.5 f=40 nmax=21 verbose=1"
+        },
+        {
+          "description": "Search with a different target and sampling interval.",
+          "command": "suplane nt=128 ntr=3 | suop op=abs | sugain bias=1500 | sulprime b=2 dz=1 f=60 nmax=31 verbose=0"
+        }
+      ],
+      "license_note": "Chris Liner credits Saudi Aramco permission to release the code.",
+      "related_programs": [
+        "subackus",
+        "subackush"
+      ]
+    },
+    {
+      "name": "suwellrf",
+      "path": "su/main/well_logs/suwellrf.c",
+      "purpose": "Convert binary depth, velocity, and density logs into time-sampled normal-incidence reflectivity traces.",
+      "selfdoc_first_line": " SUWELLRF - convert WELL log depth, velocity, density data into a\t",
+      "params": [
+        {
+          "name": "nval",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of input depth, velocity, and density records."
+        },
+        {
+          "name": "dvrfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Interleaved binary depth, velocity, and density file; takes precedence over other file forms."
+        },
+        {
+          "name": "dvfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Interleaved depth and velocity file; paired with drfile."
+        },
+        {
+          "name": "drfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Interleaved depth and density file; the paired-file branch checks dvfile twice and then opens drfile."
+        },
+        {
+          "name": "dfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Binary depth file for the three-file form."
+        },
+        {
+          "name": "vfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Binary velocity file for the three-file form."
+        },
+        {
+          "name": "rhofile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Binary density file for the three-file form."
+        },
+        {
+          "name": "dtout",
+          "type": "float",
+          "default": "computed: minimum input two-way interval divided by 2",
+          "required": false,
+          "description": "Output time interval in seconds; selfdoc says .004."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of identical output traces."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "ealloc2float",
+        "efopen",
+        "err",
+        "efread",
+        "free2float",
+        "ealloc1float",
+        "free1float",
+        "getparfloat",
+        "checkpars",
+        "warn",
+        "ints8r",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Traveltime accumulation and sample-index rounding use mixed float and double arithmetic, followed by eight-point sinc interpolation. The final reflectivity is written at maxtrace[ntmax], one past its allocation; missing file combinations leave zero input values, and the paired-file condition checks dvfile twice.",
+      "c_lines": 295,
+      "difficulty": "medium",
+      "difficulty_reason": "It supports multiple binary input layouts, builds a reflectivity series, and resamples it with sinc interpolation.",
+      "test_cases": [
+        {
+          "description": "Interleaved input and explicit output sampling; a2b creates the required non-SU binary input.",
+          "command": "printf '0 2000 2.0\\n10 2200 2.1\\n20 2400 2.2\\n' | a2b n1=3 > dvr.bin && suwellrf dvrfile=dvr.bin nval=3 dtout=0.002 ntr=2 > out.su"
+        },
+        {
+          "description": "Separate depth-velocity and depth-density files with computed output sampling.",
+          "command": "printf '0 2000\\n10 2200\\n20 2400\\n' | a2b n1=2 > dv.bin && printf '0 2.0\\n10 2.1\\n20 2.2\\n' | a2b n1=2 > dr.bin && suwellrf dvfile=dv.bin drfile=dr.bin nval=3 ntr=1 > out.su"
+        },
+        {
+          "description": "Three separate binary input files.",
+          "command": "printf '0\\n10\\n20\\n' | a2b n1=1 > d.bin && printf '2000\\n2200\\n2400\\n' | a2b n1=1 > v.bin && printf '2.0\\n2.1\\n2.2\\n' | a2b n1=1 > rho.bin && suwellrf dfile=d.bin vfile=v.bin rhofile=rho.bin nval=3 dtout=0.001 ntr=1 > out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

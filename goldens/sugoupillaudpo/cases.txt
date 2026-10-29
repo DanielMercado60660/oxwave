@@ -1,0 +1,23 @@
+# Defaults and multiple nonzero reflectors, including the surface.
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("9f", .1,-.2,.3,-.4,.5,-.6,.7,-.8,.9))' | suaddhead ns=9 | sugoupillaudpo
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("9f", .1,-.2,.3,-.4,.5,-.6,.7,-.8,.9))' | suaddhead ns=9 | sugoupillaudpo k=4 l=2 pV=1 tmax=7
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("9f", .1,-.2,.3,-.4,.5,-.6,.7,-.8,.9))' | suaddhead ns=9 | sugoupillaudpo k=2 l=5 pV=-1 tmax=9
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("9f", .1,-.2,.3,-.4,.5,-.6,.7,-.8,.9))' | suaddhead ns=9 | sugoupillaudpo k=3 l=3 pV=-1 verbose=1
+[stderr] suspike nt=9 ntr=1 k1=4 mag=0.3 | sugoupillaudpo k=2 l=3 verbose=1
+[stderr] suspike nt=1 ntr=1 k1=1 mag=0.2 | sugoupillaudpo tmax=1
+suspike nt=7 ntr=2 k1=3 mag=1 | sugoupillaudpo tmax=1
+sugoupillaudpo
+suspike nt=5 ntr=1 | sugoupillaudpo k=0
+suspike nt=5 ntr=1 | sugoupillaudpo l=0
+suspike nt=5 ntr=1 | sugoupillaudpo l=6
+suspike nt=5 ntr=1 | sugoupillaudpo tmax=-1
+suspike nt=5 ntr=1 | sugoupillaudpo tmax=0
+suspike nt=5 ntr=1 | sugoupillaudpo pV=0
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("5f", 0,1.1,0,0,0))' | suaddhead ns=5 | sugoupillaudpo
+python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("5f", 0,-1.1,0,0,0))' | suaddhead ns=5 | sugoupillaudpo
+suspike nt=7 ntr=1 | sugoupillaudpo k=5 l=1 tmax=2
+# Extreme invalid layer values exercise the optional default and validation order.
+suspike nt=5 ntr=1 | sugoupillaudpo l=-2147483648 tmax=1
+suspike nt=5 ntr=1 | sugoupillaudpo l=-2147483648
+suspike nt=5 ntr=1 | sugoupillaudpo k=-2147483648 tmax=1
+suspike nt=5 ntr=1 | sugoupillaudpo k=-2147483648

@@ -1,0 +1,17 @@
+# Defaults, all coordinates, and verbose diagnostics.
+[stderr] printf '%%!PS\n%%%%BoundingBox: -1 2 33 44\nshowpage\n' | psbbox
+[stderr] printf '%%%%BoundingBox: 1 2 3 4\n' | psbbox llx=-10 lly=0 urx=7 ury=99 verbose=1
+printf '%%%%BoundingBox: 1 2 3 4\n' | psbbox llx=12 ury=-4 verbose=0
+# Floating values, rounding and integer-prefix parsing.
+printf '%%%%BoundingBox: -1.5 2.4 3.5 -4.5\n' | psbbox verbose=0
+printf '%%%%BoundingBox: 1 2 3 4.9\n' | psbbox verbose=0
+# Deferred, repeated, absent, and malformed bounding boxes.
+printf '%%%%BoundingBox: (atend)\ntext\n%%%%BoundingBox: 1 2 3 4\n%%%%BoundingBox: 5 6 7 8\n' | psbbox verbose=0
+printf 'ordinary text\n' | psbbox verbose=0
+psbbox verbose=0 </dev/null
+printf '%%%%BoundingBox: invalid\n' | psbbox verbose=0
+printf '%%%%BoundingBox: 1 2 3 4\n' | psbbox llx=999999999999999999999 verbose=0
+# Long lines and a line without a trailing newline.
+python3 -c 'print("x"*2051); print("%%BoundingBox: 1 2 3 4", end="")' | psbbox verbose=0
+# Generated PostScript with nondeterministic comments removed.
+suplane nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 > in.ps && psbbox lly=10 urx=500 verbose=0 < in.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

@@ -1,0 +1,28 @@
+# Default filenames, defaults, and multiple component groups.
+suplane nt=65 ntr=6 > in.su && suplane nt=65 ntr=6 > polar.dir && suplane nt=65 ntr=2 > polar.rl && supofilt < in.su
+# Nontrivial powers and odd smoothing window; compare the actual output stream.
+suplane nt=65 ntr=6 > in.su && suaddnoise < in.su seed=17 > dir.su && suplane nt=65 ntr=2 > weight.su && supofilt < in.su dfile=dir.su wfile=weight.su dt=0.004 sl=0.012 wpow=2 dpow=1.5 verbose=1
+# Unsmooth, odd number of traces, custom files and zero exponents.
+suplane nt=33 ntr=5 > in.su && suplane nt=33 ntr=5 > dir.su && suplane nt=33 ntr=2 > weight.su && supofilt < in.su dfile=dir.su wfile=weight.su smooth=0 wpow=0 dpow=0 verbose=1
+# Single sample and single trace with smooth window of one sample.
+suspike nt=1 ntr=1 > in.su && cp in.su polar.dir && cp in.su polar.rl && supofilt < in.su sl=0.004 dt=0.004 verbose=1
+# Zero header dt falls back to 0.004.
+suplane nt=32 ntr=3 | sushw key=dt a=0 > in.su && cp in.su polar.dir && cp in.su polar.rl && supofilt < in.su sl=0.008 verbose=1
+# Stream lengths limit processing.
+suplane nt=32 ntr=6 > in.su && suplane nt=32 ntr=4 > polar.dir && suplane nt=32 ntr=1 > polar.rl && supofilt < in.su smooth=0 verbose=1
+# Error paths.
+supofilt </dev/null
+suplane nt=32 ntr=1 | supofilt smooth=0 dfile=missing
+suplane nt=32 ntr=1 > polar.dir && suplane nt=32 ntr=1 | supofilt smooth=0 wfile=missing
+suplane nt=32 ntr=1 > polar.dir && cp polar.dir polar.rl && suplane nt=32 ntr=1 | supofilt sl=0
+suplane nt=32 ntr=1 > polar.dir && cp polar.dir polar.rl && suplane nt=32 ntr=1 | supofilt sl=-1
+suplane nt=32 ntr=1 > polar.dir && cp polar.dir polar.rl && suplane nt=32 ntr=1 | supofilt sl=2
+suplane nt=31 ntr=1 > polar.dir && suplane nt=32 ntr=1 > polar.rl && suplane nt=32 ntr=1 | supofilt smooth=0
+suplane nt=32 ntr=1 > polar.dir && suplane nt=31 ntr=1 > polar.rl && suplane nt=32 ntr=1 | supofilt smooth=0
+# Generated polarization attributes and observable filtered traces.
+suplane nt=128 ntr=6 > in.su && supolar < in.su dt=0.004 wl=0.08 file=polar && supofilt < in.su dt=0.004 sl=0.04 wpow=2 dpow=1.5
+# Compare all verbose diagnostics, including the dt fallback and count.
+[stderr] suplane nt=33 ntr=3 | sushw key=dt a=0 > in.su && cp in.su polar.dir && cp in.su polar.rl && supofilt < in.su sl=0.008 verbose=1
+# An empty direction or weighting stream fails at its first header.
+: > polar.dir && suplane nt=32 ntr=1 > polar.rl && suplane nt=32 ntr=1 | supofilt smooth=0
+suplane nt=32 ntr=1 > polar.dir && : > polar.rl && suplane nt=32 ntr=1 | supofilt smooth=0

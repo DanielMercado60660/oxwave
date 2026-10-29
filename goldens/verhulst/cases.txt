@@ -1,0 +1,74 @@
+# No input is needed. Defaults, including all 2000 samples, are exercised.
+[f32] verhulst
+[f32] verhulst stepmax=2000 verbose=0 y0=10 h=.01 tol=1e-8 mode=x a1=1.0 a2=2000 toutfile=
+
+# Each accepted output mode; y begins at zero and then trails the population.
+[f32] verhulst stepmax=17 mode=x
+[f32] verhulst stepmax=17 mode=y
+[f32] verhulst stepmax=17 mode=z
+[f32] verhulst stepmax=17 mode=xy
+[f32] verhulst stepmax=17 mode=xz
+[f32] verhulst stepmax=17 mode=yz
+[f32] verhulst stepmax=1 mode=xy y0=23
+[f32] verhulst stepmax=2 mode=xy
+[f32] verhulst stepmax=0
+[f32] verhulst stepmax=-3
+
+# Model parameters and equilibria, including zero and negative values.
+[f32] verhulst stepmax=31 mode=xy a1=.8 a2=500 y0=20 h=.05 tol=1e-7
+[f32] verhulst stepmax=19 mode=xy a1=0
+[f32] verhulst stepmax=19 mode=xy a1=-.7
+[f32] verhulst stepmax=19 mode=xy a2=-2000
+[f32] verhulst stepmax=19 mode=xy y0=0
+[f32] verhulst stepmax=19 mode=xy y0=-10
+[f32] verhulst stepmax=19 mode=xy y0=2000
+[f32] verhulst stepmax=19 mode=xy y0=4000
+[f32] verhulst stepmax=3 mode=xy a2=0
+
+# Time increments below, at, and above the solver stopping threshold.
+[f32] verhulst stepmax=7 mode=xy h=0
+[f32] verhulst stepmax=7 mode=xy h=1e-8
+[f32] verhulst stepmax=7 mode=xy h=5e-7
+[f32] verhulst stepmax=7 mode=xy h=1e-6
+[f32] verhulst stepmax=19 mode=xy h=-.1
+[f32] verhulst stepmax=9 mode=xy h=2
+
+# Full stderr comparison verifies step acceptance, rejection and tolerance.
+[f32] [stderr] verhulst stepmax=5 mode=xy verbose=1
+[f32] [stderr] verhulst stepmax=7 mode=xy h=3 a1=2 tol=1e-12 verbose=1
+[f32] [stderr] verhulst stepmax=5 mode=xy h=-2 verbose=-1
+[f32] [stderr] verhulst stepmax=3 mode=xy tol=0 verbose=1
+[f32] [stderr] verhulst stepmax=3 mode=xy tol=-1 verbose=1
+[f32] [stderr] verhulst stepmax=5 mode=xy tol=.1 verbose=2
+
+# Read each side file back to stdout to test its binary float contents.
+[f32] verhulst stepmax=13 h=.125 toutfile=times.bin > population.bin && cat population.bin times.bin
+[f32] verhulst stepmax=9 h=-.25 mode=yz toutfile=times.bin > rate.bin && cat rate.bin times.bin
+[exact] verhulst stepmax=0 toutfile=times.bin > population.bin && cat population.bin times.bin
+[f32] verhulst stepmax=5 toutfile=/dev/stdout
+
+# Invalid modes include the documented but rejected xyz triplet.
+[stderr] verhulst mode=xyz
+[stderr] verhulst mode=bad
+[stderr] verhulst mode=
+[stderr] verhulst mode=X
+[stderr] verhulst stepmax=0 mode=xyz
+[stderr] verhulst toutfile=missing-directory/times.bin
+[stderr] verhulst stepmax=999999999999999999999999999999
+[stderr] verhulst h=1e-310
+[stderr] verhulst y0=1e999
+[stderr] verhulst tol=1e999
+[stderr] verhulst stepmax=2 a1=1e999
+[stderr] verhulst stepmax=2 a2=1e999
+
+# Parameters a1/a2 are parsed lazily only when the solver calls back.
+[f32] verhulst stepmax=0 a1=1e999 a2=1e999
+[f32] verhulst stepmax=3 h=0 mode=xy a1=1e999 a2=1e999
+
+# Getpar parsing, repeated parameters, par files and ignored unknown options.
+[f32] verhulst stepmax=5 stepmax=7 a1=.25 a1=.75 mode=y mode=xy
+[f32] verhulst stepmax=abc
+[f32] verhulst stepmax=3 h=abc mode=xy
+[f32] verhulst stepmax=3 y0= h= tol= a1= a2= mode=xy
+[f32] [stderr] verhulst stepmax=3 unknown=42
+[f32] printf 'stepmax=7 a1=.3 a2=700 y0=12 h=.03 mode=xy\n' > params && verhulst par=params y0=15

@@ -1,0 +1,19 @@
+# Default panel grid, with one output CDP.
+suplane nt=7 ntr=231 | suinterpfowler ncdps=1 cdp=0 t=0 v=1750 eta=0.15
+# Multiple control points, interpolated CDP and non-default model grid.
+[stderr] suplane nt=9 ntr=18 | suinterpfowler ncdps=3 nv=3 neta=2 vmin=1000 vmax=3000 etamin=-0.1 etamax=0.3 vscale=2 cdp=0 t=0,0.02 v=700,900 eta=0,0.1 cdp=2 t=0,0.02 v=1000,1200 eta=0.2,0.25 verbose=1
+# Single eta panel and boundary outside velocity range.
+suplane nt=1 ntr=3 | suinterpfowler ncdps=1 nv=3 etamin=0 etamax=0 cdp=0 t=0 v=2500 eta=0
+# CVS default spacing and scaled velocities.
+suplane nt=11 ntr=6 | suinterpfowler ncdps=1 nvstack=6 vscale=0.5 cdp=0 t=0,0.04 v=1,2
+# One panel yields zero output; zero output CDPs still read a trace.
+suplane nt=1 ntr=1 | suinterpfowler ncdps=1 nv=1 neta=1 cdp=0 t=0 v=1500 eta=0.1
+suplane nt=3 ntr=1 | suinterpfowler ncdps=0
+# Empty input and control-point count or array mismatches.
+suinterpfowler ncdps=1
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0 v=1500
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0 v=1500 t=0
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0 v=1500,1600 t=0 eta=0
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nvstack=6 cdp=0 v=1500,1600 t=0
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nv=2 neta=2 cdp=0 t=0 v=1700 eta=0.15

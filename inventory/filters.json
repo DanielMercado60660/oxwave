@@ -1,0 +1,485 @@
+{
+  "scope": "su/main/filters part 1 of 1",
+  "programs": [
+    {
+      "name": "subfilt",
+      "path": "su/main/filters/subfilt.c",
+      "purpose": "Apply a Butterworth low-cut, high-cut, or bandpass filter to each trace.",
+      "selfdoc_first_line": " SUBFILT - apply Butterworth bandpass filter \t\t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: tr.dt / 1000000", "required": false, "description": "Sample interval in seconds; required when the header value is zero."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print filter design information."},
+        {"name": "zerophase", "type": "int", "default": "1", "required": false, "description": "Apply the filter forward and backward."},
+        {"name": "locut", "type": "int", "default": "1", "required": false, "description": "Enable the low-cut filter."},
+        {"name": "hicut", "type": "int", "default": "1", "required": false, "description": "Enable the high-cut filter."},
+        {"name": "fstoplo", "type": "float", "default": "computed: 0.10 * Nyquist", "required": false, "description": "Low-cut stop frequency."},
+        {"name": "fpasslo", "type": "float", "default": "computed: 0.15 * Nyquist", "required": false, "description": "Low-cut pass frequency."},
+        {"name": "fpasshi", "type": "float", "default": "computed: 0.40 * Nyquist", "required": false, "description": "High-cut pass frequency."},
+        {"name": "fstophi", "type": "float", "default": "computed: 0.55 * Nyquist", "required": false, "description": "High-cut stop frequency."},
+        {"name": "astoplo", "type": "float", "default": "0.05", "required": false, "description": "Low-cut stop amplitude."},
+        {"name": "apasslo", "type": "float", "default": "0.95", "required": false, "description": "Low-cut pass amplitude."},
+        {"name": "apasshi", "type": "float", "default": "0.95", "required": false, "description": "High-cut pass amplitude."},
+        {"name": "astophi", "type": "float", "default": "0.05", "required": false, "description": "High-cut stop amplitude."},
+        {"name": "npoleslo", "type": "int", "default": "computed: bfdesign from low-cut frequencies and amplitudes", "required": false, "description": "Explicit low-cut pole count; the selfdoc misspells this as npoleselo."},
+        {"name": "npoleshi", "type": "int", "default": "computed: bfdesign from high-cut frequencies and amplitudes", "required": false, "description": "Explicit high-cut pole count; the selfdoc misspells this as npolesehi."},
+        {"name": "f3dblo", "type": "float", "default": "computed: bfdesign, or 0.15 * Nyquist when npoleslo is supplied", "required": false, "description": "Low-cut 3 dB frequency; read only when npoleslo is supplied."},
+        {"name": "f3dbhi", "type": "float", "default": "computed: bfdesign, or 0.40 * Nyquist when npoleshi is supplied", "required": false, "description": "High-cut 3 dB frequency; read only when npoleshi is supplied."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "getparfloat", "getparint", "err", "warn", "bfdesign", "bfhighpass", "bflowpass", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Recursive Butterworth sections, filter design and square roots depend on floating-point order and math-library behavior; zero-phase mode reverses and filters twice.",
+      "c_lines": 262,
+      "difficulty": "medium",
+      "difficulty_reason": "Butterworth design and recursive filtering require numerical library behavior to be reproduced.",
+      "test_cases": [
+        {"description": "Default zero-phase bandpass.", "command": "suplane nt=128 ntr=8 dt=0.004 | subfilt"},
+        {"description": "Explicit causal low-cut poles.", "command": "suplane nt=128 ntr=8 dt=0.004 | subfilt zerophase=0 hicut=0 npoleslo=3 f3dblo=15"}
+      ],
+      "license_note": "Credits identify SEAM Project contributor Bruce Verwest and the adapted subfiltpole option.",
+      "related_programs": ["sufilter", "sutvband"]
+    },
+    {
+      "name": "succfilt",
+      "path": "su/main/filters/succfilt.c",
+      "purpose": "Filter gather spectra according to adjacent-trace phase correlation.",
+      "selfdoc_first_line": " SUCCFILT -  FX domain Correlation Coefficient FILTER\t\t\t",
+      "params": [
+        {"name": "key", "type": "string", "default": "ep", "required": false, "description": "Gather identifier header."},
+        {"name": "padd", "type": "float", "default": "25.0", "required": false, "description": "FFT padding percentage."},
+        {"name": "cch", "type": "float", "default": "1.0", "required": false, "description": "Upper accepted correlation."},
+        {"name": "ccl", "type": "float", "default": "0.3", "required": false, "description": "Lower accepted correlation."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print gather progress."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparfloat", "getparint", "get_gather", "err", "npfar", "ealloc1float", "ealloc2complex", "ealloc2float", "pfarc", "pfacr", "free2complex", "free2float", "put_gather", "warn", "free1float"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT results and atan2/cos phase comparisons can vary near thresholds. The last trace and Nyquist bin are not correlation-filtered.",
+      "c_lines": 171,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers gathers and applies per-frequency FFT filtering.",
+      "test_cases": [
+        {"description": "Filter a single gather.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | succfilt key=ep ccl=0.3 cch=1 padd=25"},
+        {"description": "Use tighter correlation limits.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | succfilt key=ep ccl=-0.2 cch=0.8 padd=50"}
+      ],
+      "license_note": "Credits identify Potash Corporation and Balazs Nemeth.",
+      "related_programs": ["sufwatrim", "sulfaf"]
+    },
+    {
+      "name": "sudeghost",
+      "path": "su/main/filters/sudeghost.c",
+      "purpose": "Apply a frequency-domain ghosting or deghosting filter to each trace.",
+      "selfdoc_first_line": " SUDEGHOST - applies a DEGHOSTING filter in (t,x) or (tau,p) data\t",
+      "params": [
+        {"name": "h", "type": "float", "default": "", "required": true, "description": "Source or receiver depth."},
+        {"name": "v", "type": "float", "default": "1500.0", "required": false, "description": "Top-layer velocity."},
+        {"name": "r", "type": "float", "default": "0.5", "required": false, "description": "Surface reflectivity."},
+        {"name": "lambert", "type": "int", "default": "1", "required": false, "description": "Apply cosine obliquity factor."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt / 1000000, otherwise tr.d1; 0.004 if zero and unspecified", "required": false, "description": "Sample interval; consulted only when the header-derived interval is zero."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Advisory and debugging output."},
+        {"name": "deghost", "type": "int", "default": "1", "required": false, "description": "Select deghosting; zero models ghosts."},
+        {"name": "pnoise", "type": "float", "default": "1.0e-9", "required": false, "description": "Stabilizing white-noise parameter."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "warn", "getparfloat", "err", "npfaro", "ealloc1float", "ealloc1complex", "pfarc", "cmul", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, complex division and trigonometric functions affect rounding; the first slowness is computed as f2+d2, and invalid slowness can cause a square root of a negative value.",
+      "c_lines": 332,
+      "difficulty": "medium",
+      "difficulty_reason": "The trace-dependent complex filter and FFT require numerical care.",
+      "test_cases": [
+        {"description": "Deghost normal-incidence traces.", "command": "suplane nt=128 ntr=8 dt=0.004 | sudeghost h=10 r=0.5"},
+        {"description": "Model ghosts without the obliquity factor.", "command": "suplane nt=128 ntr=8 dt=0.004 | sudeghost h=12 v=1500 r=0.4 deghost=0 lambert=0 pnoise=0.00001"}
+      ],
+      "license_note": "",
+      "related_programs": ["sufilter"]
+    },
+    {
+      "name": "sudipfilt",
+      "path": "su/main/filters/sudipfilt.c",
+      "purpose": "Filter trace panels by slope in the frequency-wavenumber domain.",
+      "selfdoc_first_line": " SUDIPFILT - DIP--or better--SLOPE Filter in f-k domain\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: tr.dt / 1000000", "required": false, "description": "Sample interval; required if the header value is zero."},
+        {"name": "dx", "type": "float", "default": "computed: d2 parameter or tr.d2", "required": false, "description": "Trace spacing; required if neither alias nor header supplies a nonzero value."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2", "required": false, "description": "Alias for dx, consulted only when dx is absent."},
+        {"name": "slopes", "type": "float array", "default": "0.0", "required": false, "description": "Increasing slope breakpoints."},
+        {"name": "amps", "type": "float array", "default": "1.0", "required": false, "description": "Amplitudes at slope breakpoints."},
+        {"name": "bias", "type": "float", "default": "0.0", "required": false, "description": "Slope shifted to horizontal during filtering."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print progress."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR if set, otherwise empty", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "gettr", "getparfloat", "countparval", "alloc1float", "warn", "etmpfile", "temporary_filename", "efopen", "efwrite", "erewind", "efread", "puttr", "efclose", "eremove", "free1float", "npfa", "npfar", "alloc2float", "alloc2complex", "pfa2rc", "pfa2cc", "pfa2cr", "cmplx", "cmul", "intlin", "free2float", "free2complex", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional FFT, interpolated slope amplitudes and complex phase shifts depend on operation order and transcendental functions.",
+      "c_lines": 352,
+      "difficulty": "medium",
+      "difficulty_reason": "The implementation buffers an entire panel and performs a two-dimensional FFT with slope interpolation.",
+      "test_cases": [
+        {"description": "Pass all slopes.", "command": "suplane nt=128 ntr=16 dt=0.004 | sudipfilt dx=10"},
+        {"description": "Filter a biased slope range.", "command": "suplane nt=128 ntr=16 dt=0.004 | sudipfilt dx=10 slopes=-0.002,-0.001,0.001,0.002 amps=0,1,1,0 bias=0.0005"}
+      ],
+      "license_note": "",
+      "related_programs": ["suk1k2filter", "sukfilter"]
+    },
+    {
+      "name": "sufilter",
+      "path": "su/main/filters/sufilter.c",
+      "purpose": "Apply a zero-phase polygonal frequency filter with sine-squared tapers.",
+      "selfdoc_first_line": " SUFILTER - applies a zero-phase, sine-squared tapered filter\t\t",
+      "params": [
+        {"name": "f", "type": "float array", "default": "computed: 0.10,0.15,0.45,0.50 times Nyquist", "required": false, "description": "Frequency breakpoints in hertz."},
+        {"name": "amps", "type": "float array", "default": "computed: 0 at endpoints and 1 at interior f values", "required": false, "description": "Amplitudes at frequency breakpoints."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt / 1000000, otherwise tr.d1; 0.004 if zero and unspecified", "required": false, "description": "Sample interval; consulted only when the header-derived interval is zero."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print advisory messages."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "warn", "getparfloat", "npfaro", "err", "countparval", "ealloc1float", "ealloc1complex", "pfarc", "crmul", "pfacr", "puttr", "alloc1int", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT rounding, frequency-bin rounding and sine-squared taper evaluation affect exact results.",
+      "c_lines": 285,
+      "difficulty": "medium",
+      "difficulty_reason": "The filter constructs a polygonal frequency response and applies FFTs.",
+      "test_cases": [
+        {"description": "Default bandpass.", "command": "suplane nt=128 ntr=8 dt=0.004 | sufilter"},
+        {"description": "Band-reject response.", "command": "suplane nt=128 ntr=8 dt=0.004 | sufilter f=10,20,30,40 amps=1,0,0,1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sukfilter", "suk1k2filter", "sutvband"]
+    },
+    {
+      "name": "sufrac",
+      "path": "su/main/filters/sufrac.c",
+      "purpose": "Apply a fractional time derivative or integral and phase shift in the frequency domain.",
+      "selfdoc_first_line": " SUFRAC -- take general (fractional) time derivative or integral of\t",
+      "params": [
+        {"name": "power", "type": "float", "default": "0.0", "required": false, "description": "Derivative or integral exponent."},
+        {"name": "sign", "type": "float", "default": "-1.0", "required": false, "description": "Sign of the imaginary frequency factor."},
+        {"name": "phasefac", "type": "float", "default": "0.0", "required": false, "description": "Additional phase in multiples of pi."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print advisory messages."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt / 1000000, otherwise tr.d1", "required": false, "description": "Documented in selfdoc but never read from arguments; a zero header-derived interval causes an error."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "gettr", "warn", "err", "npfaro", "ealloc1float", "ealloc1complex", "crmul", "cwp_cexp", "pfarc", "cmul", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, complex exponential and pow are platform-sensitive; negative powers use FLT_MAX at zero frequency.",
+      "c_lines": 191,
+      "difficulty": "medium",
+      "difficulty_reason": "The operation uses FFTs and complex fractional powers.",
+      "test_cases": [
+        {"description": "Half derivative.", "command": "suplane nt=128 ntr=8 dt=0.004 | sufrac power=0.5 sign=1"},
+        {"description": "Integration and phase shift.", "command": "suplane nt=128 ntr=8 dt=0.004 | sufrac power=-1 phasefac=0.25"}
+      ],
+      "license_note": "",
+      "related_programs": ["sukfrac"]
+    },
+    {
+      "name": "sufwatrim",
+      "path": "su/main/filters/sufwatrim.c",
+      "purpose": "Produce one frequency-domain alpha-trimmed trace per gather.",
+      "selfdoc_first_line": " SUFWATRIM - FX domain Alpha TRIM\t\t\t\t\t",
+      "params": [
+        {"name": "key", "type": "string array", "default": "", "required": false, "description": "Mixing-coordinate header names; documented as required, but absence is not explicitly rejected."},
+        {"name": "dx", "type": "float array", "default": "", "required": true, "description": "Scale for each coordinate."},
+        {"name": "keyg", "type": "string", "default": "ep", "required": false, "description": "Gather key."},
+        {"name": "vf", "type": "int", "default": "1", "required": false, "description": "Read but not used; selfdoc says 0."},
+        {"name": "vmin", "type": "float", "default": "5000", "required": false, "description": "Read but not used."},
+        {"name": "padd", "type": "float", "default": "25.0", "required": false, "description": "FFT padding percentage."},
+        {"name": "fac", "type": "float", "default": "1.0", "required": false, "description": "Clamped to at least 1, but otherwise unused."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparint", "getparfloat", "countparval", "getparstringarray", "hdtype", "getindex", "ealloc1float", "err", "get_gather", "npfar", "ealloc1complex", "ealloc2complex", "pfarc", "gethval", "vtof", "pfacr", "puttr", "free1float", "free2complex", "ealloc1", "free1", "qkisort", "qksort", "rcabs", "warn"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sorting, weighted summation and FFT order affect results. Computed distance weights are overwritten with 1; the trim percentage is fixed at 15. The first trace is used if no mark is set.",
+      "c_lines": 307,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers gathers, sorts frequency components and performs FFTs.",
+      "test_cases": [
+        {"description": "Trim a gather using trace number as coordinate.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | sufwatrim key=tracl dx=1 keyg=ep"},
+        {"description": "Use a marked output trace and extra padding.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | sushw key=mark a=1 | sufwatrim key=tracl dx=2 padd=50 vf=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["succfilt", "sulfaf"]
+    },
+    {
+      "name": "suk1k2filter",
+      "path": "su/main/filters/suk1k2filter.c",
+      "purpose": "Apply separable polygonal filters to the two spatial wavenumber axes.",
+      "selfdoc_first_line": " SUK1K2FILTER - symmetric box-like K-domain filter defined by the\t",
+      "params": [
+        {"name": "k1", "type": "float array", "default": "computed: 0.10,0.15,0.45,0.50 times 0.5/d1", "required": false, "description": "First-axis wavenumber breakpoints."},
+        {"name": "k2", "type": "float array", "default": "computed: 0.10,0.15,0.45,0.50 times 0.5/d2", "required": false, "description": "Second-axis wavenumber breakpoints."},
+        {"name": "amps1", "type": "float array", "default": "computed: 0 at endpoints and 1 at interior k1 values", "required": false, "description": "First-axis amplitudes."},
+        {"name": "amps2", "type": "float array", "default": "computed: 0 at endpoints and 1 at interior k2 values", "required": false, "description": "Second-axis amplitudes."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1 if nonzero, otherwise 1.0", "required": false, "description": "First-axis spacing."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Second-axis spacing."},
+        {"name": "quad", "type": "int", "default": "0", "required": false, "description": "Select all or a pair of quadrants."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print progress."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR if set, otherwise empty", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "getparint", "getparstring", "etmpfile", "temporary_filename", "efopen", "efwrite", "npfaro", "npfa", "countparval", "ealloc1float", "alloc1float", "alloc1int", "alloc2float", "alloc2complex", "efread", "pfa2rc", "pfa2cc", "crmul", "pfa2cr", "erewind", "puttr", "efclose", "eremove", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional FFT, bin rounding and sine-squared taper calculations affect exact results.",
+      "c_lines": 476,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers a panel and constructs separable filters for a two-dimensional FFT.",
+      "test_cases": [
+        {"description": "Default separable filter.", "command": "suplane nt=128 ntr=16 dt=0.004 | suk1k2filter d1=1 d2=1"},
+        {"description": "Select a quadrant pair with custom filters.", "command": "suplane nt=128 ntr=16 dt=0.004 | suk1k2filter d1=1 d2=1 k1=0.02,0.05,0.2,0.3 amps1=0,1,1,0 k2=0.02,0.05,0.2,0.3 amps2=0,1,1,0 quad=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sukfilter", "sufilter", "sudipfilt"]
+    },
+    {
+      "name": "sukfilter",
+      "path": "su/main/filters/sukfilter.c",
+      "purpose": "Apply a radially symmetric polygonal wavenumber filter to a trace panel.",
+      "selfdoc_first_line": " SUKFILTER - radially symmetric K-domain, sin^2-tapered, polygonal\t",
+      "params": [
+        {"name": "k", "type": "float array", "default": "computed: 0.10,0.15,0.45,0.50 times 0.5/NINT(sqrt(d1*d1+d2*d2))", "required": false, "description": "Radial wavenumber breakpoints."},
+        {"name": "amps", "type": "float array", "default": "computed: 0 at endpoints and 1 at interior k values", "required": false, "description": "Amplitudes at breakpoints."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1 if nonzero, otherwise 1.0", "required": false, "description": "First-axis spacing."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Second-axis spacing."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory information."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "getparint", "etmpfile", "efwrite", "npfaro", "npfa", "countparval", "ealloc1float", "alloc1int", "ealloc2float", "ealloc2complex", "efread", "pfa2rc", "pfa2cc", "crmul", "pfa2cr", "erewind", "puttr", "efclose", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The radial grid, FFT and sine taper use floating-point math; the code rounds sqrt(d1²+d2²) to an integer before computing Nyquist, unlike the selfdoc.",
+      "c_lines": 376,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers a panel and maps a radial filter onto a two-dimensional FFT grid.",
+      "test_cases": [
+        {"description": "Default radial filter.", "command": "suplane nt=128 ntr=16 dt=0.004 | sukfilter d1=1 d2=1"},
+        {"description": "Custom radial low-pass filter.", "command": "suplane nt=128 ntr=16 dt=0.004 | sukfilter d1=1 d2=1 k=0,0.05,0.15,0.25 amps=1,1,0,0 verbose=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["suk1k2filter", "sukfrac", "sufilter"]
+    },
+    {
+      "name": "sukfrac",
+      "path": "su/main/filters/sukfrac.c",
+      "purpose": "Apply a radial or directional fractional wavenumber derivative and phase shift.",
+      "selfdoc_first_line": " SUKFRAC - apply FRACtional powers of i|k| to data, with phase shift ",
+      "params": [
+        {"name": "power", "type": "float", "default": "0.0", "required": false, "description": "Fractional derivative exponent."},
+        {"name": "sign", "type": "float", "default": "1.0", "required": false, "description": "Sign of the imaginary factor."},
+        {"name": "d1", "type": "float", "default": "computed: tr.d1 if nonzero, otherwise 1.0", "required": false, "description": "First-axis spacing."},
+        {"name": "d2", "type": "float", "default": "computed: tr.d2 if nonzero, otherwise 1.0", "required": false, "description": "Second-axis spacing."},
+        {"name": "phasefac", "type": "float", "default": "0.0", "required": false, "description": "Additional phase in multiples of pi."},
+        {"name": "angle", "type": "float", "default": "", "required": false, "description": "When supplied, enable a directional operator at this angle in degrees."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory information."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "getparint", "crmul", "cwp_cexp", "etmpfile", "efwrite", "npfaro", "npfa", "ealloc2float", "ealloc2complex", "efread", "pfa2rc", "pfa2cc", "cmplx", "cmul", "pfa2cr", "erewind", "puttr", "efclose", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, pow, square roots, trigonometric functions and complex exponential affect exact output, especially at zero wavenumber for negative powers.",
+      "c_lines": 300,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers a panel and applies complex fractional powers to a two-dimensional FFT.",
+      "test_cases": [
+        {"description": "Radial half derivative.", "command": "suplane nt=128 ntr=16 dt=0.004 | sukfrac d1=1 d2=1 power=0.5 phasefac=-0.25"},
+        {"description": "Directional derivative.", "command": "suplane nt=128 ntr=16 dt=0.004 | sukfrac d1=1 d2=1 power=1 angle=45 sign=-1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sufrac", "sukfilter"]
+    },
+    {
+      "name": "sulfaf",
+      "path": "su/main/filters/sulfaf.c",
+      "purpose": "Mix nearby traces in the frequency domain to form a low-frequency array response.",
+      "selfdoc_first_line": " SULFAF -  Low frequency array forming\t\t\t\t\t",
+      "params": [
+        {"name": "key", "type": "string", "default": "ep", "required": false, "description": "Gather identifier."},
+        {"name": "f1", "type": "float", "default": "3.0", "required": false, "description": "Lower cutoff frequency."},
+        {"name": "f2", "type": "float", "default": "20.0", "required": false, "description": "Upper cutoff frequency."},
+        {"name": "fr", "type": "float", "default": "5", "required": false, "description": "Frequency ramp width."},
+        {"name": "vel", "type": "float", "default": "1000", "required": false, "description": "Surface-wave velocity."},
+        {"name": "dx", "type": "float", "default": "10", "required": false, "description": "Trace spacing."},
+        {"name": "maxmix", "type": "int", "default": "computed: -1 initially, replaced by first gather's ntr", "required": false, "description": "Maximum mixing width."},
+        {"name": "adb", "type": "float", "default": "1.0", "required": false, "description": "Filtered-data blend ratio."},
+        {"name": "tri", "type": "int", "default": "0", "required": false, "description": "Use triangular mixing weights."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print progress."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparfloat", "getparint", "get_gather", "err", "npfaro", "ealloc1float", "ealloc1complex", "ealloc2float", "pfarc", "pfacr", "free2float", "put_gather", "warn"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT and trace-mixing accumulation order affect rounding; maxmix defaults to the first gather size and remains fixed for subsequent gathers.",
+      "c_lines": 230,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers gathers and performs frequency-dependent trace mixing and FFTs.",
+      "test_cases": [
+        {"description": "Default array-forming filter.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | sulfaf key=ep"},
+        {"description": "Triangular mix and partial blend.", "command": "suplane nt=128 ntr=8 dt=0.004 | sushw key=ntr a=8 | sulfaf key=ep f1=5 f2=30 fr=3 vel=1200 dx=10 maxmix=5 tri=1 adb=0.5"}
+      ],
+      "license_note": "",
+      "related_programs": ["succfilt", "sufwatrim"]
+    },
+    {
+      "name": "sumedian",
+      "path": "su/main/filters/sumedian.c",
+      "purpose": "Align traces along a supplied moveout curve, mix or median-filter them, and optionally subtract the result.",
+      "selfdoc_first_line": " SUMEDIAN - MEDIAN filter about a user-defined polygonal curve with\t",
+      "params": [
+        {"name": "xshift", "type": "float array", "default": "", "required": false, "description": "Curve positions; required with tshift unless both input files are supplied."},
+        {"name": "tshift", "type": "float array", "default": "", "required": false, "description": "Curve times; required with xshift unless both input files are supplied."},
+        {"name": "nshift", "type": "int", "default": "", "required": false, "description": "Number of values in each input file; required when both files are supplied."},
+        {"name": "xfile", "type": "string", "default": "", "required": false, "description": "Binary float positions file, paired with tfile."},
+        {"name": "tfile", "type": "string", "default": "", "required": false, "description": "Binary float times file, paired with xfile."},
+        {"name": "key", "type": "string", "default": "tracl", "required": false, "description": "Position header."},
+        {"name": "mix", "type": "float array", "default": "0.6,1,1,1,0.6", "required": false, "description": "Odd-length mixing weights."},
+        {"name": "median", "type": "int", "default": "0", "required": false, "description": "Use median instead of weighted mixing."},
+        {"name": "nmed", "type": "int", "default": "5 when median is nonzero; otherwise uninitialized and unused", "required": false, "description": "Median window length; even values are incremented."},
+        {"name": "sign", "type": "int", "default": "-1", "required": false, "description": "Shift direction."},
+        {"name": "subtract", "type": "int", "default": "1", "required": false, "description": "Subtract filtered data from the input."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print progress."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR if set, otherwise empty", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "countparval", "err", "ealloc1float", "getparfloat", "getparint", "hdtype", "getindex", "warn", "etmpfile", "temporary_filename", "efopen", "efwrite", "ealloc1int", "ealloc2float", "gettr", "gethval", "vtof", "intlin", "efread", "puttr", "efclose", "eremove", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation, weighted accumulation and median sorting affect rounding; edge handling and integer-rounded shifts are significant.",
+      "c_lines": 488,
+      "difficulty": "medium",
+      "difficulty_reason": "The implementation buffers traces, interpolates a moveout curve and supports weighted and median windows.",
+      "test_cases": [
+        {"description": "Weighted mixing with subtraction.", "command": "suplane nt=128 ntr=16 dt=0.004 | sumedian xshift=1,16 tshift=0,0.04 mix=0.5,1,0.5"},
+        {"description": "Median output without subtraction.", "command": "suplane nt=128 ntr=16 dt=0.004 | sumedian xshift=1,16 tshift=0,0.04 median=1 nmed=5 sign=1 subtract=0"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suminphase",
+      "path": "su/main/filters/suminphase.c",
+      "purpose": "Convert each input trace to a minimum-phase signal by spectral factorization.",
+      "selfdoc_first_line": " SUMINPHASE - convert input to minimum phase\t\t\t\t",
+      "params": [
+        {"name": "sign1", "type": "int", "default": "1", "required": false, "description": "First FFT sign, normalized to plus or minus one."},
+        {"name": "sign2", "type": "int", "default": "-1", "required": false, "description": "Second FFT sign, normalized to plus or minus one."},
+        {"name": "pnoise", "type": "float", "default": "1.0e-9", "required": false, "description": "Minimum normalized spectral amplitude."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print advisory messages."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt / 1000000, otherwise tr.d1; 0.004 if zero and unspecified", "required": false, "description": "Consulted only when the header-derived interval is zero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "err", "gettr", "warn", "getparfloat", "npfao", "ealloc1float", "ealloc1complex", "cmplx", "pfacc", "crmul", "rcabs", "cwp_clog", "cwp_cexp", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Complex FFT, logarithm and exponential are sensitive to rounding and platform math; an all-zero trace divides by zero when normalizing by its maximum.",
+      "c_lines": 199,
+      "difficulty": "medium",
+      "difficulty_reason": "Homomorphic spectral factorization uses several complex FFTs and transcendental operations.",
+      "test_cases": [
+        {"description": "Default minimum-phase conversion.", "command": "suplane nt=128 ntr=8 dt=0.004 | suminphase"},
+        {"description": "Alternate transform signs and noise floor.", "command": "suplane nt=128 ntr=8 dt=0.004 | suminphase sign1=-1 sign2=1 pnoise=0.0001"}
+      ],
+      "license_note": "The internal spectral-factorization routine credits Bruce VerWest, 2009.",
+      "related_programs": ["suphase"]
+    },
+    {
+      "name": "suphase",
+      "path": "su/main/filters/suphase.c",
+      "purpose": "Transform each trace's phase spectrum using a linear formula.",
+      "selfdoc_first_line": " SUPHASE - PHASE manipulation by linear transformation\t\t\t",
+      "params": [
+        {"name": "a", "type": "float", "default": "0", "required": false, "description": "Constant phase shift in degrees; selfdoc says 90."},
+        {"name": "b", "type": "float", "default": "180/PI", "required": false, "description": "Multiplier converted from degrees to radians."},
+        {"name": "c", "type": "float", "default": "0.0", "required": false, "description": "Phase increment per frequency-bin index."},
+        {"name": "dt", "type": "float", "default": "computed: tr.dt / 1000000, or 0.004 if zero", "required": false, "description": "Sample interval; read but not used in the phase calculation."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "npfaro", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, atan2, square root, sine and cosine affect exact values; c multiplies the bin index rather than frequency in hertz.",
+      "c_lines": 124,
+      "difficulty": "medium",
+      "difficulty_reason": "The phase manipulation requires FFTs and transcendental functions.",
+      "test_cases": [
+        {"description": "Default phase transform.", "command": "suplane nt=128 ntr=8 dt=0.004 | suphase"},
+        {"description": "Constant and linear phase changes.", "command": "suplane nt=128 ntr=8 dt=0.004 | suphase a=90 b=90 c=0.01"}
+      ],
+      "license_note": "",
+      "related_programs": ["suminphase", "sufrac"]
+    },
+    {
+      "name": "susmgauss2",
+      "path": "su/main/filters/susmgauss2.c",
+      "purpose": "Smooth a two-dimensional trace panel with a Gaussian wavenumber filter.",
+      "selfdoc_first_line": " SUSMGAUSS2 --- SMOOTH a uniformly sampled 2d array of velocities\t",
+      "params": [
+        {"name": "a1", "type": "float", "default": "0.0", "required": false, "description": "First-axis Gaussian correlation length."},
+        {"name": "a2", "type": "float", "default": "0.0", "required": false, "description": "Second-axis Gaussian correlation length."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparfloat", "gettr", "err", "warn", "etmpfile", "efwrite", "npfaro", "npfa", "alloc2float", "alloc2complex", "alloc1float", "efread", "pfa2rc", "pfa2cc", "crmul", "pfa2cr", "erewind", "puttr", "efclose", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional FFT, exp and pow affect rounding; output is scaled by the ratio of input and filtered maxima, which can divide by zero. Despite the selfdoc, the code does not convert velocity to slowness.",
+      "c_lines": 222,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers the panel, performs a two-dimensional FFT and rescales by extrema.",
+      "test_cases": [
+        {"description": "Smooth both axes.", "command": "suplane nt=128 ntr=16 dt=0.004 | susmgauss2 a1=2 a2=3"},
+        {"description": "Smooth only the second axis.", "command": "suplane nt=128 ntr=16 dt=0.004 | susmgauss2 a1=0 a2=4"}
+      ],
+      "license_note": "",
+      "related_programs": ["sukfilter", "suk1k2filter"]
+    },
+    {
+      "name": "sutvband",
+      "path": "su/main/filters/sutvband.c",
+      "purpose": "Apply a time-varying bandpass by interpolating between separately filtered trace segments.",
+      "selfdoc_first_line": " SUTVBAND - time-variant bandpass filter (sine-squared taper)  ",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: tr.dt / 1000000", "required": false, "description": "Sample interval; required when the header value is zero."},
+        {"name": "tf", "type": "float array", "default": "", "required": true, "description": "Filter center times."},
+        {"name": "f", "type": "float array", "default": "", "required": true, "description": "Repeat one four-frequency array for each tf value."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "countparval", "countparname", "ealloc1float", "ealloc1int", "npfaro", "ealloc2float", "getnparfloat", "ealloc1complex", "pfarc", "crmul", "pfacr", "free1float", "free1complex", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, sine tapers, time-to-sample rounding and interpolation order affect exact results; duplicate or out-of-range filter times can cause division by zero or invalid indexing.",
+      "c_lines": 226,
+      "difficulty": "medium",
+      "difficulty_reason": "The program builds multiple frequency filters and interpolates between FFT-filtered segments.",
+      "test_cases": [
+        {"description": "Two time-varying bandpasses.", "command": "suplane nt=128 ntr=8 dt=0.004 | sutvband tf=0.1,0.4 f=5,10,40,50 f=5,10,25,35"},
+        {"description": "Three filters including trace endpoints.", "command": "suplane nt=128 ntr=8 dt=0.004 | sutvband tf=0,0.25,0.508 f=0,5,30,40 f=5,10,40,50 f=10,15,50,60"}
+      ],
+      "license_note": "",
+      "related_programs": ["sufilter", "subfilt"]
+    }
+  ]
+}

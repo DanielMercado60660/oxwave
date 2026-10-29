@@ -1,0 +1,42 @@
+# Default interpolation and single trace passthrough
+suplane nt=127 ntr=7 | suinterp
+suplane nt=31 ntr=1 | suinterp
+suplane nt=31 ntr=5 | suinterp ninterp=0
+# Parameter combinations and output modes
+suplane nt=65 ntr=17 | suinterp ninterp=3 nxmax=10 freq1=2 freq2=30 lagc=50 lent=7 lenx=3 xopt=1 deriv=1 linear=1
+suplane nt=63 ntr=5 | suinterp iopt=1 freq1=0 freq2=12
+suplane nt=63 ntr=5 | suinterp iopt=2 xopt=1
+suplane nt=33 ntr=3 | suinterp verbose=1 tmpdir=.
+[stderr] suplane nt=33 ntr=3 | suinterp verbose=1
+suplane nt=33 ntr=3 | suinterp tmpdir=/does/not/exist
+suinterp </dev/null
+suplane nt=1 ntr=1 | suinterp
+suplane nt=31 ntr=3 | suinterp lagc=0 lent=0 lenx=0 freq1=-1
+# Additional boundary inputs and nonstandard output mode
+sunull nt=1 ntr=3 dt=0.004 | suinterp iopt=1
+sunull nt=17 ntr=1 dt=0.004 | suinterp
+sunull nt=17 ntr=3 dt=0.004 | suinterp ninterp=0
+suplane nt=47 ntr=4 | suinterp iopt=3 ninterp=2
+suplane nt=64 ntr=4 | suinterp tmpdir= verbose=1
+suplane nt=64 ntr=4 | suinterp freq2=0 iopt=1
+# Environment temporary directory, unknown parameter, and nontrivial FFT path
+[stderr] suplane nt=51 ntr=4 | CWP_TMPDIR=. suinterp verbose=1
+[stderr] suplane nt=51 ntr=4 | suinterp unexpected=1
+suplane nt=95 ntr=19 | suaddnoise seed=42 | suinterp xopt=0 lenx=5 lent=9 ninterp=2
+# A writable regular file passes access(WRITE_OK), then header efopen fails.
+[stderr] touch regular; suplane nt=33 ntr=3 | suinterp tmpdir=regular
+[stderr] touch regular; suplane nt=33 ntr=3 | CWP_TMPDIR=regular suinterp
+[stderr] touch regular; suplane nt=33 ntr=3 | suinterp tmpdir=regular/child
+# Check access failures, symlink resolution, and explicit environment override.
+[stderr] mkdir readonly; chmod 555 readonly; suplane nt=33 ntr=3 | suinterp tmpdir=readonly
+[stderr] mkdir scratch; ln -s scratch scratch-link; suplane nt=33 ntr=3 | suinterp tmpdir=scratch-link verbose=1
+[stderr] suplane nt=33 ntr=3 | CWP_TMPDIR=/does/not/exist suinterp tmpdir= verbose=1
+# Completed runs must remove their named header and VND files.
+mkdir scratch; suplane nt=33 ntr=3 | suinterp tmpdir=scratch >result; test -z "$(find scratch -type f)" && test -z "$(find . -name '*.VND*')" && cat result
+# These matrices exceed VND's 1 MB and 500 KB memory budgets.
+suplane nt=2049 ntr=129 | suaddnoise seed=42 | suinterp nxmax=129 ninterp=2 xopt=0 lent=7 lenx=5
+suplane nt=2051 ntr=131 | suinterp nxmax=131 iopt=1 deriv=1 freq1=0 freq2=18
+suplane nt=2051 ntr=131 | suinterp nxmax=131 iopt=2 xopt=1 lent=9 lenx=3
+# Explicit defaults and negative smoothing lengths (C treats them as copies).
+suplane nt=35 ntr=4 | suinterp ninterp=1 nxmax=500 freq1=4 freq2=20 deriv=0 linear=0 lent=5 lenx=1 lagc=400 xopt=0 iopt=0 verbose=0 tmpdir=
+suplane nt=35 ntr=4 | suinterp lagc=-1 lent=-3 lenx=-3

@@ -1,0 +1,7 @@
+# segyscan has no parameters or output modes; all tables are always printed.
+[exact] suplane nt=7 ntr=3 | sushw key=offset a=-100 b=100 | segyhdrs hfile=header bfile=binary | segywrite tape=in.segy hfile=header bfile=binary && segyscan < in.segy
+[exact] suspike nt=1 ntr=1 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] segyscan < /dev/null
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(3600+100))' | segyscan
+[exact] python3 -c 'import sys,struct; b=bytearray(3600); struct.pack_into(">HH",b,3220,1,0); struct.pack_into(">H",b,3224,3); sys.stdout.buffer.write(b+bytes(range(240))+b"xx"+bytes(reversed(range(240)))+b"xx")' | segyscan
+[exact] python3 -c 'import sys,struct; b=bytearray(3600); struct.pack_into(">H",b,3220,1); struct.pack_into(">H",b,3224,9); sys.stdout.buffer.write(b+bytes(range(240))+b"x")' | segyscan verbose=1 unknown=1

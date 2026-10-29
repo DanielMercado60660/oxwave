@@ -1,0 +1,115 @@
+{
+  "scope": "su/main/supromax part 1 of 1",
+  "programs": [
+    {
+      "name": "suget",
+      "path": "su/main/supromax/suget.c",
+      "purpose": "Read SU traces from a supplied file descriptor and write them to standard output.",
+      "selfdoc_first_line": " SUGET  - Connect SU program to file descriptor for input stream.\t",
+      "params": [
+        {
+          "name": "fd",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "File descriptor to read; the default is invalid and causes an error unless a usable descriptor is supplied."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When greater than zero, report each trace read."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "checkpars",
+        "warn",
+        "err",
+        "fgettr",
+        "fputtr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 65,
+      "difficulty": "easy",
+      "difficulty_reason": "It copies traces from a supplied file descriptor to standard output without numerical processing.",
+      "test_cases": [
+        {
+          "description": "Read a generated trace stream from descriptor 3.",
+          "command": "suplane nt=64 ntr=4 > in.su && suget fd=3 3< in.su > out.su"
+        },
+        {
+          "description": "Report each trace while reading from descriptor 3.",
+          "command": "suspike nt=32 ntr=3 > in.su && suget fd=3 verbose=1 3< in.su > out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "suput"
+      ]
+    },
+    {
+      "name": "suput",
+      "path": "su/main/supromax/suput.c",
+      "purpose": "Read SU traces from standard input and write them to a supplied file descriptor.",
+      "selfdoc_first_line": " SUPUT - Connect SU program to file descriptor for output stream.\t",
+      "params": [
+        {
+          "name": "fd",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "File descriptor to write; the default is invalid and causes an error unless a usable descriptor is supplied. The selfdoc examples call this parameter fp, but the code accepts fd."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When greater than zero, report each input trace."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "checkpars",
+        "err",
+        "fgettr",
+        "warn",
+        "fputtr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 65,
+      "difficulty": "easy",
+      "difficulty_reason": "It copies standard-input traces to a supplied file descriptor without numerical processing.",
+      "test_cases": [
+        {
+          "description": "Write a generated trace stream to descriptor 3.",
+          "command": "suplane nt=64 ntr=4 | suput fd=3 3> out.su"
+        },
+        {
+          "description": "Report each trace while writing to descriptor 3.",
+          "command": "suspike nt=32 ntr=3 | suput fd=3 verbose=1 3> out.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "suget"
+      ]
+    }
+  ]
+}

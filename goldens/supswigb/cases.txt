@@ -1,0 +1,19 @@
+suplane nt=31 ntr=5 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=33 ntr=5 | supswigb n2=5 d1=0.002 d2=2 f1=-1 f2=4 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=4 | supswigb ntr=4 style=seismic title=Example | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=16 ntr=4 | supswigb verbose=1 tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=5 | supswigb key=tracl verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=4 | supswigb key=offset d2=2 f2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=4 | sushw key=gelev,scalel a=10,-1 b=10,0 | supswigb key=gelev style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=4 | sushw key=sx,scalco a=10,1 b=10,0 | supswigb key=sx | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=4 | supswigb style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=1 | supswigb key=tracl | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=1 ntr=1 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | sushw key=trid,dt a=30,0 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=3 | sushw key=ntr,delrt a=3,25 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=3 | sushw key=d1,d2,f1,f2 a=0.01,3,1,5 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | supswigb d1=0 d2=-2 f1=-1 f2=-3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=3 | env -u CWPBIN -u CWPROOT supswigb
+suplane nt=8 ntr=3 | supswigb tmpdir=/nonexistent/oxwave
+suplane nt=8 ntr=3 | supswigb key=notakey
+supswigb

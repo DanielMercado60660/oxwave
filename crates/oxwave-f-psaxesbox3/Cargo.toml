@@ -1,0 +1,16 @@
+[package]
+name = "oxwave-f-psaxesbox3"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-axis-scale = { path = "../oxwave-axis-scale" }
+oxwave-f-basic = { path = "../oxwave-f-basic" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

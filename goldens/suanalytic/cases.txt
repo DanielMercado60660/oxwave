@@ -1,0 +1,19 @@
+# Default and explicitly supplied zero follow different branches.
+suspike nt=63 ntr=1 | suanalytic
+suspike nt=63 ntr=1 | suanalytic phaserot=0
+suspike nt=1 ntr=1 | suanalytic
+suspike nt=31 ntr=2 | suanalytic phaserot=-90
+suspike nt=67 ntr=2 | suanalytic phaserot=90
+suplane nt=101 ntr=3 | suanalytic phaserot=180
+suspike nt=65 ntr=2 | suaddnoise seed=123 | suanalytic phaserot=33.5
+# Non-seismic first trace emits a warning; verbose is not consumed by this program.
+[stderr] suspike nt=17 ntr=1 | sushw key=trid a=111 | suanalytic verbose=1
+[stderr] suspike nt=17 ntr=1 | suanalytic verbose=1
+# Empty input and numeric overflow.
+suanalytic </dev/null
+suspike nt=17 ntr=1 | suanalytic phaserot=1e999
+# Largest valid input: doubling 32767 samples fits the 65535-sample buffer.
+suspike nt=32767 ntr=2 | suanalytic
+suspike nt=32767 ntr=2 | suanalytic phaserot=0
+suspike nt=32767 ntr=2 | suanalytic phaserot=33.5
+# Larger inputs overrun the C buffer; verify their clean Rust error separately.

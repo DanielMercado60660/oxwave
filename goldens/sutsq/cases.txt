@@ -1,0 +1,15 @@
+# Defaults and forward sampling with odd trace sizes.
+[stderr] suplane nt=101 ntr=3 | sutsq
+[stderr] suspike nt=1 ntr=1 | sutsq tmin=0.01 flag=1
+[stderr] suspike nt=127 ntr=1 | sutsq tmin=0.03
+# Inverse and non-one flags, including explicit dt's original error.
+[stderr] suplane nt=127 ntr=3 | sutsq flag=-1
+[stderr] suspike nt=17 ntr=1 | sutsq flag=0
+suplane nt=128 ntr=1 | sutsq flag=-1 dt=0.004
+# Error paths, unknown parameters, and diagnostic output.
+sutsq flag=1 </dev/null
+suplane nt=128 ntr=1 | sutsq tmin=0
+suplane nt=128 ntr=1 | sutsq tmin=-0.08
+suplane nt=128 ntr=1 | sutsq tmin=0.000001
+[stderr] suplane nt=51 ntr=1 | sutsq verbose=1
+[stderr] suplane nt=51 ntr=1 | sutsq dt=0.002

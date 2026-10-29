@@ -1,0 +1,68 @@
+# Compare SU output samples directly; inventory examples redirect their output.
+suplane nt=128 ntr=16 | sushw key=cdp,offset a=1,200 b=1,0 | sudmofk cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1
+suplane nt=128 ntr=16 | sushw key=cdp,offset a=1,300 b=1,0 | sudmofk cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vdmo=1500,2000 sdmo=0.6 fmax=80
+# Explicit defaults, non-default constant velocity, stretch, frequency, and mute.
+[stderr] suspike nt=65 ntr=7 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500 sdmo=1 fmax=125 verbose=0 tmpdir=
+suspike nt=97 ntr=9 dt=0.002 | sushw key=cdp,offset a=1,250 b=1,0 | sudmofk cdpmin=1 cdpmax=9 dxcdp=12.5 noffmix=1 tdmo=0.03 vdmo=2100 sdmo=0.6 fmax=80
+sunull nt=67 ntr=5 | suaddnoise seed=123 | sushw key=cdp,offset a=1,-250 b=1,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1
+suspike nt=81 ntr=11 | sushw key=cdp,offset a=1,250 b=1,0 | sumute xmute=1 tmute=0.12 | sudmofk cdpmin=1 cdpmax=11 dxcdp=20 noffmix=1 sdmo=1.2
+# Zero offset and negative midpoint spacing.
+suspike nt=63 ntr=5 offset=0 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+suspike nt=63 ntr=5 offset=200 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=5 dxcdp=-25 noffmix=1
+# Each offset is contiguous; two full mixes followed by a partial mix.
+[stderr] sunull nt=65 ntr=35 | suaddnoise seed=246 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=7,7 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=2 verbose=1
+[stderr] suspike nt=79 ntr=21 | sushw key=cdp,offset a=1,0 b=1,0 c=0,200 j=7,7 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 verbose=1
+# Subset of CDPs; duplicate CDPs preserve headers and use the last input data.
+suspike nt=71 ntr=9 | sushw key=cdp,offset a=1,200 b=1,0 | sudmofk cdpmin=2 cdpmax=8 dxcdp=25 noffmix=1
+suspike nt=71 ntr=6 | sushw key=cdp,offset a=1,200 b=1,0 j=3,3 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+[stderr] sunull nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=5 cdpmax=7 dxcdp=25 noffmix=1 verbose=1
+# Delayed and negative first sample times.
+suspike nt=91 ntr=7 | sushw key=cdp,offset,delrt a=1,200,40 b=1,0,0 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1
+suspike nt=91 ntr=7 | sushw key=cdp,offset,delrt a=1,200,-12 b=1,0,0 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1
+# Odd and minimum dimensions, including all-zero gathers.
+suspike nt=33 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+sunull nt=1 ntr=1 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+sunull nt=3 ntr=3 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# Zero / negative optional values accepted by C on zero gathers.
+sunull nt=9 ntr=3 | sushw key=cdp a=-2 b=1 | sudmofk cdpmin=-2 cdpmax=0 dxcdp=0 noffmix=0 sdmo=0 fmax=0 vdmo=0
+sunull nt=9 ntr=3 | sushw key=cdp a=-2 b=1 | sudmofk cdpmin=-2 cdpmax=0 dxcdp=-10 noffmix=-1 sdmo=-1 fmax=-5 vdmo=-1500
+suspike nt=33 ntr=3 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 fmax=0
+# Directory selection, cleanup, environment fallback, explicit empty override.
+[stderr] mkdir headers; sunull nt=9 ntr=3 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 tmpdir=headers verbose=1; ls -A headers
+[stderr] mkdir headers; sunull nt=9 ntr=3 | sushw key=cdp a=1 b=1 | CWP_TMPDIR=headers sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1; ls -A headers
+[stderr] sunull nt=9 ntr=3 | sushw key=cdp a=1 b=1 | CWP_TMPDIR=/does/not/exist sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 tmpdir= verbose=1
+# Multiple velocity knots exercise the cmonot library dependency.
+suspike nt=101 ntr=7 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0,0.1,0.3 vdmo=1500,1800,2400
+suspike nt=101 ntr=7 | sushw key=cdp a=1 b=1 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0,0.1,0.2,0.4 vdmo=1800,2200,1700,2400
+# Linear, constant, plateau, and turning-point velocity curves on nonzero data.
+sunull nt=127 ntr=9 | suaddnoise seed=501 | sushw key=cdp,offset a=1,300 b=1,0 | sudmofk cdpmin=1 cdpmax=9 dxcdp=25 noffmix=1 tdmo=0,0.5 vdmo=2300,1800
+sunull nt=111 ntr=5 | suaddnoise seed=502 | sushw key=cdp,offset a=1,150 b=1,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 tdmo=0,0.2,0.4 vdmo=1700,1700,1700
+sunull nt=129 ntr=7 | suaddnoise seed=503 | sushw key=cdp,offset a=1,-350 b=1,0 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0,0.1,0.3,0.6 vdmo=1600,1900,1900,2200 sdmo=0.6 fmax=80
+sunull nt=151 ntr=11 | suaddnoise seed=504 | sushw key=cdp,offset a=1,400 b=1,0 | sudmofk cdpmin=1 cdpmax=11 dxcdp=12.5 noffmix=1 tdmo=0,0.13,0.29,0.7 vdmo=1800,2100,1700,2300
+# Interpolation/extrapolation with delayed traces and picks on either side of zero.
+sunull nt=123 ntr=5 dt=0.002 | suaddnoise seed=505 | sushw key=cdp,offset,delrt a=1,275,20 b=1,0,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 tdmo=0.04,0.12,0.2 vdmo=1700,1850,1950
+sunull nt=113 ntr=5 | suaddnoise seed=506 | sushw key=cdp,offset,delrt a=1,175,-12 b=1,0,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 tdmo=-0.1,0,0.2,0.5 vdmo=1600,1700,1900,2200
+# Negative delay and zero offset reach the early stretch-extrapolation boundary.
+sunull nt=113 ntr=5 | suaddnoise seed=508 | sushw key=cdp,offset,delrt a=1,0,-12 b=1,0,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 tdmo=-0.1,0,0.2,0.5 vdmo=1600,1700,1900,2200
+# Variable velocity through two complete offset mixes and a partial final mix.
+[stderr] sunull nt=131 ntr=35 | suaddnoise seed=507 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=7,7 | sudmofk cdpmin=1 cdpmax=7 dxcdp=25 noffmix=2 tdmo=0,0.1,0.3,0.6 vdmo=1500,1700,2100,2400 sdmo=0.6 fmax=90 verbose=1
+# Empty input and every parameter-validation error; compare whole stderr.
+[stderr] sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] sunull nt=9 ntr=1 | sudmofk
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=2 cdpmax=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0,1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 vdmo=1500,1800
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0,0 vdmo=1500,1800
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=1,0 vdmo=1500,1800
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tmpdir=/does/not/exist
+[stderr] sunull nt=9 ntr=1 | CWP_TMPDIR=/does/not/exist sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=999999999999999999999 cdpmax=2 dxcdp=25 noffmix=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin= cdpmax=2 dxcdp=25 noffmix=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp= noffmix=1
+[stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=
+[stderr] sunull nt=9 ntr=1 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 unknown=1 verbose=1

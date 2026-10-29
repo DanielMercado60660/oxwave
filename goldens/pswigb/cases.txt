@@ -1,0 +1,12 @@
+# Strip nondeterministic PostScript metadata.
+suplane nt=32 ntr=5 | sustrip outpar=/dev/null | pswigb n1=32 n2=5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=31 ntr=4 | sustrip outpar=/dev/null | pswigb n1=31 x2=0,1,3,5 interp=1 va=3 style=normal grid2=dash nbpi=24 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=25 ntr=3 | sustrip outpar=/dev/null | pswigb n1=25 n2=3 d1=-0.5 f1=12 d2=2 f2=-1 bias=0.2 perc=75 xcur=-0.8 wt=0 va=0 nbpi=20 verbose=1 xbox=1 ybox=2 wbox=3 hbox=4 x1beg=10 x1end=1 x2beg=3 x2end=-1 d1num=2 f1num=1 n1tic=2 grid1=dot label1=Time d2num=1 f2num=0 n2tic=2 grid2=solid label2=Trace labelfont=Courier labelsize=12 title=Example titlefont=Times-Bold titlesize=16 titlecolor=red axescolor=blue gridcolor=green axeswidth=2 ticwidth=0.5 gridwidth=0.3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n10 1\n' > curve.txt; suplane nt=20 ntr=3 | sustrip outpar=/dev/null | pswigb n1=20 n2=3 curve=curve.txt npair=2 curvecolor=red curvewidth=2 curvedash=3 nbpi=12 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=20 ntr=3 | sustrip outpar=/dev/null > data; pswigb n1=20 clip=1 va=5 nbpi=12 verbose=0 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pswigb n2=2
+pswigb n1=4 n2=2
+suplane nt=10 ntr=2 | sustrip outpar=/dev/null | pswigb n1=10
+suspike nt=17 ntr=3 | sustrip outpar=/dev/null | pswigb n1=17 n2=3 wt=1 va=0 clip=1 nbpi=13 style=normal grid1=dash grid2=dot verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=9 ntr=2 | sustrip outpar=/dev/null | pswigb n1=9 n2=2 va=2 wt=0 clip=1 nbpi=9 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n5 1\n' > a; printf '1 0\n6 1\n' > b; suspike nt=9 ntr=2 | sustrip outpar=/dev/null | pswigb n1=9 n2=2 curve=a,b npair=2,2 curvecolor=blue curvewidth=1 curvedash=2 nbpi=9 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

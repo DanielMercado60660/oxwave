@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-f-dge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-dblas = { path = "../oxwave-f-dblas" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

@@ -1,0 +1,294 @@
+{
+  "scope": "su/main/data_conversion part 1 of 1",
+  "programs": [
+    {
+      "name": "segyclean",
+      "path": "su/main/data_conversion/segyclean.c",
+      "purpose": "Zero SU-specific fields in the unassigned portion of each trace header.",
+      "selfdoc_first_line": " SEGYCLEAN - zero out unassigned portion of header\t\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 59,
+      "difficulty": "easy",
+      "difficulty_reason": "It clears a fixed set of header fields on each trace.",
+      "test_cases": [
+        {
+          "description": "Clear headers on several generated traces.",
+          "command": "suplane nt=128 ntr=8 | segyclean"
+        },
+        {
+          "description": "Clear headers on a short spike gather.",
+          "command": "suspike nt=64 ntr=4 | segyclean"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "segyhdrmod",
+      "path": "su/main/data_conversion/segyhdrmod.c",
+      "purpose": "Replace the first 3200 bytes of a SEG-Y file with a supplied text header.",
+      "selfdoc_first_line": " SEGYHDRMOD - replace the text header on a SEGY file\t\t",
+      "params": [
+        {
+          "name": "text",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "File containing the replacement 3200-byte text header."
+        },
+        {
+          "name": "data",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "SEG-Y file to modify in place."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "err", "checkpars", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 100,
+      "difficulty": "easy",
+      "difficulty_reason": "It replaces one fixed-size file block.",
+      "test_cases": [],
+      "license_note": "Credits Reginald H. Beardsley.",
+      "related_programs": []
+    },
+    {
+      "name": "suintvel",
+      "path": "su/main/data_conversion/suintvel.c",
+      "purpose": "Convert stacking velocities and zero-offset times into an interval velocity model.",
+      "selfdoc_first_line": " SUINTVEL - convert stacking velocity model to interval velocity model\t",
+      "params": [
+        {
+          "name": "vs",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Stacking velocities, one per input time."
+        },
+        {
+          "name": "t0",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Normal-incidence times."
+        },
+        {
+          "name": "mode",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Zero writes thicknesses and velocities; nonzero writes times and velocities."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter file."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "efopen", "countparval", "ealloc1float", "err", "getparfloat", "getparint", "checkpars", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float intermediates with double-precision constants and sqrt; non-increasing times or unsuitable velocities can produce division by zero or invalid square roots.",
+      "c_lines": 160,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies a direct formula to a small vector of layers.",
+      "test_cases": [
+        {
+          "description": "Write thicknesses and interval velocities.",
+          "command": "suintvel vs=5000,5523,6339 t0=0.4,0.8,1.125 mode=0 outpar=intpar"
+        },
+        {
+          "description": "Write times and interval velocities.",
+          "command": "suintvel vs=5000,5523,6339 t0=0.4,0.8,1.125 mode=1 outpar=intpar"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["sustkvel"]
+    },
+    {
+      "name": "suoldtonew",
+      "path": "su/main/data_conversion/suoldtonew.c",
+      "purpose": "Read native SU traces and write them through SU's trace output routine.",
+      "selfdoc_first_line": " SUOLDTONEW - convert existing su data to xdr format\t\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "efread", "warn", "err", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Output representation depends on whether SU was built with XDR support.",
+      "c_lines": 68,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads each native trace and passes it to the SU trace writer.",
+      "test_cases": [
+        {
+          "description": "Convert a short plane-wave gather.",
+          "command": "suplane nt=128 ntr=8 | suoldtonew"
+        },
+        {
+          "description": "Convert spike traces.",
+          "command": "suspike nt=64 ntr=4 | suoldtonew"
+        }
+      ],
+      "license_note": "Credits Stewart A. Levin, Mobil.",
+      "related_programs": []
+    },
+    {
+      "name": "sustkvel",
+      "path": "su/main/data_conversion/sustkvel.c",
+      "purpose": "Convert a constant-dip interval velocity model into stacking velocities and times.",
+      "selfdoc_first_line": " SUSTKVEL - convert constant dip layer interval velocity model to the\t",
+      "params": [
+        {
+          "name": "v",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Interval velocities."
+        },
+        {
+          "name": "h",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Layer thicknesses at the midpoint."
+        },
+        {
+          "name": "dip",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Constant layer dip in degrees."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter file."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparfloat", "getparstring", "efopen", "countparval", "ealloc1float", "err", "checkpars", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses ordered float accumulations, double-precision constants, cos and sqrt; results may vary with math library and floating-point evaluation.",
+      "c_lines": 159,
+      "difficulty": "easy",
+      "difficulty_reason": "It accumulates two sums and applies direct formulas for each layer.",
+      "test_cases": [
+        {
+          "description": "Convert a horizontal layered model.",
+          "command": "sustkvel v=5000,6000,8000 h=1000,1200,1300 dip=0 outpar=stkpar"
+        },
+        {
+          "description": "Convert a dipping layered model.",
+          "command": "sustkvel v=5000,6000,8000 h=1000,1200,1300 dip=15 outpar=stkpar"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["suintvel"]
+    },
+    {
+      "name": "suswapbytes",
+      "path": "su/main/data_conversion/suswapbytes.c",
+      "purpose": "Swap trace header and sample byte order between native and foreign formats.",
+      "selfdoc_first_line": " SUSWAPBYTES - SWAP the BYTES in SU data to convert data from big endian",
+      "params": [
+        {
+          "name": "format",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Zero converts foreign to native; nonzero converts native to foreign."
+        },
+        {
+          "name": "swaphdr",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Swap trace header words when nonzero."
+        },
+        {
+          "name": "swapdata",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Swap sample words when nonzero."
+        },
+        {
+          "name": "ns",
+          "type": "int",
+          "default": "computed: from the first trace header after any header swap",
+          "required": false,
+          "description": "Sample count for foreign-to-native conversion; required if the first header has zero ns."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "filestat", "err", "getparint", "efread", "swaphval", "checkpars", "alloc1float", "swap_float_4", "efwrite", "gettr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Foreign-to-native conversion assumes the first trace's sample count for subsequent traces and operates on raw float bit patterns.",
+      "c_lines": 153,
+      "difficulty": "easy",
+      "difficulty_reason": "It swaps fixed-width words in trace headers and samples.",
+      "test_cases": [
+        {
+          "description": "Round-trip both headers and samples.",
+          "command": "suplane nt=128 ntr=8 | suswapbytes format=1 | suswapbytes format=0"
+        },
+        {
+          "description": "Round-trip sample bytes only.",
+          "command": "suspike nt=64 ntr=4 | suswapbytes format=1 swaphdr=0 swapdata=1 | suswapbytes format=0 swaphdr=0 swapdata=1 ns=64"
+        }
+      ],
+      "license_note": "Adapted by John Stockwell from code supplied by Jens Hartmann, Institute fur Geophysik, Hamburg.",
+      "related_programs": ["swapbhed"]
+    },
+    {
+      "name": "swapbhed",
+      "path": "su/main/data_conversion/swapbhed.c",
+      "purpose": "Swap the byte order of fields in a SEG-Y binary header.",
+      "selfdoc_first_line": " SWAPBHED - SWAP the BYTES in a SEGY Binary tape HEaDer file\t\t",
+      "params": [],
+      "stdin": "other",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "efread", "swapbhval", "efwrite", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 53,
+      "difficulty": "easy",
+      "difficulty_reason": "It swaps each known field in one fixed-size binary header.",
+      "test_cases": [
+        {
+          "description": "Swap a generated binary header.",
+          "command": "suplane nt=128 ntr=8 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary > swapped.b"
+        },
+        {
+          "description": "Swap a generated binary header twice.",
+          "command": "suspike nt=64 ntr=4 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary | swapbhed > restored.b"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["suswapbytes"]
+    }
+  ]
+}

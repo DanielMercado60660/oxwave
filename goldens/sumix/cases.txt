@@ -1,0 +1,14 @@
+# Default and custom mixes, including single and asymmetric weights.
+suplane nt=17 ntr=9 | sumix
+suplane nt=17 ntr=9 | sumix mix=1
+suplane nt=17 ntr=9 | sumix mix=1,2,-3,0
+suplane nt=33 ntr=9 | suaddnoise seed=17 | sumix mix=0.2,-1,3,0.7
+suplane nt=17 ntr=3 | sumix mix=1,1,1,1,1
+suplane nt=1 ntr=1 | sumix mix=0
+suplane nt=1 ntr=7 | sumix mix=-1,0,2
+suplane nt=11 ntr=7 | sumix mix=
+suplane nt=11 ntr=7 | sumix mix=1,,2
+[stderr] suplane nt=11 ntr=7 | sumix mix=1,2,3 verbose=1
+[stderr] suplane nt=11 ntr=7 | sumix unknown=1
+sumix mix=1
+suplane nt=11 ntr=7 | sumix mix=1e999

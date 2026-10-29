@@ -1,0 +1,19 @@
+[package]
+name = "sudipdivcor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sudipdivcor"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-cubicspline = { path = "../../crates/oxwave-f-cubicspline" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-cubic-interp = { path = "../../crates/oxwave-cubic-interp" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }

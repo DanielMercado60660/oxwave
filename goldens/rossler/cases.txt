@@ -1,0 +1,75 @@
+# Default trajectory and explicitly supplied defaults (native binary floats).
+[f32] rossler
+[f32] rossler a=.2 b=.2 c=5.7 y0=1 y1=-1 y2=1 h=.01 tol=1e-8 stepmax=500 mode=xy verbose=0
+
+# Every output mode, including one point and odd trajectory sizes.
+[f32] rossler stepmax=1 mode=xy
+[f32] rossler stepmax=7 mode=yz
+[f32] rossler stepmax=13 mode=xz
+[f32] rossler stepmax=17 mode=xyz
+[f32] rossler stepmax=31 mode=x
+[f32] rossler stepmax=33 mode=y
+[f32] rossler stepmax=19 mode=z
+
+# Each coefficient and initial coordinate independently, plus combined changes.
+[f32] rossler stepmax=41 mode=xyz a=.1
+[f32] rossler stepmax=41 mode=xyz b=.3
+[f32] rossler stepmax=41 mode=xyz c=4
+[f32] rossler stepmax=41 mode=xyz y0=2
+[f32] rossler stepmax=41 mode=xyz y1=1
+[f32] rossler stepmax=41 mode=xyz y2=3
+[f32] rossler stepmax=32 mode=xyz h=.02 a=.1 b=.3 c=4 > rossler_xyz.bin; cat rossler_xyz.bin
+[f32] rossler stepmax=32 mode=y y0=2 y1=1 y2=3 tol=1e-7 > rossler_y.bin; cat rossler_y.bin
+[f32] rossler stepmax=29 mode=xyz a=0 b=0 c=0 y0=0 y1=0 y2=0
+[f32] rossler stepmax=29 mode=xyz a=-.1 b=-.2 c=-1 y0=-2 y1=-1 y2=-.5 h=.002
+
+# Forward, backward, stationary, and sub-minimum solver intervals.
+[f32] rossler stepmax=51 mode=xyz h=.05
+[f32] rossler stepmax=51 mode=xyz h=-.001
+[f32] rossler stepmax=9 mode=xyz h=0
+[f32] rossler stepmax=9 mode=xyz h=1e-8
+[f32] rossler stepmax=9 mode=xyz h=-1e-8
+[f32] rossler stepmax=5001 mode=xyz
+
+# Error tolerance, rejected steps, and complete verbose diagnostics.
+[f32] [stderr] rossler stepmax=5 mode=xyz verbose=1
+[f32] [stderr] rossler stepmax=7 mode=xyz h=.1 tol=1e-12 verbose=1
+[f32] [stderr] rossler stepmax=5 mode=xyz tol=.01 verbose=-1
+[f32] [stderr] rossler stepmax=5 mode=xyz tol=0 verbose=1
+[f32] [stderr] rossler stepmax=3 mode=xyz h=.000001 tol=-1 verbose=1
+
+# Zero and negative counts produce empty output; coefficients are parsed lazily.
+[exact] [stderr] rossler stepmax=0 verbose=1
+[exact] [stderr] rossler stepmax=-7 verbose=1
+[exact] [stderr] rossler stepmax=0 a=1e999
+[f32] [stderr] rossler stepmax=3 h=0 a=1e999
+[f32] [stderr] rossler stepmax=3 unknown=ignored
+
+# Empty numeric values use defaults, malformed numerics parse as zero, last wins.
+[f32] rossler stepmax=7 a= b= c= y0= y1= y2= h= tol=
+[f32] rossler stepmax=abc
+[f32] rossler stepmax=7 y0=abc h=abc
+[f32] rossler stepmax=2 stepmax=7 mode=x mode=xyz a=.1 a=.2
+[f32] rossler stepmax=7 mode=xyz a=.1junk h=.02junk
+[f32] rossler stepmax=3 mode=xyz y0=nan
+[f32] rossler stepmax=3 mode=xyz h=nan
+[f32] rossler stepmax=3 mode=xyz tol=nan
+
+# Invalid modes, integer/double overflow, and lazy coefficient parse failures.
+[stderr] rossler mode=bad
+[stderr] rossler mode=
+[stderr] rossler stepmax=0 mode=XY
+[stderr] rossler stepmax=2147483648
+[stderr] rossler verbose=2147483648
+[stderr] rossler y0=1e999
+[stderr] rossler y1=1e999
+[stderr] rossler y2=1e999
+[stderr] rossler h=1e999
+[stderr] rossler tol=1e999
+[stderr] rossler tol=1e-310
+[f32] [stderr] rossler stepmax=3 a=1e999
+[f32] [stderr] rossler stepmax=3 b=1e999
+[f32] [stderr] rossler stepmax=3 c=1e999
+
+# Parameter-file parsing and command-line precedence.
+[f32] printf 'stepmax=9 mode=xyz a=.1 b=.3 c=4 y0=2 y1=1 y2=3 h=.02 tol=1e-7\n' > parameters; rossler par=parameters a=.2

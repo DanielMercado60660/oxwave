@@ -1,0 +1,12 @@
+# Single sample and single trace.
+suspike nt=1 ntr=1 | sugain bias=2 | suai2r
+# Odd trace lengths and multiple traces, negative impedances.
+suspike nt=7 ntr=3 k1=3 mag=2 | sugain bias=-3 | suai2r verbose=1
+# Zero impedance and zero sums produce nonfinite samples.
+sunull nt=5 ntr=2 | suai2r
+suspike nt=9 ntr=1 k1=4 mag=2 | sugain bias=-1 | suai2r verbose=0
+# Empty input and malformed numeric parameter.
+suai2r </dev/null
+suai2r verbose=999999999999999999999 </dev/null
+# Unrecognized parameters are ignored because the original does not call checkpars.
+suspike nt=3 ntr=1 | suai2r unknown=1

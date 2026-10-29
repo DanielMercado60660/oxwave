@@ -1,0 +1,46 @@
+# Defaults and individual spike counts, including the always-enabled first spike.
+suspike
+suspike nt=17 ntr=9 nspk=0
+suspike nt=17 ntr=9 nspk=1
+suspike nt=17 ntr=9 nspk=2
+suspike nt=17 ntr=9 nspk=3
+suspike nt=17 ntr=9 nspk=5
+# Explicit positions and header values.
+suspike nt=11 ntr=7 dt=0.0015 offset=-123.75 ix1=1 it1=1 ix2=2 it2=3 ix3=5 it3=7 ix4=7 it4=11
+suspike nt=1 ntr=1 ix1=1 it1=1 nspk=1
+suspike nt=1 ntr=1
+suspike ntr=0
+suspike ntr=-1
+suspike nt=9 ntr=5 dt=0 offset=0 verbose=1
+suspike nt=65536
+suspike nt=9999999999999999999999
+# Small defaults write spike values into the header immediately before data.
+[exact] suspike nt=1 ntr=4
+[exact] suspike nt=2 ntr=4
+[exact] suspike nt=3 ntr=4
+[exact] suspike nt=0 ntr=4
+# Every spike can target the header; the changed header persists across traces.
+[exact] suspike nt=8 ntr=5 ix1=1 it1=0 ix2=2 it2=-1 ix3=3 it3=-10 ix4=4 it4=-29
+# The first header word is overwritten by tracl after placing the spike.
+[exact] suspike nt=8 ntr=2 nspk=1 ix1=1 it1=-59
+# Exercise every header word through each spike branch, including ns and dt.
+[exact] for ((it=-59; it<=0; it++)); do suspike nt=8 ntr=5 ix1=1 ix2=2 ix3=3 ix4=4 it1=$it it2=$it it3=$it it4=$it || exit; done
+# Writes beyond nt still fit in the full SU_NFLTS allocation and are not output.
+[exact] suspike nt=1 ntr=4 it1=2 it2=65535 it3=5 it4=65535
+[exact] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535
+# Unselected positions must not be evaluated, even if outside trace storage.
+suspike nt=9 ntr=5 ix1=0 it1=-2147483648 ix2=-1 it2=2147483647 ix3=6 it3=-60 ix4=2147483647 it4=65536
+suspike nt=9 ntr=5 nspk=-1 ix1=1 it1=9 it2=-2147483648 it3=65536 it4=-60
+suspike nt=-1 ntr=0
+# Explicit defaults, repeated and empty parameters, and parser errors.
+[exact] suspike nt=64 ntr=32 dt=0.004 offset=400 nspk=4 ix1=8 it1=16 ix2=8 it2=48 ix3=24 it3=16 ix4=24 it4=48
+suspike nt=7 nt=9 ntr=4 nspk=1 ix1=1 it1=9
+suspike nt= ntr=4 nspk=1 ix1=1 it1=1
+suspike nt=abc ntr=4
+[stderr] suspike nt=9 ntr=5 dt=-0.001 offset=-1.75 verbose=1 unknown=ignored
+[stderr] suspike nt=2147483648
+[stderr] suspike ntr=2147483648
+[stderr] suspike dt=1e-310
+[stderr] suspike offset=1e-310
+[stderr] suspike ix1=2147483648
+[stderr] suspike it4=2147483648

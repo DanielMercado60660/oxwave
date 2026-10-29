@@ -1,0 +1,70 @@
+{
+  "scope": "Refl/lib part 2",
+  "functions": [
+    {
+      "name": "compute_synthetics",
+      "file": "Refl/lib/synthetic.c",
+      "signature": "void compute_synthetics (int verbose, int nt, int ntc, int nx, int nor, int nw,\n\tint nlayers, int lsource, int nf, int flt, int vsp, int win, int wtype, \n\tfloat tlag, float red_vel, float decay, float tsec, float bx, float dx, \n\tfloat w1, float w2, int *fil_phase, int nfilters, int *fil_type, \n\tfloat *dbpo, float *f1, float *f2, int *lobs, float *cl, float *t, \n\tcomplex ***response, float **reflectivity, FILE *outfp);",
+      "purpose": "Construct synthetic seismogram traces from frequency-domain reflectivity responses with optional flattening, tapering, and filtering.",
+      "calls": ["npfa", "alloc1float", "alloc1complex", "cmplx", "cneg", "cmul", "cipow", "red_vel_factor", "compute_Hanning_window", "construct_tx_trace", "free1float", "free1complex"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Layer depths accumulate sequentially in float; frequency and trace loops use complex arithmetic, sqrt and sin, with integer conversions for window indices and mixed floating constants. Preserve the distinct VSP and normal frequency factors, FFT sizing, and receiver overwrite order; the flattening expression can be singular at zero offset.",
+      "c_lines": 180,
+      "difficulty": "hard",
+      "group": "reflectivity-synthetics",
+      "license_note": ""
+    },
+    {
+      "name": "red_vel_factor",
+      "file": "Refl/lib/synthetic.c",
+      "signature": "void red_vel_factor (float x, float red_vel, float tlag, complex wpie, \n\tcomplex wsq, complex *rvfac);",
+      "purpose": "Compute the complex reducing-velocity and time-lag factor multiplied by the supplied frequency factor.",
+      "calls": ["crmul", "cmul", "cmplx", "cwp_cexp1"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The zero-velocity branch avoids division; otherwise float division and subtraction feed a complex exponential and complex multiplication.",
+      "c_lines": 12,
+      "difficulty": "medium",
+      "group": "reflectivity-synthetics",
+      "license_note": ""
+    },
+    {
+      "name": "construct_tx_trace",
+      "file": "Refl/lib/synthetic.c",
+      "signature": "void construct_tx_trace (int nw, int nt, int ntc, int ntfft, int nfilters,\n\tint *filters_phase, float tsec, float unexp, float sphrd, complex *refw,\n\tint *fil_type, float *f1, float *f2, float *dbpo, float *reft);",
+      "purpose": "Optionally filter a frequency-domain trace, inverse transform it, apply decay and flattening corrections, and clear the workspace.",
+      "calls": ["apply_filters", "pfacc", "cmplx"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT operation order and scaling must match pfacc; each sample uses float intermediates and exp with a double result converted to float. The self-documentation prototype omits ntc, but the definition and callers include it.",
+      "c_lines": 23,
+      "difficulty": "hard",
+      "group": "reflectivity-synthetics",
+      "license_note": ""
+    },
+    {
+      "name": "compute_Hanning_window",
+      "file": "Refl/lib/synthetic.c",
+      "signature": "void compute_Hanning_window (int iwin, int iw, int if1, int if2, int nf, \n\tcomplex *win);",
+      "purpose": "Calculate the complex-valued Hanning taper coefficient for one frequency index.",
+      "calls": ["crmul", "cmplx"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Piecewise index boundaries and cosine expressions determine the taper; preserve C expression promotion and float conversion, including behavior at degenerate window bounds.",
+      "c_lines": 21,
+      "difficulty": "medium",
+      "group": "reflectivity-synthetics",
+      "license_note": ""
+    },
+    {
+      "name": "apply_filters",
+      "file": "Refl/lib/synthetic.c",
+      "signature": "void apply_filters (int *min_phase, int nfilters, int nw, float tsec, float *f1,\n\tfloat *f2, float *dbpo, int *filter_type, complex *refw);",
+      "purpose": "Apply cascaded low-pass, high-pass, or notch filters, optionally converting their response to minimum phase.",
+      "calls": ["alloc1complex", "cmplx", "crmul", "warn", "conjg", "pfacc", "cneg", "cwp_cexp1", "cadd", "rcabs", "cmul", "free1complex"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sequential filter multiplication and minimum-phase FFTs are order-sensitive; pow, sqrt, cos, log, and complex exponential mix double calculations with float storage. Preserve index conversion, conjugate indexing, normalization, and the persistent delfq value across filters; invalid frequency bounds can cause division by zero or out-of-range indexing.",
+      "c_lines": 130,
+      "difficulty": "hard",
+      "group": "reflectivity-synthetics",
+      "license_note": ""
+    }
+  ]
+}

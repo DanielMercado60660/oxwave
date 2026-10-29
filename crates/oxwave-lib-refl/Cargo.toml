@@ -1,0 +1,19 @@
+[package]
+name = "oxwave-lib-refl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-complexf = { path = "../oxwave-f-complexf" }
+oxwave-f-convolution = { path = "../oxwave-f-convolution" }
+oxwave-f-franuni = { path = "../oxwave-f-franuni" }
+oxwave-pfa-fft = { path = "../oxwave-pfa-fft" }
+oxwave-waveforms = { path = "../oxwave-waveforms" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

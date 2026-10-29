@@ -1,0 +1,76 @@
+# One SU trace-stream output mode. Defaults and explicit defaults, with full
+# stderr comparison because mig1k prints ns even when verbose is zero.
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 fmax=125 tmig=0 vmig=1500 nxpad=0 ltaper=0 speed=1 verbose=0 tmpdir=
+[stderr] suspike | sumigtk dxcdp=12.5
+# Non-power-of-two and minimal sizes, with explicit nonzero input spikes.
+[stderr] suspike nt=17 ntr=7 nspk=1 ix1=4 it1=9 | sumigtk dxcdp=20
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sumigtk dxcdp=25
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigtk dxcdp=25
+[stderr] suspike nt=1 ntr=5 nspk=1 ix1=3 it1=1 | sumigtk dxcdp=25
+[stderr] suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | sumigtk dxcdp=25
+[stderr] sunull nt=19 ntr=5 | sumigtk dxcdp=25
+# Frequency, sampling, padding, taper, and the undocumented speed parameter.
+[stderr] suspike nt=33 ntr=5 dt=0.002 | sumigtk dxcdp=15 fmax=80
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 nxpad=7
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 ltaper=2
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 ltaper=9 nxpad=3
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 speed=0.3
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 speed=8
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=0
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=-25
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 fmax=0
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 fmax=-10 ltaper=-2
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 speed=0
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 speed=-1
+# nxpad=-1 is safe with one input trace: npfaro still returns at least 2.
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sumigtk dxcdp=25 nxpad=-1
+# Interpolated interval velocities and constant extrapolation.
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 vmig=2200
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 tmig=-0.1,0.03,0.07 vmig=1200,1800,2600
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 tmig=0.04,0.08 vmig=1300,2100
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 tmig=0 vmig=0
+[stderr] suspike nt=33 ntr=5 | sumigtk dxcdp=25 tmig=0 vmig=-1500
+# Both cdp sort directions and nonzero delrt: preserve all headers.
+[stderr] suspike nt=17 ntr=5 | sushw key=cdp,delrt a=100,40 b=1,0 | sumigtk dxcdp=25
+[stderr] suspike nt=17 ntr=5 | sushw key=cdp,delrt a=100,-40 b=-1,0 | sumigtk dxcdp=25
+# Diagnostics, unknown parameters, and last-occurrence parameter precedence.
+[stderr] suspike nt=17 ntr=5 | sumigtk dxcdp=25 verbose=1
+[stderr] suspike nt=17 ntr=5 | sumigtk dxcdp=25 verbose=2 ignored=1
+[stderr] suspike nt=17 ntr=5 | sumigtk dxcdp=10 dxcdp=25 vmig=1000 vmig=1800
+# File velocities: native f32 values, excess values, and ignored tmig/vmig.
+[stderr] python3 -c 'import struct; open("vel.bin","wb").write(struct.pack("=17f",*([1800.0]*17)))'; suspike nt=17 ntr=5 | sumigtk dxcdp=25 vfile=vel.bin
+[stderr] python3 -c 'import struct; open("vel.bin","wb").write(struct.pack("=20f",*([1300.0+i*50 for i in range(20)])))'; suspike nt=17 ntr=5 | sumigtk dxcdp=25 vfile=vel.bin tmig=1,0 vmig=1 verbose=1
+# User-supplied temp directory, environment fallback, and explicit override.
+[stderr] mkdir scratch; suspike nt=17 ntr=5 | sumigtk dxcdp=25 tmpdir=scratch verbose=1
+[stderr] mkdir scratch; suspike nt=17 ntr=5 | CWP_TMPDIR=scratch sumigtk dxcdp=25 verbose=1
+[stderr] suspike nt=17 ntr=5 | CWP_TMPDIR=missing sumigtk dxcdp=25 tmpdir= verbose=1
+# Early error exits: empty input, missing spacing, array mismatch and ordering.
+[stderr] sumigtk dxcdp=25
+[stderr] sumigtk
+[stderr] suspike nt=17 ntr=3 | sumigtk
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 tmig=0,0.04 vmig=1500
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 tmig=0 vmig=1500,1800
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 tmig=0,0 vmig=1500,1800
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 tmig=0.04,0 vmig=1500,1800
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 tmpdir=missing
+[stderr] suspike nt=17 ntr=3 | CWP_TMPDIR=missing sumigtk dxcdp=25
+[stderr] : > vel.bin; suspike nt=17 ntr=3 | sumigtk dxcdp=25 vfile=vel.bin
+[stderr] printf '1500\n1800\n' | a2b n1=1 > vel.bin; suspike nt=17 ntr=3 | sumigtk dxcdp=25 vfile=vel.bin
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 nxpad=2147483648
+[stderr] suspike nt=17 ntr=3 | sumigtk dxcdp=25 fmax=1e-310
+# First trace establishes ns; detect inconsistent subsequent trace headers.
+[stderr] { suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9; } | sumigtk dxcdp=25
+# Nonzero data exercise dispersion/resampling, tapers, larger spatial FFTs,
+# and variable velocities. Short suspike defaults can otherwise be all zero.
+[stderr] suspike nt=65 ntr=11 nspk=3 ix1=1 it1=4 ix2=6 it2=33 ix3=11 it3=61 | sumigtk dxcdp=12.5 fmax=85 nxpad=13 ltaper=3 speed=0.3 verbose=1
+[stderr] suspike nt=65 ntr=11 nspk=3 ix1=1 it1=4 ix2=6 it2=33 ix3=11 it3=61 | sumigtk dxcdp=12.5 speed=8 ltaper=20
+[stderr] suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=-10 tmig=-0.1,0.03,0.07 vmig=1200,1800,2600 speed=0.7
+[stderr] suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=10 fmax=0
+[stderr] suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=10 speed=0
+[stderr] suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=0
+[stderr] suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | suaddnoise seed=2026 sn=2 | sumigtk dxcdp=10 fmax=100 speed=0.8 tmig=0,0.07,0.2 vmig=1300,2100,2700
+[stderr] python3 -c 'import struct; open("vel.bin","wb").write(struct.pack("=33f",*([1300.0+i*50 for i in range(33)])))'; suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=10 vfile=vel.bin speed=0.6 nxpad=5
+# Temporary files must be gone after successful output.
+[stderr] mkdir scratch; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=9 | sumigtk dxcdp=25 tmpdir=scratch > migrated.su; find scratch -type f; cat migrated.su

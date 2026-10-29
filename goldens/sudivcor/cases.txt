@@ -1,0 +1,19 @@
+# Default correction, odd trace and sample counts, and a nonzero start time.
+suplane nt=17 ntr=1 | sushw key=delrt a=100 | sudivcor
+suplane nt=1 ntr=1 | sudivcor
+# Velocity interpolation, extrapolation, and single-pick constant velocity.
+suplane nt=73 ntr=3 | sushw key=delrt a=-20 | sudivcor trms=0,0.04,0.12 vrms=1400,1800,2200
+suplane nt=21 ntr=1 | sudivcor trms=0.1 vrms=1800
+suplane nt=11 ntr=1 | sudivcor trms=-0.1,0.1 vrms=-1500,2000
+suplane nt=5 ntr=1 | sudivcor trms=0,0.1 vrms=0,0
+suplane nt=5 ntr=1 | sushw key=dt a=0 | sudivcor
+# File velocities are native floats; supplied picks are ignored.
+python3 -c 'import struct; open("vel", "wb").write(struct.pack("5f", 1500,1600,1700,1800,1900))' && suplane nt=5 ntr=2 | sudivcor vfile=vel trms=3 vrms=4
+python3 -c 'import struct; open("vel", "wb").write(struct.pack("2f", 1500,1600))' && suplane nt=5 ntr=1 | sudivcor vfile=vel
+suplane nt=5 ntr=1 | sudivcor vfile=missing
+# Errors and diagnostics.
+sudivcor </dev/null
+suplane nt=5 ntr=1 | sudivcor trms=0,1 vrms=1500
+suplane nt=5 ntr=1 | sudivcor trms=0,0 vrms=1500,1600
+suplane nt=5 ntr=1 | sudivcor trms=1,0 vrms=1500,1600
+[stderr] suplane nt=5 ntr=1 | sudivcor verbose=1

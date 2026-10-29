@@ -1,0 +1,66 @@
+# Seeded default and varied random shifts.
+suplane nt=31 ntr=5 | sujitter seed=42
+suplane nt=31 ntr=5 | sujitter seed=7 min=0 max=5 pon=0
+suplane nt=31 ntr=7 | sushw key=fldr a=1 b=1 j=2 | sujitter seed=123 min=1 max=4 fldr=1
+suplane nt=31 ntr=3 | sujitter seed=9 min=-3 max=-1 pon=1
+# Fixed shifts, zero, nonstandard flags, and odd dimensions.
+suplane nt=31 ntr=3 | sujitter seed=1 min=2 max=2 pon=0
+suplane nt=31 ntr=3 | sujitter seed=1 min=-2 max=-2 pon=0
+suplane nt=1 ntr=1 | sujitter seed=1 min=0 max=0 pon=0
+suplane nt=31 ntr=3 | sujitter seed=2 min=0 max=0 pon=2 fldr=2
+# Parameters and failure paths.
+suplane nt=31 ntr=2 | sujitter seed=3 min=4 max=2
+sujitter seed=1
+suplane nt=31 ntr=2 | sujitter seed=1 min=1 max=1 pon=0 verbose=1
+suplane nt=31 ntr=2 | sujitter seed=4294967295 min=1 max=1 pon=0
+suplane nt=17 ntr=1 | sujitter min=1 max=1 pon=0
+suplane nt=17 ntr=4 | sushw key=fldr a=1 b=1 | sujitter seed=8 min=1 max=1 pon=0 fldr=1
+suplane nt=17 ntr=1 | sujitter seed=4294967296
+# Zero remains deterministic even with the default random sign enabled.
+[stderr] suplane nt=1 ntr=1 | sujitter seed=0 min=0 max=0
+# Match the original's ignored verbose/unknown flags (it never checkpars).
+[stderr] suplane nt=17 ntr=3 | sujitter seed=1 min=2 max=2 pon=-1 fldr=-1 verbose=1 unused=1
+# Dense samples expose shifts and edge/stale-buffer behavior.
+suplane nt=127 ntr=9 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=0 min=-3 max=5 pon=0
+suplane nt=127 ntr=9 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=2147483648 min=0 max=7
+suplane nt=127 ntr=9 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=4294967295 min=1 max=6
+suplane nt=127 ntr=9 | suaddnoise seed=17 sn=2 noise=flat | sushw key=fldr a=5 b=1 j=3 | sujitter seed=37 min=-5 max=5 fldr=1
+suplane nt=127 ntr=9 | suaddnoise seed=17 sn=2 noise=flat | sushw key=fldr a=5 b=1 | sujitter seed=37 min=1 max=6 fldr=2
+# Negative shift edges keep the full trace allocation, including stale data.
+suplane nt=127 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=1 min=-3 max=-3 pon=0
+# Full error messages, numeric overflow, and first-trace validation ordering.
+[stderr] suplane nt=17 ntr=1 | sujitter seed=1 min=4 max=2
+[stderr] suplane nt=17 ntr=1 | sujitter seed=1 min=2147483648
+[stderr] suplane nt=17 ntr=1 | sujitter seed=1 max=2147483648
+[stderr] suplane nt=17 ntr=1 | sujitter seed=1 pon=2147483648
+[stderr] suplane nt=17 ntr=1 | sujitter seed=1 fldr=2147483648
+[stderr] suplane nt=17 ntr=1 | sujitter seed=4294967296 min=0 max=0
+[stderr] sujitter seed=1 min=4 max=2
+# Empty numeric values restore defaults; later occurrences override earlier ones.
+suplane nt=17 ntr=3 | sujitter seed=1 min= max= pon=0 fldr=
+suplane nt=17 ntr=3 | sujitter seed=1 min=9 min=1 max=1 pon=0
+# Exercise each bound's default independently with visible, dense samples.
+suplane nt=31 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=42 max=5
+suplane nt=31 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=42 min=-3
+# The original holds the initial random shift for nonzero flags other than 1.
+suplane nt=31 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sushw key=fldr a=1 b=1 | sujitter seed=42 min=1 max=5 pon=-1 fldr=-1
+# One-sample traces still execute the original edge-copy loops.
+suplane nt=1 ntr=1 | sujitter seed=1 min=1 max=1 pon=0
+suplane nt=1 ntr=1 | sujitter seed=1 min=-1 max=-1 pon=0
+# Random shifts only copy samples, so these regressions require exact bytes.
+# Dense data exercises all explicit defaults and reuse of the initial shot shift.
+[exact] suplane nt=33 ntr=11 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=42 min=1 max=1 pon=1 fldr=0
+[exact] suplane nt=33 ntr=11 | suaddnoise seed=17 sn=2 noise=flat | sushw key=fldr a=7 b=0 | sujitter seed=42 min=1 max=8 fldr=1
+# Nonstandard pon suppresses sign draws even as each new field gets a shift.
+[exact] suplane nt=33 ntr=11 | suaddnoise seed=17 sn=2 noise=flat | sushw key=fldr a=-5 b=1 | sujitter seed=42 min=-8 max=8 pon=2 fldr=1
+# Longer streams span many complete cycles of the 17-element generator state.
+[exact] suplane nt=129 ntr=97 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=2147483647 min=-15 max=16 pon=1
+[exact] suplane nt=129 ntr=97 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=2147483649 min=0 max=16 pon=0
+# Shifts larger than ns still use the original loops within the full allocation.
+[exact] suspike nt=1 ntr=1 it1=1 | sujitter seed=42 min=-3 max=-3 pon=0
+[exact] suspike nt=1 ntr=1 it1=1 | sujitter seed=42 min=3 max=3 pon=0
+# Parameter-file values precede command-line overrides; verbose remains ignored.
+[exact] [stderr] printf 'seed=42 min=2 max=7 pon=0 fldr=1\n' > jitter.par; suplane nt=33 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sujitter par=jitter.par pon=1 verbose=1
+# Empty sign restores its default, and malformed unsigned seeds report overflow.
+[exact] suplane nt=33 ntr=5 | suaddnoise seed=17 sn=2 noise=flat | sujitter seed=42 pon= min=0 max=7
+[stderr] suplane nt=17 ntr=1 | sujitter seed=-1

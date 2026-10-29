@@ -1,0 +1,358 @@
+{
+  "scope": "su/main/transforms part 1 of 2",
+  "programs": [
+    {
+      "name": "suamp",
+      "path": "su/main/transforms/suamp.c",
+      "purpose": "Extract amplitude, log amplitude, phase, unwrapped phase, real part, or imaginary part from complex traces.",
+      "selfdoc_first_line": " SUAMP - output amp, phase, real or imag trace from\t\t\t",
+      "params": [
+        {"name": "mode", "type": "string", "default": "amp", "required": false, "description": "Output component: amp, logamp, phase, ouphase, suphase, real, or imag."},
+        {"name": "jack", "type": "int", "default": "0", "required": false, "description": "Halve the zero-frequency amplitude; also applied to the first sample in logamp mode."},
+        {"name": "unwrap", "type": "float", "default": "1", "required": false, "description": "Phase-unwrapping threshold divisor; read only for unwrapped phase modes, and zero disables unwrapping."},
+        {"name": "trend", "type": "int", "default": "1", "required": false, "description": "Remove the linear phase trend in unwrapped phase modes."},
+        {"name": "zeromean", "type": "int", "default": "0", "required": false, "description": "Use zero-mean phase instead of phase starting at zero in unwrapped phase modes."},
+        {"name": "smooth", "type": "int", "default": "0", "required": false, "description": "Smooth unwrapped phase using damped least squares."},
+        {"name": "r", "type": "float", "default": "10.0", "required": false, "description": "Smoothing damping coefficient."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print the missing sampling interval warning."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "warn", "getparstring", "getparfloat", "checkpars", "ealloc1float", "alloc1float", "simple_unwrap_phase", "smooth_1", "oppenheim_unwrap_phase", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses sqrt, log and atan2, phase-unwrapping routines and optional least-squares smoothing. The fallback frequency step is calculated as dt/nf. In logamp mode the first output sample is amplitude, not its logarithm.",
+      "c_lines": 336,
+      "difficulty": "medium",
+      "difficulty_reason": "Complex component extraction includes two phase-unwrapping methods and optional smoothing.",
+      "test_cases": [
+        {"description": "Amplitude with zero-frequency adjustment", "command": "suspike nt=128 ntr=2 | sufft verbose=0 | suamp mode=amp jack=1"},
+        {"description": "Simple unwrapped and smoothed phase", "command": "suspike nt=128 ntr=2 | sufft verbose=0 | suamp mode=suphase unwrap=0.8 trend=0 zeromean=1 smooth=1 r=5"},
+        {"description": "Oppenheim unwrapped phase", "command": "suspike nt=128 ntr=2 | sufft verbose=0 | suamp mode=ouphase trend=1"},
+        {"description": "Log amplitude", "command": "suspike nt=128 ntr=2 | sufft verbose=0 | suamp mode=logamp"}
+      ],
+      "license_note": "",
+      "related_programs": ["suclogfft", "sucepstrum"]
+    },
+    {
+      "name": "suanalytic",
+      "path": "su/main/transforms/suanalytic.c",
+      "purpose": "Create a complex analytic trace from each input trace and its Hilbert transform.",
+      "selfdoc_first_line": " SUANALYTIC - use the Hilbert transform to generate an ANALYTIC\t",
+      "params": [
+        {"name": "phaserot", "type": "float", "default": "0.0", "required": false, "description": "If explicitly supplied, multiply the real and Hilbert components by cosine and sine of this angle in degrees; omission follows a different path."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "ealloc1float", "hilbert", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The direct Hilbert transform accumulates floating-point values; an explicitly supplied phaserot uses double-precision trigonometric functions. Explicit phaserot=0 differs from omitting it.",
+      "c_lines": 133,
+      "difficulty": "easy",
+      "difficulty_reason": "The program applies a library Hilbert transform and interleaves two trace components.",
+      "test_cases": [
+        {"description": "Default analytic trace", "command": "suspike nt=128 ntr=2 | suanalytic"},
+        {"description": "Phase-rotated components", "command": "suspike nt=128 ntr=2 | suanalytic phaserot=45"}
+      ],
+      "license_note": "",
+      "related_programs": ["suhilb"]
+    },
+    {
+      "name": "succepstrum",
+      "path": "su/main/transforms/succepstrum.c",
+      "purpose": "Compute a complex cepstrum using a Fourier transform and unwrapped spectral phase.",
+      "selfdoc_first_line": " SUCCEPSTRUM - Compute the complex CEPSTRUM of a seismic trace \t \t\t\t\t\t\t\t\t",
+      "params": [
+        {"name": "sign1", "type": "int", "default": "1", "required": false, "description": "Sign of the real-to-complex transform."},
+        {"name": "sign2", "type": "int", "default": "-1", "required": false, "description": "Sign of the complex transform."},
+        {"name": "mode", "type": "string", "default": "ouphase", "required": false, "description": "Phase unwrapping method: ouphase or suphase."},
+        {"name": "unwrap", "type": "float", "default": "1.0", "required": false, "description": "Simple phase-unwrapping threshold divisor."},
+        {"name": "trend", "type": "int", "default": "1", "required": false, "description": "Remove phase trend."},
+        {"name": "zeromean", "type": "int", "default": "0", "required": false, "description": "Use zero-mean phase."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "getparfloat", "checkpars", "err", "gettr", "puttr", "CWP_Exit", "npfao", "ealloc1complex", "ealloc1float", "sscal", "pfarc", "rcabs", "oppenheim_unwrap_phase", "simple_unwrap_phase", "pfacc", "free1float", "free1complex"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT scaling, atan2, logarithms and phase unwrapping are sensitive to rounding. The code writes 2*(nfftc/2+1) values but leaves tr.ns at its input value; it also calls pfacc with nf, which may not be a valid PFA length.",
+      "c_lines": 255,
+      "difficulty": "medium",
+      "difficulty_reason": "The transform combines FFTs, complex logarithms and selectable phase unwrapping.",
+      "test_cases": [
+        {"description": "Default complex cepstrum", "command": "suspike nt=128 ntr=2 | succepstrum"},
+        {"description": "Simple phase unwrapping and opposite transform signs", "command": "suspike nt=128 ntr=2 | succepstrum mode=suphase unwrap=0.8 trend=0 zeromean=1 sign1=-1 sign2=1"}
+      ],
+      "license_note": "Based on sucepstrum by Balazs Nemeth of Potash Corporation of Saskatchewan Inc., given to CWP in 2008.",
+      "related_programs": ["sucepstrum", "suclogfft"]
+    },
+    {
+      "name": "succwt",
+      "path": "su/main/transforms/succwt.c",
+      "purpose": "Compute a complex continuous wavelet transform or Fourier-kernel decomposition of each trace.",
+      "selfdoc_first_line": " SUCCWT - Complex continuous wavelet transform of seismic traces\t",
+      "params": [
+        {"name": "noct", "type": "int", "default": "5", "required": false, "description": "Number of octaves."},
+        {"name": "nv", "type": "int", "default": "10", "required": false, "description": "Voices per octave."},
+        {"name": "fmax", "type": "float", "default": "computed: 1/(2*dt)", "required": false, "description": "Maximum wavelet frequency."},
+        {"name": "p", "type": "float", "default": "-0.5", "required": false, "description": "Scale normalization exponent."},
+        {"name": "c", "type": "float", "default": "computed: 1/(2*fmax)", "required": false, "description": "Gaussian damping parameter."},
+        {"name": "k", "type": "int", "default": "1", "required": false, "description": "Kernel: 1 Morlet, 2 Fourier; invalid values become 1."},
+        {"name": "fs", "type": "int", "default": "1", "required": false, "description": "Frequency sampling: 1 dyadic, 2 linear."},
+        {"name": "df", "type": "float", "default": "1.0", "required": false, "description": "Used to calculate the number of scales when fs=2; scale construction itself does not use df."},
+        {"name": "dt", "type": "float", "default": "computed: tr.dt divided by 1000000", "required": false, "description": "Sampling interval in seconds."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print additional diagnostics."},
+        {"name": "out", "type": "int", "default": "1", "required": false, "description": "Read but never used."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "gettr", "err", "npfa", "warn", "checkpars", "alloc1float", "ealloc1complex", "ealloc2complex", "pfacc", "cmul", "puttr", "CWP_Exit", "cmplx", "cwp_cexp", "crmul"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses FFTs, complex exponentials, pow and exp with mixed precision. Both kernel builders write w[1] through w[nt], leaving w[0] uninitialized and writing past the allocation; the basis shift can also index beyond the buffer. Verbose output reads a[na] out of bounds.",
+      "c_lines": 425,
+      "difficulty": "medium",
+      "difficulty_reason": "The program builds complex wavelet bases and applies FFT-based convolution over many scales.",
+      "test_cases": [
+        {"description": "Small dyadic Morlet transform", "command": "suspike nt=128 ntr=1 | succwt noct=2 nv=3 dt=0.004 fmax=100"},
+        {"description": "Linear-frequency Fourier kernel", "command": "suspike nt=128 ntr=1 | succwt fs=2 k=2 dt=0.004 fmax=20 df=5 p=0"}
+      ],
+      "license_note": "Also copyrighted University of Tulsa, 2003-4; authors Chris Liner and Bob Clapp.",
+      "related_programs": ["sucwt"]
+    },
+    {
+      "name": "sucepstrum",
+      "path": "su/main/transforms/sucepstrum.c",
+      "purpose": "Convert real traces to real cepstral traces using a complex log spectrum.",
+      "selfdoc_first_line": " SUCEPSTRUM - transform to the CEPSTRal domain\t\t\t\t",
+      "params": [
+        {"name": "sign1", "type": "int", "default": "1", "required": false, "description": "Forward FFT sign, restricted to 1 or -1."},
+        {"name": "sign2", "type": "int", "default": "-1", "required": false, "description": "Inverse FFT sign, restricted to 1 or -1."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt/1000000 or nonseismic tr.d1, falling back to 0.004", "required": false, "description": "Documented but never read as a parameter; sampling interval is taken from the header."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory messages."},
+        {"name": "mode", "type": "string", "default": "ouphase", "required": false, "description": "Phase unwrapping method: ouphase or suphase."},
+        {"name": "unwrap", "type": "float", "default": "1.0", "required": false, "description": "Threshold divisor for simple unwrapping; zero disables either unwrapping method."},
+        {"name": "trend", "type": "int", "default": "1", "required": false, "description": "Remove linear phase trend."},
+        {"name": "zeromean", "type": "int", "default": "0", "required": false, "description": "Use zero-mean phase."},
+        {"name": "smooth", "type": "int", "default": "0", "required": false, "description": "Smooth unwrapped phase."},
+        {"name": "r", "type": "float", "default": "10.0", "required": false, "description": "Smoothing damping coefficient."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "warn", "getparfloat", "gettr", "npfaro", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "alloc1float", "simple_unwrap_phase", "oppenheim_unwrap_phase", "smooth_1", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT rounding, log, atan2, phase unwrapping and optional smoothing affect results; sampling interval and scaling mix float and double arithmetic.",
+      "c_lines": 295,
+      "difficulty": "medium",
+      "difficulty_reason": "The implementation combines forward and inverse FFTs with phase unwrapping and optional smoothing.",
+      "test_cases": [
+        {"description": "Default phase method", "command": "suspike nt=128 ntr=2 | sucepstrum verbose=0"},
+        {"description": "Simple smoothed phase", "command": "suspike nt=128 ntr=2 | sucepstrum verbose=0 mode=suphase unwrap=0.8 trend=0 zeromean=1 smooth=1 r=5"},
+        {"description": "No phase unwrapping and reversed signs", "command": "suspike nt=128 ntr=2 | sucepstrum verbose=0 unwrap=0 sign1=-1 sign2=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suclogfft", "suicepstrum", "succepstrum"]
+    },
+    {
+      "name": "suclogfft",
+      "path": "su/main/transforms/suclogfft.c",
+      "purpose": "Transform real traces into complex logarithmic frequency spectra.",
+      "selfdoc_first_line": " SUCLOGFFT - fft real time traces to complex log frequency domain traces",
+      "params": [
+        {"name": "sign", "type": "int", "default": "1", "required": false, "description": "FFT sign, restricted to 1 or -1."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt/1000000 or nonseismic tr.d1, falling back to 0.004", "required": false, "description": "Documented but never read as a parameter."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory messages."},
+        {"name": "mode", "type": "string", "default": "ouphase", "required": false, "description": "Phase unwrapping method: ouphase or suphase; the selfdoc incorrectly lists suphase as default."},
+        {"name": "unwrap", "type": "float", "default": "1.0", "required": false, "description": "Simple unwrapping threshold divisor; zero disables either method."},
+        {"name": "trend", "type": "int", "default": "1", "required": false, "description": "Remove linear phase trend."},
+        {"name": "zeromean", "type": "int", "default": "0", "required": false, "description": "Use zero-mean phase."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "warn", "gettr", "npfaro", "getparfloat", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "simple_unwrap_phase", "oppenheim_unwrap_phase", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, log, atan2 and phase-unwrapping rounding affect output; near-zero amplitudes are handled by CLOSETO.",
+      "c_lines": 257,
+      "difficulty": "medium",
+      "difficulty_reason": "The program combines a padded FFT with logarithmic amplitude and selectable phase unwrapping.",
+      "test_cases": [
+        {"description": "Oppenheim phase", "command": "suspike nt=128 ntr=2 | suclogfft verbose=0 mode=ouphase"},
+        {"description": "Simple phase and reversed sign", "command": "suspike nt=128 ntr=2 | suclogfft verbose=0 mode=suphase unwrap=0.8 trend=0 zeromean=1 sign=-1"},
+        {"description": "Wrapped phase", "command": "suspike nt=128 ntr=2 | suclogfft verbose=0 unwrap=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["sufft", "sucepstrum", "suiclogfft"]
+    },
+    {
+      "name": "sucwt",
+      "path": "su/main/transforms/sucwt.c",
+      "purpose": "Compute wavelet amplitude panels or a Holder regularity estimate for each input trace.",
+      "selfdoc_first_line": " SUCWT - generates Continous Wavelet Transform amplitude, regularity\t",
+      "params": [
+        {"name": "base", "type": "float", "default": "10.", "required": false, "description": "Base for wavelet scales."},
+        {"name": "first", "type": "float", "default": "-1.0", "required": false, "description": "First scale exponent."},
+        {"name": "expinc", "type": "float", "default": "0.01", "required": false, "description": "Scale exponent increment."},
+        {"name": "last", "type": "float", "default": "1.5", "required": false, "description": "Last scale exponent."},
+        {"name": "wtype", "type": "int", "default": "0", "required": false, "description": "Wavelet type; only 0 is implemented."},
+        {"name": "nwavelet", "type": "int", "default": "1024", "required": false, "description": "Number of mother-wavelet samples."},
+        {"name": "xmin", "type": "float", "default": "-20.0", "required": false, "description": "Minimum wavelet coordinate; overwritten with 0.0 when xcenter is omitted."},
+        {"name": "xcenter", "type": "float", "default": "0.0", "required": false, "description": "Wavelet center; when omitted, a coding error assigns 0.0 to xmin instead."},
+        {"name": "xmax", "type": "float", "default": "20.0", "required": false, "description": "Maximum wavelet coordinate."},
+        {"name": "sigma", "type": "float", "default": "1.0", "required": false, "description": "Wavelet sharpness parameter."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostics."},
+        {"name": "holder", "type": "int", "default": "0", "required": false, "description": "Output Holder regularity instead of amplitude panels."},
+        {"name": "divisor", "type": "float", "default": "1.0", "required": false, "description": "Controls regression segment lengths for Holder estimates."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparfloat", "getparint", "checkpars", "warn", "ealloc1float", "err", "ealloc1int", "ealloc2float", "gettr", "convolve_cwp", "hilbert", "puttr", "linear_regression", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Wavelet and scale construction use pow, exp and mixed float/double arithmetic; convolution and regression depend on accumulation order. Filter indexing can exceed allocations for some scale settings; Holder mode has an unassigned output when icount equals 10 and can loop indefinitely when the integer increment derived from interval is zero.",
+      "c_lines": 518,
+      "difficulty": "medium",
+      "difficulty_reason": "The program constructs many filters, performs convolution and Hilbert transforms, and optionally fits regressions.",
+      "test_cases": [
+        {"description": "Small amplitude panel", "command": "suspike nt=128 ntr=1 | sucwt nwavelet=128 xmin=-5 xcenter=0 xmax=5 first=-1 last=0 expinc=0.2"},
+        {"description": "Holder regularity", "command": "suspike nt=128 ntr=1 | sucwt holder=1 divisor=1 nwavelet=256 xmin=-5 xcenter=0 xmax=5 first=-1 last=0 expinc=0.05"}
+      ],
+      "license_note": "Credits say the implementation was inspired in part by BHP_SU bhpcwt, written by Michael Glinsky, based loosely on a Matlab CWT function.",
+      "related_programs": ["succwt", "sugabor"]
+    },
+    {
+      "name": "sufft",
+      "path": "su/main/transforms/sufft.c",
+      "purpose": "Transform real traces into complex frequency-domain traces.",
+      "selfdoc_first_line": " SUFFT - fft real time traces to complex frequency traces\t\t",
+      "params": [
+        {"name": "sign", "type": "int", "default": "1", "required": false, "description": "FFT sign, restricted to 1 or -1."},
+        {"name": "dt", "type": "float", "default": "computed: seismic tr.dt/1000000 or nonseismic tr.d1, falling back to 0.004", "required": false, "description": "Documented but never read as a parameter."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory messages."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "warn", "npfaro", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "PFA FFT arithmetic and float/double sampling-interval calculations affect exact output bits.",
+      "c_lines": 157,
+      "difficulty": "medium",
+      "difficulty_reason": "The program pads traces and performs a real-to-complex FFT.",
+      "test_cases": [
+        {"description": "Default transform", "command": "suspike nt=128 ntr=2 | sufft verbose=0"},
+        {"description": "Opposite FFT sign", "command": "suplane nt=128 ntr=4 | sufft sign=-1 verbose=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["suclogfft", "suifft"]
+    },
+    {
+      "name": "sugabor",
+      "path": "su/main/transforms/sugabor.c",
+      "purpose": "Produce time-frequency amplitude panels or regularity estimates using Gaussian frequency filters.",
+      "selfdoc_first_line": " SUGABOR -  Outputs a time-frequency representation of seismic data via",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: tr.dt divided by 1000000", "required": false, "description": "Time sampling interval; required if the header value is zero, and the resulting value must be nonzero."},
+        {"name": "fmin", "type": "float", "default": "computed: 0.0*Nyquist", "required": false, "description": "Minimum filter center frequency."},
+        {"name": "fmax", "type": "float", "default": "computed: Nyquist", "required": false, "description": "Upper frequency used to determine filter count."},
+        {"name": "beta", "type": "float", "default": "3.0", "required": false, "description": "Logarithmic filter endpoint decay."},
+        {"name": "band", "type": "float", "default": "computed: 0.05*Nyquist", "required": false, "description": "Filter bandwidth and center-frequency increment."},
+        {"name": "alpha", "type": "float", "default": "computed: beta/(band*band)", "required": false, "description": "Gaussian filter width parameter."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostics."},
+        {"name": "holder", "type": "int", "default": "0", "required": false, "description": "0 outputs amplitude panels; 1 or 2 outputs logarithmic or linear regularity estimates."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "npfaro", "getparint", "checkpars", "ealloc1float", "ealloc1complex", "ealloc2float", "pfarc", "crmul", "pfacr", "hilbert", "puttr", "linear_regression", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, Hilbert transform, exp, sqrt, log and regression are sensitive to rounding and accumulation order. Holder mode reads tmpdata[j][i+1] beyond the last populated filter column, and requires enough filters for y[3].",
+      "c_lines": 378,
+      "difficulty": "medium",
+      "difficulty_reason": "The program filters FFTs at multiple frequencies and optionally performs per-sample regression.",
+      "test_cases": [
+        {"description": "Amplitude panels", "command": "suspike nt=128 ntr=1 | sugabor dt=0.004 fmin=5 fmax=65 band=10 beta=3"},
+        {"description": "Linear regularity estimate", "command": "suspike nt=128 ntr=1 | sugabor dt=0.004 fmin=0 fmax=80 band=10 holder=2 alpha=0.03"}
+      ],
+      "license_note": "",
+      "related_programs": ["sucwt"]
+    },
+    {
+      "name": "suhilb",
+      "path": "su/main/transforms/suhilb.c",
+      "purpose": "Apply a direct time-domain Hilbert transform to each trace.",
+      "selfdoc_first_line": " SUHILB - Hilbert transform\t\t\t\t\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "ealloc1float", "hilbert", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The Hilbert transform's floating-point accumulation order affects exact results.",
+      "c_lines": 75,
+      "difficulty": "easy",
+      "difficulty_reason": "The program applies a library Hilbert transform independently to each trace.",
+      "test_cases": [
+        {"description": "Impulse response", "command": "suspike nt=128 ntr=2 | suhilb"},
+        {"description": "Plane-wave traces", "command": "suplane nt=128 ntr=4 | suhilb"}
+      ],
+      "license_note": "",
+      "related_programs": ["suanalytic"]
+    },
+    {
+      "name": "suicepstrum",
+      "path": "su/main/transforms/suicepstrum.c",
+      "purpose": "Attempt to reconstruct real traces from real cepstral traces.",
+      "selfdoc_first_line": " SUICEPSTRUM - fft of complex log frequency traces to real time traces",
+      "params": [
+        {"name": "sign1", "type": "int", "default": "1", "required": false, "description": "Forward FFT sign, restricted to 1 or -1."},
+        {"name": "sign2", "type": "int", "default": "-1", "required": false, "description": "Inverse FFT sign, restricted to 1 or -1."},
+        {"name": "sym", "type": "int", "default": "0", "required": false, "description": "Center output by changing alternate frequency signs."},
+        {"name": "dt", "type": "float", "default": "computed: tr.dt/1000000, then tr.d1 if zero, then 0.004 if still zero", "required": false, "description": "Output time sampling interval."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostics."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "getparfloat", "warn", "npfaro", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses FFTs, exp, sin and cos with mixed float/double arithmetic. The inverse pfacr is called with newnf rather than newnfft, potentially an invalid transform length, leaving part of the zeroed output untouched. A zero real spectral component is mapped to zero instead of exp(0).",
+      "c_lines": 202,
+      "difficulty": "medium",
+      "difficulty_reason": "The inverse cepstral calculation uses forward and inverse FFTs and complex exponentiation.",
+      "test_cases": [
+        {"description": "Inverse cepstrum", "command": "suspike nt=128 ntr=1 | sucepstrum verbose=0 unwrap=0 | suicepstrum dt=0.004"},
+        {"description": "Centered output and reversed signs", "command": "suspike nt=128 ntr=1 | sucepstrum verbose=0 | suicepstrum dt=0.004 sym=1 sign1=-1 sign2=1 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sucepstrum", "suiclogfft"]
+    },
+    {
+      "name": "suiclogfft",
+      "path": "su/main/transforms/suiclogfft.c",
+      "purpose": "Convert complex logarithmic spectra back to real traces.",
+      "selfdoc_first_line": " SUICLOGFFT - fft of complex log frequency traces to real time traces",
+      "params": [
+        {"name": "sign", "type": "int", "default": "-1", "required": false, "description": "Inverse FFT sign, restricted to 1 or -1."},
+        {"name": "sym", "type": "int", "default": "0", "required": false, "description": "Center the output by changing alternate frequency signs."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "checkpars", "ealloc1complex", "ealloc1float", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Complex exponentiation uses exp, cos and sin with mixed float/double arithmetic, followed by an FFT and scaling. A zero log-amplitude is mapped to zero rather than exp(0).",
+      "c_lines": 156,
+      "difficulty": "medium",
+      "difficulty_reason": "The program exponentiates a complex spectrum and applies an inverse FFT.",
+      "test_cases": [
+        {"description": "Inverse log spectrum", "command": "suspike nt=128 ntr=2 | suclogfft verbose=0 unwrap=0 | suiclogfft"},
+        {"description": "Centered output with reversed sign", "command": "suspike nt=128 ntr=2 | suclogfft verbose=0 sign=-1 | suiclogfft sign=1 sym=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suclogfft", "suicepstrum", "suifft"]
+    }
+  ]
+}

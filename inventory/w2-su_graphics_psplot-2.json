@@ -1,0 +1,390 @@
+{
+  "scope": "su/graphics/psplot (wave 2, batch 2)",
+  "programs": [
+    {
+      "name": "supsmovie",
+      "path": "su/graphics/psplot/supsmovie.c",
+      "purpose": "Plot SU traces as a PostScript movie by sending their samples to psmovie.",
+      "selfdoc_first_line": " SUPSMOVIE - PostScript MOVIE plot of a segy data set\t\t\t",
+      "params": [
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "computed: ntr if n3 is absent; otherwise ntr/n3",
+          "required": false,
+          "description": "Traces per frame; ntr comes from the first header or a count of input traces."
+        },
+        {
+          "name": "n3",
+          "type": "int",
+          "default": "computed: 1 if n2 is absent; otherwise ntr/n2",
+          "required": false,
+          "description": "Number of frames; integer division is used."
+        },
+        {
+          "name": "d1",
+          "type": "float",
+          "default": "computed: first trace d1, else dt/1000000, else 0.004 for seismic or 1.0 for nonseismic",
+          "required": false,
+          "description": "Fast-dimension sampling interval."
+        },
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "computed: first trace d2 if nonzero, else 1.0",
+          "required": false,
+          "description": "Slow-dimension sampling interval."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "computed: first trace f1, else delrt/1000, else 0.0",
+          "required": false,
+          "description": "First fast-dimension coordinate."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "First slow-dimension coordinate. A second getpar call overwrites all header-derived defaults with 1.0 when f2 is absent."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print trace-counting and temporary-file information."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise \"\"",
+          "required": false,
+          "description": "Directory for named temporary files; an empty value uses tmpfile."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparfloat",
+        "warn",
+        "getparstring",
+        "emalloc",
+        "ealloc1float",
+        "etmpfile",
+        "temporary_filename",
+        "efopen",
+        "efwrite",
+        "epopen",
+        "efread",
+        "epclose",
+        "efclose",
+        "eremove"
+      ],
+      "calls_programs": [
+        "psmovie"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header dt is divided in double precision and converted to float; coordinates are passed to psmovie formatted with %f. Output also depends on psmovie. The code appends a slash directly to the CWPBIN environment string, which can invoke undefined behavior, and constructs a command in a fixed-size buffer without bounds checks.",
+      "c_lines": 280,
+      "difficulty": "medium",
+      "difficulty_reason": "The wrapper handles frame dimensions, optional trace buffering, and a subprocess that produces the plot.",
+      "test_cases": [
+        {
+          "description": "Count traces and make a single-frame movie.",
+          "command": "suplane nt=64 ntr=8 | supsmovie d1=0.004 d2=1 f1=0 f2=1 > movie.ps"
+        },
+        {
+          "description": "Use explicit frame dimensions and pass a plotting option through to psmovie.",
+          "command": "suplane nt=64 ntr=8 | supsmovie n2=4 n3=2 d1=0.004 d2=2 f1=0 f2=1 verbose=1 > movie.ps"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "supswigb",
+        "supswigp"
+      ]
+    },
+    {
+      "name": "supswigb",
+      "path": "su/graphics/psplot/supswigb.c",
+      "purpose": "Plot SU traces as a bitmapped PostScript wiggle plot using pswigb.",
+      "selfdoc_first_line": " SUPSWIGB - PostScript Bit-mapped WIGgle plot of a segy data set\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Trace header field supplying irregular trace positions; depth and coordinate fields use their associated scale headers."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "computed: first trace ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Trace count; takes precedence over the ntr parameter."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "computed: first trace ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Alias for n2, read only when n2 is absent."
+        },
+        {
+          "name": "d1",
+          "type": "float",
+          "default": "computed: first trace d1, else dt/1000000, else 0.004 for seismic or 1.0 for nonseismic",
+          "required": false,
+          "description": "Fast-dimension sampling interval."
+        },
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "computed: first trace d2 if nonzero, else 1.0",
+          "required": false,
+          "description": "Slow-dimension sampling interval."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "computed: first trace f1, else delrt/1000, else 0.0",
+          "required": false,
+          "description": "First fast-dimension coordinate."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "computed: first trace f2, else tracr, else tracl, else 1.0 for seismic or 0.0 for nonseismic",
+          "required": false,
+          "description": "First slow-dimension coordinate; the nonseismic fallback differs from the selfdoc."
+        },
+        {
+          "name": "style",
+          "type": "string",
+          "default": "seismic",
+          "required": false,
+          "description": "Plot style; vsp reverses depth positions and sample polarity when key names a depth field."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print trace-counting and temporary-file information."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise \"\"",
+          "required": false,
+          "description": "Directory for named temporary files; an empty value uses tmpfile."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparfloat",
+        "warn",
+        "getparstring",
+        "hdtype",
+        "getindex",
+        "emalloc",
+        "ealloc1float",
+        "etmpfile",
+        "temporary_filename",
+        "efopen",
+        "gethval",
+        "vtod",
+        "vtof",
+        "efwrite",
+        "efclose",
+        "eremove",
+        "eftell",
+        "epopen",
+        "efread",
+        "epclose"
+      ],
+      "calls_programs": [
+        "pswigb"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Irregular depth or coordinate positions use double-precision pow(10, scaler), then convert to float and format with %g; dt conversion mixes double and float. The x2 buffer is read without explicitly writing a terminating NUL before use as a string, causing undefined behavior. The code also appends to the CWPBIN environment string and builds command strings without bounds checks. Output depends on pswigb.",
+      "c_lines": 396,
+      "difficulty": "medium",
+      "difficulty_reason": "The wrapper buffers traces, derives irregular positions from scaled headers, and drives a plotting subprocess.",
+      "test_cases": [
+        {
+          "description": "Plot regularly spaced traces with explicit dimensions and style.",
+          "command": "suplane nt=64 ntr=8 | supswigb n2=8 d1=0.004 d2=2 f1=0 f2=1 style=normal > wigb.ps"
+        },
+        {
+          "description": "Build irregular positions from trace sequence headers.",
+          "command": "suplane nt=64 ntr=8 | supswigb key=tracl style=seismic verbose=1 > wigb.ps"
+        },
+        {
+          "description": "Exercise equal header positions and the regular-spacing fallback.",
+          "command": "suplane nt=64 ntr=8 | supswigb key=offset d2=2 f2=1 > wigb.ps"
+        }
+      ],
+      "license_note": "Credits Delphi's Alexander Koek for irregular trace spacing and Brian Zook of Southwest Research Institute for scale factors and vsp style.",
+      "related_programs": [
+        "supswigp",
+        "supsmovie"
+      ]
+    },
+    {
+      "name": "supswigp",
+      "path": "su/graphics/psplot/supswigp.c",
+      "purpose": "Plot SU traces as a polygon-filled PostScript wiggle plot using pswigp.",
+      "selfdoc_first_line": " SUPSWIGP - PostScript Polygon-filled WIGgle plot of a segy data set\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Trace header field supplying irregular trace positions; depth and coordinate fields use their associated scale headers."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "computed: first trace ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Trace count; takes precedence over the ntr parameter."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "computed: first trace ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Alias for n2, read only when n2 is absent."
+        },
+        {
+          "name": "d1",
+          "type": "float",
+          "default": "computed: first trace d1, else dt/1000000, else 0.004 for seismic or 1.0 for nonseismic",
+          "required": false,
+          "description": "Fast-dimension sampling interval."
+        },
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "computed: first trace d2 if nonzero, else 1.0",
+          "required": false,
+          "description": "Slow-dimension sampling interval."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "computed: first trace f1, else delrt/1000, else 0.0",
+          "required": false,
+          "description": "First fast-dimension coordinate."
+        },
+        {
+          "name": "f2",
+          "type": "float",
+          "default": "computed: first trace f2, else tracr, else tracl, else 1.0 for seismic or 0.0 for nonseismic",
+          "required": false,
+          "description": "First slow-dimension coordinate; the nonseismic fallback differs from the selfdoc."
+        },
+        {
+          "name": "style",
+          "type": "string",
+          "default": "seismic",
+          "required": false,
+          "description": "Plot style; vsp reverses depth positions and sample polarity when key names a depth field."
+        },
+        {
+          "name": "fill",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Polygon fill passed to pswigp; forced to -1 for depth-key vsp plots."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print trace-counting and temporary-file information."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise \"\"",
+          "required": false,
+          "description": "Directory for named temporary files; an empty value uses tmpfile."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparfloat",
+        "warn",
+        "getparstring",
+        "hdtype",
+        "getindex",
+        "emalloc",
+        "ealloc1float",
+        "etmpfile",
+        "temporary_filename",
+        "efopen",
+        "gethval",
+        "vtod",
+        "vtof",
+        "efwrite",
+        "efclose",
+        "eftell",
+        "epopen",
+        "efread",
+        "epclose",
+        "eremove"
+      ],
+      "calls_programs": [
+        "pswigp"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Irregular depth or coordinate positions use double-precision pow(10, scaler), then convert to float and format with %g; dt conversion mixes double and float. The x2 buffer is read without explicitly writing a terminating NUL before use as a string, causing undefined behavior. The code also appends to the CWPBIN environment string and builds command strings without bounds checks. Output depends on pswigp.",
+      "c_lines": 405,
+      "difficulty": "medium",
+      "difficulty_reason": "The wrapper buffers traces, derives irregular positions from scaled headers, and drives a plotting subprocess.",
+      "test_cases": [
+        {
+          "description": "Plot regularly spaced traces with explicit fill and style.",
+          "command": "suplane nt=64 ntr=8 | supswigp n2=8 d1=0.004 d2=2 f1=0 f2=1 style=normal fill=0 > wigp.ps"
+        },
+        {
+          "description": "Build irregular positions from trace sequence headers.",
+          "command": "suplane nt=64 ntr=8 | supswigp key=tracl style=seismic fill=1 verbose=1 > wigp.ps"
+        },
+        {
+          "description": "Exercise equal header positions and the regular-spacing fallback.",
+          "command": "suplane nt=64 ntr=8 | supswigp key=offset d2=2 f2=1 fill=-1 > wigp.ps"
+        }
+      ],
+      "license_note": "Credits Delphi's Alexander Koek for irregular trace spacing and Brian Zook of Southwest Research Institute for scale factors and vsp style.",
+      "related_programs": [
+        "supswigb",
+        "supsmovie"
+      ]
+    }
+  ]
+}

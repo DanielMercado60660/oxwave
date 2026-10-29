@@ -1,0 +1,93 @@
+# Native RayEnd input is 108 bytes: 27 native 32-bit floats/integers.
+# raydata returns 1 even after successful output; most cases preserve that status.
+# The final three data cases check that status, then end with cat (exit 0).
+# All default flags and explicit zero flags; count data and inspect created files.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata; s=$?; cat outpar; find . -type f | sort; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=0 px=0 pz=0 vgx=0 vgz=0 pxvx=0 pol=0 ascci=0 kend=2147483647; s=$?; cat outpar; find . -type f | sort; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata ascci=1; s=$?; find . -type f | sort; exit $s; }
+# Single record, every output mode, exact ASCII and native binary pair ordering.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; find . -name outpar; exit $s; }
+[f32] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+# Odd record count; four polarization branches, f32 division before double sqrt/atan.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[20]=4.; a[22]=9.; [(a.__setitem__(1,i+.125),a.__setitem__(21,g),a.__setitem__(22,h),sys.stdout.buffer.write(struct.pack("=27f",*a))) for i,(g,h) in enumerate([(1,9),(-1,9),(0,9),(0,-9),(1,7)])]' | { raydata pol=1 ascci=1; s=$?; cat x_pol.data; exit $s; }
+[f32] python3 -c 'import struct,sys; a=[0.]*27; a[20]=4.; a[22]=9.; [(a.__setitem__(1,i+.125),a.__setitem__(21,g),a.__setitem__(22,h),sys.stdout.buffer.write(struct.pack("=27f",*a))) for i,(g,h) in enumerate([(1,9),(-1,9),(0,9),(0,-9),(1,7)])]' | { raydata pol=1 ascci=0; s=$?; cat x_pol.data; exit $s; }
+# Negative kend, explicit zero kend, INT_MAX sentinel, no matches, and all-match pol.
+[exact] python3 -c 'import struct,sys; a=bytearray(108); struct.pack_into("=f",a,4,2.5); struct.pack_into("=i",a,60,-7); sys.stdout.buffer.write(a*3)' | { raydata kend=-7 t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata kend=0 t=1; s=$?; cat outpar; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata kend=-1 t=1; s=$?; cat outpar x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata kend=2147483647 t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata kend=0 pol=1 ascci=1; s=$?; cat x_pol.data; exit $s; }
+# Mixed indices and 403 records exercise both allocation growth boundaries and selection order.
+[exact] python3 -c 'import struct,sys; a=bytearray(108); b=bytearray(108); struct.pack_into("=i",a,60,7); struct.pack_into("=i",b,60,8); struct.pack_into("=f",a,4,3.); struct.pack_into("=f",b,4,-2.); sys.stdout.buffer.write((a+b)*201+a)' | { raydata kend=7 t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+# Empty and partial input are accepted, counted only in complete native records.
+[exact] raydata </dev/null; s=$?; cat outpar; exit $s
+[exact] raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1 </dev/null; s=$?; wc -c x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s
+[exact] printf abc | { raydata t=1; s=$?; cat outpar x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=3.25; a[5]=.75; sys.stdout.buffer.write(struct.pack("=27f",*a)+b"partial")' | { raydata t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+# t requires positive to create a file; px/pz/vgx/vgz create for any nonzero but write only for 1.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=-1 px=-1 pz=2 vgx=2 vgz=-1 pxvx=0 pol=0 ascci=1; s=$?; wc -c x_px.data x_pz.data x_vgx.data x_vgz.data; test -e x_t.data; echo t_exists=$?; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=2 px=2 pz=-2 vgx=-2 vgz=2 ascci=0; s=$?; cat outpar; wc -c x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data; exit $s; }
+# pxvx and pol write for any nonzero value; px/vgx are implicitly allocated.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata pxvx=-2 pol=-1 ascci=1; s=$?; cat px_vgx.data x_pol.data; exit $s; }
+[f32] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata pxvx=2 pol=2 ascci=0; s=$?; cat px_vgx.data x_pol.data; exit $s; }
+# Non-0/1 ascci creates requested files but writes neither data nor outpar.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=2; s=$?; wc -c x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; test -e outpar; echo outpar_exists=$?; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=-1; s=$?; wc -c x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; test -e outpar; echo outpar_exists=$?; exit $s; }
+# getpar defaults on empty values, last occurrence wins, parameter-file handling.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata kend= t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 t=0 t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+[exact] printf 't=1 pxvx=1 ascci=1\n' > params; python3 -c 'import struct,sys; a=[0.]*27; a[1]=-2.25; a[3]=.125; a[4]=-.75; a[5]=1.5; a[12]=4.25; a[13]=-3.5; a[20]=4.; a[21]=1.; a[22]=9.; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata par=params ascci=0; s=$?; cat outpar; exit $s; }
+# getpar/checkpars messages, conversion errors, and efopen failure are checked in full.
+[stderr] raydata verbose=1 t=2 px=-1 pz=2 vgx=2 vgz=-1 pxvx=-1 pol=-1 ascci=2 </dev/null
+[stderr] raydata kend=999999999999999999999 </dev/null
+[stderr] raydata ascci=999999999999999999999 </dev/null
+[stderr] raydata unknown=1 </dev/null
+[stderr] raydata t=abc px= ascci=1 verbose=1 </dev/null
+[stderr] mkdir outpar; raydata </dev/null
+# Real endpoints: elamodel and elaray also return 1 on success, so use semicolons.
+[exact] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=5 fangle=-20 langle=20 < model.bin > rays.bin; { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=1 < rays.bin; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; exit $s; }
+[f32] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=5 fangle=-20 langle=20 < model.bin > rays.bin; { raydata t=1 pol=1 < rays.bin; s=$?; cat x_t.data x_pol.data; exit $s; }
+# Mixed native integer indices and distinct data in each selected row.
+# The original pol loop overruns its allocations for filtering; these small
+# cases produce stable selected values on this build and exercise the padded tail.
+[exact] python3 -c 'import struct,sys; [sys.stdout.buffer.write(struct.pack("=10f2i3fi3fi3f2i2f",0,i+.25,0,-i*.125,i*.375,i*.5,0,0,0,0,0,0,i+4.25,i-3.5,0,i%2,0,0,0,0,i+2,1 if i%2 else -1,i+3,0,0,0,0)) for i in range(5)]' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 kend=0 ascci=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+[f32] python3 -c 'import struct,sys; [sys.stdout.buffer.write(struct.pack("=10f2i3fi3fi3f2i2f",0,i+.25,0,-i*.125,i*.375,i*.5,0,0,0,0,0,0,i+4.25,i-3.5,0,i%2,0,0,0,0,i+2,1 if i%2 else -1,i+3,0,0,0,0)) for i in range(5)]' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 kend=0; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(108)*5)' | { raydata pol=1 kend=99; s=$?; cat outpar x_pol.data; exit $s; }
+# A record one byte short is ignored; a complete record followed by one is kept.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(107))' | { raydata t=1; s=$?; cat outpar x_t.data; exit $s; }
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=7.5; a[5]=-2.25; b=struct.pack("=27f",*a); sys.stdout.buffer.write(b+b[:107])' | { raydata t=1 ascci=1; s=$?; cat x_t.data; exit $s; }
+# printf must preserve negative zero and format infinities/NaNs like the original.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; a[1]=-0.; a[3]=float("inf"); a[4]=-float("inf"); a[5]=float("nan"); a[12]=-0.; a[13]=1e-30; sys.stdout.buffer.write(struct.pack("=27f",*a))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; exit $s; }
+# Polarization with a negative ratio, zero denominator, and signed zero g13.
+[exact] python3 -c 'import struct,sys; a=[0.]*27; [(a.__setitem__(1,i),a.__setitem__(20,g11),a.__setitem__(21,g13),a.__setitem__(22,g33),sys.stdout.buffer.write(struct.pack("=27f",*a))) for i,(g11,g13,g33) in enumerate([(-4,1,9),(4,1,0),(0,-1,9),(4,-0.,9),(4,-0.,-9)])]' | { raydata pol=1 ascci=1; s=$?; cat x_pol.data; exit $s; }
+# All empty numeric parameters take their defaults, including the kend sentinel.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(108)*3)' | { raydata kend= t= px= pz= vgx= vgz= pxvx= pol= ascci=; s=$?; cat outpar; find . -type f | sort; exit $s; }
+# The documented misspelling is significant: ascii is an unknown parameter.
+[stderr] raydata ascii=1 verbose=1 </dev/null; s=$?; cat outpar; exit $s
+[stderr] raydata par=missing.params </dev/null
+[stderr] raydata t=2147483648 </dev/null
+# Unchecked data-file opens are not used when there are no selected records.
+[exact] mkdir x_t.data; raydata t=1 </dev/null; s=$?; cat outpar; exit $s
+# Data files are opened before the checked outpar failure.
+[stderr] mkdir outpar; raydata t=1 px=1 </dev/null; s=$?; wc -c x_t.data x_px.data; exit $s
+# Exact allocation boundaries: EOF immediately after growth, then a short record
+# after the second growth. Distinct rows exercise every output and polarization.
+[exact] python3 -c 'import struct,sys; [sys.stdout.buffer.write(struct.pack("=10f2i3fi3fi3f2i2f",0,i+.25,0,-i*.125,i*.375,i*.5,0,0,0,0,0,0,i+4.25,i-3.5,0,i%2,0,0,0,0,i+2,1 if i%2 else -1,i+3,0,0,0,0)) for i in range(301)]' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+[f32] python3 -c 'import struct,sys; [sys.stdout.buffer.write(struct.pack("=10f2i3fi3fi3f2i2f",0,i+.25,0,-i*.125,i*.375,i*.5,0,0,0,0,0,0,i+4.25,i-3.5,0,i%2,0,0,0,0,i+2,1 if i%2 else -1,i+3,0,0,0,0)) for i in range(401)]; sys.stdout.buffer.write(bytes(107))' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+# Native binary copies retain signed zero, subnormals, infinities and NaN payloads.
+[exact] python3 -c 'import struct,sys; a=bytearray(108); [struct.pack_into("=I",a,4*i,b) for i,b in [(1,0x80000000),(3,0x7fa12345),(4,0xffc12345),(5,1),(12,0x7f800000),(13,0xff800000)]]; sys.stdout.buffer.write(a)' | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; exit $s; }
+# INT_MIN is a selectable index; only INT_MAX means all endpoints.
+[exact] python3 -c 'import struct,sys; a=bytearray(108); struct.pack_into("=f",a,4,-7.5); struct.pack_into("=f",a,20,2.25); struct.pack_into("=i",a,60,-2147483648); sys.stdout.buffer.write(bytes(108)+a+bytes(108))' | { raydata kend=-2147483648 t=1 ascci=1 verbose=1; s=$?; cat x_t.data; exit $s; }
+# Audit regressions: 21 real endpoints, every binary output, ASCII
+# selection and polarization, and the binary output's record-count file.
+[f32] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=21 fangle=-40 langle=40 < model.bin > rays.bin; { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 < rays.bin; s=$?; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; exit $s; }
+[exact] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=21 fangle=-40 langle=40 < model.bin > rays.bin; { raydata kend=0 t=1 pol=1 ascci=1 < rays.bin; s=$?; cat x_t.data x_pol.data; exit $s; }
+[exact] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=21 fangle=-40 langle=40 < model.bin > rays.bin; { raydata t=1 < rays.bin; s=$?; cat outpar; exit $s; }
+# Successful data pipelines: assert raydata's normal status 1 before cat so an
+# unexpected exit cannot be hidden. Nonempty output from every file is compared.
+# Seven P-rays from an interior source, all ASCII columns and verbose diagnostics.
+[exact] [stderr] elamodel fill=0.5,0.5,3,1.5,2 > model.bin; elaray xs=0.35 zs=0.1 nangle=7 fangle=-33 langle=27 < model.bin > rays.bin; raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1 verbose=1 < rays.bin; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data
+# Nine SV-rays avoid exactly vertical polarization (undefined in the C for SV).
+[f32] elamodel fill=0.5,0.5,3,1.5,2 > model.bin; elaray mode=1 nangle=9 fangle=-35 langle=45 < model.bin > rays.bin; raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=0 kend=2147483647 < rays.bin; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data
+# A single real endpoint with explicit kend=0; every ASCII output and pair order.
+[exact] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=1 fangle=15 langle=15 < model.bin > rays.bin; raydata kend=0 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1 < rays.bin; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data

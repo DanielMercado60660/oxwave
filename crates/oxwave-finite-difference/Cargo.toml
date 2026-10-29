@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-finite-difference"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-vandermonde = { path = "../oxwave-vandermonde" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

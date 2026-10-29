@@ -1,0 +1,370 @@
+{
+  "scope": "su/main/transforms part 2 of 2",
+  "programs": [
+    {
+      "name": "suifft",
+      "path": "su/main/transforms/suifft.c",
+      "purpose": "Convert complex frequency traces to real time traces with an inverse FFT.",
+      "selfdoc_first_line": " SUIFFT - fft complex frequency traces to real time traces\t",
+      "params": [
+        {
+          "name": "sign",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "Exponent sign; must be 1 or -1."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "checkpars", "ealloc1complex", "ealloc1float", "pfacr", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Prime-factor FFT and float normalization depend on arithmetic order; output sampling is computed from d1 or dt.",
+      "c_lines": 118,
+      "difficulty": "medium",
+      "difficulty_reason": "The program performs an inverse real FFT and adjusts frequency-domain headers.",
+      "test_cases": [
+        {
+          "description": "Default inverse transform.",
+          "command": "suplane nt=128 ntr=8 | sufft sign=1 | suifft sign=-1"
+        },
+        {
+          "description": "Opposite transform signs.",
+          "command": "suplane nt=96 ntr=4 | sufft sign=-1 | suifft sign=1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["sufft", "suslowift"]
+    },
+    {
+      "name": "suphasevel",
+      "path": "su/main/transforms/suphasevel.c",
+      "purpose": "Compute a complex phase-velocity dispersion map from traces and their offsets.",
+      "selfdoc_first_line": " SUPHASEVEL - Multi-mode PHASE VELocity dispersion map computed",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: from header dt; errors if header dt is zero", "required": false, "description": "Time sample interval in seconds."},
+        {"name": "fv", "type": "float", "default": "330", "required": false, "description": "First phase velocity."},
+        {"name": "dv", "type": "float", "default": "25", "required": false, "description": "Phase-velocity increment."},
+        {"name": "nv", "type": "int", "default": "100", "required": false, "description": "Number of phase velocities."},
+        {"name": "out", "type": "int", "default": "0", "required": false, "description": "Parsed but unused."},
+        {"name": "norm", "type": "int", "default": "0", "required": false, "description": "Set to 1 to normalize each input spectrum by amplitude."},
+        {"name": "fmax", "type": "float", "default": "50", "required": false, "description": "Maximum processed frequency; 0 selects Nyquist."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print temporary-file information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Directory for temporary trace storage."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "getparstring", "warn", "checkpars", "etmpfile", "temporary_filename", "efopen", "alloc1float", "efwrite", "npfar", "alloc2complex", "alloc2float", "erewind", "efread", "efclose", "pfa2rc", "alloc1complex", "rcabs", "crmul", "cmplx", "cwp_cexp", "cadd", "cmul", "puttr", "eremove", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, complex exponentials and ordered float summation affect results. Normalization divides by zero for zero spectral amplitudes; fmax can select bins beyond the allocated FFT spectrum, and more than 10000 input offsets overflow the offset array.",
+      "c_lines": 339,
+      "difficulty": "hard",
+      "difficulty_reason": "The transform buffers a full gather and sums complex phase kernels across offsets for each frequency and velocity.",
+      "test_cases": [
+        {"description": "Full-band dispersion map.", "command": "suplane nt=128 ntr=8 | sushw key=offset a=100 b=25 | suphasevel fv=500 dv=100 nv=5 fmax=0 norm=0"},
+        {"description": "Amplitude-normalized limited-band map.", "command": "suplane nt=128 ntr=8 | sushw key=offset a=100 b=25 | suphasevel fv=600 dv=50 nv=4 fmax=40 norm=1"}
+      ],
+      "license_note": "Credits state that the program was cloned from suspecfk and cite a 1998 SEG abstract.",
+      "related_programs": ["suspecfk"]
+    },
+    {
+      "name": "suradon",
+      "path": "su/main/transforms/suradon.c",
+      "purpose": "Compute forward or inverse Radon transforms and estimate or subtract multiples.",
+      "selfdoc_first_line": " SURADON - compute forward or reverse Radon transform or remove multiples",
+      "params": [
+        {"name": "choose", "type": "int", "default": "0", "required": false, "description": "Operation: forward, subtraction, multiple estimate, forward and inverse, or inverse for values 0 through 4."},
+        {"name": "igopt", "type": "int", "default": "1", "required": false, "description": "Moveout geometry: parabolic, hyperbolic, linear, or absolute linear."},
+        {"name": "offref", "type": "float", "default": "2000.", "required": false, "description": "Reference offset."},
+        {"name": "interoff", "type": "float", "default": "0.", "required": false, "description": "Intercept offset."},
+        {"name": "pmin", "type": "float", "default": "-200.", "required": false, "description": "Minimum moveout or slowness."},
+        {"name": "pmax", "type": "float", "default": "400.", "required": false, "description": "Maximum moveout or slowness."},
+        {"name": "anderson", "type": "int", "default": "1", "required": false, "description": "Interpret p values as reference-offset milliseconds when 1, or horizontal slowness when 0."},
+        {"name": "dp", "type": "float", "default": "16.", "required": false, "description": "Moveout or slowness increment."},
+        {"name": "pmula", "type": "float", "default": "80.", "required": false, "description": "Multiple-mute boundary at maximum time."},
+        {"name": "pmulb", "type": "float", "default": "200.", "required": false, "description": "Multiple-mute boundary at zero time."},
+        {"name": "depthref", "type": "float", "default": "500.", "required": false, "description": "Reference depth for hyperbolic geometry."},
+        {"name": "nwin", "type": "int", "default": "1", "required": false, "description": "Number of mute-zone windows; negative values are reset to 1."},
+        {"name": "f1", "type": "float", "default": "60.", "required": false, "description": "Frequency where the high-frequency taper begins."},
+        {"name": "f2", "type": "float", "default": "80.", "required": false, "description": "Frequency where the high-frequency taper ends."},
+        {"name": "prewhite", "type": "float", "default": "0.1", "required": false, "description": "Prewhitening percentage."},
+        {"name": "cdpkey", "type": "string", "default": "cdp", "required": false, "description": "Ensemble header key."},
+        {"name": "offkey", "type": "string", "default": "offset", "required": false, "description": "Offset header key."},
+        {"name": "nxmax", "type": "int", "default": "240", "required": false, "description": "Maximum traces per ensemble."},
+        {"name": "ltaper", "type": "int", "default": "7", "required": false, "description": "Mute taper length."},
+        {"name": "ninterp", "type": "int", "default": "1", "required": false, "description": "Traces interpolated between input traces. The parameter is read twice; the second missing-parameter default overrides the first default of 0."},
+        {"name": "freq1", "type": "float", "default": "4.", "required": false, "description": "Low-frequency bound for interpolation picking."},
+        {"name": "freq2", "type": "float", "default": "20.", "required": false, "description": "High-frequency bound for interpolation picking."},
+        {"name": "lagc", "type": "int", "default": "400", "required": false, "description": "AGC operator length for picking."},
+        {"name": "lent", "type": "int", "default": "5", "required": false, "description": "Time smoothing length."},
+        {"name": "lenx", "type": "int", "default": "7", "required": false, "description": "Spatial smoothing length."},
+        {"name": "xopt", "type": "int", "default": "1", "required": false, "description": "Spatial derivative: differences for 1, FFT for 0; fewer than 16 traces force differences."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "getparfloat", "checkpars", "getindex", "err", "gettr", "gethval", "npfar", "VNDemalloc", "VNDtempname", "V2Dop", "VNDfree", "V2Dr0", "V2Dw0", "intlin", "VNDmemchk", "erewind", "efread", "puttr", "efwrite", "VNDcl", "VNDtotalmem", "CWP_Exit", "pfarc", "VNDr2c", "V2Dr1", "crmul", "V2Dw1", "pfacr", "VNDc2r", "cadd", "csub", "cmul", "conjg", "cmplx", "ints8r"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT transforms, ordered complex sums, Toeplitz or conjugate-gradient solves, interpolation and trigonometric functions are sensitive to rounding. The selfdoc notes a freq1=0 bug; some paths can divide by zero or use invalid dimensions. The duplicated ninterp parsing changes its effective default.",
+      "c_lines": 1542,
+      "difficulty": "hard",
+      "difficulty_reason": "This is a disk-backed ensemble inversion with iterative solvers, interpolation, mute windows and multiple processing modes.",
+      "test_cases": [
+        {"description": "Forward parabolic transform without interpolation.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,100 b=0,100 | suradon choose=0 ninterp=0 nxmax=16 pmin=-32 pmax=32 dp=16 f1=40 f2=60"},
+        {"description": "Forward and inverse linear transform with interpolation.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,100 b=0,100 | suradon choose=3 igopt=3 ninterp=1 nxmax=16 pmin=-32 pmax=32 dp=16 f1=40 f2=60"},
+        {"description": "Multiple subtraction.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,100 b=0,100 | suradon choose=1 ninterp=0 nxmax=16 pmin=-32 pmax=64 dp=16 pmula=0 pmulb=32"}
+      ],
+      "license_note": "Credits identify John Anderson as a visitor from Mobil; references include SEG expanded abstracts.",
+      "related_programs": ["sutaup"]
+    },
+    {
+      "name": "suslowft",
+      "path": "su/main/transforms/suslowft.c",
+      "purpose": "Compute a direct discrete Fourier transform of each real input trace.",
+      "selfdoc_first_line": " SUSLOWFT - Fourier Transforms by a (SLOW) DFT algorithm (Not an FFT)",
+      "params": [
+        {"name": "sign", "type": "int", "default": "1", "required": false, "description": "Exponent sign; must be 1 or -1."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; 0.004 if zero", "required": false, "description": "Time sampling interval."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "getparint", "ealloc1float", "ealloc1complex", "puttr", "cmplx"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The quadratic DFT accumulates floats in order and uses sin and cos. It writes 2*nt float values but sets ns=nt, so the trace writer emits only nt values.",
+      "c_lines": 247,
+      "difficulty": "medium",
+      "difficulty_reason": "The direct DFT requires complex arithmetic and careful handling of its unusual output length.",
+      "test_cases": [
+        {"description": "Default DFT.", "command": "suplane nt=64 ntr=4 | suslowft sign=1 dt=0.004"},
+        {"description": "Negative exponent.", "command": "suplane nt=96 ntr=2 | suslowft sign=-1 dt=0.002"}
+      ],
+      "license_note": "The DFT function comments cite Numerical Recipes in C, page 406.",
+      "related_programs": ["suslowift", "sufft"]
+    },
+    {
+      "name": "suslowift",
+      "path": "su/main/transforms/suslowift.c",
+      "purpose": "Compute a direct inverse discrete Fourier transform from complex frequency samples to real traces.",
+      "selfdoc_first_line": " SUSLOWIFT - Fourier Transforms by (SLOW) DFT algorithm (Not an FFT)",
+      "params": [
+        {"name": "sign", "type": "int", "default": "-1", "required": false, "description": "Exponent sign; must be 1 or -1."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; 0.004 if zero", "required": false, "description": "Sampling interval used for an advisory message."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "getparint", "ealloc1float", "ealloc1complex", "puttr", "cmplx"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The quadratic DFT uses ordered float accumulation and trigonometric functions. It reads 2*ns floats from the trace data even though the input trace contains only ns floats, so the second half can contain stale or zero-initialized data.",
+      "c_lines": 240,
+      "difficulty": "medium",
+      "difficulty_reason": "The direct inverse DFT uses complex arithmetic and unusual input-length assumptions.",
+      "test_cases": [
+        {"description": "Default inverse after slow forward transform.", "command": "suplane nt=64 ntr=4 | suslowft sign=1 | suslowift sign=-1 dt=0.004"},
+        {"description": "Opposite exponent.", "command": "suplane nt=64 ntr=2 | suslowft sign=-1 | suslowift sign=1 dt=0.002"}
+      ],
+      "license_note": "The code is based on suifft and its DFT function comments cite Numerical Recipes.",
+      "related_programs": ["suslowft", "suifft"]
+    },
+    {
+      "name": "suspecfk",
+      "path": "su/main/transforms/suspecfk.c",
+      "purpose": "Compute the amplitude spectrum of a trace panel in frequency and spatial wavenumber.",
+      "selfdoc_first_line": " SUSPECFK - F-K Fourier SPECtrum of data set\t\t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; 0.004 if zero", "required": false, "description": "Time sample interval."},
+        {"name": "dx", "type": "float", "default": "computed: header d2; 1.0 if zero", "required": false, "description": "Spatial sample interval."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print temporary-file information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "getparint", "getparstring", "checkpars", "etmpfile", "temporary_filename", "efopen", "efwrite", "npfar", "npfa", "alloc2complex", "alloc2float", "erewind", "efread", "efclose", "pfa2rc", "pfa2cc", "rcabs", "puttr", "eremove", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional prime-factor FFTs and complex magnitudes are sensitive to floating-point evaluation and math-library behavior.",
+      "c_lines": 228,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers the full panel and performs two FFT dimensions.",
+      "test_cases": [
+        {"description": "Default sampling from headers.", "command": "suplane nt=128 ntr=8 | suspecfk verbose=0"},
+        {"description": "Explicit sampling.", "command": "suplane nt=96 ntr=12 | suspecfk dt=0.002 dx=25 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suspeck1k2", "suphasevel"]
+    },
+    {
+      "name": "suspecfx",
+      "path": "su/main/transforms/suspecfx.c",
+      "purpose": "Compute the frequency amplitude spectrum of each trace.",
+      "selfdoc_first_line": " SUSPECFX - Fourier SPECtrum (T -> F) of traces \t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; 0.004 if zero", "required": false, "description": "Time sample interval."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "warn", "checkpars", "npfaro", "ealloc1float", "ealloc1complex", "pfarc", "rcabs", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT and complex magnitude calculations can differ with arithmetic order and math libraries; the DC amplitude is halved.",
+      "c_lines": 110,
+      "difficulty": "medium",
+      "difficulty_reason": "The program performs a padded real FFT on each trace.",
+      "test_cases": [
+        {"description": "Spectrum with header sampling.", "command": "suplane nt=128 ntr=8 | suspecfx"},
+        {"description": "Spectrum with explicit sampling.", "command": "suplane nt=96 ntr=4 | suspecfx dt=0.002"}
+      ],
+      "license_note": "",
+      "related_programs": ["suspecfk", "sufft"]
+    },
+    {
+      "name": "suspeck1k2",
+      "path": "su/main/transforms/suspeck1k2.c",
+      "purpose": "Compute the two-dimensional spatial wavenumber amplitude spectrum of a trace panel.",
+      "selfdoc_first_line": " SUSPECK1K2 - 2D (K1,K2) Fourier SPECtrum of (x1,x2) data set\t\t",
+      "params": [
+        {"name": "d1", "type": "float", "default": "computed: header d1; 1.0 if zero", "required": false, "description": "First spatial sampling interval."},
+        {"name": "d2", "type": "float", "default": "computed: header d2; 1.0 if zero", "required": false, "description": "Second spatial sampling interval."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print temporary-file information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "warn", "err", "getparfloat", "getparint", "getparstring", "checkpars", "etmpfile", "temporary_filename", "efopen", "efwrite", "npfar", "npfa", "alloc2float", "alloc2complex", "erewind", "efread", "efclose", "pfa2rc", "pfa2cc", "rcabs", "puttr", "eremove", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Two-dimensional FFTs and complex magnitudes depend on floating-point operation order and math-library behavior.",
+      "c_lines": 247,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a full panel, performs two FFT dimensions and rearranges the spectrum.",
+      "test_cases": [
+        {"description": "Spatial spectrum using defaults.", "command": "suplane nt=64 ntr=8 | sushw key=trid a=30 | suspeck1k2"},
+        {"description": "Explicit spatial sampling.", "command": "suplane nt=96 ntr=12 | sushw key=trid a=30 | suspeck1k2 d1=5 d2=25 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suspecfk"]
+    },
+    {
+      "name": "sust",
+      "path": "su/main/transforms/sust.c",
+      "purpose": "Produce a time-frequency amplitude representation using the Stockwell transform.",
+      "selfdoc_first_line": " SUST -  Outputs a time-frequency representation of seismic data via",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; errors if zero", "required": false, "description": "Time sample interval; required when header dt is zero."},
+        {"name": "fmin", "type": "float", "default": "computed: 0.0 times Nyquist", "required": false, "description": "Minimum frequency."},
+        {"name": "fmax", "type": "float", "default": "computed: Nyquist frequency", "required": false, "description": "Maximum frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Parsed verbosity flag."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "warn", "getparfloat", "getparint", "npfaro", "checkpars", "ealloc1float", "ealloc2float", "puttr", "CWP_Exit", "ealloc1double", "ealloc1complex", "pfacc"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT, double Gaussian exponentials and square roots mix with float spectra. The transform writes nfft samples per row into rows allocated for nt samples, causing out-of-bounds writes when padding makes nfft greater than nt; work arrays are leaked per trace.",
+      "c_lines": 307,
+      "difficulty": "hard",
+      "difficulty_reason": "The transform builds a separate frequency-dependent Gaussian and inverse FFT for each frequency bin.",
+      "test_cases": [
+        {"description": "Restricted frequency range.", "command": "suplane nt=128 ntr=2 | sust dt=0.004 fmin=10 fmax=40 verbose=0"},
+        {"description": "Nyquist range.", "command": "suplane nt=64 ntr=2 | sust dt=0.002 fmin=0 fmax=250 verbose=1"}
+      ],
+      "license_note": "Credits name BRGM and Adnand Bitri; the header cites Stockwell-transform publications.",
+      "related_programs": []
+    },
+    {
+      "name": "sutaup",
+      "path": "su/main/transforms/sutaup.c",
+      "purpose": "Compute forward or inverse global slant stacks in the time-space or frequency-wavenumber domain.",
+      "selfdoc_first_line": " SUTAUP - forward and inverse T-X and F-K global slant stacks\t\t",
+      "params": [
+        {"name": "option", "type": "int", "default": "1", "required": false, "description": "Select forward F-K, forward T-X, inverse F-K, or inverse T-X for values 1 through 4."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds; errors if zero", "required": false, "description": "Time sample interval."},
+        {"name": "nx", "type": "int", "default": "computed: number of input traces", "required": false, "description": "Number of horizontal samples."},
+        {"name": "dx", "type": "float", "default": "1.0", "required": false, "description": "Horizontal spacing."},
+        {"name": "npoints", "type": "int", "default": "71", "required": false, "description": "Rho-filter points for inverse T-X processing."},
+        {"name": "pmin", "type": "float", "default": "0.0", "required": false, "description": "Minimum slope."},
+        {"name": "pmax", "type": "float", "default": "0.006", "required": false, "description": "Maximum slope."},
+        {"name": "np", "type": "int", "default": "computed: number of input traces", "required": false, "description": "Number of slope samples and output traces."},
+        {"name": "ntau", "type": "int", "default": "computed: input nt in the documented interface", "required": false, "description": "Documented only; the code never reads this parameter and always uses input nt."},
+        {"name": "fmin", "type": "float", "default": "3.", "required": false, "description": "Minimum frequency for F-K processing."},
+        {"name": "xmin", "type": "float", "default": "0.0", "required": false, "description": "First trace offset."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print temporary-file information."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Temporary-file directory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "gettr", "etmpfile", "warn", "temporary_filename", "efopen", "efwrite", "getparfloat", "checkpars", "alloc2float", "erewind", "efclose", "eremove", "fwd_FK_sstack", "fwd_tx_sstack", "inv_FK_sstack", "inv_tx_sstack", "efread", "puttr", "free2float", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The library slant stacks use FFTs or interpolation and ordered sums. np=1 divides by zero, and dimensions or header reads can be invalid when user-supplied nx or np differ from the trace count.",
+      "c_lines": 235,
+      "difficulty": "hard",
+      "difficulty_reason": "Four multi-trace slant-stack modes delegate to substantial numerical library routines.",
+      "test_cases": [
+        {"description": "Forward F-K slant stack.", "command": "suplane nt=128 ntr=8 | sutaup option=1 dt=0.004 dx=25 np=8 pmin=-0.002 pmax=0.002 fmin=5"},
+        {"description": "Forward T-X slant stack.", "command": "suplane nt=128 ntr=8 | sutaup option=2 dt=0.004 dx=25 np=8 pmin=-0.002 pmax=0.002"},
+        {"description": "Inverse T-X slant stack.", "command": "suplane nt=128 ntr=8 | sutaup option=2 dt=0.004 dx=25 np=8 pmin=-0.002 pmax=0.002 | sutaup option=4 dt=0.004 dx=25 nx=8 np=8 pmin=-0.002 pmax=0.002 npoints=11"},
+        {"description": "Inverse F-K slant stack.", "command": "suplane nt=128 ntr=8 | sutaup option=1 dt=0.004 dx=25 np=8 pmin=-0.002 pmax=0.002 | sutaup option=3 dt=0.004 dx=25 nx=8 np=8 pmin=-0.002 pmax=0.002 fmin=5"}
+      ],
+      "license_note": "The header references an SEG Press slant-stack volume.",
+      "related_programs": ["suradon"]
+    },
+    {
+      "name": "suwfft",
+      "path": "su/main/transforms/suwfft.c",
+      "purpose": "Flatten each trace's FFT amplitude spectrum using weighted neighboring amplitudes.",
+      "selfdoc_first_line": " SUWFFT - Weighted amplitude FFT with spectrum flattening 0->Nyquist\t",
+      "params": [
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Print advisory messages."},
+        {"name": "sign", "type": "int", "default": "1", "required": false, "description": "FFT exponent sign; must be 1 or -1."},
+        {"name": "w0", "type": "float", "default": "0.75", "required": false, "description": "Previous-bin amplitude weight."},
+        {"name": "w1", "type": "float", "default": "1.00", "required": false, "description": "Current-bin amplitude weight."},
+        {"name": "w2", "type": "float", "default": "0.75", "required": false, "description": "Next-bin amplitude weight."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "warn", "npfaro", "getparfloat", "checkpars", "ealloc1float", "ealloc1complex", "pfarc", "rcabs", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The FFT and amplitude divisions are rounding-sensitive. The code reads ct[-1] and ct[nf] when computing boundary weights; its i==nf condition is unreachable, and zero amplitudes cause division by zero.",
+      "c_lines": 161,
+      "difficulty": "medium",
+      "difficulty_reason": "The program performs an FFT and frequency-bin weighting with unsafe boundary accesses.",
+      "test_cases": [
+        {"description": "Default neighboring weights.", "command": "suplane nt=128 ntr=4 | suwfft sign=1 verbose=0 w0=0.75 w1=1 w2=0.75"},
+        {"description": "Flat-spectrum weights and opposite sign.", "command": "suplane nt=96 ntr=4 | suwfft sign=-1 verbose=0 w0=0 w1=1 w2=0"}
+      ],
+      "license_note": "Credits describe the concept as coming from Bassel Al-Moughraby's University of Tulsa PhD thesis.",
+      "related_programs": ["sufft", "suifft"]
+    },
+    {
+      "name": "suzerophase",
+      "path": "su/main/transforms/suzerophase.c",
+      "purpose": "Replace each trace's phase spectrum to produce a zero-phase equivalent centered at a chosen time.",
+      "selfdoc_first_line": " SUZEROPHASE - convert input to zero phase equivalent\t\t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: seismic header dt or nonseismic header d1; if zero, supplied dt or 0.004", "required": false, "description": "Sampling interval is consulted only when the selected header interval is zero."},
+        {"name": "t0", "type": "float", "default": "1.0", "required": false, "description": "Peak time used in the spectral phase and output delay."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print advisory messages."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "warn", "getparfloat", "npfao", "ealloc1float", "ealloc1complex", "cmplx", "pfacc", "rcabs", "conjg", "crmul", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Complex FFT, magnitude, sine and cosine calculations and float scaling are sensitive to operation order and math-library behavior.",
+      "c_lines": 142,
+      "difficulty": "medium",
+      "difficulty_reason": "The program performs forward and inverse complex FFTs and reconstructs a Hermitian phase spectrum.",
+      "test_cases": [
+        {"description": "Default peak time.", "command": "suplane nt=128 ntr=4 | suzerophase t0=1 verbose=0"},
+        {"description": "Shorter peak time.", "command": "suplane nt=96 ntr=4 | suzerophase t0=0.1 verbose=1"}
+      ],
+      "license_note": "Credits identify Bruce VerWest and the SEAM project.",
+      "related_programs": ["sufft", "suifft"]
+    }
+  ]
+}

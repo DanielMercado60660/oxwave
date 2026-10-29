@@ -1,0 +1,19 @@
+# Defaults and single-trace/odd-length input.
+suplane nt=63 ntr=1 | suvelan
+suplane nt=1 ntr=1 | suvelan nv=2 dtratio=1
+# Multiple CDPs, nonzero delay, distinct velocities, and fractional power.
+suplane nt=127 ntr=8 | sushw key=offset,cdp,delrt a=0,1,12 b=40,1,0 | suvelan nv=3 fv=1200 dv=125 dtratio=3 nsmooth=8 pwr=0.5
+# Diagnostic output, moveout warning, zero smoothing, and zero output ratio.
+[stderr] suplane nt=65 ntr=3 | sushw key=offset a=20 b=20 | suvelan nv=2 anis1=-1e-5 anis2=1e-6 verbose=1
+suplane nt=17 ntr=2 | suvelan nv=2 nsmooth=0 dtratio=0
+# Invalid parameters and empty input.
+suvelan </dev/null
+suplane nt=16 ntr=1 | suvelan smute=1
+suplane nt=16 ntr=1 | suvelan pwr=0
+suplane nt=16 ntr=1 | suvelan pwr=-1
+suplane nt=16 ntr=1 | suvelan nv=-1
+suplane nt=16 ntr=1 | suvelan dtratio=-1
+suplane nt=16 ntr=1 | suvelan nv=0
+suplane nt=16 ntr=1 | sushw key=offset a=100 | suvelan anis2=-0.001
+# Varied samples across a gather exercise interpolation and accumulation.
+suplane nt=129 ntr=9 | suaddnoise seed=17 sn=3 | sushw key=offset a=10 b=35 | suvelan nv=7 fv=1100 dv=175 smute=1.8 dtratio=2 nsmooth=5 pwr=1.7

@@ -1,0 +1,33 @@
+# Defaults, individual and overlapping ramps, odd trace and sample counts.
+suplane nt=31 ntr=3 | suramp
+suplane nt=31 ntr=3 | suramp tmin=0.04
+suplane nt=31 ntr=3 | suramp tmax=0.08
+suplane nt=31 ntr=3 | suramp tmin=0.08 tmax=0.04
+suplane nt=1 ntr=1 | suramp
+suplane nt=17 ntr=1 | suramp dt=0.002 tmin=0.01 tmax=0.02
+# Header delay and explicit sample interval.
+suplane nt=31 ntr=2 | sushw key=delrt a=20 | suramp tmin=0.04 tmax=0.10
+suplane nt=31 ntr=2 | sushw key=dt a=0 | suramp dt=0.004 tmin=0.02
+# Zero and negative values with valid ramp bounds.
+suplane nt=17 ntr=1 | suramp tmin=-1 tmax=1
+suplane nt=17 ntr=1 | suramp dt=-0.004 tmin=0 tmax=0
+[stderr] suplane nt=17 ntr=1 | suramp verbose=1 tmin=0.02
+[stderr] suplane nt=17 ntr=1 | suramp unknown=1
+suplane nt=17 ntr=1 | suramp dt=0
+suplane nt=17 ntr=1 | sushw key=dt a=0 | suramp
+suramp dt=0.004
+# Out-of-range times whose rounded tapers still stay inside the C buffer.
+# dt=0.004: ntaper2=17 (starts at sample 0), just before the invalid boundary.
+suspike nt=17 ntr=1 | suramp tmax=-0.004
+suspike nt=17 ntr=1 | suramp tmax=-0.00599
+suspike nt=1 ntr=1 | suramp tmax=-0.004
+# A negative trace start also permits negative tmax within the trace.
+suspike nt=17 ntr=3 | sushw key=delrt a=-100 | suramp tmax=-0.08
+# Starting ramps can extend beyond ns, up to the full SU_NFLTS buffer.
+suspike nt=17 ntr=1 | suramp tmin=0.08
+suspike nt=17 ntr=1 | suramp dt=1 tmin=65535
+# Non-finite parameters fail in the shared parameter parser, as in SU.
+[stderr] suspike nt=17 ntr=1 | suramp tmin=inf
+[stderr] suspike nt=17 ntr=1 | suramp tmax=-inf
+# Undefined C cases (tmax=-0.00601 or -1 for nt=17, tmin=65536 dt=1)
+# are checked separately against clean Rust errors, not C memory corruption.

@@ -1,0 +1,91 @@
+{
+  "scope": "cwp/main (wave 2, batch 2)",
+  "programs": [
+    {
+      "name": "pause",
+      "path": "cwp/main/pause.c",
+      "purpose": "Print a prompt and wait for a character from standard input.",
+      "selfdoc_first_line": "PAUSE - prompt and wait for user signal to continue",
+      "params": [],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Concatenating sufficiently long command-line arguments overflows the fixed-size do_what buffer, causing undefined behavior.",
+      "c_lines": 48,
+      "difficulty": "easy",
+      "difficulty_reason": "The program builds a prompt from positional arguments and reads one character.",
+      "test_cases": [
+        {
+          "description": "Use the default prompt and provide a newline.",
+          "command": "printf '\\n' | pause"
+        },
+        {
+          "description": "Use multiple positional words in the prompt.",
+          "command": "printf '\\n' | pause do plot"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "t",
+      "path": "cwp/main/t.c",
+      "purpose": "Print the current local time and date in a 12-hour style.",
+      "selfdoc_first_line": "T - time and date for non-military types",
+      "params": [],
+      "stdin": "none",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Output depends on the current clock and local time zone, so it is not a stable golden without controlling time; midnight is printed as hour 0.",
+      "c_lines": 61,
+      "difficulty": "easy",
+      "difficulty_reason": "The program formats the current local date and time without numerical processing.",
+      "test_cases": [
+        {
+          "description": "Print the date and time in UTC.",
+          "command": "TZ=UTC t"
+        },
+        {
+          "description": "Print the date and time in a different local time zone.",
+          "command": "TZ=America/Chicago t"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "upfort",
+      "path": "cwp/main/upfort.c",
+      "purpose": "Convert Fortran source to uppercase while preserving comments and most quoted strings.",
+      "selfdoc_first_line": "UPFORT - change Fortran programs to upper case, preserving strings",
+      "params": [],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The inner loops do not check for EOF, so a final line without a newline or an unterminated quoted string can cause an infinite loop; character classification also depends on the C locale.",
+      "c_lines": 62,
+      "difficulty": "easy",
+      "difficulty_reason": "The program transforms characters in a single input stream with simple comment and quote handling.",
+      "test_cases": [
+        {
+          "description": "Convert code while preserving a comment and a quoted string.",
+          "command": "printf 'c mixed Case comment\\n      print *, '\\''Mixed Case'\\''\\n      end\\n' | upfort"
+        },
+        {
+          "description": "Exercise the special quoted text beginning with an opening parenthesis.",
+          "command": "printf '      format '\\''(abc)'\\''\\n' | upfort"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "downfort"
+      ]
+    }
+  ]
+}

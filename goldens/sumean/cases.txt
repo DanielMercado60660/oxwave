@@ -1,0 +1,18 @@
+# Defaults and per-trace output, including an output file.
+suplane nt=17 ntr=3 | sumean outpar=mean.txt && cat mean.txt
+suplane nt=17 ntr=3 | sumean power=1 abs=1 verbose=1 outpar=mean.txt && cat mean.txt
+suplane nt=17 ntr=3 | sumean power=1 abs=0 verbose=1 outpar=mean.txt && cat mean.txt
+# Negative samples, fractional and negative powers, zero power, and zeros.
+suspike nt=7 ntr=1 mag=-2 | sumean power=1 abs=0 outpar=mean.txt && cat mean.txt
+suspike nt=7 ntr=1 mag=-2 | sumean power=1 abs=1 outpar=mean.txt && cat mean.txt
+suspike nt=7 ntr=1 mag=-2 | sumean power=0.5 abs=0 outpar=mean.txt && cat mean.txt
+suspike nt=7 ntr=1 mag=-2 | sumean power=0.5 abs=1 outpar=mean.txt && cat mean.txt
+sunull nt=5 ntr=2 | sumean power=-1 outpar=mean.txt && cat mean.txt
+sunull nt=1 ntr=1 | sumean power=0 verbose=1 outpar=mean.txt && cat mean.txt
+# Invalid modes, failed file open, empty input, and unknown parameter.
+[stderr] sumean verbose=2 outpar=/dev/stdout
+[stderr] sumean verbose=-1 outpar=/dev/stdout
+[stderr] sumean outpar=/no/such/directory/mean
+[stderr] sumean outpar=mean.txt
+[stderr] suplane nt=9 ntr=1 | sumean outpar=mean.txt extra=1 && cat mean.txt
+[stderr] sumean

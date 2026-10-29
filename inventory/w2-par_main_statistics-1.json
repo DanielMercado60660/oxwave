@@ -1,0 +1,287 @@
+{
+  "scope": "par/main/statistics (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "cpftrend",
+      "path": "par/main/statistics/cpftrend.c",
+      "purpose": "Pick cumulative-probability levels and calculate a spread for each populated X bin of ASCII column data.",
+      "selfdoc_first_line": "   CPFTREND - generate picks of the Cumulate Probability Function \t",
+      "params": [
+        {
+          "name": "ix",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "One-based column containing X."
+        },
+        {
+          "name": "iy",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "One-based column containing Y."
+        },
+        {
+          "name": "min_x",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Lower X bin boundary."
+        },
+        {
+          "name": "max_x",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Upper X bin boundary."
+        },
+        {
+          "name": "min_y",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Lower Y bin boundary."
+        },
+        {
+          "name": "max_y",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Upper Y bin boundary."
+        },
+        {
+          "name": "nx",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of X bins."
+        },
+        {
+          "name": "ny",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of Y bins."
+        },
+        {
+          "name": "logx",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use natural-log X binning when nonzero."
+        },
+        {
+          "name": "logy",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use natural-log Y binning when nonzero."
+        },
+        {
+          "name": "ir",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "One-based rejection-variable column; values greater than zero enable threshold filtering."
+        },
+        {
+          "name": "rmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Accept values strictly above this nonzero threshold. A threshold is required when ir>0; rmin is read only when rmax is absent."
+        },
+        {
+          "name": "rmax",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Accept values strictly below this nonzero threshold. A threshold is required when ir>0; rmax takes precedence over rmin."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "err",
+        "checkpars",
+        "ealloc2",
+        "ealloc1"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float bin coordinates, counts and sums are accumulated in input order; log, exp and sqrt use double-precision library math with float conversions. The sigma expression can divide by zero for a single sample or produce a negative radicand through rounding. Percentile tests use an else-if chain, so one bin can trigger only one pick and output rows can have fewer than five picks. Bin zero is excluded; float-to-int conversion truncates toward zero. Zero logarithmic bounds are accepted despite log(0). Input columns are not validated: missing or malformed values can leave v elements uninitialized, and more than 128 tokens or invalid indices can access outside v. Integer products in the sigma denominator can overflow.",
+      "c_lines": 393,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a two-dimensional histogram and computes cumulative picks and per-bin statistics.",
+      "test_cases": [
+        {
+          "description": "Linear bins with no rejection threshold.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=40 min_y=0 max_y=20 nx=8 ny=8"
+        },
+        {
+          "description": "Logarithmic axes and a lower rejection threshold.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns,tracl output=geom | cpftrend ix=1 iy=2 ir=3 rmin=8 min_x=1 max_x=40 min_y=1 max_y=20 nx=8 ny=8 logx=1 logy=1"
+        },
+        {
+          "description": "Upper rejection threshold.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns,tracl output=geom | cpftrend ix=1 iy=2 ir=3 rmax=24 min_x=0 max_x=40 min_y=0 max_y=20 nx=8 ny=8"
+        }
+      ],
+      "license_note": "Credits Reginald H. Beardsley and copyright 2006 Exploration Software Consultants Inc.",
+      "related_programs": [
+        "pdfhistogram"
+      ]
+    },
+    {
+      "name": "pdfhistogram",
+      "path": "par/main/statistics/pdfhistogram.c",
+      "purpose": "Build and normalize a two-dimensional histogram from ASCII column data.",
+      "selfdoc_first_line": " PDFHISTOGRAM - generate a HISTOGRAM of the Probability Density function",
+      "params": [
+        {
+          "name": "ix",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "One-based column containing X."
+        },
+        {
+          "name": "iy",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "One-based column containing Y."
+        },
+        {
+          "name": "min_x",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Lower X bin boundary."
+        },
+        {
+          "name": "max_x",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Upper X bin boundary."
+        },
+        {
+          "name": "min_y",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Lower Y bin boundary."
+        },
+        {
+          "name": "max_y",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Upper Y bin boundary."
+        },
+        {
+          "name": "logx",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use natural-log X binning when nonzero."
+        },
+        {
+          "name": "logy",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Use natural-log Y binning when nonzero."
+        },
+        {
+          "name": "norm",
+          "type": "string",
+          "default": "total",
+          "required": false,
+          "description": "Normalization: sqrt, avg_cnt, avg_sum, xcnt, ycnt, log or total. The code implements avg_cnt as the average of the two normalized counts and avg_sum as twice the bin count divided by the sum of marginal counts, opposite to the selfdoc labels."
+        },
+        {
+          "name": "nx",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of X bins."
+        },
+        {
+          "name": "ny",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of Y bins."
+        },
+        {
+          "name": "ir",
+          "type": "int",
+          "default": "-1",
+          "required": false,
+          "description": "One-based rejection-variable column; values greater than zero enable threshold filtering."
+        },
+        {
+          "name": "rmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Accept values strictly above this nonzero threshold. A threshold is required when ir>0; rmin is read only when rmax is absent."
+        },
+        {
+          "name": "rmax",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Accept values strictly below this nonzero threshold. A threshold is required when ir>0; rmax takes precedence over rmin."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "err",
+        "checkpars",
+        "ealloc2",
+        "ealloc1"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Output is native-endian binary: two int dimensions, six float metadata values, then ny rows of nx floats. Float bin coordinates and normalizations mix float operations with double constants and log, exp and sqrt. Bin zero is excluded and float-to-int conversion truncates toward zero. Initialization clears ny floats per row despite each row having nx elements: nx>ny leaves elements uninitialized and nx<ny writes beyond rows, potentially beyond the allocation. The ycnt normalization indexes ycnt by i instead of j and can read out of bounds when nx>ny. Zero logarithmic bounds are accepted despite log(0). Missing or malformed columns can leave v elements uninitialized; more than 128 tokens or invalid indices can access outside v.",
+      "c_lines": 412,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a two-dimensional histogram and supports several marginal-count normalizations.",
+      "test_cases": [
+        {
+          "description": "Default total normalization with square bins.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=40 min_y=0 max_y=20 nx=8 ny=8 norm=total > histogram.bin"
+        },
+        {
+          "description": "Square-root normalization with logarithmic axes and lower rejection.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns,tracl output=geom | pdfhistogram ix=1 iy=2 ir=3 rmin=8 min_x=1 max_x=40 min_y=1 max_y=20 nx=8 ny=8 logx=1 logy=1 norm=sqrt > histogram.bin"
+        },
+        {
+          "description": "Average-count normalization with upper rejection.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns,tracl output=geom | pdfhistogram ix=1 iy=2 ir=3 rmax=24 min_x=0 max_x=40 min_y=0 max_y=20 nx=8 ny=8 norm=avg_cnt > histogram.bin"
+        },
+        {
+          "description": "Y-count normalization with square bins.",
+          "command": "suplane nt=16 ntr=32 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=40 min_y=0 max_y=20 nx=8 ny=8 norm=ycnt > histogram.bin"
+        }
+      ],
+      "license_note": "Credits Reginald H. Beardsley and copyright 2006 Exploration Software Consultants Inc.",
+      "related_programs": [
+        "cpftrend"
+      ]
+    }
+  ]
+}

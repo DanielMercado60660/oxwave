@@ -1,0 +1,25 @@
+# Raw float output from seekable files; conversions cover all ordinary types.
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0.1 > in && velconv < in intype=vintt outtype=zt nt=9 nz=11 dt=0.004 dz=4 ft=0.004 fz=2 nx=1
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0.1 > in && velconv < in intype=vrmst outtype=vintt nt=9 dt=0.004 nx=1
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0.1 > in && velconv < in intype=vintz outtype=tz nz=9 nt=7 dz=4 dt=0.004 nx=1
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0.1 > in && velconv < in intype=vintz outtype=vrmst nz=9 dz=4 dt=0.004
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintt outtype=vintz nt=9 dt=0.004 dz=4
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintt outtype=zt nt=9 dt=0.004 dz=4 > z && velconv < z intype=zt outtype=tz nt=9 dt=0.004 dz=4
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintz outtype=tz nz=9 dt=0.004 dz=4 > t && velconv < t intype=tz outtype=zt nz=9 dt=0.004 dz=4
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintt outtype=zt
+[f32] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=otherz outtype=othert otherfile=in nz=9 nt=9 dz=4 dt=0.004
+[stderr] vtlvz nt=9 dt=0.004 v0=2000 a=0 > in && velconv < in intype=othert outtype=otherz otherfile=in nt=9 nz=9 dz=4 dt=0.004 verbose=1 > /dev/null
+[stderr] velconv intype=vintt
+[stderr] velconv intype=bad outtype=zt nt=3
+[stderr] velconv intype=vintt outtype=bad nt=3
+[stderr] velconv intype=vintt outtype=zt nt=3 otherfile=x
+[stderr] velconv intype=otherz outtype=zt nt=3 otherfile=x
+[stderr] velconv intype=vintz outtype=zt nt=3 < /dev/null
+[stderr] printf '\000\000\200\277\000\000\200\277\000\000\200\277' > in && velconv < in intype=vintz outtype=zt nt=3
+[f32] vtlvz nt=3 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintt outtype=zt nt=3 nx=0
+[f32] vtlvz nt=5 dt=0.004 v0=2000 a=0.1 > in && cat in in > traces && velconv < traces intype=vintt outtype=vrmst nt=5 dt=0.004 dz=4 nx=2
+[f32] vtlvz nt=5 dt=0.004 v0=2000 a=0 > in && velconv < in intype=othert outtype=otherz otherfile=in nt=5 nz=5 dt=0.004 dz=4
+[stderr] printf '' | velconv intype=vintt outtype=zt nt=3
+[stderr] velconv intype=othert outtype=zt nt=3
+[stderr] velconv intype=otherz outtype=othert nt=3 otherfile=missing
+[f32] vtlvz nt=1 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintz outtype=zt nz=1 nt=3 dz=4 dt=0.004 fz=1

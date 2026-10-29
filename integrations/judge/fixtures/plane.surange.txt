@@ -1,0 +1,19 @@
+8 traces:
+tracl    1 8 (1 - 8)
+tracr    1 8 (1 - 8)
+cdp      1 8 (1 - 8)
+offset   -200 150 (-200 - 150)
+sx       0 70 (0 - 70)
+gx       100 240 (100 - 240)
+ns       64
+dt       4000
+d2       0.025000
+
+Shot coordinate limits:
+	North(0,0) South(0,0) East(70,0) West(0,0)
+
+Receiver coordinate limits:
+	North(100,0) South(100,0) East(240,0) West(100,0)
+
+Midpoint coordinate limits:
+	North(50,0) South(50,0) East(155,0) West(50,0)

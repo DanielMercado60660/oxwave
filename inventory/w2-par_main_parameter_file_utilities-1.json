@@ -1,0 +1,152 @@
+{
+  "scope": "par/main/parameter_file_utilities (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "mkparfile",
+      "path": "par/main/parameter_file_utilities/mkparfile.c",
+      "purpose": "Convert two columns of ASCII numbers into two comma-separated parameter vectors.",
+      "selfdoc_first_line": " MKPARFILE - convert ascii to par file format \t\t\t\t",
+      "params": [
+        {
+          "name": "string1",
+          "type": "string",
+          "default": "par1",
+          "required": false,
+          "description": "Name of the parameter vector made from the first input column."
+        },
+        {
+          "name": "string2",
+          "type": "string",
+          "default": "par2",
+          "required": false,
+          "description": "Name of the parameter vector made from the second input column."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "etmpfile",
+        "checkpars",
+        "err",
+        "efwrite",
+        "efread",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Input values are parsed as float and printed with %g, so decimal values are rounded to float and output formatting depends on the C library and locale.",
+      "c_lines": 95,
+      "difficulty": "easy",
+      "difficulty_reason": "It parses two ASCII columns and writes each column as a parameter vector.",
+      "test_cases": [
+        {
+          "description": "Convert generated trace headers using the default parameter names.",
+          "command": "suplane nt=8 ntr=3 | sugethw key=tracl,ns output=geom | mkparfile"
+        },
+        {
+          "description": "Use custom parameter names and generated header values.",
+          "command": "suplane nt=16 ntr=4 | sugethw key=tracl,ns output=geom | mkparfile string1=tnmo string2=vnmo"
+        },
+        {
+          "description": "Exercise the empty-input error.",
+          "command": "printf '' | mkparfile string1=t string2=v"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "tvnmoqc",
+      "path": "par/main/parameter_file_utilities/tvnmoqc.c",
+      "purpose": "Check time and velocity parameter pairs for each CDP and optionally write them to column files.",
+      "selfdoc_first_line": " TVNMOQC - Check tnmo-vnmo pairs; create t-v column files           ",
+      "params": [
+        {
+          "name": "mode",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Set to 1 for checking or 2 for checking and writing one time-velocity file per CDP; other values perform checking without writing files."
+        },
+        {
+          "name": "prefix",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Output filename prefix; required when mode=2. Files are named prefix.cdp."
+        },
+        {
+          "name": "cdp",
+          "type": "int array",
+          "default": "",
+          "required": true,
+          "description": "CDP values; one value is required for each repeated tnmo and vnmo pair."
+        },
+        {
+          "name": "tnmo",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Repeated time arrays, one per CDP. Each must contain at least one value and match the corresponding vnmo array length; non-increasing times produce warnings."
+        },
+        {
+          "name": "vnmo",
+          "type": "float array",
+          "default": "",
+          "required": true,
+          "description": "Repeated velocity arrays, one per CDP. Each must contain at least one value and match the corresponding tnmo array length."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "err",
+        "countparval",
+        "warn",
+        "countparname",
+        "ealloc1int",
+        "countnparval",
+        "ealloc1float",
+        "getnparfloat",
+        "free1float",
+        "free1int",
+        "CWP_Exit",
+        "efopen",
+        "efclose"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Times and velocities are parsed as float, and time ordering is checked after float rounding. Mode 2 prints values with %g, whose formatting depends on the C library and locale. The fixed 80-byte output filename buffer can overflow for a long prefix.",
+      "c_lines": 174,
+      "difficulty": "easy",
+      "difficulty_reason": "It validates parameter arrays, compares adjacent times, and optionally writes ASCII files.",
+      "test_cases": [
+        {
+          "description": "Check two valid CDP time-velocity pairs.",
+          "command": "tvnmoqc mode=1 cdp=15,35 tnmo=0.0,0.5,1.0 vnmo=1500,2000,2500 tnmo=0.0,0.4 vnmo=1600,2100"
+        },
+        {
+          "description": "Write one file per CDP and inspect the results.",
+          "command": "tvnmoqc mode=2 prefix=tvqc cdp=15,35 tnmo=0.0,0.5 vnmo=1500,2000 tnmo=0.0,1.0 vnmo=1600,2400 && cat tvqc.15 tvqc.35"
+        },
+        {
+          "description": "Exercise the warning for non-increasing times.",
+          "command": "tvnmoqc mode=1 cdp=7 tnmo=0.0,0.5,0.5 vnmo=1500,1800,2000"
+        },
+        {
+          "description": "Exercise the mismatched time and velocity counts error.",
+          "command": "tvnmoqc mode=1 cdp=7 tnmo=0.0,0.5 vnmo=1500"
+        }
+      ],
+      "license_note": "Credits identify David Forel, MTU, and say the program was adapted from SUNMO.",
+      "related_programs": []
+    }
+  ]
+}

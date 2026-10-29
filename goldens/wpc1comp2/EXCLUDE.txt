@@ -1,0 +1,12 @@
+# Cases excluded because the original SU program reads freed memory here.
+# wpc1Compress (src/comp/dwpt/1d/lib/wpc1.c:230) assigns realloc's result to a local only, so wpc1->code still points at the
+# freed buffer and wpc1Write writes freed memory (AddressSanitizer: heap-use-after-free).
+# Rule: a case is excluded only if its output changes when that one line is fixed
+# (code = wpc1->code = realloc(...)), built with SU's own flags. Cases where the freed
+# memory still held the right bytes give the same output and stay as tests.
+suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128
+suspike nt=100 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=100 error=0.05
+suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128 error=0.01
+printf '1\n' | a2b n1=1 | wpc1comp2 n1=1
+suplane nt=129 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=129
+suplane nt=256 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=256

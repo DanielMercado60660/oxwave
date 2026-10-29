@@ -1,0 +1,152 @@
+{
+  "scope": "su/main/migration_inversion (re-scout batch 2)",
+  "programs": [
+    {
+      "name": "sumigffd",
+      "path": "su/main/migration_inversion/sumigffd.c",
+      "purpose": "Depth-migrate zero-offset traces using Fourier finite differences and a velocity model.",
+      "selfdoc_first_line": " SUMIGFFD - Fourier finite difference depth migration for\t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds, or 0.004 if unset", "required": false, "description": "Time sampling interval."},
+        {"name": "dx", "type": "float", "default": "computed: header d2, or 1.0 if unset", "required": false, "description": "Midpoint spacing."},
+        {"name": "ft", "type": "float", "default": "0.0", "required": false, "description": "First time sample; read but not used in the migration."},
+        {"name": "nz", "type": "int", "default": "", "required": true, "description": "Number of output depth samples."},
+        {"name": "dz", "type": "float", "default": "", "required": true, "description": "Depth sampling interval."},
+        {"name": "fz", "type": "float", "default": "0.0", "required": false, "description": "First depth sample; the resulting depth coordinate is not used in the migration."},
+        {"name": "vfile", "type": "string", "default": "", "required": true, "description": "Native-float velocity file, indexed as v[depth][trace]."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Report temporary-file choices."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Directory for named temporary files; an empty string selects tmpfile()."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "getparstring", "warn", "checkpars", "etmpfile", "temporary_filename", "efopen", "efwrite", "erewind", "npfar", "npfa", "alloc2float", "alloc2complex", "efread", "efclose", "pfa2rc", "cneg", "cmplx", "pfa2cc", "cmul", "crmul", "puttr", "eremove", "CWP_Exit", "alloc1float", "alloc1complex", "conjg", "cadd", "cwp_cexp", "cdiv", "free1complex", "free1float", "csub"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT results, ordered frequency accumulation, complex tridiagonal solves, and mixed float and double calculations using pow, sqrt, sin and cos affect reproducibility. The finite-difference boundary code accesses indices 1 and 2 and requires at least three traces; small or singular systems can cause invalid accesses or divisions. The allocated c array in fdmig is not freed.",
+      "c_lines": 457,
+      "difficulty": "hard",
+      "difficulty_reason": "This is a depth migration combining FFT propagation with complex finite-difference solves.",
+      "test_cases": [
+        {"description": "Constant-velocity zero-offset migration.", "command": "sunull nt=16 ntr=16 | sugain bias=1500 | sustrip > vel.su.bin && suplane nt=128 ntr=16 dt=0.004 | sumigffd vfile=vel.su.bin nz=16 dz=10 dx=10 dt=0.004 > out.su"},
+        {"description": "Override sampling and first coordinates with a dipping plane.", "command": "sunull nt=12 ntr=16 | sugain bias=1800 | sustrip > vel.su.bin && suplane nt=128 ntr=16 npl=1 dip1=4 dt=0.002 | sumigffd vfile=vel.su.bin nz=12 dz=8 dx=12 dt=0.002 ft=0.01 fz=5 verbose=1 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumigprefd"]
+    },
+    {
+      "name": "sumiggbzo",
+      "path": "su/main/migration_inversion/sumiggbzo.c",
+      "purpose": "Depth-migrate zero-offset traces by tracing and accumulating Gaussian beams through an isotropic velocity model.",
+      "selfdoc_first_line": " SUMIGGBZO - MIGration via Gaussian Beams of Zero-Offset SU data\t",
+      "params": [
+        {"name": "vfile", "type": "string", "default": "", "required": true, "description": "Native-float velocity model indexed as v[trace][depth]."},
+        {"name": "nz", "type": "int", "default": "", "required": true, "description": "Number of depth samples."},
+        {"name": "dz", "type": "float", "default": "", "required": true, "description": "Depth spacing. Although the selfdoc gives 1.0, the earlier mandatory lookup errors when it is absent."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Report migration parameters and progress."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds, or 0.004 if unset", "required": false, "description": "Time sampling interval."},
+        {"name": "dx", "type": "float", "default": "computed: header d2, or 1.0 if unset", "required": false, "description": "Trace spacing."},
+        {"name": "fmin", "type": "float", "default": "computed: 0.025/dt", "required": false, "description": "Minimum frequency."},
+        {"name": "fmax", "type": "float", "default": "computed: 10.0*fmin", "required": false, "description": "Maximum frequency."},
+        {"name": "amax", "type": "float", "default": "60.0", "required": false, "description": "Maximum emergence angle in degrees."},
+        {"name": "amin", "type": "float", "default": "computed: -amax", "required": false, "description": "Minimum emergence angle in degrees."},
+        {"name": "bwh", "type": "float", "default": "computed: average of the input velocities after halving, divided by fmin", "required": false, "description": "Surface beam half-width."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparstring", "getparint", "getparfloat", "warn", "etmpfile", "efwrite", "ealloc2float", "efread", "efclose", "efopen", "checkpars", "puttr", "free2float", "CWP_Exit", "alloc1", "alloc2", "alloc1float", "alloc2float", "alloc1complex", "alloc2complex", "free1", "free2", "free1float", "free1complex", "free2complex", "franuni", "npfa", "npfao", "npfar", "npfaro", "pfacc", "pfacr", "pfarc", "cmplx", "ints8c"],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "Ray integration, interpolated velocity derivatives, FFTs, beam interpolation and ordered image accumulation mix float arithmetic with transcendental functions. franuni generates live/dead cell markers; marker collisions can change behavior. Beam-center spacing can round to zero for unsuitable bwh and dx, causing division by zero.",
+      "c_lines": 1933,
+      "difficulty": "hard",
+      "difficulty_reason": "Gaussian-beam migration combines ray tracing, interpolation, FFTs and image accumulation across many beams.",
+      "test_cases": [
+        {"description": "Migrate a small constant-velocity model.", "command": "sunull nt=16 ntr=16 | sugain bias=1500 | sustrip > vel.bin && suplane nt=128 ntr=16 dt=0.004 | sumiggbzo vfile=vel.bin nz=16 dz=10 dx=10 dt=0.004 > out.su"},
+        {"description": "Use explicit beam width, frequency band and asymmetric angles.", "command": "sunull nt=16 ntr=16 | sugain bias=1800 | sustrip > vel.bin && suplane nt=128 ntr=16 npl=1 dip1=4 dt=0.004 | sumiggbzo vfile=vel.bin nz=16 dz=10 dx=10 dt=0.004 fmin=8 fmax=40 amin=-30 amax=45 bwh=80 verbose=1 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumiggbzoan"]
+    },
+    {
+      "name": "sumiggbzoan",
+      "path": "su/main/migration_inversion/sumiggbzoan.c",
+      "purpose": "Depth-migrate zero-offset traces using Gaussian beams through an anisotropic P-wave stiffness model.",
+      "selfdoc_first_line": " SUMIGGBZOAN - MIGration via Gaussian beams ANisotropic media (P-wave)\t",
+      "params": [
+        {"name": "a3333file", "type": "string", "default": "", "required": true, "description": "Native-float a3333 model indexed as [trace][depth]."},
+        {"name": "nx", "type": "int", "default": "", "required": true, "description": "Required by the parser, but overwritten by the actual number of input traces."},
+        {"name": "nz", "type": "int", "default": "", "required": true, "description": "Number of depth samples."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Report parameters and progress."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds, or 0.004 if unset", "required": false, "description": "Time sampling interval."},
+        {"name": "dx", "type": "float", "default": "computed: header d2, or 1.0 if unset", "required": false, "description": "Trace spacing."},
+        {"name": "dz", "type": "float", "default": "1.0", "required": false, "description": "Depth spacing."},
+        {"name": "fmin", "type": "float", "default": "computed: 0.025/dt", "required": false, "description": "Minimum frequency."},
+        {"name": "fmax", "type": "float", "default": "computed: 10.0*fmin", "required": false, "description": "Maximum frequency."},
+        {"name": "amax", "type": "float", "default": "60.0", "required": false, "description": "Maximum emergence angle in degrees."},
+        {"name": "amin", "type": "float", "default": "computed: -amax", "required": false, "description": "Minimum emergence angle in degrees."},
+        {"name": "a1111file", "type": "string", "default": "", "required": false, "description": "Optional a1111 model; absent, initialize it from a3333."},
+        {"name": "a1133file", "type": "string", "default": "", "required": false, "description": "Optional a1133 model; absent, initialize it to 0.4*a3333."},
+        {"name": "a1313file", "type": "string", "default": "", "required": false, "description": "Optional a1313 model; absent, initialize it to 0.3*a3333."},
+        {"name": "a1113file", "type": "string", "default": "", "required": false, "description": "Optional a1113 model; absent, initialize it to zero."},
+        {"name": "a3313file", "type": "string", "default": "", "required": false, "description": "Optional a3313 model; absent, initialize it to zero."},
+        {"name": "deltafile", "type": "string", "default": "", "required": false, "description": "Optional Thomsen delta model; absent, delta is zero when epsilon is supplied."},
+        {"name": "epsilonfile", "type": "string", "default": "", "required": false, "description": "Optional Thomsen epsilon model; absent, epsilon is zero when delta is supplied. Supplying either Thomsen file recomputes a1111 and a1133."},
+        {"name": "bwh", "type": "float", "default": "computed: mean of sqrt(a1111*0.25) and sqrt(a3333*0.25) over the model, divided by fmin", "required": false, "description": "Surface beam half-width."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparstring", "getparint", "getparfloat", "warn", "etmpfile", "efwrite", "alloc2float", "efread", "efclose", "free2float", "checkpars", "puttr", "CWP_Exit", "alloc1", "alloc2", "alloc1float", "alloc1complex", "alloc2complex", "free1", "free2", "free1float", "free1complex", "free2complex", "franuni", "npfa", "npfao", "npfar", "npfaro", "pfacc", "pfacr", "pfarc", "cmplx", "ints8c"],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "Anisotropic ray integration, stiffness interpolation, square roots, FFTs and ordered beam accumulation are sensitive to floating-point evaluation and math-library behavior. franuni supplies live/dead cell markers, whose collision can affect results. Beam-center spacing can round to zero; invalid stiffness combinations can also produce invalid square roots.",
+      "c_lines": 2779,
+      "difficulty": "hard",
+      "difficulty_reason": "Anisotropic Gaussian-beam migration requires complex ray tracing, model interpolation and FFT-based beam accumulation.",
+      "test_cases": [
+        {"description": "Use isotropic defaults for the optional stiffness files.", "command": "sunull nt=16 ntr=16 | sugain bias=2250000 | sustrip > a3333.bin && suplane nt=128 ntr=16 dt=0.004 | sumiggbzoan a3333file=a3333.bin nx=16 nz=16 dz=10 dx=10 dt=0.004 > out.su"},
+        {"description": "Exercise the Thomsen-parameter path and explicit beam settings.", "command": "sunull nt=16 ntr=16 | sugain bias=2250000 | sustrip > a3333.bin && sunull nt=16 ntr=16 | sugain bias=0.1 | sustrip > epsilon.bin && suplane nt=128 ntr=16 npl=1 dt=0.004 | sumiggbzoan a3333file=a3333.bin epsilonfile=epsilon.bin nx=16 nz=16 dz=10 dx=10 dt=0.004 fmin=8 fmax=40 amin=-30 amax=45 bwh=80 verbose=1 > out.su"}
+      ],
+      "license_note": "Credits state that Tariq Alkhalifah based the anisotropic implementation on Dave Hale's MIGGBZO.",
+      "related_programs": ["sumiggbzo"]
+    },
+    {
+      "name": "sumigprefd",
+      "path": "su/main/migration_inversion/sumigprefd.c",
+      "purpose": "Depth-migrate common-shot prestack data using finite-difference wavefield extrapolation.",
+      "selfdoc_first_line": " SUMIGPREFD --- The 2-D prestack common-shot 45-90 degree\t\t",
+      "params": [
+        {"name": "nz", "type": "int", "default": "", "required": true, "description": "Number of output depth samples."},
+        {"name": "nxo", "type": "int", "default": "", "required": true, "description": "Number of output horizontal samples."},
+        {"name": "dz", "type": "float", "default": "", "required": true, "description": "Depth sampling interval."},
+        {"name": "vfile", "type": "string", "default": "", "required": true, "description": "Native-float velocity file indexed as v[depth][horizontal position]."},
+        {"name": "nxshot", "type": "int", "default": "", "required": true, "description": "Number of shot gathers to migrate."},
+        {"name": "fmax", "type": "float", "default": "25.0", "required": false, "description": "Ricker source-wavelet peak frequency."},
+        {"name": "f1", "type": "float", "default": "10.0", "required": false, "description": "First frequency-window corner; the selfdoc says 5."},
+        {"name": "f2", "type": "float", "default": "20.0", "required": false, "description": "Second frequency-window corner; the selfdoc says 10."},
+        {"name": "f3", "type": "float", "default": "40.0", "required": false, "description": "Third frequency-window corner."},
+        {"name": "f4", "type": "float", "default": "50.0", "required": false, "description": "Fourth frequency-window corner."},
+        {"name": "lpad", "type": "int", "default": "9999", "required": false, "description": "Left migration-aperture padding in traces."},
+        {"name": "rpad", "type": "int", "default": "9999", "required": false, "description": "Right migration-aperture padding in traces."},
+        {"name": "dip", "type": "int", "default": "79", "required": false, "description": "Finite-difference dip approximation: 45, 65, 79, 80, 87, 89 or 90 degrees."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Runtime reporting level."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in seconds, or 0.004 if unset", "required": false, "description": "Time sampling interval."},
+        {"name": "dx", "type": "float", "default": "computed: header d2, or 1.0 if unset", "required": false, "description": "Horizontal sampling interval; despite the selfdoc, it is not mandatory."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "getparstring", "alloc2float", "efopen", "efread", "efclose", "gettr", "err", "warn", "checkpars", "npfar", "alloc1float", "alloc1complex", "free1float", "pfarc", "alloc2complex", "pfa2rc", "crmul", "cmplx", "free2float", "free2complex", "free1complex", "cmul", "puttr", "CWP_Exit", "conjg", "cadd", "cwp_cexp", "cdiv", "cneg", "csub"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Ricker generation, FFTs, frequency tapers, ordered shot/frequency accumulation and repeated complex tridiagonal solves depend on float rounding and transcendental math. Unsupported dip values leave coefficients uninitialized; too-small apertures access outside the finite-difference arrays, and coincident frequency bins can cause divisions by zero. Trace placement and shot grouping depend on the code's delayed header updates.",
+      "c_lines": 743,
+      "difficulty": "hard",
+      "difficulty_reason": "Prestack migration propagates source and receiver wavefields through repeated finite-difference solves over shots and depths.",
+      "test_cases": [
+        {"description": "Migrate one shot with a constant velocity and increasing receiver coordinates.", "command": "sunull nt=16 ntr=16 | sugain bias=1500 | sustrip > vel.bin && suplane nt=128 ntr=16 dt=0.004 | suchw key1=gx key2=tracl a=-10 b=10 | sumigprefd vfile=vel.bin nxo=16 nxshot=1 nz=16 dz=10 dx=10 dt=0.004 > out.su"},
+        {"description": "Exercise the multistep dip approximation and explicit frequency window.", "command": "sunull nt=16 ntr=16 | sugain bias=1800 | sustrip > vel.bin && suplane nt=128 ntr=16 npl=1 dt=0.004 | suchw key1=gx key2=tracl a=-10 b=10 | sumigprefd vfile=vel.bin nxo=16 nxshot=1 nz=16 dz=10 dx=10 dt=0.004 dip=80 fmax=30 f1=4 f2=12 f3=35 f4=55 lpad=4 rpad=4 verbose=1 > out.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumigffd"]
+    }
+  ]
+}

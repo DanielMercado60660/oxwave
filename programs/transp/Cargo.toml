@@ -1,0 +1,16 @@
+[package]
+name = "transp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "transp"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-bigmatrix = { path = "../../crates/oxwave-f-bigmatrix" }

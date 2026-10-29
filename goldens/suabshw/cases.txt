@@ -1,0 +1,16 @@
+# Default key, negative, zero and positive values over an odd number of traces.
+suplane nt=7 ntr=5 | sushw key=offset a=-2 b=1 | suabshw
+# Signed short, including its minimum representable value.
+suplane nt=1 ntr=1 | sushw key=delrt a=-32768 | suabshw key=delrt
+suplane nt=7 ntr=3 | sushw key=delrt a=-2 b=2 | suabshw key=delrt
+# Signed integer minimum.
+suplane nt=1 ntr=1 | sushw key=offset a=-2147483648 | suabshw key=offset
+# Floating point and unsigned header words.
+suplane nt=7 ntr=3 | sushw key=f1 a=-1.5 b=1.5 | suabshw key=f1
+suplane nt=7 ntr=3 | sushw key=dt a=2000 b=1 | suabshw key=dt
+# Diagnostics and parameter parsing.
+[stderr] suplane nt=1 ntr=1 | suabshw verbose=1
+[stderr] suplane nt=1 ntr=1 | suabshw extra=1
+[stderr] suabshw key=notakey
+[stderr] suabshw key=
+[stderr] suabshw

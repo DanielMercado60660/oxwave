@@ -1,0 +1,13 @@
+# Strip variable PostScript metadata.
+suplane nt=16 ntr=6 | sustrip outpar=/dev/null | psmovie n1=16 n2=3 n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=6 | sustrip outpar=/dev/null | psmovie n1=9 n2=3 n3=2 loopdsp=1 clip=2 style=normal grid1=dot grid2=dash verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=6 | sustrip outpar=/dev/null | psmovie n1=9 n2=3 n3=2 loopdsp=2 perc=85 bperc=90 wperc=10 d1s=.5 d2s=.5 title2=Frame d3=.25 f3=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=6 | sustrip outpar=/dev/null | psmovie n1=9 n2=3 n3=2 d1=-.2 f1=2 d2=-2 f2=5 bclip=2 wclip=-1 xbox=.5 ybox=1 wbox=4 hbox=5 x1beg=2 x1end=1 x2beg=5 x2end=1 d1num=.2 f1num=1 n1tic=2 grid1=solid label1=Time d2num=2 f2num=1 n2tic=3 grid2=solid label2=Trace labelfont=Courier labelsize=12 title=Movie titlefont=Times-Bold titlesize=16 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | psmovie n1=1 n2=1 n3=1 clip=1 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmovie n2=1 n3=1
+psmovie n1=2 n2=2 n3=1
+printf '' | psmovie n1=2
+printf '' | psmovie n1=2 n2=1
+suplane nt=4 ntr=2 | sustrip outpar=/dev/null > data; psmovie n1=4 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | psmovie n1=7 n2=3 n3=1 clip=0 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | psmovie n1=7 n2=3 n3=1 bclip=1 wclip=-1 d1s=2 d2s=2 grid1=dash grid2=dot | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

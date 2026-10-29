@@ -1,0 +1,18 @@
+[package]
+name = "suinvvxzco"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suinvvxzco"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-upweik = { path = "../../crates/oxwave-f-upweik" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-polar-grid = { path = "../../crates/oxwave-polar-grid" }
+oxwave-tridiag = { path = "../../crates/oxwave-tridiag" }

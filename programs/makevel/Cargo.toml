@@ -1,0 +1,16 @@
+[package]
+name = "makevel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "makevel"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-frannor = { path = "../../crates/oxwave-f-frannor" }

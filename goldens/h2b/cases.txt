@@ -1,0 +1,19 @@
+# Empty input, explicit stderr and default outpar failure without a tty.
+[stderr] h2b outpar=/dev/stderr < /dev/null
+h2b < /dev/null
+# Uppercase and lowercase, single values, odd digit counts, and multiple lines.
+[f32] printf '00ff7F80\n123\nA\n' | h2b outpar=count
+[f32] printf '00\n' | h2b outpar=count
+[f32] printf 'aB00ff\n1234\n' | h2b outpar=count
+# C scanning semantics for whitespace, malformed text, and signed fields.
+[f32] printf ' 00 ff\n12zz34\n-1+2\n' | h2b outpar=count
+# Report parameter file contents independently of binary output.
+[exact] printf '000102\nff\n' | h2b outpar=count >/dev/null && cat count
+# Verbose and unknown parameter diagnostics.
+[stderr] printf '0001\n' | h2b outpar=count verbose=1 mystery=1
+# Invalid output path.
+h2b outpar=/no/such/directory/count < /dev/null
+# Input crosses the C fgets buffer boundary.
+[f32] python3 -c 'print("ab" * 700)' | h2b outpar=count
+[exact] h2b outpar=count </dev/null >/dev/null && cat count
+[f32] printf '0\nff\n' | h2b outpar=count

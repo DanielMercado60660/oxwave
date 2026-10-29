@@ -1,0 +1,23 @@
+# Default parameters and multiple input traces
+suspike nt=64 ntr=2 | succwt
+# Dyadic Fourier, explicit normalization and damping
+suspike nt=63 ntr=1 | succwt noct=2 nv=2 k=2 p=0 c=0.02 dt=0.003 fmax=80 out=0
+# Linear Morlet and non-default spacing
+suspike nt=70 ntr=1 | succwt fs=2 fmax=12 df=3 dt=0.004 k=1
+# Invalid kernel falls back to Morlet
+suspike nt=32 ntr=1 | succwt noct=1 nv=2 k=9
+# Verbose diagnostics and unknown argument
+[stderr] suspike nt=32 ntr=1 | succwt noct=1 nv=2 verbose=1 mystery=1
+# Single sample and no scales
+suspike nt=1 ntr=1 | succwt noct=0
+# Empty input
+succwt noct=1
+# Single-sample transform and odd FFT length
+suspike nt=1 ntr=1 | succwt noct=1 nv=1 dt=0.004
+suspike nt=15 ntr=1 | succwt noct=1 nv=2 p=-1
+# Zero scale count and alternate frequency selector
+suspike nt=16 ntr=1 | succwt nv=0 fs=3
+# Argument conversion failure
+suspike nt=16 ntr=1 | succwt noct=999999999999999999999
+# Negative scale count fails allocation in the original
+[stderr] suspike nt=16 ntr=1 | succwt noct=1 nv=-1

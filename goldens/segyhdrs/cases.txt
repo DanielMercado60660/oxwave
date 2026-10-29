@@ -1,0 +1,18 @@
+# Compare both generated headers and the copied traces.
+[exact] suspike nt=1 ntr=1 | segyhdrs > copy; cat header binary copy
+[exact] suplane nt=17 ntr=3 | segyhdrs hfile=text bfile=bin ns=13 dt=1234 jobid=-7 lino=23 reno=45 ntrpr=-2 nart=3 dto=4000 nso=17 format=5 fold=6 tsort=2 vscode=3 hsfs=4 hsfe=5 hslen=6 hstyp=7 schn=8 hstas=9 hstae=10 htatyp=11 hcorr=12 bgrcv=13 rcvm=14 mfeet=2 polyt=1 vpol=8 > copy; cat text bin copy
+[exact] suspike nt=7 ntr=2 | segyhdrs ns=0 dt=0 > copy; cat binary copy
+[stderr] suspike nt=7 ntr=1 | segyhdrs verbose=1 > /dev/null
+[stderr] suspike nt=7 ntr=1 | segyhdrs unknown=1 > /dev/null
+[stderr] segyhdrs < /dev/null
+[stderr] segyhdrs ns=1 dt=2 < /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs ns=70000
+[stderr] suspike nt=1 ntr=1 | segyhdrs hfile=/nonexistent/header
+[exact] segyhdrs ns=1 dt=2000 < .; cat header binary
+[stderr] segyhdrs dt=2000 extra=1 < .
+[stderr] segyhdrs ns=1 extra=1 < .
+# Boundary values, repeated parameters, and output-file failure.
+[exact] segyhdrs ns=0 dt=0 jobid=0 lino=-1 reno=2147483647 ntrpr=-32768 nart=32767 dto=65535 nso=65535 format=-1 < .; cat header binary
+[exact] suspike nt=3 ntr=2 | segyhdrs ns=2 ns=3 dt=4000 dt=1000 > copy; cat binary copy
+[stderr] suspike nt=1 ntr=1 | segyhdrs ntrpr=32768 > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs bfile=/nonexistent/binary > /dev/null

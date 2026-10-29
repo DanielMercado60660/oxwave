@@ -1,0 +1,22 @@
+printf '14.125 40.822\n-73 -40\n0 0\n' | utmconv
+printf '14.125 40.822\n-73 -40\n' | utmconv letter=1 format=%.6f
+printf '426213 4519366 33T\n500000 6000000 18h\n' | utmconv invert=1 letter=1 format=%.8f
+printf '500000 0 31\n500000 10000000 -31\n' | utmconv invert=1
+printf '9 60\n15 75\n180 0\n0 -85\n' | utmconv letter=1
+printf '10 20\n-10 -20\n' | utmconv idx=0 a=6378000 f=0 lon0=0 xoff=0 ynoff=123 ysoff=456 verbose=1
+[stderr] printf '1 2\n' | utmconv idx=5 verbose=1
+[stderr] utmconv verbose=1 </dev/null
+utmconv idx=-1
+utmconv idx=24
+utmconv lon0=181
+utmconv a=0
+utmconv f=-1
+utmconv format=123456789012345678901
+printf '181 0\n' | utmconv
+printf '0 90\n' | utmconv
+printf '1 2\n' | utmconv invert=1
+printf '1 2 0\n' | utmconv invert=1
+printf '1 2 32\n' | utmconv invert=1 letter=1
+printf '1 2 32?\n' | utmconv invert=1 letter=1
+printf '1 2 0\n' | utmconv invert=1 lon0=0
+printf '1\n' | utmconv

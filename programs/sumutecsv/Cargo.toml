@@ -1,0 +1,19 @@
+[package]
+name = "sumutecsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sumutecsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-bilinear-interp = { path = "../../crates/oxwave-bilinear-interp" }
+oxwave-grid-geometry = { path = "../../crates/oxwave-grid-geometry" }
+oxwave-grid-parameters = { path = "../../crates/oxwave-grid-parameters" }
+oxwave-q-file = { path = "../../crates/oxwave-q-file" }

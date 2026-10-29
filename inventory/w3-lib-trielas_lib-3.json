@@ -1,0 +1,31 @@
+{
+  "scope": "Trielas/lib part 3",
+  "functions": [
+    {
+      "name": "solveForSlowqP",
+      "file": "Trielas/lib/solveForSlowqP.c",
+      "signature": "int solveForSlowqP (float s, float c, float pl, float a1111, float\n\ta3333, float a1133,float a1313, float a1113, float a3313, \n\tfloat *pxnew, float *pznew, float rt);",
+      "purpose": "Continues qP-wave slowness across an anisotropic interface and reports whether the iterative solution is critical.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses a secant iteration with squared-error threshold 1e-11 and a 50-iteration limit; preserve expression order, float input subexpressions, double intermediates, and float output conversion. Calls sqrt; initial radicands are clamped but iterative radicands are not. In the s*s >= 0.49 branch, sqr remains initialized to zero for the initial eigenvalue calculation despite computing sqrsq; preserve this behavior. Division by zero, NaNs, and sqrt behavior can affect convergence and status.",
+      "c_lines": 120,
+      "difficulty": "hard",
+      "group": "anisotropic-slowness",
+      "license_note": ""
+    },
+    {
+      "name": "solveForSlowqSV",
+      "file": "Trielas/lib/solveForSlowqSV.c",
+      "signature": "int solveForSlowqSV (float s, float c, float pl, float a1111, float\n\t a3333, float a1133,float a1313, float a1113, float a3313, float \n\t*pxnew, float *pznew, float rt);",
+      "purpose": "Continues qSV-wave slowness across an anisotropic interface and reports whether the iterative solution is critical.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses a secant iteration with squared-error threshold 1e-11 and a 50-iteration limit; preserve expression order, float input subexpressions, double intermediates, and float output conversion. Calls sqrt; initial radicands are clamped but iterative radicands are not. Division by zero, NaNs, and sqrt behavior can affect convergence and status.",
+      "c_lines": 120,
+      "difficulty": "hard",
+      "group": "anisotropic-slowness",
+      "license_note": ""
+    }
+  ]
+}

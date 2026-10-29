@@ -1,0 +1,65 @@
+# Default parameters and header-derived sampling; the program has one SU output mode.
+[stderr] suplane nt=64 ntr=8 | sugazmig
+[stderr] suspike nt=32 ntr=3 | sushw key=dt,d2 a=0,0 | sugazmig
+[stderr] suplane nt=48 ntr=6 dt=0.002 | sushw key=d2 a=12.5 | sugazmig
+suplane nt=64 ntr=8 | sugazmig dt=0.004 dx=1 ft=0 ntau=64 dtau=0.004 ftau=0 tmig=0 vmig=1500 Q=1000000 ceil=1000000 verbose=0 tmpdir=
+# Different output axes, nonzero first times, interpolation and extrapolation.
+suplane nt=63 ntr=7 | sugazmig dx=15 ntau=37 dtau=0.006 ft=0.012 ftau=0.008 tmig=0,0.04,0.12 vmig=1200,1800,2100 Q=35 ceil=12
+suplane nt=31 ntr=5 | sugazmig dx=10 ntau=47 dtau=0.002 ft=-0.004 ftau=-0.008 tmig=0.01,0.02 vmig=1600,1900
+suplane nt=48 ntr=5 | sugazmig dx=10 ft=0.016
+# Odd and minimum dimensions, including FFT padding in both dimensions.
+suspike nt=1 ntr=1 | sugazmig dx=10
+suspike nt=2 ntr=1 | sugazmig dx=10
+suspike nt=17 ntr=13 | sugazmig dx=10
+suplane nt=67 ntr=17 | suaddnoise seed=12345 | sugazmig dx=20 Q=20 ceil=3
+sunull nt=19 ntr=3 | sugazmig dx=10
+# Attenuation and gain ceiling branches; zero/negative physical parameters.
+suplane nt=48 ntr=7 | sugazmig dx=10 Q=2 ceil=1.01
+suplane nt=24 ntr=3 | sugazmig dx=10 ceil=1
+suplane nt=24 ntr=3 | sugazmig dx=10 ceil=0
+suplane nt=24 ntr=3 | sugazmig dx=10 ceil=-1 Q=-5
+suplane nt=24 ntr=3 | sugazmig dx=10 Q=0
+suplane nt=24 ntr=3 | sugazmig dx=10 vmig=0
+suplane nt=24 ntr=3 | sugazmig dx=-10 vmig=-1500
+suplane nt=24 ntr=3 | sugazmig dx=0
+suplane nt=24 ntr=3 | sugazmig dx=10 dt=0
+suplane nt=24 ntr=3 | sugazmig dx=10 dt=-0.004 dtau=-0.002
+suplane nt=24 ntr=3 | sugazmig dx=10 dtau=0
+# Diagnostics, unknown arguments and temporary file selection.
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 verbose=1
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 verbose=2 unused=1
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 tmpdir=. verbose=1
+[stderr] suplane nt=24 ntr=3 | CWP_TMPDIR=. sugazmig dx=10 verbose=1
+[stderr] suplane nt=24 ntr=3 | CWP_TMPDIR=missing sugazmig dx=10 tmpdir= verbose=1
+# Binary velocity input, including its ignored array arguments.
+python3 -c 'import struct; open("vel","wb").write(struct.pack("=32f", *([1700.0]*32)))'; suplane nt=32 ntr=5 | sugazmig dx=10 vfile=vel
+[stderr] python3 -c 'import struct; open("vel","wb").write(struct.pack("=24f", *[1400.0+20*i for i in range(24)]))'; suplane nt=24 ntr=3 | sugazmig dx=10 vfile=vel tmig=0,0 vmig=1 verbose=1
+# Errors: empty/truncated input, count/ordering constraints, output limit, file errors.
+[stderr] sugazmig
+[stderr] printf x | sugazmig dx=10
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 tmig=0,0.1 vmig=1500
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 tmig=0,0 vmig=1500,1600
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 tmig=0.1,0 vmig=1500,1600
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 ntau=65536
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 tmpdir=missing
+[stderr] touch vel; suplane nt=24 ntr=3 | sugazmig dx=10 vfile=vel
+# getpar: empty values, repeated values and numeric parse errors.
+suplane nt=24 ntr=3 | sugazmig dx=10 dt= ft= ntau= dtau= ftau= Q= ceil= tmig= vmig= verbose= tmpdir=
+suplane nt=24 ntr=3 | sugazmig dx=1 dx=10 tmig=0,0.1 vmig=1500,1800 vmig=1700,1900
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 ntau=99999999999999999999
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 dt=1e-310
+# Empty and invalid output sample counts and additional header conversions.
+suplane nt=24 ntr=3 | sugazmig dx=10 ntau=0
+[stderr] suplane nt=24 ntr=3 | sugazmig dx=10 ntau=-1
+suplane nt=24 ntr=3 | sugazmig dx=10 dtau=0.1 ftau=-40
+suplane nt=24 ntr=3 | sugazmig dx=10 ftau=1.5
+[stderr] touch regularfile; suplane nt=24 ntr=3 | sugazmig dx=10 tmpdir=regularfile
+# The original dereferences NULL on a missing velocity file. Use a launcher
+# to compare its signal exit without shell-generated PID/path diagnostics.
+[stderr] suplane nt=24 ntr=3 | python3 -c 'import resource,subprocess,sys; resource.setrlimit(resource.RLIMIT_CORE,(0,0)); p=subprocess.run(sys.argv[1:],stdin=sys.stdin.buffer); sys.exit(128-p.returncode if p.returncode<0 else p.returncode)' sugazmig dx=10 vfile=missing
+# Signal cleanup: wait for named files to open, signal while reading traces,
+# then release the input read so deferred cleanup can run outside the handler.
+[stderr] suplane nt=24 ntr=1 | python3 -c 'import os,signal,subprocess,sys,time; data=sys.stdin.buffer.read(); os.mkdir("temps"); p=subprocess.Popen(sys.argv[1:],cwd="temps",stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE); p.stdin.write(data); p.stdin.flush(); next(line for line in iter(p.stderr.readline,b"") if b"putting temporary files" in line); p.send_signal(signal.SIGINT); time.sleep(.02); p.stdin.close(); p.stdin=None; out,err=p.communicate(timeout=5); assert not out and not err; print("exit=%d files=%d" % (p.returncode,len(os.listdir("temps"))))' sugazmig dx=10 tmpdir=. verbose=1
+[stderr] suplane nt=24 ntr=1 | python3 -c 'import os,signal,subprocess,sys,time; data=sys.stdin.buffer.read(); os.mkdir("temps"); p=subprocess.Popen(sys.argv[1:],cwd="temps",stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE); p.stdin.write(data); p.stdin.flush(); next(line for line in iter(p.stderr.readline,b"") if b"putting temporary files" in line); p.send_signal(signal.SIGQUIT); time.sleep(.02); p.stdin.close(); p.stdin=None; out,err=p.communicate(timeout=5); assert not out and not err; print("exit=%d files=%d" % (p.returncode,len(os.listdir("temps"))))' sugazmig dx=10 tmpdir=. verbose=1
+[stderr] suplane nt=24 ntr=1 | python3 -c 'import os,signal,subprocess,sys,time; data=sys.stdin.buffer.read(); os.mkdir("temps"); p=subprocess.Popen(sys.argv[1:],cwd="temps",stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE); p.stdin.write(data); p.stdin.flush(); next(line for line in iter(p.stderr.readline,b"") if b"putting temporary files" in line); p.send_signal(signal.SIGHUP); time.sleep(.02); p.stdin.close(); p.stdin=None; out,err=p.communicate(timeout=5); assert not out and not err; print("exit=%d files=%d" % (p.returncode,len(os.listdir("temps"))))' sugazmig dx=10 tmpdir=. verbose=1
+[stderr] suplane nt=24 ntr=1 | python3 -c 'import os,signal,subprocess,sys,time; data=sys.stdin.buffer.read(); os.mkdir("temps"); p=subprocess.Popen(sys.argv[1:],cwd="temps",stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE); p.stdin.write(data); p.stdin.flush(); next(line for line in iter(p.stderr.readline,b"") if b"putting temporary files" in line); p.send_signal(signal.SIGTERM); time.sleep(.02); p.stdin.close(); p.stdin=None; out,err=p.communicate(timeout=5); assert not out and not err; print("exit=%d files=%d" % (p.returncode,len(os.listdir("temps"))))' sugazmig dx=10 tmpdir=. verbose=1

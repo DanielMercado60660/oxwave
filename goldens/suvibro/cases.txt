@@ -1,0 +1,44 @@
+# Defaults and all sweep modes, taper shapes, phase units, and segment defaults.
+suvibro
+suvibro sweep=2 tv=0.1 dt=0.01 t1=0 t2=0
+suvibro sweep=3 swconst=-6 tv=0.1 dt=0.01 t1=0 t2=0
+suvibro sweep=4 swconst=0 tv=0.1 dt=0.01 t1=0 t2=0
+suvibro sweep=4 swconst=1.5 tv=0.1 dt=0.01 t1=0.02 t2=0.03 taper=2
+suvibro sweep=5 swconst=0.5 tv=0.1 dt=0.01 t1=0.02 t2=0.03 taper=5
+suvibro sweep=1 tv=0.1 dt=0.01 f1=3 f2=7 phz=0.3 radians=1 t1=0.02 t2=0 taper=1
+suvibro sweep=2 tv=0.1 dt=0.01 tseg=0,0.03,0.1 fseg=5,20,40 t1=0 t2=0
+# Errors and odd/zero values.
+suvibro tv=1000 dt=0.001
+suvibro tv=1 t1=1 t2=1
+suvibro sweep=2 tseg=0,1,2 fseg=1,2
+suvibro sweep=2 tseg=0,2,1 fseg=1,2,3
+suvibro tv=0.1 dt=0.01 t1=0.02 t2=0 taper=9
+suvibro tv=0 dt=0.01 t1=0 t2=0
+suvibro sweep=8 tv=0.06 dt=0.01 t1=0 t2=0
+suvibro tv=0.07 dt=0.01 t1=-0.01 t2=0 verbose=1
+# Compare the inventory waveforms directly, including the non-default modes.
+suvibro sweep=1 dt=0.004 tv=0.4 f1=8 f2=50 phz=45 radians=0 t1=0.04 t2=0.04 taper=3
+suvibro sweep=2 dt=0.004 tv=0.4 tseg=0,0.2,0.4 fseg=10,30,60 t1=0 t2=0
+suvibro sweep=3 swconst=3 dt=0.004 tv=0.4 f1=10 f2=50 t1=0.04 t2=0.04 taper=4
+suvibro sweep=5 swconst=2 dt=0.004 tv=0.4 f1=10 f2=50 t1=0 t2=0
+
+# Additional phase, segment duration, and error-message coverage.
+suvibro sweep=2 tv=0.2 dt=0.01 tseg=0,0.05,0.12 fseg=3,12,8 t1=0 t2=0
+suvibro sweep=3 swconst=-3 tv=0.12 dt=0.01 f1=4 f2=12 phz=90 radians=0 t1=0 t2=0
+suvibro sweep=4 swconst=-0.5 tv=0.12 dt=0.01 f1=4 f2=12 phz=0.2 t1=0 t2=0
+[stderr] suvibro tv=1 t1=0.75 t2=0.75
+[stderr] suvibro sweep=2 tseg=0,1,2,3 fseg=1,2
+[stderr] suvibro tv=0.1 dt=0.01 t1=0 t2=0.02 taper=9
+
+# Segment duration may exceed tv; the header keeps the original sample count.
+suvibro sweep=2 tv=0.1 dt=0.01 tseg=0,0.2 fseg=10,60 t1=0 t2=0
+# Buffer boundaries: the full buffer fits without an end taper; leave one
+# sample of room for the reference's end taper at index nt.
+suvibro sweep=2 tv=65.5335 dt=0.001 tseg=0,65.5345 fseg=10,60 t1=0 t2=0
+suvibro sweep=2 tv=65.5325 dt=0.001 tseg=0,65.5335 fseg=10,60 t1=0 t2=0.01
+# A negative first boundary generates more samples than tv/dt, within capacity.
+suvibro sweep=2 tv=0.1 dt=0.01 tseg=-0.1,0.1 fseg=10,60 t1=0 t2=0
+# Multiple segments near capacity exercise the accumulated write offset.
+suvibro sweep=2 tv=65.5335 dt=0.001 tseg=0,32.767,65.5345 fseg=10,30,60 t1=0 t2=0
+# One boundary creates no segments, so even a large replacement tv is safe.
+suvibro sweep=2 tv=0.1 dt=0.01 tseg=1000 fseg=10 t1=0 t2=0

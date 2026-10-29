@@ -1,0 +1,73 @@
+# Deterministic default values and both spike modes.
+surandspike seed=42
+surandspike seed=123 n1=31 n2=3 dt=0.004 nspk=7 amax=-0.7 mode=1
+[stderr] surandspike seed=7 n1=17 n2=3 nspk=5 mode=2 verbose=1
+surandspike seed=0 n1=1 n2=1 nspk=1
+surandspike seed=1 n1=9 n2=1 nspk=0 amax=0 dt=0
+surandspike seed=1 n2=0
+surandspike seed=1 n2=-1
+surandspike seed=1 n1=7 n2=2 nspk=-1
+[stderr] surandspike mode=0 seed=1
+[stderr] surandspike mode=3 seed=1
+[stderr] surandspike seed=1 n2=1 nspk=0 unknown=1
+
+# Numeric parsing edge cases.
+surandspike seed=4294967295 n1=13 n2=2 nspk=0 mode=2
+[stderr] surandspike seed=1 n1=2147483648
+[stderr] surandspike seed=4294967296
+[stderr] surandspike seed=1 mode=abc
+
+# Explicit defaults, collisions, signed seed conversion, and zero amplitude.
+surandspike seed=42 n1=500 n2=100 dt=0.002 nspk=20 amax=0.2 mode=1
+surandspike seed=9 n1=3 n2=2 nspk=100
+surandspike seed=4294967295 n1=13 n2=2 nspk=7 mode=2
+surandspike seed=2147483648 n1=19 n2=2 nspk=9
+surandspike seed=15 n1=11 n2=2 nspk=6 amax=0
+
+# Header interval conversion wraps above 65535 us in the original C build.
+surandspike seed=1 n1=3 n2=1 nspk=0 dt=0.1
+surandspike seed=1 n1=3 n2=1 nspk=0 dt=1
+surandspike seed=1 n1=3 n2=1 nspk=0 dt=-0.002
+surandspike seed=1 n1=0 n2=1 nspk=0
+surandspike seed=1 n1=-1 n2=0
+
+# Clock seeding is deterministic in output when no spikes are requested.
+[stderr] surandspike n1=5 n2=2 nspk=0 mode=2 verbose=1
+
+# Empty numeric arguments select defaults; later duplicate parameters win.
+surandspike seed=1 n1= n2=1 nspk=0 dt= amax= mode=
+surandspike seed=1 n1=7 n1=5 n2=1 nspk=0
+
+# Parsing errors occur before the trace generation loop.
+[stderr] surandspike seed=1 n2=2147483648
+[stderr] surandspike seed=1 nspk=2147483648
+[stderr] surandspike seed=1 dt=inf
+[stderr] surandspike seed=1 amax=inf
+
+# Full trace capacity, both modes with no traces, and validation precedence.
+surandspike seed=1 n1=65535 n2=2 nspk=0
+surandspike seed=1 n2=0 mode=2
+[stderr] surandspike mode=-1 seed=4294967296
+
+# Unsigned seed parsing and complete diagnostic ordering.
+[stderr] surandspike seed=-1 n2=0
+[stderr] surandspike seed=1 n1=3 n2=1 nspk=0 verbose=1 unknown=1
+
+# Parameter files precede command-line arguments, including the sample count.
+printf 'seed=42 n1=7 n2=2 nspk=0 mode=2 dt=0.004\n' > params; surandspike par=params n1=5
+
+# Exercise RNG state across traces, the signed seed boundary, and dense collisions.
+[exact] surandspike seed=2147483647 n1=101 n2=7 nspk=127 amax=1.25
+[exact] surandspike seed=2147483649 n1=23 n2=5 nspk=53 mode=2
+[exact] surandspike seed=0 n1=2 n2=3 nspk=100 amax=-1
+[exact] surandspike seed=0 n1=1 n2=3 nspk=20 mode=2
+
+# Degenerate intervals still consume random times and amplitudes in C order.
+surandspike seed=23 n1=13 n2=3 nspk=11 dt=0
+surandspike seed=23 n1=13 n2=3 nspk=11 dt=-0.004
+surandspike seed=23 n1=0 n2=2 nspk=4
+surandspike seed=23 n1=65535 n2=1 nspk=1000
+
+# Empty arguments and duplicate parameters also select the seeded spike path.
+surandspike seed=1 n1= n2=1 nspk= dt= amax= mode=
+[stderr] surandspike seed=9 seed=3 n1=11 n2=2 nspk=7 mode=2 verbose=1 unknown=1

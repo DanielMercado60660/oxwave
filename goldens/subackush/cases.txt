@@ -1,0 +1,14 @@
+# Constant logs, default window and parameters.
+(sunull nt=151 ntr=1 | sugain bias=3000; sunull nt=151 ntr=1 | sugain bias=1500; sunull nt=151 ntr=1 | sugain bias=2200) | subackush
+# Proportional and pure shale, with all shale parameters overridden.
+(sunull nt=31 ntr=1 | sugain bias=3000; sunull nt=31 ntr=1 | sugain bias=1500; sunull nt=31 ntr=1 | sugain bias=2200; sunull nt=31 ntr=1 | sugain bias=60) | subackush navg=4 gr=1 grs=90 grc=5 se=0.3 sd=0.1 sg=0.2 smode=1
+(sunull nt=31 ntr=1 | sugain bias=3000; sunull nt=31 ntr=1 | sugain bias=1500; sunull nt=31 ntr=1 | sugain bias=2200; sunull nt=31 ntr=1 | sugain bias=120) | subackush navg=3 gr=1 smode=0 verbose=1
+sunull nt=7 ntr=1 | subackush navg=1
+subackush navg=3 </dev/null
+subackush navg=999999999999999999999 </dev/null
+# Varying logs exercise the averaging loops and all eight output traces.
+suplane nt=129 ntr=4 | suop op=abs | sugain bias=100 | subackush navg=11 gr=1
+suplane nt=129 ntr=3 | suop op=abs | sugain bias=2000 | subackush navg=201
+sunull nt=1 ntr=1 | subackush navg=1
+sunull nt=9 ntr=3 | subackush navg=0 gr=2 smode=2
+sunull nt=9 ntr=3 | subackush navg=-1

@@ -1,0 +1,25 @@
+# Defaults and odd trace sizes; unsupported units pass through.
+sunull nt=1 ntr=1 | suutm
+sunull nt=7 ntr=3 | sushw key=sx,sy,gx,gy,scalco,counit a=10,20,30,40,-10,5 | suutm
+# Decimal degrees, southern zone and short and floating zone keys.
+sunull nt=7 ntr=1 | sushw key=sx,sy,gx,gy,counit a=30,-30,30,-30,3 | suutm zkey=trid
+sunull nt=7 ntr=1 | sushw key=sx,sy,gx,gy,counit a=10,75,20,75,3 | suutm zkey=d1
+# DMS and scaled fractional DMS, plus arc seconds with positive scaling.
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=-1053000,403000,-1041500,401500,1,4 | suutm
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=12304550,-304550,12304550,-304550,-100,4 | suutm
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=1800,3600,1800,3600,2,2 | suutm
+# Override units, ellipsoid and offsets, and exercise verbose and fixed meridian.
+[stderr] sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy a=3,60,3,60 | suutm counit=3 idx=1 verbose=1 xoff=-20 ynoff=30 ysoff=40 zkey=cdp
+[stderr] sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=180,0,180,0,3 | suutm lon0=180 a=6371000 f=0 verbose=1 zkey=cdp
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=10,-20,10,-20,3 | suutm idx=13 ysoff=-1 ynoff=42
+# Parameter and input errors.
+suutm idx=-1
+suutm idx=24
+suutm lon0=181
+suutm lon0=-181
+suutm a=0
+suutm f=-1
+suutm zkey=notakey
+suutm
+sunull nt=1 ntr=1 | sushw key=gx,gy,counit a=181,0,3 | suutm
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,90,0,0,3 | suutm

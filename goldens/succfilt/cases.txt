@@ -1,0 +1,16 @@
+# Defaults, odd trace length, and nontrivial spectra.
+suplane nt=127 ntr=7 | suaddnoise seed=123 | succfilt
+# Alternate gather key, multiple gathers, verbose progress and explicit parameters.
+[stderr] suplane nt=63 ntr=8 | sushw key=cdp a=1 b=1 j=2 | succfilt key=cdp padd=0 ccl=-0.5 cch=0.8 verbose=1
+# Single sample and single trace.
+sunull nt=1 ntr=1 | succfilt padd=0
+# Zero and negative correlation thresholds.
+suplane nt=31 ntr=4 | succfilt ccl=-1 cch=0 padd=100
+# Slight negative padding still rounds to a sufficient FFT size.
+suplane nt=32 ntr=3 | succfilt padd=-1
+# Empty input, invalid key, and excessive FFT length.
+succfilt < /dev/null
+sunull nt=8 ntr=2 | succfilt key=invalid
+sunull nt=128 ntr=2 | succfilt padd=100000
+# Invalid numeric parameter.
+sunull nt=8 ntr=2 | succfilt verbose=999999999999999999999999

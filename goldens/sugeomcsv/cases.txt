@@ -1,0 +1,127 @@
+# Geometry updates: success cases compare complete diagnostics as well as SU traces.
+# Stream beyond maxrecords while counting, without parsing excess rows.
+[stderr] python3 -c 'print("1,10\n" * 10000, end="")' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=1
+[stderr] printf '1,10\n2,unreadable\n3,1 2\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=1
+[stderr] printf '1,unreadable\n2,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=1
+[stderr] printf 'skip\nC_SU_NAMES\nignored\nS,1,10\nC_SU_FORMS\nignored\nR,2,20\nS,2,20\nC_SU_NAMES\nignored\nS,3,30\n' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=S match=tracl names=C_su_id,tracl,selev nicerecord=2 maxrecords=0
+[stderr] printf 'skip\nC_SU_NAMES\nignored\nS,1,10\nC_SU_FORMS\nignored\nR,2,20\nS,2,20\nC_SU_NAMES\nignored\nS,3,30\n' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=S match=tracl names=C_su_id,tracl,selev nicerecord=2 maxrecords=3
+# Negative nsamps must skip initialization and reach the C negative-time error.
+[stderr] printf '1,10\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call(" sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=-1,0,2,1",shell=True,stdin=s))'
+# With explicit maxrecords, zero loaded records retain C calloc values at index 0.
+[stderr] printf '' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=1
+[stderr] printf '' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=2 missing=pass
+[stderr] printf '' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=2 missing=delete
+[stderr] printf '' > geom.csv && sunull nt=1 ntr=1 | sushw key=selev a=123 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr names=fldr,selev maxrecords=1
+[stderr] printf '' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracf names=fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt maxrecords=1
+[stderr] printf '' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl_cf,tracl_ct,tracl_ci,gaps_rf,gaps_rt maxrecords=1 missing=pass
+[stderr] printf '' > geom.txt && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.txt ufile=command setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8 maxrecords=1 missing=delete
+[stderr] printf 'R,1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=S match=tracl names=C_su_id,tracl,selev maxrecords=1 missing=pass
+[stderr] printf '' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call(" sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=1 create=1",shell=True,stdin=s))'
+[stderr] printf '' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call(" sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=3 create=3",shell=True,stdin=s))'
+[stderr] printf '1,10\n2,-2.25\n3,0\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev scalel=1 maxrecords=3 nicerecord=1 tolr=0.01 verbose=1
+[stderr] printf '1,1.25\n2,-2.75\n3,3\n' > geom.csv && sunull nt=1 ntr=3 | sushw key=selev a=12 b=2 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev action=add scalel=100
+[stderr] printf '1,1.25\n2,-2.75\n3,3\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev action=SuBtRaCt scalel=-10
+[stderr] printf '1,1\n2,2\n3,3\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev scalel=-1
+[stderr] printf '1,1\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev missing=pass
+[stderr] printf '1,1\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev missing=delete
+[stderr] printf '1,1\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,10\n' > geom.csv && cat /dev/null | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=2
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=5
+[stderr] printf '1;10\n2;20\n3;30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev rdelim=';'
+[stderr] printf '1|10\n2|20\n3|30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev rdelim='"|"' rtype=CSV
+[stderr] printf 'S,1,10\nR,20,12\nS,2,20\nS,3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=s match=tracl names=C_su_id,tracl,selev 
+[stderr] printf 's,1,10\ns,2,20\ns,3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid='"s"' match=tracl names=C_su_id,tracl,selev 
+[stderr] printf 'junk\n1,10\n2,20\n3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=none match=tracl names=tracl,selev nicerecord=2
+[stderr] printf '1,0,0,3,4\n2,1,2,4,6\n3,-2,-3,1,1\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,sx,sy,gx,gy 
+[stderr] printf '1,0,0,3,4,123\n2,1,2,4,6,-9\n3,-2,-3,1,1,0\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,sx,sy,gx,gy,offset scalco=-10
+[stderr] printf '1,1,2,3,4,5,6,7\n2,1,2,3,4,5,6,7\n3,1,2,3,4,5,6,7\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,gelev,selev,sdepth,gdel,sdel,swdep,gwdep scalel=1000
+[stderr] printf '1,1.5,2.5,3.5,-1.5,0.25\n2,2,3,4,5,-1.5\n3,0,0,0,0,0\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,cdp,trid,dt,mark,d1 
+[stderr] printf '1,9,11,10\n2,9,21,10\n3,9,31,10\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,null1,selev,numb8 
+[stderr] printf '0,1,100\n0,2,200\n0,3,300\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl,selev 
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=match1,selev 
+[stderr] printf '0,1,100\n0,2,200\n0,3,300\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=match1,matche1,selev 
+[stderr] printf '1,1\n2,2\n1,3\n2,4\n' > geom.csv && sunull nt=3 ntr=4 | sushw key=tracl a=1 b=1 c=2 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev unrepeat=1
+[stderr] printf '1,1\n2,2\n' > geom.csv && sunull nt=3 ntr=2 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev unrepeat=2 missing=pass
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && suspike nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=all spikes=2
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && suspike nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=2 spikes=1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=9
+[stderr] printf 'S001  10\nS002  20\nS003  30\n' > geom.txt && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.txt ufile=command setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,S\nC_SU_NAMES\nC_su_id,tracl,selev\nS,1,10\nS,2,20\nS,3,30\n' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,ANY\nC_SU_NAMES\ntracl,selev\n' > opts.txt && printf '1,10\n2,20\n3,30\n' > geom.csv && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.csv ufile=opts.txt
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,ANY\nC_SU_NAMES\n1_tracl_3\nC_SU_MORE,4_selev_7\n001  10\n002  20\n003  30\n' > geom.txt && sunull nt=3 ntr=3 | sugeomcsv rfile=geom.txt
+[stderr] printf '0,1,3,1,101,103\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl_cf,tracl_ct,tracl_ci,gaps_rf,gaps_rt 
+[stderr] printf '0,3,1,-1,103,101\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl_cf,tracl_ct,tracl_ci,gaps_rf,gaps_rt 
+[stderr] printf '0,1,3,2,100,200\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl_cf,tracl_ct,tracl_ci,gaps_rf,gaps_rt 
+[stderr] printf '0,1,2,1,1,2\n0,2,3,1,3,4\n0,3,4,1,4,5\n' > geom.csv && sunull nt=7 ntr=3 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracl names=fldr,tracl_cf,tracl_ct,tracl_ci,gaps_rf,gaps_rt 
+[stderr] printf '' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,1\n1,2\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,1 2\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,abc\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,  \n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,99999999999\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev nicerecord=0
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=-1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev tolr=0
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev scalel=0
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev scalco=3
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev action=replace
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev missing=halt
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=-1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev spikes=1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=0
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=1,2,3
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev rtype=foo
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev rdelim=ab
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev rtype=fixed rdelim=x
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev unrepeat=0 create=1 spikes=1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev scalco=1
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,unknown 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,tracl 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=nope names=tracl,selev 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=cdp names=tracl,selev 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,1_selev_0 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev_x 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,matche2 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,1_a_b_c_d 
+[stderr] printf '1,10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,cdp scalel=1
+[stderr] sugeomcsv
+[stderr] sugeomcsv rfile=absent.csv
+[stderr] printf '1,10\n' > geom.csv && sugeomcsv rfile=geom.csv ufile=absent
+[stderr] printf '1,10\n' > geom.csv && sugeomcsv rfile=geom.csv ufile=command
+[stderr] printf '1,10\n' > geom.csv && sugeomcsv rfile=geom.csv
+[stderr] printf 'S001\n' > geom.txt && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.txt match=tracl names=C_su_id,2_tracl_4,5_selev_9 setid=S
+# Additional terminal-based creation and SPS preset cases.
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=all'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=2 spikes=2,0.001,6,1,10,-1'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=4,0,1,5'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 unrepeat=0'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=0'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=1'"'"',shell=True,stdin=s))'
+[stderr] printf '1,10\n2,20\n3,30\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,selev create=1 spikes=4,1'"'"',shell=True,stdin=s))'
+[stderr] printf '0,1,5,2,101,103\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracf names=fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt create=all'"'"',shell=True,stdin=s))'
+[stderr] printf '%s\n' 'X             1           1         1     1    31         1       101       103 ' > geom.txt && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.txt setid=X names=sps2 match=sps2 create=all'"'"',shell=True,stdin=s))'
+[stderr] printf '%s\n' 'S         1         1        1   1   1 1     1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnofr,grnlof a=1,1 | sugeomcsv rfile=geom.txt setid=S names=sps2 match=sps2
+[stderr] printf '%s\n' 'S         1         1        1   1   1 1     1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnofr,grnlof a=1,1 | sugeomcsv rfile=geom.txt setid=S names=sps2all match=sps2
+[stderr] printf '%s\n' 'R         1         1        1       1 1     1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnors,gaps a=1,1 | sugeomcsv rfile=geom.txt setid=R names=sps2 match=sps2
+[stderr] printf '%s\n' 'R         1         1        1       1 1     1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnors,gaps a=1,1 | sugeomcsv rfile=geom.txt setid=R names=sps2all match=sps2
+[stderr] printf '%s\n' 'X         1                 1       1    1   31               1     101     103 ' > geom.txt && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call('"'"' sugeomcsv rfile=geom.txt setid=X names=sps1 match=sps1 create=all'"'"',shell=True,stdin=s))'
+[stderr] printf '%s\n' 'S               1       1      1   1   1 1   1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnofr,grnlof a=1,1 | sugeomcsv rfile=geom.txt setid=S names=sps1 match=sps1
+[stderr] printf '%s\n' 'S               1       1      1   1   1 1   1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnofr,grnlof a=1,1 | sugeomcsv rfile=geom.txt setid=S names=sps1all match=sps1
+[stderr] printf '%s\n' 'R               1       1      1       1 1   1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnors,gaps a=1,1 | sugeomcsv rfile=geom.txt setid=R names=sps1 match=sps1
+[stderr] printf '%s\n' 'R               1       1      1       1 1   1        1         1     1         ' > geom.txt && sunull nt=5 ntr=1 | sushw key=grnors,gaps a=1,1 | sugeomcsv rfile=geom.txt setid=R names=sps1all match=sps1
+[stderr] printf 'ab,1,-9\n' > geom.txt && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.txt rtype=csv setid='"ab"' ufile=command match=tracl names=C_su_id,tracl,selev
+[stderr] printf -- '-1.125,10\n-0.25,20\n0.625,30\n' > geom.csv && sunull nt=3 ntr=3 | sushw key=f1 a=-1.125 b=0.875 | sugeomcsv rfile=geom.csv setid=any ufile=command match=f1 names=f1,cdp tolr=0.001
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,S\nC_SU_NAMES\nC_su_id,2_tracl_4,5_selev_8\nS001  10\n' > geom.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=geom.csv ufile=geom.csv rtype=FiXeD
+[stderr] printf '1,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,1.25,1.25,1.25,1.25,1.25,1.25,2.5,2.5\n' > geom.csv && sunull nt=3 ntr=1 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,tracr,fldr,tracf,ep,cdp,cdpt,trid,nvs,nhs,duse,offset,gelev,selev,sdepth,gdel,sdel,swdep,gwdep,scalel,scalco,sx,sy,gx,gy,counit,wevel,swevel,sut,gut,sstat,gstat,tstat,laga,lagb,delrt,muts,mute,dt,gain,igc,igi,corr,sfs,sfe,slen,styp,stas,stae,tatyp,afilf,afils,nofilf,nofils,lcf,hcf,lcs,hcs,year,day,hour,minute,sec,timbas,trwf,grnors,grnofr,grnlof,gaps,otrav,d1,f1,d2,f2,ungpow,unscale,ntr,mark
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+[stderr] printf '1,2,10\n1,3,20\n2,2,30\n' > geom.csv && sunull nt=3 ntr=3 | sushw key=fldr,tracf a=1,2 b=0,1 c=1,0 j=2,2 | sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracf names=match1,matche1,selev
+[stderr] printf '%s\n' 'S  1  10' 'S  2 -25' 'R  3  99' 'S  3 300' > geom.txt && sunull nt=2 ntr=3 | sugeomcsv rfile=geom.txt ufile=command rtype=fixed setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8
+[stderr] printf '0,1,1,5,2,101,103\n0,2,9,5,2,203,201\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call(" sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracf names=null,fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt create=all",shell=True,stdin=s))'
+[stderr] printf '1,10.126,-3.004\n2,-0.555,7.5\n' > geom.csv && sunull nt=2 ntr=2 | sushw key=sx,gx,scalco a=1000,2000,-100 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,sx,gx action=add scalco=100

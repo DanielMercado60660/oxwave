@@ -1,0 +1,329 @@
+{
+  "scope": "par/main/smoothing (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "smooth2",
+      "path": "par/main/smoothing/smooth2.c",
+      "purpose": "Smooth a uniformly sampled two-dimensional float array, optionally within a window.",
+      "selfdoc_first_line": " SMOOTH2 --- SMOOTH a uniformly sampled 2d array of data, within a user-",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the fast dimension."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the slow dimension."
+        },
+        {
+          "name": "r1",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Smoothing parameter in the first dimension; internally scaled to r1*r1*0.25."
+        },
+        {
+          "name": "r2",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Smoothing parameter in the second dimension; internally scaled to r2*r2*0.25."
+        },
+        {
+          "name": "win",
+          "type": "int array",
+          "default": "computed: 0,n1,0,n2",
+          "required": false,
+          "description": "Four window bounds: first-dimension start and exclusive end, then second-dimension start and exclusive end."
+        },
+        {
+          "name": "rw",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Window-edge smoothing parameter; internally scaled to rw*rw*0.25."
+        },
+        {
+          "name": "efile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Optional file for n1 binary floats containing cumulative relative RMS error by first-dimension index."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "checkpars",
+        "err",
+        "alloc1int",
+        "alloc1float",
+        "alloc2float",
+        "tripd",
+        "efopen",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sequential tridiagonal solves use float arithmetic and depend on operation order; double constants and sqrt introduce float/double mixing. Error-file sums accumulate across both dimensions without resetting at each depth. The first-dimension solve updates f[0] before assigning f[n1-2], which overwrites that update when n1=2; small or invalid dimensions and out-of-range or incomplete win values can cause invalid or uninitialized accesses. Input read counts are unchecked.",
+      "c_lines": 218,
+      "difficulty": "hard",
+      "difficulty_reason": "The windowed damped least-squares implementation requires multiple ordered tridiagonal solves and careful boundary handling.",
+      "test_cases": [
+        {
+          "description": "Smooth the full grid in both dimensions.",
+          "command": "suplane nt=32 ntr=8 | sustrip | smooth2 n1=32 n2=8 r1=4 r2=3 > out.bin"
+        },
+        {
+          "description": "Smooth a window with blurred edges and write relative errors.",
+          "command": "suplane nt=32 ntr=8 | sustrip | smooth2 n1=32 n2=8 r1=5 r2=2 win=4,28,1,7 rw=2 efile=error.bin > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "smooth3d"
+      ]
+    },
+    {
+      "name": "smooth3d",
+      "path": "par/main/smoothing/smooth3d.c",
+      "purpose": "Smooth a three-dimensional velocity grid with damped least squares, optionally smoothing slowness.",
+      "selfdoc_first_line": " SMOOTH3D - 3D grid velocity SMOOTHing by the damped least squares\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "0",
+          "required": true,
+          "description": "Number of samples in the first dimension; must be positive."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "0",
+          "required": true,
+          "description": "Number of samples in the second dimension; must be positive."
+        },
+        {
+          "name": "n3",
+          "type": "int",
+          "default": "0",
+          "required": true,
+          "description": "Number of samples in the third dimension; must be positive."
+        },
+        {
+          "name": "r1",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "First-dimension operator length; forced to zero when n1<4 or d1<=0."
+        },
+        {
+          "name": "r2",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Second-dimension operator length; forced to zero when n2<4 or d2<=0."
+        },
+        {
+          "name": "r3",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Third-dimension operator length; forced to zero when n3<4 or d3<=0."
+        },
+        {
+          "name": "d1",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "First-dimension sample interval."
+        },
+        {
+          "name": "d2",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Second-dimension sample interval."
+        },
+        {
+          "name": "d3",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Third-dimension sample interval."
+        },
+        {
+          "name": "iter",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Number of repeated smoothing solves; must be 1, 2, or 3."
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Time-axis dimension; a nonzero value replaces depth."
+        },
+        {
+          "name": "depth",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Depth-axis dimension used for weighting; overridden by a nonzero time."
+        },
+        {
+          "name": "mu",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Relative smoothing weight at maximum depth or time; must be at least 1."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, print minimum wavelengths to stderr."
+        },
+        {
+          "name": "slowness",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, invert velocity to slowness before smoothing and invert it back afterward."
+        },
+        {
+          "name": "vminc",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Lower velocity clipping limit before smoothing."
+        },
+        {
+          "name": "vmaxc",
+          "type": "float",
+          "default": "99999",
+          "required": false,
+          "description": "Upper velocity clipping limit before smoothing."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "err",
+        "alloc1float",
+        "alloc2float",
+        "alloc3float",
+        "free1float",
+        "free2float",
+        "efread",
+        "efwrite",
+        "efclose",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Repeated float tridiagonal solves and sequential dimension passes are sensitive to arithmetic order and float/double mixing. Slowness conversion and verbose wavelength calculations divide by velocity, including zero; verbose also divides by sample intervals and uses sqrt. Multiple active dimensions overwrite allocated workspace pointers before freeing them, leaking earlier workspaces. Invalid depth or time values are not checked.",
+      "c_lines": 500,
+      "difficulty": "hard",
+      "difficulty_reason": "The program performs repeated weighted tridiagonal solves across three dimensions with several coupled numerical options.",
+      "test_cases": [
+        {
+          "description": "Smooth all three dimensions with two iterations.",
+          "command": "suplane nt=16 ntr=16 | sustrip | smooth3d n1=16 n2=4 n3=4 d1=1 d2=2 d3=2 r1=4 r2=4 r3=4 iter=2 > out.bin"
+        },
+        {
+          "description": "Exercise clipping, slowness smoothing, time weighting, and wavelength reporting.",
+          "command": "suplane nt=16 ntr=16 | sustrip | smooth3d n1=16 n2=4 n3=4 r1=3 r2=2 r3=2 iter=3 time=2 mu=2 slowness=1 vminc=1 vmaxc=10 verbose=1 > out.bin"
+        },
+        {
+          "description": "Exercise a single iteration with second-dimension depth weighting.",
+          "command": "suplane nt=16 ntr=16 | sustrip | smooth3d n1=16 n2=4 n3=4 r1=2 r2=3 depth=2 mu=1.5 iter=1 > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "smooth2"
+      ]
+    },
+    {
+      "name": "smoothint2",
+      "path": "par/main/smoothing/smoothint2.c",
+      "purpose": "Smooth nonuniformly sampled interfaces supplied as ASCII coordinate pairs.",
+      "selfdoc_first_line": " SMOOTHINT2 --- SMOOTH non-uniformly sampled INTerfaces, via the damped",
+      "params": [
+        {
+          "name": "ninf",
+          "type": "int",
+          "default": "5",
+          "required": false,
+          "description": "Number of interfaces to read."
+        },
+        {
+          "name": "r",
+          "type": "float",
+          "default": "0",
+          "required": false,
+          "description": "Smoothing parameter; the selfdoc incorrectly states a default of 100."
+        },
+        {
+          "name": "npmax",
+          "type": "int",
+          "default": "101",
+          "required": false,
+          "description": "Maximum number of input entries per interface, including its terminating sentinel."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "alloc1float",
+        "err",
+        "smooth_1",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "smooth_1 performs two ordered float tridiagonal solves with float/double mixing and divides by squared coordinate spacing; duplicate adjacent x values cause an error. ASCII input and %g output introduce decimal conversion and output rounding. scanf return values are unchecked, so malformed or prematurely ended input can use uninitialized or stale values.",
+      "c_lines": 104,
+      "difficulty": "hard",
+      "difficulty_reason": "The numerical core uses repeated tridiagonal solves on nonuniformly spaced coordinates.",
+      "test_cases": [
+        {
+          "description": "Smooth the five non-surface interfaces from the supplied demonstration model.",
+          "command": "unif2 tfile=in.txt && sed '1,3d' in.txt | smoothint2 ninf=5 npmax=101 r=100 > out.txt"
+        },
+        {
+          "description": "Exercise zero smoothing and a smaller interface count.",
+          "command": "unif2 tfile=in.txt && sed '1,3d' in.txt | smoothint2 ninf=2 npmax=20 r=0 > out.txt"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

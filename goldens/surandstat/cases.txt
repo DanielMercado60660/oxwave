@@ -1,0 +1,57 @@
+# Seeded default max and odd trace sizes.
+suspike nt=7 ntr=3 | surandstat seed=1
+suspike nt=1 ntr=1 | surandstat seed=42
+# Explicit parameters and random shifts.
+suspike nt=21 ntr=3 | surandstat seed=1 max=5 scale=1
+suspike nt=21 ntr=2 | surandstat seed=2 max=5 scale=0.5
+suspike nt=21 ntr=2 | surandstat seed=17 max=-3 scale=1
+suspike nt=7 ntr=2 | surandstat seed=5 max=0 scale=-1
+suspike nt=7 ntr=2 | surandstat seed=5 max=5 scale=0
+[stderr] suspike nt=7 ntr=1 | surandstat seed=9 verbose=1
+surandstat seed=1
+suspike nt=7 ntr=1 | surandstat seed=999999999999999999999
+# Default scale, zero seed, and unsigned seed converted to signed by sranuni.
+suspike nt=21 ntr=3 nspk=1 ix1=1 it1=11 | surandstat seed=0 max=5
+suspike nt=21 ntr=3 nspk=1 ix1=1 it1=11 | surandstat seed=4294967295 max=5
+# Negative scale and truncation of the resulting shift toward zero.
+suspike nt=21 ntr=3 nspk=1 ix1=1 it1=11 | surandstat seed=1 max=5 scale=-1
+# Zero/default max makes a clock seed unobservable; default dt cast is zero.
+suspike nt=9 ntr=1 nspk=1 ix1=1 it1=5 | surandstat
+suspike nt=9 ntr=2 dt=0 | surandstat seed=2
+sunull nt=1 ntr=1 | surandstat seed=1 max=0 scale=0
+# Parser behavior, repeated parameters, parameter files, and full diagnostics.
+[stderr] suspike nt=7 ntr=1 | surandstat seed=1 unknown=1
+[stderr] suspike nt=7 ntr=1 | surandstat seed=1 verbose=0
+suspike nt=9 ntr=2 | surandstat seed=1 max=5 max=0 scale=-2
+suspike nt=9 ntr=2 | surandstat seed=1 max= scale=
+suspike nt=9 ntr=2 | surandstat seed=abc max=abc scale=abc
+printf 'seed=17 max=0 scale=-1\n' > params; suspike nt=9 ntr=2 | surandstat par=params
+[stderr] surandstat
+[stderr] suspike nt=7 ntr=1 | surandstat seed=4294967296
+[stderr] suspike nt=7 ntr=1 | surandstat seed=1 max=2147483648
+[stderr] suspike nt=7 ntr=1 | surandstat seed=1 scale=1e-310
+# Maximum trace length: the C loop also writes the un-emitted data[nt] cell.
+suspike nt=65535 ntr=2 nspk=1 ix1=1 it1=32767 | surandstat seed=1
+# NaN scale converts the shift to zero on the reference arm64 build.
+suspike nt=9 ntr=3 nspk=1 ix1=1 it1=5 | surandstat seed=1 scale=nan
+suspike nt=9 ntr=3 nspk=1 ix1=1 it1=5 | surandstat seed=17 max=5 scale=nan
+# Nonfinite parser errors and zero-length input data.
+[stderr] suspike nt=9 ntr=1 | surandstat seed=1 scale=inf
+[stderr] suspike nt=9 ntr=1 | surandstat seed=1 scale=-inf
+[stderr] sunull nt=0 ntr=1 | surandstat seed=1
+# Signed conversion of unsigned seeds and multi-trace random shift coverage.
+suplane nt=31 ntr=7 | surandstat seed=2147483647 max=5
+suplane nt=31 ntr=7 | surandstat seed=2147483648 max=5
+suplane nt=31 ntr=7 | surandstat seed=1 max=5 scale=-0.5
+# Both ends of the sample range expose the C loop's unchanged vacated samples.
+suspike nt=11 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=11 | surandstat seed=1 max=5
+suspike nt=11 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=11 | surandstat seed=2 max=5
+# Dense seeded samples expose every copied sample and per-trace reseeding.
+# Shifting copies floats without arithmetic, so exact bytes are expected.
+[exact] sunull nt=31 ntr=5 | suaddnoise seed=123 | surandstat seed=1 max=5
+[exact] sunull nt=31 ntr=5 | suaddnoise seed=123 | surandstat seed=2 max=5
+[exact] sunull nt=31 ntr=5 | suaddnoise seed=123 | surandstat seed=2147483648 max=5
+[exact] sunull nt=31 ntr=5 | suaddnoise seed=123 | surandstat seed=4294967295 max=5 scale=-1
+# One-sample nonzero traces with random shifts in both directions.
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | surandstat seed=1 max=5
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | surandstat seed=2 max=5

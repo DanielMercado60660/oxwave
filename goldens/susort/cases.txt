@@ -1,0 +1,71 @@
+# Disk input, default and multiple ascending/descending keys, repeated values.
+suplane nt=7 ntr=11 | sushw key=cdp,offset a=3,20 b=-1,-3 j=3,1 > in.su && susort < in.su
+suplane nt=7 ntr=11 | sushw key=cdp,offset a=2,-7 b=1,2 j=3,1 > in.su && susort -cdp +offset < in.su
+suplane nt=1 ntr=1 > in.su && susort +tracl < in.su
+suplane nt=3 ntr=5 | sushw key=ns a=3 > in.su && susort -ns < in.su
+suplane nt=5 ntr=7 | sushw key=d1 a=2 b=-1 > in.su && susort -d1 < in.su
+suplane nt=1 ntr=1030 | sushw key=cdp a=10 b=-1 j=7 > in.su && susort cdp -tracl < in.su
+# Pipe input requires disk output; inspect the native output bytes.
+[exact] suplane nt=3 ntr=5 | susort -tracl > out.su && cat out.su
+[exact] suplane nt=3 ntr=5 | CWP_TMPDIR=. susort +tracl > out.su && cat out.su
+# Invalid keys, missing input, unsuitable pipe output, and invalid temporary directory.
+[stderr] susort invalid </dev/null
+[stderr] susort </dev/null
+[stderr] suplane nt=3 ntr=1 | susort | cat
+[stderr] CWP_TMPDIR=/no/such/susort/dir susort </dev/null
+[stderr] susort verbose=1 </dev/null
+# All-equal keys and secondary keys that resolve ties; retain trace identities.
+suplane nt=7 ntr=11 | sushw key=fldr a=1 b=1 > in.su && susort cdp < in.su
+suplane nt=7 ntr=11 | sushw key=cdp,offset a=0,-5 b=1,2 j=3,11 > in.su && susort +cdp -offset < in.su
+# Signed short keys, zero/negative integer keys, unsigned reversal and float keys.
+suplane nt=3 ntr=9 | sushw key=delrt a=-4 b=1 > in.su && susort -delrt < in.su
+suplane nt=3 ntr=9 | sushw key=cdp a=-4 b=1 > in.su && susort cdp < in.su
+suplane nt=3 ntr=9 | sushw key=cdp a=-4 b=1 > in.su && susort < in.su
+suplane nt=3 ntr=9 | sushw key=dt a=65535 b=-8000 > in.su && susort -dt < in.su
+suplane nt=3 ntr=9 | sushw key=d1 a=-2 b=0.5 > in.su && susort +d1 < in.su
+# Disk-to-disk output, then disk-to-pipe through another SU program.
+suplane nt=7 ntr=11 > in.su && susort -tracl < in.su > out.su && cat out.su
+suplane nt=7 ntr=11 > in.su && susort -tracl < in.su | sugethw key=tracl,tracr,cdp
+# Pipe output is a native struct dump in this SU build, so compare exact bytes.
+[exact] suplane nt=7 ntr=11 | sushw key=cdp,fldr a=0,1 b=1,1 j=3,11 | susort cdp > out.su && cat out.su
+[exact] suplane nt=1 ntr=1 | CWP_TMPDIR= susort > out.su && cat out.su
+# Explicit empty/sign-only keys and unsupported named options are errors.
+[stderr] susort '' </dev/null
+[stderr] susort + </dev/null
+[stderr] susort - </dev/null
+[stderr] susort key=cdp </dev/null
+# A named temporary file is removed after successful pipe sorting.
+[exact] mkdir tmpdir && suplane nt=3 ntr=5 | CWP_TMPDIR=tmpdir susort -tracl > out.su && cat out.su && find tmpdir -type f
+# qsort ties at small/large partition sizes and across the NTRSTEP growth boundary.
+# fldr retains input identity after susort renumbers tracl and tracr.
+[exact] for n in 2 6 7 8 9 40 41 128 1023 1024 1025 2049; do sunull nt=1 ntr=$n | sushw key=fldr a=1 b=1 > in.su && susort cdp < in.su || exit; done
+[exact] sunull nt=3 ntr=129 | sushw key=fldr a=1 b=1 > in.su && susort +cdp -offset delrt d1 -dt < in.su
+[exact] sunull nt=3 ntr=1025 | sushw key=fldr a=1 b=1 | susort cdp offset -d1 > out.su && cat out.su
+# Mixed ties with three key priorities, repeated float keys, and signed minima.
+suplane nt=9 ntr=137 | sushw key=cdp,offset,delrt,fldr a=-2,3,-4,1 b=1,-1,1,1 j=3,5,7,137 > in.su && susort -cdp offset -delrt < in.su
+suplane nt=5 ntr=41 | sushw key=d1,fldr a=-1,1 b=0.5,1 j=5,41 > in.su && susort -d1 < in.su
+sunull nt=1 ntr=4 | sushw key=cdp,fldr a=-2147483648,1 b=1073741824,1 > in.su && susort -cdp < in.su
+sunull nt=1 ntr=4 | sushw key=delrt,fldr a=-32768,1 b=16384,1 > in.su && susort -delrt < in.su
+sunull nt=1 ntr=9 | sushw key=dt,fldr a=0,1 b=8191,1 > in.su && susort dt < in.su
+# Floating NaN and infinity keys use the original valcmp semantics.
+sunull nt=3 ntr=17 | sushw key=d1,fldr a=nan,1 b=0,1 > in.su && susort -d1 cdp < in.su
+sunull nt=1 ntr=9 | sushw key=d1,fldr a=3e38,1 b=3e38,1 > in.su && susort d1 < in.su
+# FIFO input follows the pipe path; its output is a native struct dump.
+[exact] mkfifo input && { suplane nt=5 ntr=11 > input & writer=$!; susort -tracl < input > out.su && wait "$writer" && cat out.su; }
+# Empty, truncated, zero-sample, and inconsistent-size input errors.
+[stderr] touch empty.su && susort cdp < empty.su
+[stderr] printf abc > in.su && susort cdp < in.su
+[stderr] sunull nt=0 ntr=1 > in.su && susort cdp < in.su
+[stderr] { sunull nt=1 ntr=1; sunull nt=3 ntr=1; } > in.su && susort cdp < in.su
+[stderr] suplane nt=3 ntr=1 | dd bs=1 count=244 2>/dev/null > in.su && susort cdp < in.su
+# Verbosity is a positional key here, including verbose=0; no checkpars call.
+[stderr] susort verbose=0 </dev/null
+[stderr] susort cdp verbose=1 </dev/null
+# Directory permission failure is checked before input and header-key errors.
+[stderr] mkdir tmpdir && chmod 500 tmpdir && CWP_TMPDIR=tmpdir susort invalid </dev/null
+# Wait for the named temporary file, then interrupt while stdin is still open.
+# Check all installed handlers, failure status, and removal without timing output.
+[stderr] mkdir tmpdir && mkfifo input && exec 3<>input && for sig in INT QUIT HUP TERM; do CWP_TMPDIR=tmpdir susort < input > out.su & pid=$!; for i in $(seq 1 200); do test -n "$(find tmpdir -type f -print)" && break; sleep 0.01; done; kill -s "$sig" "$pid"; wait "$pid"; rc=$?; test "$rc" -eq 1 && test -z "$(find tmpdir -type f -print)" || exit 2; done
+# Interrupt after trace I/O has filled the named temporary file, with stdin
+# still open. Each signal must exit silently with status 1 and remove the file.
+[stderr] sunull nt=3 ntr=1025 > in.su && mkdir tmpdir && for sig in INT QUIT HUP TERM; do mkfifo input && exec 3<>input || exit 2; CWP_TMPDIR=tmpdir susort < input > out.su & pid=$!; cat in.su >&3; for i in $(seq 1 200); do test -n "$(find tmpdir -type f -size +0c -print)" && break; sleep 0.01; done; test -n "$(find tmpdir -type f -size +0c -print)" || exit 2; kill -s "$sig" "$pid"; wait "$pid"; rc=$?; exec 3>&-; test "$rc" -eq 1 && test ! -s out.su && test -z "$(find tmpdir -type f -print)" || exit 2; rm input; done

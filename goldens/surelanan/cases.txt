@@ -1,0 +1,69 @@
+# Defaults and a single trace.
+printf '40 0\n40 10\n' > refl.txt && suplane nt=65 ntr=1 | sushw key=d1,offset a=2,4 | surelanan refl=refl.txt npicks=2
+# All grid parameters, odd dimensions, changing CDPs and diagnostic output.
+[stderr] printf '40 0\n42 5\n44 10\n' > refl.txt && suplane nt=71 ntr=5 | sushw key=d1,f1,offset,cdp a=2,1,4,1 b=0,0,3,1 | surelanan refl=refl.txt npicks=3 nr1=3 nr2=5 dr1=0.02 dr2=0.03 fr1=-0.1 fr2=0.1 dzratio=2 verbose=1
+# Each cubic interpolation method.
+printf '40 0\n42 5\n44 10\n' > refl.txt && suplane nt=65 ntr=3 | sushw key=d1,offset a=2,4 | surelanan refl=refl.txt npicks=3 nr1=2 nr2=3 method=akima
+printf '40 0\n42 5\n44 10\n' > refl.txt && suplane nt=65 ntr=3 | sushw key=d1,offset a=2,4 | surelanan refl=refl.txt npicks=3 nr1=2 nr2=3 method=spline
+# Unknown method and empty input.
+printf '40 0\n40 10\n' > refl.txt && suplane nt=65 ntr=1 | surelanan refl=refl.txt npicks=2 method=invalid
+surelanan refl=missing npicks=2 < /dev/null
+# One input sample and zero smoothing window.
+printf '1 0\n1 10\n' > refl.txt && suplane nt=1 ntr=1 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=2 nr1=1 nr2=1 nsmooth=0
+# Negative offset and a zero grid increment, with the default smoothing derived from dzratio.
+printf '20 0\n30 10\n' > refl.txt && suplane nt=47 ntr=3 | sushw key=d1,offset a=1,-7 b=0,2 | surelanan refl=refl.txt npicks=2 nr1=2 nr2=3 dr1=0 dr2=-0.02 fr1=-0.2 fr2=0 dzratio=0
+# Interpolate between unequal reflector picks at a nonzero CDP.
+printf '20 0\n30 10\n50 20\n' > refl.txt && suplane nt=81 ntr=3 | sushw key=d1,offset,cdp a=1,8,5 b=0,4,0 | surelanan refl=refl.txt npicks=3 nr1=3 nr2=3 nsmooth=5 method=linear
+# Explicit defaults, with all optional parameters supplied.
+[stderr] printf '40 0\n40 10\n' > refl.txt && suplane nt=65 ntr=1 | sushw key=d1,offset a=2,4 | surelanan refl=refl.txt npicks=2 nr1=51 nr2=51 dr1=0.01 dr2=0.01 fr1=-0.25 fr2=-0.25 dzratio=5 nsmooth=11 verbose=0 method=linear
+# Nonzero samples throughout the smoothing window, even nsmooth, and changing gathers.
+[stderr] printf '20 0\n30 10\n50 20\n' > refl.txt && suplane nt=83 ntr=5 | suaddnoise seed=17 | sushw key=d1,f1,offset,cdp a=1,2,-9,5 b=0,0,5,1 | surelanan refl=refl.txt npicks=3 nr1=5 nr2=7 dr1=0.13 dr2=0.07 fr1=-0.3 fr2=-0.2 nsmooth=4 verbose=1
+# One pick, one sample, and a positive smoothing window.
+[stderr] printf '1 5\n' > refl.txt && suplane nt=1 ntr=1 | sushw key=d1,cdp a=1,5 | surelanan refl=refl.txt npicks=1 nr1=1 nr2=1 nsmooth=1
+# Descending reflector coordinates and interior interpolation; first-letter method selection.
+[stderr] printf '50 20\n30 10\n20 0\n' > refl.txt && suplane nt=81 ntr=3 | suaddnoise seed=11 | sushw key=d1,offset,cdp a=1,8,5 b=0,4,0 | surelanan refl=refl.txt npicks=3 nr1=3 nr2=3 nsmooth=5 method=l
+# Linear extrapolation uses the endpoint depth on each side.
+[stderr] printf '20 10\n40 20\n' > refl.txt && suplane nt=65 ntr=2 | sushw key=d1,cdp a=1,-5 | surelanan refl=refl.txt npicks=2 nr1=1 nr2=3 nsmooth=3
+[stderr] printf '20 10\n40 20\n' > refl.txt && suplane nt=65 ntr=2 | sushw key=d1,cdp a=1,25 | surelanan refl=refl.txt npicks=2 nr1=1 nr2=3 nsmooth=3
+# An explicit window overrides negative dzratio, and a zero r2 increment is permitted.
+printf '20 0\n30 10\n' > refl.txt && suplane nt=47 ntr=3 | sushw key=d1,offset a=1,-7 b=0,2 | surelanan refl=refl.txt npicks=2 nr1=2 nr2=3 dr2=0 dzratio=-1 nsmooth=1
+# Empty method and numeric overflow fail before producing traces.
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=47 ntr=1 | surelanan refl=refl.txt npicks=2 method=
+[stderr] suplane nt=47 ntr=1 | surelanan npicks=2147483648
+# Missing required reflector parameters on empty input: gettr fails first.
+[stderr] surelanan < /dev/null
+# Nonlinear interior cubic interpolation, using noise so depth differences affect output.
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=23 | sushw key=d1,offset,cdp a=1,3,7 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=mono
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=23 | sushw key=d1,offset,cdp a=1,3,7 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=akima
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=23 | sushw key=d1,offset,cdp a=1,3,7 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=spline
+# All-zero input leaves every semblance denominator zero.
+[stderr] printf '20 0\n30 10\n' > refl.txt && sunull nt=43 ntr=3 | sushw key=d1,offset a=1,8 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4
+# Zero depth and half-offset make the moveout expression NaN; the C comparison selects sample zero.
+[stderr] printf '0 0\n0 10\n' > refl.txt && suplane nt=43 ntr=3 | suaddnoise seed=29 | sushw key=d1,offset a=1,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=3
+# Zero depth sampling makes the normalized depth infinite; no sample contributes.
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=43 ntr=3 | suaddnoise seed=29 | sushw key=d1,offset a=0,8 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=3
+# Negative first sample, descending r1 grid, and odd negative offsets.
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=43 ntr=3 | suaddnoise seed=29 | sushw key=d1,f1,offset,cdp a=1,-2,-9,7 b=0,0,2,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 dr1=-0.2 fr1=0.3 dr2=0 nsmooth=4 verbose=1
+# A reflector below the trace range produces a zero semblance panel.
+[stderr] printf '120 0\n130 10\n' > refl.txt && suplane nt=43 ntr=3 | suaddnoise seed=29 | sushw key=d1,offset a=1,8 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=3
+# checkpars reports unknown arguments before the unconditional depth warning and gather diagnostics.
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=43 ntr=1 | sushw key=d1,offset a=1,8 | surelanan refl=refl.txt npicks=2 nr1=1 nr2=3 unknown=1 verbose=1
+# Cubic methods with one pick give constant depth even outside the picked coordinate.
+[stderr] printf '23 5\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,9 b=0,4,0 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=5 nsmooth=4 method=m
+[stderr] printf '23 5\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,9 b=0,4,0 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=5 nsmooth=4 method=a
+[stderr] printf '23 5\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,9 b=0,4,0 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=5 nsmooth=4 method=s
+# Two picks give a line for each cubic method, with first-letter selection.
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,7 b=0,4,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4 method=m
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,7 b=0,4,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4 method=a
+[stderr] printf '20 0\n30 10\n' > refl.txt && suplane nt=57 ntr=3 | suaddnoise seed=31 | sushw key=d1,offset,cdp a=1,3,7 b=0,4,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4 method=s
+# Descending nonlinear picks, multiple gathers, and full diagnostics for each cubic method.
+[stderr] printf '40 20\n23 11\n27 4\n20 0\n' > refl.txt && suplane nt=83 ntr=5 | suaddnoise seed=37 | sushw key=d1,offset,cdp a=1,-9,7 b=0,5,1 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=mono verbose=1
+[stderr] printf '40 20\n23 11\n27 4\n20 0\n' > refl.txt && suplane nt=83 ntr=5 | suaddnoise seed=37 | sushw key=d1,offset,cdp a=1,-9,7 b=0,5,1 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=akima verbose=1
+[stderr] printf '40 20\n23 11\n27 4\n20 0\n' > refl.txt && suplane nt=83 ntr=5 | suaddnoise seed=37 | sushw key=d1,offset,cdp a=1,-9,7 b=0,5,1 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=6 method=spline verbose=1
+# Cubic endpoint extrapolation on both sides of a nonlinear reflector.
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,-2 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=mono
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,22 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=mono
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,-2 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=akima
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,22 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=akima
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,-2 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=spline
+[stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,22 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=spline

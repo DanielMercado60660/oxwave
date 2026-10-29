@@ -1,0 +1,16 @@
+# Defaults, resampling factors, overrides, and odd trace sizes.
+suplane nt=31 ntr=3 | suresamp
+suspike nt=17 ntr=1 | suresamp rf=0.5
+suspike nt=1 ntr=1 | suresamp rf=2 nt=3 dt=0.001 tmin=-0.002
+suplane nt=25 ntr=2 | suresamp rf=0 nt=19 dt=0.003 tmin=0.007 verbose=1
+suplane nt=19 ntr=2 | sushw key=trid,d1,f1 a=30,0.5,1 | suresamp rf=2 tmin=0.75 verbose=1
+suplane nt=19 ntr=1 | sushw key=dt a=0 | suresamp dt_in=0.004 nt=7
+suplane nt=19 ntr=1 | sushw key=dt a=0 | suresamp
+suplane nt=19 ntr=1 | suresamp rf=-1
+suplane nt=19 ntr=1 | suresamp nt=65536
+suresamp nt=10
+suplane nt=19 ntr=1 | suresamp nt=0
+suplane nt=19 ntr=1 | suresamp dt=0
+suplane nt=19 ntr=1 | suresamp nt=-1
+[stderr] suplane nt=19 ntr=1 | suresamp verbose=1
+[stderr] suplane nt=19 ntr=1 | sushw key=trid,d1,f1 a=30,0.5,1 | suresamp verbose=1

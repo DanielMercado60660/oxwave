@@ -1,0 +1,16 @@
+# Defaults, existing input samples, and an event within the trace
+suspike nt=301 ntr=3 dt=0.004 | suaddevent
+# Odd sizes, delay, negative offsets, and nonintegral event times
+sunull nt=127 ntr=5 dt=0.002 | sushw key=offset,delrt a=-120,20 b=60,0 | suaddevent type=lmo t0=0.031 vel=1234 amp=0.75
+sunull nt=1 ntr=1 dt=0.004 | suaddevent type=nmo t0=0 amp=2
+sunull nt=137 ntr=3 dt=0.004 | sushw key=offset a=-70 b=70 | suaddevent type=other t0=-0.12 vel=-1500 amp=-2
+# Header dt overrides the command line; zero header dt requires a parameter.
+sunull nt=51 ntr=2 dt=0.004 | suaddevent dt=0.01 t0=0.08
+sunull nt=51 ntr=2 dt=0.004 | sushw key=dt a=0 | suaddevent dt=0.004 t0=0 amp=3
+sunull nt=51 ntr=1 dt=0.004 | sushw key=dt a=0 | suaddevent
+# Empty input and invalid numeric parameter
+suaddevent
+sunull nt=20 ntr=1 dt=0.004 | suaddevent t0=1e999
+# The original does not call checkpars, including for verbose and unknown options.
+sunull nt=33 ntr=1 dt=0.004 | suaddevent verbose=1 unused=1 t0=0.03
+sunull nt=33 ntr=1 dt=0.004 | suaddevent type=lmo t0=0 vel=1000 amp=0

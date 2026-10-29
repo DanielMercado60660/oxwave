@@ -1,0 +1,104 @@
+# Default model, default verbose diagnostics, and input-independent generation.
+[stderr] susynlvfti
+[stderr] susynlvfti nxm=1
+susynlvfti nxm=1 verbose=0
+sunull nt=7 ntr=1 | susynlvfti nxm=1 verbose=0
+
+# Explicit defaults, including the actual ntries=20 (selfdoc says 40).
+[stderr] susynlvfti nt=101 dt=0.04 ft=0 kilounits=1 nxo=1 dxo=0.05 fxo=0 nxm=1 dxm=0.05 fxm=0 x0=0 z0=0 v00=2 dvdx=0 dvdz=0 fpeak=5 ls=0 er=0 ob=0 tmin=0.4 ndpfz=5 smooth=0 verbose=1 angxs=0 a=1 f=0.4 l=0.3 delta=0 epsilon=0 ntries=20 epsx=0.001 epst=0.0001 nitmax=12 'ref=1:1,2;4,2'
+
+# Odd sample counts, very short traces, shifted time origin, and dt header wrap.
+susynlvfti nt=1 nxm=1 verbose=0
+susynlvfti nt=7 nxm=1 verbose=0
+susynlvfti nt=131 dt=0.02 ft=-0.1 nxm=3 verbose=0
+susynlvfti nt=99 dt=0.1 ft=0.3 nxm=1 verbose=0
+
+# Uniform and explicit signed offsets, positive and negative spatial increments.
+susynlvfti nxm=3 dxm=0.15 fxm=1 nxo=3 dxo=0.2 fxo=-0.2 verbose=0
+susynlvfti nxm=3 dxm=-0.15 fxm=1 nxo=2 dxo=-0.1 fxo=0.3 verbose=0
+susynlvfti nxm=2 dxm=0 xo=-0.3,0,0.4 verbose=0
+susynlvfti nxm=2 xo=0.3 verbose=0
+susynlvfti nxs=3 dxs=0.15 fxs=1 nxo=3 dxo=0.2 fxo=-0.2 verbose=0
+susynlvfti nxs=2 dxs=-0.1 fxs=1 xo=-0.2,0.2 verbose=0
+susynlvfti nxs=1 verbose=0
+susynlvfti dxs=0.03 nxo=0 verbose=0
+susynlvfti fxs=1 nxo=0 verbose=0
+susynlvfti dxm=0.03 nxo=0 verbose=0
+susynlvfti fxm=1 nxo=0 verbose=0
+susynlvfti nxm=2 fxm=1.5 dxm=0.75 fxo=-1.25 kilounits=0 verbose=0
+
+# Velocity reference coordinates and gradients, both ray directions.
+susynlvfti nxm=3 fxm=1 x0=1 z0=0.2 v00=2.4 dvdx=0.05 dvdz=0.2 verbose=0
+susynlvfti nxm=2 fxm=1 dvdz=-0.1 verbose=0
+susynlvfti nxm=2 fxm=1 dvdx=-0.08 dvdz=0.15 fpeak=7 ndpfz=3 tmin=0.2 verbose=0
+
+# Point source, line source, exploding reflector, and obliquity amplitude modes.
+susynlvfti nxm=2 fxm=1 ls=1 nxo=2 dxo=0.2 verbose=0
+susynlvfti nxm=2 fxm=1 er=1 verbose=0
+susynlvfti nxm=2 fxm=1 er=1 ls=1 ob=1 verbose=0
+susynlvfti nxm=2 fxm=1 ob=1 'ref=1:4,2;1,2' verbose=0
+
+# Spline smoothing, omitted amplitudes, and repeated reflector parameters.
+susynlvfti nxm=2 fxm=1 smooth=1 'ref=0,1;1,1.3;2,1.1;3,1.5' verbose=0
+susynlvfti nxm=2 fxm=1 'ref=0.5:0,1;1,1.3;3,1.1' 'ref=-0.2:0,2;3,2.5' verbose=0
+
+# Elastic ratios and Thomsen parameters, tilted axes, constant and gradient media.
+susynlvfti nxm=2 fxm=1 a=1.2 f=0.45 l=0.25 angxs=-15 verbose=0
+susynlvfti nxm=2 fxm=1 delta=0.08 epsilon=0.15 ntries=40 epsx=0.0001 epst=0.00001 nitmax=10 verbose=0
+susynlvfti nxm=2 fxm=1 dvdz=0.2 delta=0.05 epsilon=0.1 angxs=10 ntries=30 nitmax=10 verbose=0
+susynlvfti nxs=2 fxs=1 nxo=2 dxo=0.2 fxo=0.1 dvdx=0.05 dvdz=0.2 a=1.1 f=0.4 l=0.3 angxs=10 verbose=0
+susynlvfti nxm=1 fxm=0 dvdz=0.2 a=1.1 f=0.4 l=0.3 'ref=0,1;0,2' verbose=0
+susynlvfti nxm=1 fxm=1 dvdz=-0.1 delta=0.03 epsilon=0.1 verbose=0
+susynlvfti nxm=1 fxm=1 a=1.1 ntries=0 nitmax=0 verbose=0
+
+# Empty output geometries, negative count, and a zero sample count.
+susynlvfti nxm=0 verbose=0
+susynlvfti nxs=0 verbose=0
+susynlvfti nxm=-1 verbose=0
+susynlvfti nxm=1 nxo=0 verbose=0
+susynlvfti nt=0 nxm=1 verbose=0
+
+# Unknown parameters are ignored: this C program never calls checkpars().
+[stderr] susynlvfti nxm=1 verbose=0 unknown=1
+
+# Error exits: conflicting geometry, numeric overflow, malformed reflectors.
+[stderr] susynlvfti nxs=1 nxm=1
+[stderr] susynlvfti dxs=0.1 fxm=0
+[stderr] susynlvfti fxs=0 dxm=0.1
+[stderr] susynlvfti nt=2147483648
+[stderr] susynlvfti dt=1e-310
+[stderr] susynlvfti nxm=1 'ref=1:0,1'
+[stderr] susynlvfti nxm=1 'ref=1:0,1;2'
+[stderr] susynlvfti nxm=1 'ref='
+[stderr] susynlvfti nxm=1 'ref=0,1;3,1' 'ref=bad'
+
+# Parameter file precedence and repeat occurrences.
+printf 'nxm=2\nfxm=1\nverbose=1\n' > model.par; susynlvfti par=model.par nxm=1 verbose=0
+susynlvfti nxm=2 nxm=1 verbose=1 verbose=0
+
+# Explicit offsets leave dxo/fxo at the reference executable's bit pattern 1.
+# Check both header words and single-offset selection, including ignored inputs.
+susynlvfti nxs=1 fxs=1 xo=0 verbose=0
+susynlvfti nxs=2 fxs=1 xo=0.3 dxo=1 fxo=2 verbose=0
+susynlvfti nxm=2 fxm=1 xo=-0.3 verbose=0
+susynlvfti nxs=1 xo=-0.2,0,0.4 kilounits=0 verbose=0
+
+# Short traces with arrivals inside the recording window exercise convolution
+# edges (unlike short traces whose default reflector arrivals are out of range).
+susynlvfti nt=3 nxm=1 fxm=0 'ref=-0.1,0.03;0.1,0.03' verbose=0
+susynlvfti nt=17 nxm=2 fxm=0 'ref=-0.2,0.25;0.2,0.25' verbose=0
+susynlvfti nt=41 dt=0.02 nxm=1 fxm=0 'ref=-0.3,0.2;0.3,0.2' verbose=0
+
+# Degenerate ray searches: constant TI velocity yields SIGBUS, but a gradient
+# follows the unfound-ray path. Zero integration iterations alone do not crash.
+[stderr] susynlvfti nxm=1 fxm=1 a=1.1 ntries=0 verbose=0
+[stderr] susynlvfti nxm=1 fxm=1 a=1.1 ntries=-1 verbose=0
+[stderr] susynlvfti nxm=1 fxm=1 a=1.1 ntries=0 nt=0 verbose=0
+susynlvfti nxm=1 fxm=1 a=1.1 ntries=0 dvdz=0.2 verbose=0
+susynlvfti nxm=1 fxm=1 a=1.1 nitmax=0 dvdz=0.2 verbose=0
+
+# Curved reflectors with obliquity, nonzero-offset TI amplitudes, and a downward
+# ray in a horizontal velocity gradient exercise combined numerical branches.
+[stderr] susynlvfti nt=151 nxm=2 fxm=1 smooth=1 ob=1 'ref=0.8:0,1;1,1.5;2,1;3,1.3' verbose=1
+susynlvfti nt=151 nxs=2 fxs=1 nxo=2 dxo=0.3 fxo=-0.2 er=1 ob=1 delta=0.07 epsilon=0.15 angxs=-20 verbose=0
+susynlvfti nt=151 nxm=2 fxm=1 nxo=2 dxo=0.2 ls=1 ob=1 dvdx=0.1 a=1.2 f=0.45 l=0.25 verbose=0

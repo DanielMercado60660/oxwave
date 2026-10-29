@@ -1,0 +1,99 @@
+# Required parameter and input errors; compare complete diagnostics.
+[stderr] sultt
+[stderr] sultt inS11=missing
+[stderr] sultt inS11=missing inS12=missing
+[stderr] sultt inS11=missing inS12=missing inS21=missing
+[stderr] sultt inS11=missing inS12=missing inS21=missing inS22=missing
+[stderr] sultt inS11= inS12=missing inS21=missing inS22=missing
+[stderr] touch empty; sultt inS11=empty inS12=empty inS21=empty inS22=empty
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=missing inS21=a inS22=a
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=missing inS22=a
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=missing
+[stderr] suplane nt=9 ntr=1 > a; suplane nt=7 ntr=1 > b; sultt inS11=a inS12=b inS21=a inS22=a
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a alpha=missing/out
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=1 theta=missing/out
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=1 gamma=missing/out
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a alpha=
+[stderr] sultt ntraces=2147483648
+# Default calculation and explicit default values; observe attribute file bytes.
+suplane nt=17 ntr=7 > a && sultt inS11=a inS12=a inS21=a inS22=a && cat alpha
+suplane nt=17 ntr=7 > a && sultt inS11=a inS12=a inS21=a inS22=a ntraces=5 wl=3 mode=2 Total=0 alpha=alpha theta=theta gamma=gamma outS11=S11_out outS12=S12_out outS21=S21_out outS22=S22_out && cat alpha
+# Every calculation mode with distinct, seeded component volumes.
+suplane nt=17 ntr=5 | suaddnoise seed=11 > a; suplane nt=17 ntr=5 | suaddnoise seed=12 > b; suplane nt=17 ntr=5 | suaddnoise seed=21 > c; suplane nt=17 ntr=5 | suaddnoise seed=22 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=3 wl=5 theta=t gamma=g && cat t g
+suplane nt=17 ntr=5 | suaddnoise seed=11 > a; suplane nt=17 ntr=5 | suaddnoise seed=12 > b; suplane nt=17 ntr=5 | suaddnoise seed=21 > c; suplane nt=17 ntr=5 | suaddnoise seed=22 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=1 wl=1 alpha=p && cat p
+suplane nt=17 ntr=5 | suaddnoise seed=11 > a; suplane nt=17 ntr=5 | suaddnoise seed=12 > b; suplane nt=17 ntr=5 | suaddnoise seed=21 > c; suplane nt=17 ntr=5 | suaddnoise seed=22 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=2 wl=7 alpha=p && cat p
+# Zero input, singleton sizes, even and oversized windows.
+sunull nt=1 ntr=1 > a && sultt inS11=a inS12=a inS21=a inS22=a ntraces=1 wl=1 && cat alpha
+sunull nt=1 ntr=1 > a && sultt inS11=a inS12=a inS21=a inS22=a ntraces=1 wl=1 mode=1 && cat theta gamma
+sunull nt=1 ntr=1 > a && sultt inS11=a inS12=a inS21=a inS22=a ntraces=1 wl=1 mode=3 && cat alpha
+suplane nt=9 ntr=1 > a && sultt inS11=a inS12=a inS21=a inS22=a wl=2 && cat alpha
+suplane nt=3 ntr=1 > a && sultt inS11=a inS12=a inS21=a inS22=a wl=9 && cat alpha
+suplane nt=9 ntr=2 > a && sultt inS11=a inS12=a inS21=a inS22=a wl=0 && cat alpha
+[stderr] suplane nt=9 ntr=2 > a; sultt inS11=a inS12=a inS21=a inS22=a wl=-1
+[stderr] suplane nt=9 ntr=2 > a; sultt inS11=a inS12=a inS21=a inS22=a ntraces=-1
+# Original dereferences row zero of a zero-row panel and receives SIGSEGV.
+# Suppress bash's PID-bearing crash message to compare shell status 139.
+# The Rust port exits 139; exact signal termination needs a core helper.
+suplane nt=9 ntr=2 > a; { sultt inS11=a inS12=a inS21=a inS22=a ntraces=0; } 2>/dev/null
+# Modes outside 1..3 have no attributes assigned; nonpositive modes skip convolution.
+suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=0 && cat alpha
+suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=-1 && cat alpha
+suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=4 && cat alpha
+# stdout contains progress when Total is nonzero, so test it apart from SU output.
+[exact] suplane nt=11 ntr=4 > a && sultt inS11=a inS12=a inS21=a inS22=a Total=2
+[exact] suplane nt=11 ntr=4 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=0 Total=-3 && test "$(wc -c < alpha)" -eq 1136
+[stderr] suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=0 verbose=1 && cat alpha
+[stderr] suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=0 unexpected=2 && cat alpha
+# Parsed component output names are unused; the files must not be opened.
+suplane nt=11 ntr=3 > a && sultt inS11=a inS12=a inS21=a inS22=a mode=0 outS11=missing/11 outS12=missing/12 outS21=missing/21 outS22=missing/22 && cat alpha
+# Zero dt is accepted because open_vol checks the dt pointer.
+suplane nt=11 ntr=1 | sushw key=dt a=0 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=0 && cat alpha
+# End at the shortest input volume, preserving first-component headers.
+suplane nt=11 ntr=5 > a; suplane nt=11 ntr=2 > b; sultt inS11=a inS12=b inS21=a inS22=a mode=0 && cat alpha
+suplane nt=11 ntr=5 > a; suplane nt=11 ntr=2 > b; sultt inS11=a inS12=a inS21=b inS22=a mode=0 && cat alpha
+suplane nt=11 ntr=5 > a; suplane nt=11 ntr=2 > b; sultt inS11=a inS12=a inS21=a inS22=b mode=0 && cat alpha
+
+# Empty later components must report the trace reader's error at open time.
+[stderr] suplane nt=9 ntr=1 > a; touch empty; sultt inS11=a inS12=empty inS21=a inS22=a
+[stderr] suplane nt=9 ntr=1 > a; touch empty; sultt inS11=a inS12=a inS21=empty inS22=a
+[stderr] suplane nt=9 ntr=1 > a; touch empty; sultt inS11=a inS12=a inS21=a inS22=empty
+# Each file fixes its own first ns, and later changes fail while reading.
+[stderr] suplane nt=9 ntr=1 > a; suplane nt=7 ntr=1 > b; cat a b > c; sultt inS11=c inS12=c inS21=c inS22=c mode=0 && cat alpha
+# Weight allocation precedes the mode-specific calculations, even for mode 0.
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=0 wl=-1
+
+# Output validation happens after checkpars but before window allocation.
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=1 wl=-1 theta=missing/out verbose=1
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a wl=-1 alpha=missing/out
+# Mixing-panel allocation precedes checkpars and opening any output file.
+[stderr] suplane nt=9 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a ntraces=-1 alpha=missing/out verbose=1
+# Check progress timing when S22 ends before the other input volumes.
+[exact] suplane nt=9 ntr=3 > a; suplane nt=9 ntr=1 > b; sultt inS11=a inS12=a inS21=a inS22=b mode=0 Total=3
+# Even windows retain the final unsmoothed sample in every attribute mode.
+suplane nt=9 ntr=2 > a; sunull nt=9 ntr=2 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=1 ntraces=1 wl=2 && cat theta gamma
+suplane nt=9 ntr=2 > a; sunull nt=9 ntr=2 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 ntraces=1 wl=2 && cat alpha
+
+# Mode 2 with distinct components exercises both trace mixing and time smoothing.
+suplane nt=19 ntr=7 | suaddnoise seed=31 > a; suplane nt=19 ntr=7 | suaddnoise seed=32 > b; suplane nt=19 ntr=7 | suaddnoise seed=33 > c; suplane nt=19 ntr=7 | suaddnoise seed=34 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=4 wl=3 && cat alpha
+# Compare complete verbose diagnostics during a normal numerical mode.
+[stderr] suplane nt=13 ntr=3 > a; sunull nt=13 ntr=3 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 verbose=1 && cat alpha
+# Both asymmetry outputs inherit S11 headers and stop at the shorter S22 volume.
+suplane nt=13 ntr=4 | sushw key=cdp,offset,dt a=101,-500,0 b=7,50,0 > a; sunull nt=13 ntr=2 > b; sultt inS11=a inS12=a inS21=b inS22=b mode=1 ntraces=2 wl=3 && cat theta gamma
+# A later ns change in S22 must be diagnosed by that stream's trace reader.
+[stderr] suplane nt=9 ntr=3 > a; suplane nt=9 ntr=1 > b; suplane nt=7 ntr=1 >> b; sultt inS11=a inS12=a inS21=a inS22=b mode=0
+
+# Exercise the supplied convolution library with longer seeded panels.
+suplane nt=129 ntr=9 | suaddnoise seed=41 > a; suplane nt=129 ntr=9 | suaddnoise seed=42 > b; suplane nt=129 ntr=9 | suaddnoise seed=43 > c; suplane nt=129 ntr=9 | suaddnoise seed=44 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=5 wl=11 && cat theta gamma
+suplane nt=129 ntr=9 | suaddnoise seed=41 > a; suplane nt=129 ntr=9 | suaddnoise seed=42 > b; suplane nt=129 ntr=9 | suaddnoise seed=43 > c; suplane nt=129 ntr=9 | suaddnoise seed=44 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=3 wl=8 && cat alpha
+suplane nt=129 ntr=9 | suaddnoise seed=41 > a; suplane nt=129 ntr=9 | suaddnoise seed=42 > b; suplane nt=129 ntr=9 | suaddnoise seed=43 > c; suplane nt=129 ntr=9 | suaddnoise seed=44 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=11 wl=9 && cat alpha
+# Zero, singleton, even, odd, equal-length, and oversized filters in every mode.
+# Concatenate each attribute volume to observe every window's numerical result.
+suplane nt=7 ntr=3 | suaddnoise seed=51 > a; suplane nt=7 ntr=3 | suaddnoise seed=52 > b; suplane nt=7 ntr=3 | suaddnoise seed=53 > c; suplane nt=7 ntr=3 | suaddnoise seed=54 > d; for w in 0 1 2 6 7 8 11 12; do sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=2 wl=$w && cat theta gamma || exit; done
+suplane nt=7 ntr=3 | suaddnoise seed=51 > a; suplane nt=7 ntr=3 | suaddnoise seed=52 > b; suplane nt=7 ntr=3 | suaddnoise seed=53 > c; suplane nt=7 ntr=3 | suaddnoise seed=54 > d; for w in 0 1 2 6 7 8 11 12; do sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=2 wl=$w && cat alpha || exit; done
+suplane nt=7 ntr=3 | suaddnoise seed=51 > a; suplane nt=7 ntr=3 | suaddnoise seed=52 > b; suplane nt=7 ntr=3 | suaddnoise seed=53 > c; suplane nt=7 ntr=3 | suaddnoise seed=54 > d; for w in 0 1 2 6 7 8 11 12; do sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=2 wl=$w && cat alpha || exit; done
+# Nonzero singleton inputs distinguish empty extraction from a zero-valued trace.
+sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=-0.25 > b; sunull nt=1 ntr=1 | sugain bias=0.5 > c; sunull nt=1 ntr=1 | sugain bias=-1 > d; for w in 0 1 2 5; do sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=1 wl=$w && cat theta gamma || exit; done
+sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=-0.25 > b; sunull nt=1 ntr=1 | sugain bias=0.5 > c; sunull nt=1 ntr=1 | sugain bias=-1 > d; for w in 0 1 2 5; do sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=1 wl=$w && cat alpha || exit; done
+sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=-0.25 > b; sunull nt=1 ntr=1 | sugain bias=0.5 > c; sunull nt=1 ntr=1 | sugain bias=-1 > d; for w in 0 1 2 5; do sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=1 wl=$w && cat alpha || exit; done
+# Small but nonzero amplitudes take the asymmetry eigenvalue threshold branch.
+sunull nt=5 ntr=3 | sugain bias=0.000001 > a; sunull nt=5 ntr=3 | sugain bias=0.0000001 > b; sunull nt=5 ntr=3 > c; sultt inS11=a inS12=b inS21=c inS22=a mode=1 ntraces=1 wl=3 && cat theta gamma

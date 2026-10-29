@@ -1,0 +1,17 @@
+# Defaults and advisory messages, including the documented but unread dt parameter.
+[stderr] suspike nt=65 ntr=2 | suclogfft
+[stderr] suspike nt=31 ntr=1 | suclogfft verbose=1 dt=0.002
+[stderr] suspike nt=17 ntr=1 | sushw key=trid,dt a=130,0 | suclogfft verbose=1
+[stderr] suspike nt=17 ntr=1 | sushw key=trid,d1 a=130,0.002 | suclogfft verbose=1
+suspike nt=1 ntr=1 | suclogfft verbose=0 unwrap=0
+suspike nt=3 ntr=1 | suclogfft verbose=0 mode=suphase trend=0 zeromean=1 unwrap=-1
+sunull nt=27 ntr=1 | suclogfft verbose=0 mode=ouphase trend=0 zeromean=1
+suspike nt=75 ntr=3 | suclogfft verbose=0 mode=ouphase sign=-1 trend=1 zeromean=1
+suspike nt=43 ntr=1 | suclogfft verbose=0 mode=suphase unwrap=0 trend=0
+sunull nt=119 ntr=2 | suaddnoise seed=123 sn=1 | suclogfft verbose=0 mode=suphase unwrap=0.8 trend=1 zeromean=1
+sunull nt=119 ntr=2 | suaddnoise seed=123 sn=1 | suclogfft verbose=0 mode=ouphase trend=0
+[stderr] suclogfft verbose=0 mode=bad
+[stderr] suclogfft verbose=0
+[stderr] suspike nt=32 ntr=1 | suclogfft verbose=0 sign=0
+[stderr] suspike nt=32 ntr=1 | suclogfft verbose=0 sign=2
+[stderr] suspike nt=65535 ntr=1 | suclogfft verbose=0

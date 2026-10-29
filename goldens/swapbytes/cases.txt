@@ -1,0 +1,19 @@
+# All data types, non-symmetric values, partial final values and counts.
+[exact] printf '\001\002\003\004\005\006\007\010\011' | swapbytes outpar=count
+[exact] printf '\001\002\003\004\005\006\007\010\011' | swapbytes in=double outpar=count
+[exact] printf '\001\002\003\004\005' | swapbytes in=short outpar=count
+[exact] printf '\377\200\001\002\003' | swapbytes in=ushort outpar=count
+[exact] printf '\001\002\003\004\005\006\007\010\011' | swapbytes in=long outpar=count
+[exact] printf '\377\200\003\004\005\006\007\010\011' | swapbytes in=ulong outpar=count
+[exact] printf '\377\200\003\004\005\006\007\010\011' | swapbytes in=int outpar=count
+[exact] printf '\000\000\000\000\000\000\200\277' | swapbytes in=float outpar=count; cat count
+[stderr] swapbytes outpar=count
+[stderr] swapbytes in=bad outpar=count
+[stderr] swapbytes in= outpar=count
+[stderr] swapbytes in=int outpar=count verbose=1 unknown=3
+[stderr] swapbytes in=int
+[stderr] swapbytes outpar=/nonexistent/oxwave/count
+[exact] suspike nt=1 ntr=1 | sustrip outpar=stripcount | swapbytes outpar=count
+[stderr] swapbytes in=short outpar=/dev/stderr
+[exact] printf '\001\002\003\004\005\006\007\010' | swapbytes in=long outpar=count; cat count
+[exact] printf '\001\002\003\004\005' | swapbytes in=short outpar=count; cat count

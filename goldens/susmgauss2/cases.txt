@@ -1,0 +1,11 @@
+# Defaults and each smoothing direction, including negative parameters.
+suplane nt=64 ntr=8 | susmgauss2
+suplane nt=73 ntr=7 | susmgauss2 a1=2.5 a2=0
+suplane nt=31 ntr=5 | susmgauss2 a1=-1.5 a2=-2
+suplane nt=37 ntr=9 | sushw key=trid a=130 | susmgauss2 a1=1 a2=2
+suplane nt=1 ntr=1 | susmgauss2 a1=1 a2=1
+suplane nt=11 ntr=1 | susmgauss2 a1=3
+sunull nt=13 ntr=3 | susmgauss2 a1=0 a2=0
+[stderr] suplane nt=17 ntr=3 | susmgauss2 verbose=1 a1=1
+susmgauss2 a1=1 </dev/null
+susmgauss2 a1=1e999 </dev/null

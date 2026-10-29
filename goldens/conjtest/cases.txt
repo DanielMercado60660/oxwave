@@ -1,0 +1,17 @@
+# Fixed 5x4 system, ten iterations, one ASCII output mode. No parameters,
+# input reads, selfdoc, verbose mode, or program-defined error exits exist.
+# Check exact text (including trailing spaces) and the absence of stderr.
+[exact] [stderr] conjtest
+# Argument parsing is absent: help, unknown names, verbose and output ignored.
+[exact] [stderr] conjtest --help
+[exact] [stderr] conjtest verbose=1 output=binary unknown=abc
+# Sizes/iterations are fixed even for zero, negative, odd, empty or invalid args.
+[exact] [stderr] conjtest m=0 n=-1 niter=0
+[exact] [stderr] conjtest m=1 n=3 niter=-1
+[exact] [stderr] conjtest m= n=abc niter=9999999999999999999999
+# Parameter files are not opened, including nonexistent files.
+[exact] [stderr] conjtest par=missing.par
+# Ignore arbitrary text and small SU streams, including singleton/odd samples.
+[exact] [stderr] printf 'not seismic data\n' | conjtest
+[exact] [stderr] sunull nt=1 ntr=1 | conjtest
+[exact] [stderr] sunull nt=7 ntr=3 | conjtest

@@ -1,0 +1,61 @@
+# Required parameters, numeric conversion errors, and exact stderr.
+[stderr] smooth2
+[stderr] smooth2 n2=3
+[stderr] smooth2 n1=5
+[stderr] smooth2 n1= n2=3
+[stderr] smooth2 n1=2147483648 n2=3
+[stderr] smooth2 n1=5 n2=3 r1=1e-310
+[stderr] smooth2 n1=5 n2=3 r2=1e-310
+[stderr] smooth2 n1=5 n2=3 rw=1e-310
+
+# Default and explicit no-smoothing parameters on an odd grid.
+[f32] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5
+[f32] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=0 r2=0 rw=0 win=0,7,0,5 efile=
+[f32] suplane nt=7 ntr=5 | suaddnoise seed=17 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=4
+[f32] suplane nt=7 ntr=5 | suaddnoise seed=17 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r2=3
+[f32] suplane nt=7 ntr=5 | suaddnoise seed=17 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=2.5 r2=6.75
+[f32] suplane nt=7 ntr=5 | suaddnoise seed=17 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=-2.5 r2=-6.75
+
+# Sharp, blurred, full, empty, reversed, and one-cell windows.
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=23 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 win=2,8,1,6
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=23 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 win=2,8,1,6 rw=2
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=23 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 win=2,8,1,6 rw=-2
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=23 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 win=0,9,0,7 rw=12
+[f32] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=4 r2=3 win=0,0,0,0 rw=0
+[f32] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=4 r2=3 win=4,2,4,1 rw=1.25
+[f32] suplane nt=7 ntr=5 | sustrip outpar=/dev/null | smooth2 n1=7 n2=5 r1=4 r2=3 win=3,4,2,3 rw=0.75
+
+# Error-file output: smoothed data, cumulative error, and all-zero RMS branch.
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=31 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 efile=errors.bin && cat errors.bin
+[f32] suplane nt=9 ntr=7 | suaddnoise seed=31 | sustrip outpar=/dev/null | smooth2 n1=9 n2=7 r1=5 r2=3 win=1,8,2,6 rw=2 efile=errors.bin > smoothed.bin && cat errors.bin
+[f32] sunull nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 r1=4 r2=3 efile=errors.bin > smoothed.bin && cat errors.bin
+[f32] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 efile=errors.bin > smoothed.bin && cat errors.bin
+[f32] [stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 efile=missing/directory/error.bin
+
+# Diagnostics occur after output and efile lookup, matching checkpars order.
+[f32] [stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 r1=2 verbose=1
+[f32] [stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 surprise=4
+[f32] [stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 r1=0 r1=2 verbose=0
+
+# Tiny dimensions retain the original boundary behavior.
+[f32] printf '1 2 3 4 5 6 7\n' | a2b n1=7 | smooth2 n1=7 n2=1 r1=2 r2=3
+[f32] printf '1 2 3 4 5 6 7\n' | a2b n1=7 | smooth2 n1=7 n2=1 r1=2 r2=3 win=1,6,0,1 rw=1
+[f32] printf '1 2 3\n' | a2b n1=3 | smooth2 n1=1 n2=3 r1=2 r2=3
+[f32] printf '1 2 3\n' | a2b n1=3 | smooth2 n1=1 n2=3 r1=2 r2=3 win=0,1,1,2 rw=2
+[f32] printf '1\n' | a2b n1=1 | smooth2 n1=1 n2=1
+[f32] printf '1\n' | a2b n1=1 | smooth2 n1=1 n2=1 r1=2 r2=3
+[f32] printf '1 2 3 4 5 6\n' | a2b n1=6 | smooth2 n1=2 n2=3 r1=2 r2=3
+
+# Empty/truncated raw input is unchecked by the original fread.
+[f32] smooth2 n1=5 n2=3 r1=2 r2=3
+[f32] printf '1 2 3\n' | a2b n1=3 | smooth2 n1=5 n2=3 r1=2 r2=3
+[exact] smooth2 n1=0 n2=3
+[exact] smooth2 n1=0 n2=0
+# Invalid dimensions cause SIGSEGV in the C allocation/access sequence.
+[exact] smooth2 n1=3 n2=0
+[exact] smooth2 n1=-1 n2=3
+[exact] smooth2 n1=3 n2=-1
+
+# Parameter-file precedence and empty/nonnumeric optional numeric values.
+[f32] printf 'n1=7 n2=3 r1=2 r2=3 win=1,6,0,3 rw=1\n' > params; suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 par=params r1=4
+[f32] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | smooth2 n1=7 n2=3 r1= r2=abc rw= win=

@@ -1,0 +1,382 @@
+{
+  "scope": "su/main/headers part 1 of 2",
+  "programs": [
+    {
+      "name": "bhedtopar",
+      "path": "su/main/headers/bhedtopar.c",
+      "purpose": "Convert a binary SEG-Y tape header into an ASCII parameter file.",
+      "selfdoc_first_line": " BHEDTOPAR - convert a Binary tape HEaDer file to PAR file format\t",
+      "params": [
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter-file path."
+        },
+        {
+          "name": "swap",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Swap the bytes of each binary-header value."
+        }
+      ],
+      "stdin": "other",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparint", "checkpars", "efopen", "efread", "xdrbhdrsub", "swapbhval", "getbhval", "efclose", "CWP_Exit", "err"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Binary-header representation and byte order depend on the SUXDR build and swap option.",
+      "c_lines": 171,
+      "difficulty": "easy",
+      "difficulty_reason": "The program reads one binary header and prints its fields.",
+      "test_cases": [
+        {
+          "description": "Convert a generated binary header.",
+          "command": "suplane nt=32 ntr=4 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=header.par < binary"
+        },
+        {
+          "description": "Exercise byte swapping.",
+          "command": "suplane nt=32 ntr=4 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar swap=1 outpar=swapped.par < binary"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "su3dchart",
+      "path": "su/main/headers/su3dchart.c",
+      "purpose": "Write source-receiver midpoint coordinate pairs as binary floats.",
+      "selfdoc_first_line": " SU3DCHART - plot x-midpoints vs. y-midpoints for 3-D data\t",
+      "params": [
+        {
+          "name": "degree",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Convert coordinates in seconds of arc to degrees when counit is 2."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Optional file receiving the number of coordinate pairs."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "binary_floats",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "efwrite", "getparstring", "efopen", "checkpars", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Coordinates and scaling are calculated in double precision and converted to float for output.",
+      "c_lines": 103,
+      "difficulty": "easy",
+      "difficulty_reason": "Each output pair is calculated independently from one trace header.",
+      "test_cases": [
+        {
+          "description": "Write midpoint pairs and a count file.",
+          "command": "suplane nt=32 ntr=4 | sushw key=sx,gx,sy,gy a=100,200,300,400 | su3dchart outpar=count.par > midpoints.bin"
+        },
+        {
+          "description": "Convert scaled angular coordinates to degrees.",
+          "command": "suplane nt=32 ntr=4 | sushw key=sx,gx,sy,gy,scalco,counit a=3600,7200,10800,14400,-10,2 | su3dchart degree=1 > degrees.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suabshw",
+      "path": "su/main/headers/suabshw.c",
+      "purpose": "Replace a selected trace-header value with its absolute value.",
+      "selfdoc_first_line": " SUABSHW - replace header key word by its absolute value\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "offset",
+          "required": false,
+          "description": "Header word to modify."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "checkpars", "hdtype", "getindex", "gettr", "gethval", "puthval", "puttr", "CWP_Exit", "err"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Negating the minimum signed integer can overflow; unsigned values are left unchanged.",
+      "c_lines": 85,
+      "difficulty": "easy",
+      "difficulty_reason": "The program changes one header value independently for each trace.",
+      "test_cases": [
+        {
+          "description": "Take absolute offsets.",
+          "command": "suplane nt=32 ntr=4 | sushw key=offset a=-100 b=50 | suabshw key=offset"
+        },
+        {
+          "description": "Take absolute values of another signed header.",
+          "command": "suplane nt=32 ntr=4 | sushw key=sx a=-200 b=50 | suabshw key=sx"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suaddhead",
+      "path": "su/main/headers/suaddhead.c",
+      "purpose": "Attach SU trace headers to bare floating-point sample arrays.",
+      "selfdoc_first_line": " SUADDHEAD - put headers on bare traces and set the tracl and ns fields",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Samples per trace; takes precedence over nt and ns. One of these three aliases is required."
+        },
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Samples per trace; an alternative to n1 and ns. One of these three aliases is required."
+        },
+        {
+          "name": "ns",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Samples per trace; an alternative to n1 and nt. One of these three aliases is required."
+        },
+        {
+          "name": "ftn",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to skip Fortran record markers."
+        },
+        {
+          "name": "ntrpr",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Traces per record for the optional line header."
+        },
+        {
+          "name": "tsort",
+          "type": "int",
+          "default": "3",
+          "required": false,
+          "description": "Sorting code for the optional line header."
+        },
+        {
+          "name": "head",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Input header file, available only when compiled with SU_LINE_HEADER."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "efopen", "checkpars", "fgethdr", "efread", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Input floats use the native binary representation; Fortran record markers are skipped without validating their values.",
+      "c_lines": 156,
+      "difficulty": "easy",
+      "difficulty_reason": "The program adds headers to fixed-length arrays of samples.",
+      "test_cases": [
+        {
+          "description": "Strip and regenerate trace headers.",
+          "command": "suplane nt=32 ntr=4 | sustrip > bare.bin && suaddhead ns=32 ftn=0 < bare.bin"
+        },
+        {
+          "description": "Use the nt alias and non-default line-header settings.",
+          "command": "suplane nt=64 ntr=3 | sustrip > bare.bin && suaddhead nt=64 tsort=2 ntrpr=3 < bare.bin"
+        }
+      ],
+      "license_note": "Credits include SEP and UNOCAL contributions.",
+      "related_programs": []
+    },
+    {
+      "name": "suahw",
+      "path": "su/main/headers/suahw.c",
+      "purpose": "Assign a header value from a table indexed by another header value.",
+      "selfdoc_first_line": " SUAHW - Assign Header Word using another header word\t\t\t",
+      "params": [
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "extrapolate",
+          "required": false,
+          "description": "Behavior for values absent from the table: extrapolate, interpolate, zero, preserve, or transfer."
+        },
+        {
+          "name": "key1",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Output header word."
+        },
+        {
+          "name": "key2",
+          "type": "string",
+          "default": "fldr",
+          "required": false,
+          "description": "Input header word."
+        },
+        {
+          "name": "key3",
+          "type": "string",
+          "default": "tracf",
+          "required": false,
+          "description": "Header word used with the optional c filter."
+        },
+        {
+          "name": "a",
+          "type": "double array",
+          "default": "",
+          "required": true,
+          "description": "Output table values."
+        },
+        {
+          "name": "b",
+          "type": "double array",
+          "default": "",
+          "required": true,
+          "description": "Strictly ascending input table values; must have the same length as a."
+        },
+        {
+          "name": "c",
+          "type": "double array",
+          "default": "",
+          "required": false,
+          "description": "Optional values or range used to filter modifications by key3."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "countparval", "ealloc1double", "getpardouble", "err", "checkpars", "hdtype", "getindex", "gettr", "gethval", "vtod", "puthval", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation uses double arithmetic before conversion to the destination header type.",
+      "c_lines": 293,
+      "difficulty": "medium",
+      "difficulty_reason": "It supports several table lookup and interpolation modes with an additional header filter.",
+      "test_cases": [
+        {
+          "description": "Interpolate a header from a two-point table.",
+          "command": "suplane nt=32 ntr=4 | sushw key=fldr a=1 b=1 | suahw key1=ep key2=fldr a=10,40 b=1,4 mode=interpolate"
+        },
+        {
+          "description": "Set unmatched values to zero while filtering on a third header.",
+          "command": "suplane nt=32 ntr=4 | sushw key=fldr,tracf a=1,1 b=1,1 | suahw key1=ep key2=fldr key3=tracf a=10,30 b=1,3 c=2 mode=zero"
+        }
+      ],
+      "license_note": "Credits say the program was cloned from suchw by Einar Kjartansson, SEP.",
+      "related_programs": ["suchw"]
+    },
+    {
+      "name": "suazimuth",
+      "path": "su/main/headers/suazimuth.c",
+      "purpose": "Calculate azimuth and optionally offset and midpoint coordinates from trace headers.",
+      "selfdoc_first_line": " SUAZIMUTH - compute trace AZIMUTH, offset, and midpoint coordinates    ",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "otrav",
+          "required": false,
+          "description": "Output header for azimuth."
+        },
+        {
+          "name": "offkey",
+          "type": "string",
+          "default": "offset",
+          "required": false,
+          "description": "Output header for offset."
+        },
+        {
+          "name": "mxkey",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Output header for midpoint x."
+        },
+        {
+          "name": "mykey",
+          "type": "string",
+          "default": "cdp",
+          "required": false,
+          "description": "Output header for midpoint y."
+        },
+        {
+          "name": "scale",
+          "type": "double",
+          "default": "1.0",
+          "required": false,
+          "description": "Azimuth output scale."
+        },
+        {
+          "name": "az",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Azimuth direction convention."
+        },
+        {
+          "name": "sector",
+          "type": "double",
+          "default": "1.0",
+          "required": false,
+          "description": "Angular sector width."
+        },
+        {
+          "name": "offset",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Enable offset calculation."
+        },
+        {
+          "name": "signedflag",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Enable signed offsets."
+        },
+        {
+          "name": "cmp",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Enable midpoint header output."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getpardouble", "getparint", "checkpars", "hdtype", "getindex", "gettr", "puthval", "puttr", "CWP_Exit", "err"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Double-precision coordinate calculations use transcendental functions and square root before conversion to header types; signed-offset selection casts coordinate differences to float.",
+      "c_lines": 370,
+      "difficulty": "easy",
+      "difficulty_reason": "The program computes independent coordinate-derived header values for each trace.",
+      "test_cases": [
+        {
+          "description": "Calculate azimuth, signed offset, and midpoint.",
+          "command": "suplane nt=32 ntr=4 | sushw key=sx,sy,gx,gy a=100,200,300,500 | suazimuth az=1 offset=1 signedflag=1 cmp=1"
+        },
+        {
+          "description": "Calculate reverse-direction azimuth sectors in another header.",
+          "command": "suplane nt=32 ntr=4 | sushw key=sx,sy,gx,gy a=100,200,300,500 | suazimuth az=-1 sector=10 key=ep scale=2"
+        }
+      ],
+      "license_note": "Credits state that the program is based on suchw and su3dchart and include UTulsa and RISSC contributions.",
+      "related_programs": ["suchw", "su3dchart"]
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "scope": "comp/dct/lib part 1",
+  "functions": [
+    {
+      "name": "buffAlloc1",
+      "file": "comp/dct/lib/buffalloc.c",
+      "signature": "memBUFF *buffAlloc1(int n);",
+      "purpose": "Allocate a one-dimensional buffer and initialize its bound and position.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; allocation failures are not checked.",
+      "c_lines": 13,
+      "difficulty": "easy",
+      "group": "alloc",
+      "license_note": ""
+    },
+    {
+      "name": "buffRealloc1",
+      "file": "comp/dct/lib/buffalloc.c",
+      "signature": "void buffRealloc1(memBUFF *buff, int n);",
+      "purpose": "Resize a buffer and clamp its position to the new bound.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; realloc failure is not checked.",
+      "c_lines": 10,
+      "difficulty": "easy",
+      "group": "alloc",
+      "license_note": ""
+    },
+    {
+      "name": "buffFree1",
+      "file": "comp/dct/lib/buffalloc.c",
+      "signature": "void buffFree1(memBUFF *buff);",
+      "purpose": "Free a buffer's data and its descriptor.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic.",
+      "c_lines": 4,
+      "difficulty": "easy",
+      "group": "alloc",
+      "license_note": ""
+    },
+    {
+      "name": "buffAlloc2",
+      "file": "comp/dct/lib/buffalloc.c",
+      "signature": "memBUFF **buffAlloc2(int n1, int n2);",
+      "purpose": "Allocate an array of n1 separately allocated buffers, each of size n2.",
+      "calls": [
+        "buffAlloc1"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; allocation failures are not checked.",
+      "c_lines": 12,
+      "difficulty": "easy",
+      "group": "alloc",
+      "license_note": ""
+    },
+    {
+      "name": "buffFree2",
+      "file": "comp/dct/lib/buffalloc.c",
+      "signature": "void buffFree2(memBUFF **buff, int n1);",
+      "purpose": "Free each buffer in an array and then free the array.",
+      "calls": [
+        "buffFree1"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic.",
+      "c_lines": 8,
+      "difficulty": "easy",
+      "group": "alloc",
+      "license_note": ""
+    },
+    {
+      "name": "dctiv",
+      "file": "comp/dct/lib/dct1.c",
+      "signature": "void dctiv(float *x, int n, float **c);",
+      "purpose": "Apply an in-place one-dimensional type-IV DCT using a precomputed transform matrix.",
+      "calls": [
+        "alloc1float",
+        "free1float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Each output is accumulated in float in increasing input-index order; preserve multiplication and addition order and avoid unintended fused operations.",
+      "c_lines": 19,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "dct",
+      "file": "comp/dct/lib/dct1.c",
+      "signature": "void dct(float *x, int n, float **c, int type);",
+      "purpose": "Apply an in-place forward or inverse one-dimensional DCT using a precomputed transform matrix.",
+      "calls": [
+        "alloc1float",
+        "free1float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float products are accumulated in increasing input-index order; the inverse uses the transposed matrix, and any nonzero type selects it.",
+      "c_lines": 31,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "dctiv_2",
+      "file": "comp/dct/lib/dct2.c",
+      "signature": "void dctiv_2(float **x, int n1, int n2, float **c1, float **c2);",
+      "purpose": "Apply an in-place two-dimensional type-IV DCT along the fast dimension and then the slow dimension.",
+      "calls": [
+        "dctiv",
+        "dctiv_row"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The static dctiv_row helper accumulates float products in increasing slow-dimension input-index order; preserve dimension order and accumulation order.",
+      "c_lines": 10,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "dct_2",
+      "file": "comp/dct/lib/dct2.c",
+      "signature": "void dct_2(float **x, int n1, int n2, float **c1, float **c2, int type);",
+      "purpose": "Apply an in-place forward or inverse two-dimensional DCT along the fast dimension and then the slow dimension.",
+      "calls": [
+        "dct",
+        "dct_row"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The static dct_row helper accumulates float products in increasing slow-dimension input-index order; preserve dimension order, matrix orientation, and accumulation order.",
+      "c_lines": 10,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "dctivAlloc",
+      "file": "comp/dct/lib/dctalloc.c",
+      "signature": "float **dctivAlloc(int n);",
+      "purpose": "Allocate and generate the transform matrix for a type-IV DCT.",
+      "calls": [
+        "alloc2float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses double sqrt and cos with double literals, but stores scaling factors and matrix entries as float; preserve intermediate conversions and expression order. Transcendental results may vary by math library.",
+      "c_lines": 17,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "dctAlloc",
+      "file": "comp/dct/lib/dctalloc.c",
+      "signature": "float **dctAlloc(int n);",
+      "purpose": "Allocate and generate the transform matrix for the forward and inverse DCT.",
+      "calls": [
+        "alloc2float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses double sqrt and cos with double literals, but stores scaling factors and matrix entries as float; preserve intermediate conversions and expression order. Transcendental results may vary by math library; n must be positive because row zero is written unconditionally.",
+      "c_lines": 19,
+      "difficulty": "medium",
+      "group": "dct",
+      "license_note": ""
+    },
+    {
+      "name": "waveGetfilter",
+      "file": "comp/dct/lib/getfilter.c",
+      "signature": "waveFilter *waveGetfilter(int id);",
+      "purpose": "Allocate a wavelet filter and populate its low-pass and reversed alternating-sign high-pass coefficients from the selected table.",
+      "calls": [
+        "alloc1float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Decimal table constants are converted to float; preserve their float values and the exact reversal and sign changes. IDs at or above NWAVETYPE return NULL, while negative IDs are not checked and cause undefined indexing.",
+      "c_lines": 25,
+      "difficulty": "easy",
+      "group": "wavelet-filter",
+      "license_note": ""
+    },
+    {
+      "name": "waveFreefilter",
+      "file": "comp/dct/lib/getfilter.c",
+      "signature": "void waveFreefilter(waveFilter *filter);",
+      "purpose": "Free both coefficient arrays and the wavelet filter descriptor.",
+      "calls": [
+        "free1float"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic.",
+      "c_lines": 5,
+      "difficulty": "easy",
+      "group": "wavelet-filter",
+      "license_note": ""
+    }
+  ]
+}

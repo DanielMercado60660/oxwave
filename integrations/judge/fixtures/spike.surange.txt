@@ -1,0 +1,8 @@
+6 traces:
+tracl    1 6 (1 - 6)
+offset   400
+gelev    -35 0 (-35 - 0)
+scalco   -10
+ns       100
+dt       2000
+f1       0.100000

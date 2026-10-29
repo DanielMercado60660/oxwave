@@ -1,0 +1,59 @@
+# Defaults, short traces, odd sample counts and multiple traces
+suspike nt=1 ntr=1 | suicepstrum
+suspike nt=5 ntr=3 | suicepstrum
+suspike nt=17 ntr=1 | suicepstrum
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum
+suspike nt=17 ntr=1 | suaddnoise seed=42 sn=2 | suicepstrum sym=1
+suspike nt=6 ntr=1 | suaddnoise seed=42 sn=2 | suicepstrum
+sunull nt=6 ntr=1 | suicepstrum
+# Parameters and diagnostics
+[stderr] suspike nt=6 ntr=1 | suicepstrum verbose=1 dt=0.002 sym=1 sign1=-1 sign2=1
+suspike nt=6 ntr=1 | suicepstrum dt=0 sym=-1 sign1=1 sign2=-1
+[stderr] sunull nt=6 ntr=1 | sushw key=dt,d1 a=0,0 | suicepstrum verbose=1
+suspike nt=6 ntr=1 | sushw key=dt,d1 a=0,0.002 | suicepstrum
+# Errors and unknown arguments
+[stderr] suicepstrum
+[stderr] suspike nt=6 ntr=1 | suicepstrum sign1=0
+[stderr] suspike nt=6 ntr=1 | suicepstrum sign2=2
+[stderr] suspike nt=6 ntr=1 | suicepstrum extra=1
+[stderr] suspike nt=65535 ntr=1 | suicepstrum
+# Explicit defaults, all sign pairs, and noisy inputs with even inverse lengths
+[stderr] suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | suicepstrum sym=0 sign1=1 sign2=-1 verbose=0
+suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | suicepstrum sign1=1 sign2=1
+suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | suicepstrum sign1=-1 sign2=-1
+suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | suicepstrum sign1=-1 sign2=1 sym=1
+# Small non-power-of-two input with multiple traces.
+suspike nt=3 ntr=2 | suaddnoise seed=91 sn=2 | suicepstrum
+# Regression: C calls pfacr with an odd length; do not relax tolerances.
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=1 sign1=-1 sign2=1
+# Negative time sampling, nonzero delay, and first-trace header fallbacks
+[stderr] suspike nt=17 ntr=2 | sushw key=delrt a=31 | suicepstrum dt=-0.002 sym=1 verbose=1
+[stderr] suspike nt=17 ntr=1 | sushw key=dt,d1 a=0,0.003 | suicepstrum dt=0 verbose=1
+suspike nt=2 ntr=1 | suicepstrum
+# Numeric parsing failures and negative invalid FFT signs
+[stderr] suspike nt=6 ntr=1 | suicepstrum sign1=-2 verbose=1
+[stderr] suspike nt=6 ntr=1 | suicepstrum sign2=0
+[stderr] suspike nt=6 ntr=1 | suicepstrum sign1=2147483648
+[stderr] suspike nt=6 ntr=1 | suicepstrum dt=1e-310
+# Centering wraps the signed 16-bit delay header after conversion to int.
+suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | sushw key=delrt a=32767 b=-1 | suicepstrum sym=1
+suspike nt=17 ntr=2 | suaddnoise seed=91 sn=2 | sushw key=delrt a=-32768 b=1 | suicepstrum sym=1 dt=-0.004
+suspike nt=17 ntr=1 | sushw key=delrt a=32767 | suicepstrum sym=1 dt=4
+suspike nt=17 ntr=1 | sushw key=delrt a=-32768 | suicepstrum sym=1 dt=-4
+# Empty numeric values use the C defaults; last occurrence wins.
+[stderr] suspike nt=17 ntr=1 | suicepstrum sym= sign1= sign2= verbose= dt=
+suspike nt=17 ntr=1 | suicepstrum sign1=0 sign1=-1 sign2=0 sign2=1 sym=0 sym=1
+# Diagnostics and validation retain C statement order.
+[stderr] suspike nt=17 ntr=1 | sushw key=dt,d1 a=0,0 | suicepstrum sign1=0 sign2=0 extra=1 verbose=1
+# Complete all sign pairs in both modes with odd inverse length 85.
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=0 sign1=1 sign2=1
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=0 sign1=-1 sign2=-1
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=0 sign1=-1 sign2=1
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=1 sign1=1 sign2=-1
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=1 sign1=1 sign2=1
+suspike nt=128 ntr=2 | suaddnoise seed=123 sn=2 | suicepstrum sym=1 sign1=-1 sign2=-1
+# Short odd inverse lengths 5 and 9, including C's retained final float slot.
+suspike nt=7 ntr=3 | suaddnoise seed=17 sn=2 | suicepstrum
+suspike nt=7 ntr=3 | suaddnoise seed=17 sn=2 | suicepstrum sym=1 sign1=-1 sign2=1
+suspike nt=9 ntr=2 | suaddnoise seed=29 sn=2 | suicepstrum
+suspike nt=9 ntr=2 | suaddnoise seed=29 sn=2 | suicepstrum sym=1 sign1=-1 sign2=1

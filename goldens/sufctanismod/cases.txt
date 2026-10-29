@@ -1,0 +1,97 @@
+# Defaults, no input, and the documented modes. Output grids are native floats.
+[f32] sufctanismod
+[f32] sufctanismod nx=7 nz=9 nt=1
+[f32] sufctanismod nx=7 nz=9 nt=0
+[f32] sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=1
+[f32] sufctanismod nx=13 nz=15 nt=31 source=1 indexux=1 wavelet=2
+[f32] sufctanismod nx=13 nz=15 nt=31 source=1 indexux=1 wavelet=3
+[f32] sufctanismod nx=13 nz=15 nt=31 source=1 indexux=1 wavelet=4
+[f32] sufctanismod nx=7 nz=9 nt=1 source=1 indexux=1 wavelet=3
+[f32] sufctanismod nx=9 nz=11 nt=12 source=1 indexux=1 wavelet=0
+[f32] sufctanismod nx=9 nz=11 nt=12 source=0 indexux=1 wavelet=4
+[f32] sufctanismod nx=15 nz=17 nt=17 source=2 indexux=1 indexuy=1 indexuz=1 wavelet=3
+[f32] sufctanismod nx=15 nz=17 nt=17 source=3 indexux=1 indexuy=1 indexuz=1 wavelet=3
+[f32] sufctanismod nx=11 nz=13 nt=9 source=-1 sx=-1 sz=-1 wavelet=4 indexux=1
+
+# Fourth order is parsed but the C program always calls the second order solver.
+[f32] sufctanismod nx=15 nz=17 nt=23 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 order=4 dofct=1
+[f32] sufctanismod nx=15 nz=17 nt=23 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 order=0 dofct=1 eta0=0.015 eta=0.02 deta0dx=0.01 deta0dz=-0.02 detadx=-0.01 detadz=0.02 fctxbeg=3 fctzbeg=4 fctxend=8 fctzend=9
+[f32] sufctanismod nx=9 nz=13 nt=23 source=1 indexux=1 wavelet=3 dofct=1 eta0=0 eta=0
+[f32] sufctanismod nx=11 nz=13 nt=13 source=1 indexux=1 wavelet=4 isurf=1
+[f32] sufctanismod nx=11 nz=13 nt=13 source=1 indexux=1 wavelet=4 isurf=2
+[f32] sufctanismod nx=11 nz=13 nt=13 source=1 indexux=1 wavelet=4 isurf=3
+[f32] sufctanismod nx=11 nz=13 nt=13 source=1 indexux=1 wavelet=4 isurf=0
+[f32] sufctanismod nx=51 nz=101 nt=23 source=1 indexux=1 wavelet=3 movebc=1 impulse=1
+[f32] sufctanismod nx=51 nz=101 nt=23 source=2 indexux=1 indexuz=1 wavelet=3 movebc=1 impulse=0
+[f32] sufctanismod nx=51 nz=101 nt=23 source=1 indexux=1 wavelet=3 movebc=1 impulse=1 dofct=1
+
+# Spatial/time steps, all material values and gradients, source/receiver positions.
+[f32] sufctanismod nx=13 nz=17 nt=21 sx=3 sz=5 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 dx=0.03 dz=0.025 dt=0.001 fpeak=30 rho00=1.7 aa00=3 cc00=4 ff00=2.5 ll00=1 nn00=1.5 daadx=0.1 daadz=0.2 dccdx=0.3 dccdz=0.4 dffdx=-0.2 dffdz=0.1 dlldx=-0.1 dlldz=0.3 dnndx=0.2 dnndz=-0.1 drhodx=0.02 drhodz=-0.01
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 dx=0.04 dz=0.02 dt=0
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 dt=-0.001 eta=-0.01 eta0=-0.02 dofct=1
+
+# Exact diagnostic formatting, snapshot cadence (including zero/negative mt).
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 verbose=1 mt=2
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 verbose=2 mt=3 unknown=ignored
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 mt=0 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 mt=-2 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sufctanismod nx=13 nz=15 nt=17 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=3 mt=3 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+
+# Each receiver component, raw and SU output; consume all side files.
+[f32] sufctanismod nx=13 nz=15 nt=17 sx=4 sz=6 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=3 receiverdepth=7 vspnx=5 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final; cat rx ry rz vx vy vz final
+sufctanismod nx=13 nz=15 nt=17 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=3 reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final; cat rx ry rz vx vy vz
+# Header fields explicitly set by su_output (the C leaves other header bytes uninitialized).
+[ws] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 reflxfile=rx > final; sugethw key=trid,sx,sdepth,ns,dt,d2,offset,tracl,tracr < rx
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 suhead=2 reflxfile=rx vspxfile=vx receiverdepth=2 vspnx=0 > final; cat rx vx final
+[f32] sufctanismod nx=9 nz=11 nt=5 source=1 indexux=1 wavelet=4 suhead=0 vspxfile=vx vspnx=-1 > final; cat vx final
+
+# All file-backed material and source parameters, native-float inputs.
+[f32] sunull nt=11 ntr=9 | sugain bias=2 | sustrip outpar=/dev/null > grid; sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 sfile=grid dfile=grid afile=grid cfile=grid ffile=grid lfile=grid nfile=grid
+[f32] sunull nt=11 ntr=9 | sugain bias=1 | sustrip outpar=/dev/null > grid; sufctanismod nx=9 nz=11 nt=7 indexux=1 wavelet=4 dfile=grid
+
+# Errors: bounds checks, every missing input file, output-file failures, getpar overflow.
+[stderr] sufctanismod nx=9 nz=11 nt=1 sx=10
+[stderr] sufctanismod nx=9 nz=11 nt=1 sz=12
+[stderr] sufctanismod nx=9 nz=11 nt=1 dfile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 afile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 cfile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 ffile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 lfile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 nfile=missing
+[stderr] sufctanismod nx=9 nz=11 nt=1 sfile=missing
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 reflxfile=missing/file
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 reflyfile=missing/file
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 reflzfile=missing/file
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 vspxfile=missing/file
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 vspyfile=missing/file
+[f32] [stderr] sufctanismod nx=9 nz=11 nt=1 vspzfile=missing/file
+[stderr] sufctanismod nx=999999999999999999999
+[stderr] sufctanismod dt=1e-310
+
+# Regression: C converts dt through int, then stores the low 16 header bits.
+[ws] for step in 0.032767 0.032768 0.04 0.065535 0.065536 0.08 -0.04; do sufctanismod nx=7 nz=9 nt=1 dt=$step reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final || exit; cat rx ry rz vx vy vz | sugethw key=dt; done
+
+# Source coordinates may cross a row inside C's contiguous grid allocation.
+[f32] sufctanismod nx=9 nz=11 nt=5 sx=3 sz=11 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4
+[f32] sufctanismod nx=9 nz=11 nt=5 sx=3 sz=-1 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4
+[f32] sufctanismod nx=9 nz=11 nt=5 sx=9 sz=11 source=0
+[f32] sufctanismod nx=101 nz=7 nt=5 source=2 indexux=1 indexuy=1 indexuz=1 wavelet=4
+[f32] sufctanismod nx=101 nz=7 nt=5 source=3 indexux=1 indexuy=1 indexuz=1 wavelet=4
+
+# Unused receiver coordinates are accepted: no samples are read at nt=0,
+# and receiverdepth is ignored when only VSP seismograms are requested.
+[f32] sufctanismod nx=9 nz=11 nt=0 receiverdepth=11 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz > final; cat rx ry rz final
+[f32] sufctanismod nx=9 nz=11 nt=5 receiverdepth=11 suhead=0 vspxfile=vx > final; cat vx final
+
+# Failed snapshot opens are harmless when no time steps write the streams.
+[f32] [stderr] mkdir snapshotx.data; sufctanismod nx=7 nz=9 nt=0
+[f32] [stderr] mkdir snapshoty.data; sufctanismod nx=7 nz=9 nt=0
+[f32] [stderr] mkdir snapshotz.data; sufctanismod nx=7 nz=9 nt=0
+
+# All failed opens remain unused, including with verbose diagnostics enabled.
+[f32] [stderr] mkdir snapshotx.data snapshoty.data snapshotz.data; sufctanismod nx=7 nz=9 nt=0 verbose=2
+# An unchecked open failure must not prevent later opens from truncating files.
+# Assert the directory survives and both other snapshot files exist and are empty.
+[f32] [stderr] mkdir snapshotx.data; printf stale > snapshoty.data; printf stale > snapshotz.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshotx.data && test -f snapshoty.data && test ! -s snapshoty.data && test -f snapshotz.data && test ! -s snapshotz.data && cat final
+[f32] [stderr] mkdir snapshoty.data; printf stale > snapshotx.data; printf stale > snapshotz.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshoty.data && test -f snapshotx.data && test ! -s snapshotx.data && test -f snapshotz.data && test ! -s snapshotz.data && cat final
+[f32] [stderr] mkdir snapshotz.data; printf stale > snapshotx.data; printf stale > snapshoty.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshotz.data && test -f snapshotx.data && test ! -s snapshotx.data && test -f snapshoty.data && test ! -s snapshoty.data && cat final

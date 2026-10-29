@@ -1,0 +1,29 @@
+# Extra sugethw cases (one shell pipeline per line; optional [tags] first).
+suplane nt=32 ntr=4 | sugethw key=tracl,cdp,offset,ns,dt,d1,f1
+suplane nt=16 ntr=5 | sushw key=d1,f1,scalco,gx a=0.004,-2.25,-100,-7 | sugethw key=d1,f1,scalco,gx,tracl output=geom
+suplane nt=16 ntr=3 | sushw key=d2,f2 a=1e20,1.5e-7 | sugethw key=d2,f2 output=ascii
+suplane nt=16 ntr=3 | sushw key=gx,offset a=-2147483648,2147483647 | sugethw key=gx,offset,ns output=binary
+suplane ntr=3 | sugethw sx offset dt
+suplane ntr=3 | sugethw output=geom sx
+suplane ntr=2 | sugethw key=foo
+suplane ntr=2 | sugethw key=tracl output=xx
+[stderr] suplane ntr=2 | sugethw key=tracl bogus=1 verbose=1
+[stderr] suplane ntr=2 | sugethw verbose=1 sx
+sugethw
+sugethw key=tracl < /dev/null
+suplane | suswapbytes | sugethw key=ns
+suplane | head -c 5000 | sugethw key=tracl,ns
+suplane nt=8 ntr=2 > a.su && suplane nt=4 ntr=2 >> a.su && sugethw key=tracl,ns < a.su
+suplane nt=8 ntr=2 | sugethw key=tracl par=missing.par
+printf 'key=tracl,cdp\noutput=geom\n' > p.par && suplane nt=8 ntr=3 | sugethw par=p.par
+printf 'key=tracl output=binary' > p.par && suplane nt=8 ntr=3 | sugethw par=p.par key=cdp,ns,dt
+suplane nt=8 ntr=3 | sugethw key=tracl,,cdp
+suplane nt=8 ntr=3 | sugethw key=tracl verbose=1e-400
+
+# Single sample and trace, explicit defaults, repeated keys and signed values.
+sunull nt=1 ntr=1 | sugethw key=ns,tracl,offset output=ascii verbose=0
+sunull nt=7 ntr=3 | sushw key=offset,scalco a=-5,-1 b=5,1 | sugethw key=offset,scalco,offset output=geom
+sunull nt=1 ntr=1 | sugethw key=ns,dt output=binary
+sugethw output=geom < /dev/null
+sugethw key=tracl output=invalid < /dev/null
+sugethw key=tracl output=geom < /dev/null

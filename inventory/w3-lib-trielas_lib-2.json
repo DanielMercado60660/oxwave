@@ -1,0 +1,70 @@
+{
+  "scope": "Trielas/lib part 2",
+  "functions": [
+    {
+      "name": "rotvector",
+      "file": "Trielas/lib/rotvector.c",
+      "signature": "void rotvector (float *x, float *z, float si, float co );",
+      "purpose": "Rotate a two-dimensional vector using supplied sine and cosine values.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float arithmetic and preserves the original components before calculating both outputs; multiplication and addition order can affect rounding.",
+      "c_lines": 9,
+      "difficulty": "easy",
+      "group": "anisotropic-interface",
+      "license_note": ""
+    },
+    {
+      "name": "rt_SHa_real",
+      "file": "Trielas/lib/rt_SHa_real.c",
+      "signature": "int rt_SHa_real(float c1212i, float c2323i, float c1223i, float c1212t, float c2323t, float c1223t, float pxi, float pzi, float pxt, float pzt, float pxr, float pzr, int rort, float *coeff, float gz, float gx);",
+      "purpose": "Calculate a real SH reflection or transmission coefficient at an anisotropic interface or free surface.",
+      "calls": ["rotvector", "rottensh", "err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float rotations and arithmetic feed divisions guarded by an absolute FLT_EPSILON threshold; cancellation and operation order can change coefficients or error branches near a zero denominator.",
+      "c_lines": 40,
+      "difficulty": "medium",
+      "group": "anisotropic-interface",
+      "license_note": ""
+    },
+    {
+      "name": "rt_ani_real",
+      "file": "Trielas/lib/rt_ani_real.c",
+      "signature": "int rt_ani_real(float gz, float gx, float a1111i, float a3333i, float a1133i, float a1313i, float a1113i, float a3313i, float rhoi, float a1111t, float a3333t, float a1133t, float a1313t, float a1113t, float a3313t, float rhot, float pxi, float pzi, float g11i, float g13i, float g33i, float pxg,float pzg, float g11g, float g13g, float g33g, int modei, int modeg, int rort, float *coeff,FILE *ifp);",
+      "purpose": "Calculate an anisotropic P or SV reflection or transmission coefficient using wave roots, polarizations, and boundary conditions.",
+      "calls": ["alloc2float", "alloc1float", "alloc1int", "err", "polar", "rotvector", "findqPqSV", "rottensor", "warn", "sgeco", "sgesl"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float root and polarization calculations, sign conventions, ordered matrix accumulations, and a four-by-four linear solve affect results; near-singular systems and absolute FLT_EPSILON checks are especially sensitive. Root finding and solver behavior depend on the called routines; optional diagnostic output uses C formatted floating-point conversion.",
+      "c_lines": 313,
+      "difficulty": "hard",
+      "group": "anisotropic-interface",
+      "license_note": ""
+    },
+    {
+      "name": "rt_iso_cmplx",
+      "file": "Trielas/lib/rt_iso_cmplx.c",
+      "signature": "int rt_iso_cmplx(float vp1, float vp2, float vs1, float vs2, float rho1, float rho2, float pl, int modei, int modet, int rort, float *coeff,float *phase);",
+      "purpose": "Calculate an isotropic reflection or transmission coefficient and phase, including complex postcritical cases.",
+      "calls": ["cmplx", "crmul", "cadd", "cinv", "cmul", "csub", "rcabs", "err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float intermediates and C complex helper operations combine with double-returning sqrt and atan calls and PI constants; preserve operation order, postcritical square-root signs, absolute FLT_EPSILON branches, and the explicit phase-quadrant logic. Near critical angles and small denominators results are sensitive to rounding; the SH branch inverts its denominator without the later magnitude check.",
+      "c_lines": 200,
+      "difficulty": "hard",
+      "group": "isotropic-interface",
+      "license_note": "Comments cite Aki and Richards, pages 145ff, as a reference for the coefficients."
+    },
+    {
+      "name": "rt_iso_real",
+      "file": "Trielas/lib/rt_iso_real.c",
+      "signature": "int rt_iso_real(float vp1, float vp2, float vs1, float vs2, float rho1, float rho2, float pl, int modei, int modet, int rort, float *coeff);",
+      "purpose": "Calculate a real isotropic reflection or transmission coefficient or report a postcritical case.",
+      "calls": ["err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float intermediates use double-returning sqrt before conversion to float; preserve expression order, the postcritical comparisons, and absolute FLT_EPSILON denominator checks. Critical angles, cancellation, and near-singular denominators are sensitive to rounding; the SH free-surface coefficient is marked in the source as needing verification.",
+      "c_lines": 145,
+      "difficulty": "medium",
+      "group": "isotropic-interface",
+      "license_note": "Comments cite Aki and Richards, pages 145ff, as a reference for the coefficients."
+    }
+  ]
+}

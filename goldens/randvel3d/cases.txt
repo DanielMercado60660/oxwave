@@ -1,0 +1,60 @@
+# Raw float output must be compared, including cases redirected by inventory.
+# Mode 1's uninitialized v2 is normally zero in this original build; these
+# cases intentionally retain its write-to-vel behavior and geometry offsets.
+[f32] makevel nz=35 nx=7 v000=2000 dvdz=2 > in.bin && randvel3d n1=35 n2=7 seed=123 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 dvdz=2 > in.bin && randvel3d n1=35 n2=7 n3=1 mode=1 seed=0 i1beg=0 i1end=7 i2beg=0 i2end=7 i3beg=0 i3end=1 cvel=0 r1=0 r2=0 r3=0 nrvl=3 pdv=10 slowness=0 add=1 how=0 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=1800 dvdz=3 dvdx=4 dvdy=5 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=812 i1beg=2 i1end=9 i2beg=1 i2end=6 i3beg=1 i3end=4 vlsd=321 how=1 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=1800 dvdz=3 dvdx=4 dvdy=5 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=812 i1beg=2 i1end=9 i2beg=1 i2end=6 i3beg=1 i3end=4 vlsd=321 how=2 < in.bin
+[f32] makevel nz=35 nx=7 v000=1700 dvdz=5 > in.bin && randvel3d n1=35 n2=7 seed=37 add=0 how=0 < in.bin
+[f32] makevel nz=35 nx=7 v000=1700 dvdz=5 > in.bin && randvel3d n1=35 n2=7 seed=37 add=0 how=1 < in.bin
+[f32] makevel nz=35 nx=7 v000=1700 dvdz=5 > in.bin && randvel3d n1=35 n2=7 seed=37 add=0 how=2 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=2000 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=123 cvel=1800 i1beg=2 i1end=9 i2beg=1 i2end=6 i3beg=1 i3end=4 vlsd=999 add=0 how=1 < in.bin
+# Individual smoothing directions and combined smoothing; nn1 >= 2.
+[f32] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 seed=99 r1=5 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 seed=99 r2=3 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=2000 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=99 r3=4 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=2000 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=99 r1=5 r2=3 r3=4 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 seed=99 slowness=1 < in.bin
+[f32] makevel nz=35 nx=7 ny=5 v000=2000 > in.bin && randvel3d n1=35 n2=7 n3=5 seed=99 r1=5 r2=3 r3=4 slowness=1 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 seed=99 r1=-3 r2=-2 cvel=-1 vlsd=-10 < in.bin
+# Smoothing disabled for global dimensions < 4; singleton and odd grids.
+[f32] makevel nz=1 nx=1 v000=2000 > in.bin && randvel3d n1=1 n2=1 seed=5 r1=3 r2=3 r3=3 < in.bin
+[f32] makevel nz=3 nx=3 ny=3 v000=2000 > in.bin && randvel3d n1=3 n2=3 n3=3 seed=5 i1end=3 r1=3 r2=3 r3=3 < in.bin
+[f32] makevel nz=15 nx=1 v000=2000 > in.bin && randvel3d n1=15 n2=1 seed=5 < in.bin
+# Mode 2: seeded layer values and thickness; seekable input and actual output.
+[f32] [stderr] makevel nz=32 nx=8 v000=2000 dvdz=2 > in.bin && randvel3d n1=32 n2=8 mode=2 nrvl=1 pdv=8 seed=123 < in.bin
+[f32] [stderr] makevel nz=35 nx=7 ny=5 v000=1700 dvdz=3 dvdx=5 dvdy=7 > in.bin && randvel3d n1=35 n2=7 n3=5 mode=2 nrvl=1 seed=0 < in.bin
+[f32] [stderr] makevel nz=15 nx=1 v000=2000 dvdz=3 > in.bin && randvel3d n1=15 n2=1 mode=2 seed=37 pdv=-10 < in.bin
+[f32] [stderr] makevel nz=5 nx=3 v000=2000 > in.bin && randvel3d n1=5 n2=3 mode=2 seed=4 < in.bin
+[f32] [stderr] makevel nz=15 nx=3 v000=2000 > in.bin && randvel3d n1=15 n2=3 mode=2 nrvl=0 pdv=0 seed=4294967295 < in.bin
+[f32] [stderr] makevel nz=15 nx=3 v000=2000 > in.bin && randvel3d n1=15 n2=3 mode=2 nrvl=-1 seed=2147483648 < in.bin
+[f32] [stderr] makevel nz=25 nx=5 v000=2000 > in.bin && randvel3d n1=25 n2=5 mode=2 nrvl=2 pdv=0 seed=123 < in.bin
+[f32] [stderr] makevel nz=35 nx=7 v000=2000 dvdz=3 > in.bin && randvel3d n1=35 n2=7 mode=2 seed=123 < in.bin
+# This seed overruns a layer row; C aliases the next contiguous grid row.
+[f32] [stderr] makevel nz=35 nx=7 v000=2000 dvdz=3 > in.bin && randvel3d n1=35 n2=7 mode=2 seed=37 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 dvdz=3 > in.bin && randvel3d n1=35 n2=7 seed=2147483648 < in.bin
+[f32] makevel nz=35 nx=7 v000=2000 dvdz=3 > in.bin && randvel3d n1=35 n2=7 seed=4294967295 < in.bin
+# Clock default is deterministic in output when cvel replaces the entire RVL.
+[f32] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 cvel=1800 < in.bin
+[f32] [stderr] makevel nz=35 nx=7 v000=2000 > in.bin && randvel3d n1=35 n2=7 seed=123 verbose=1 unused=9 < in.bin
+# Missing/invalid required parameters, mode and count validation before input.
+[stderr] randvel3d
+[stderr] randvel3d n1=0 n2=1
+[stderr] randvel3d n1=-1 n2=1
+[stderr] randvel3d n1=abc n2=1
+[stderr] randvel3d n1=5
+[stderr] randvel3d n1=5 n2=0
+[stderr] randvel3d n1=5 n2=-3
+[stderr] randvel3d n1=5 n2=1 mode=0
+[stderr] randvel3d n1=5 n2=1 mode=3
+[stderr] randvel3d n1=5 n2=1 nrvl=5 seed=1
+[stderr] randvel3d n1=2147483648
+# Validation of add/how occurs after reading input, even for mode 2.
+[stderr] makevel nz=15 nx=3 > in.bin && randvel3d n1=15 n2=3 seed=1 add=-1 < in.bin
+[stderr] makevel nz=15 nx=3 > in.bin && randvel3d n1=15 n2=3 seed=1 add=2 < in.bin
+[stderr] makevel nz=15 nx=3 > in.bin && randvel3d n1=15 n2=3 seed=1 how=-1 < in.bin
+[stderr] makevel nz=15 nx=3 > in.bin && randvel3d n1=15 n2=3 seed=1 how=3 < in.bin
+[stderr] makevel nz=15 nx=3 > in.bin && randvel3d n1=15 n2=3 mode=2 nrvl=1 seed=1 add=2 < in.bin
+# Piped input is rejected by the original rewind; empty seekable input is not.
+[stderr] makevel nz=15 nx=3 | randvel3d n1=15 n2=3 seed=123
+[f32] randvel3d n1=15 n2=3 seed=123 < /dev/null

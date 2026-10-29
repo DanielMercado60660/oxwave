@@ -1,0 +1,57 @@
+# Raw compressed output, default and explicit compression errors.
+[exact] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wpccompress n1=128 n2=16
+[exact] suspike nt=100 ntr=9 | sustrip outpar=/dev/null | wpccompress n1=100 n2=9 error=0.05
+[stderr] suplane nt=64 ntr=4 | sustrip outpar=/dev/null | wpccompress n1=64 n2=4 error=0.1 verbose=1
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=1 n2=1
+[exact] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | wpccompress n1=17 n2=3 error=0
+[exact] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | wpccompress n1=17 n2=3 error=-0.1
+[stderr] wpccompress
+[stderr] wpccompress n1=1
+[stderr] wpccompress n1=0 n2=1
+[stderr] wpccompress n1=1 n2=0
+[stderr] wpccompress n1=-1 n2=1
+[stderr] wpccompress n1=1 n2=1 < /dev/null
+# Full zero-filled tiles fit the original output allocation without reallocating.
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.05
+[stderr] wpccompress n2=1
+[stderr] wpccompress n1=abc n2=1
+
+# Nonzero full tiles exercise the encoded payload without output growth.
+[exact] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256
+[exact] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.01
+[exact] suspike nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.1
+[exact] suspike nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=1
+[stderr] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 verbose=0
+[stderr] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 verbose=1
+# Multiple blocks/strips and odd dimensions, including a partial final strip.
+[exact] suplane nt=257 ntr=257 | sustrip outpar=/dev/null | wpccompress n1=257 n2=257 error=0.05
+[exact] suplane nt=512 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=512 n2=256
+[exact] suplane nt=256 ntr=512 | sustrip outpar=/dev/null | wpccompress n1=256 n2=512
+# Zero error, negative error, empty error (default), and nonnumeric error.
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=-0.1
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=
+[exact] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=abc
+# Parameter file and repeated parameters use the same getpar precedence as C.
+[exact] printf 'n1=256 n2=256 error=0.05\n' > params; suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress par=params error=0.01
+[exact] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=1 n1=256 n2=256 error=0.1 error=0.01
+[stderr] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 unknown=1
+# Empty/malformed required parameters, numeric overflow, and the other negative dimension.
+[stderr] wpccompress n1= n2=1
+[stderr] wpccompress n1=1 n2=
+[stderr] wpccompress n1=1 n2=abc
+[stderr] wpccompress n1=2147483648 n2=1
+[stderr] wpccompress n1=1 n2=1 error=1e-310
+[stderr] wpccompress n1=1 n2=-1
+
+# Minimal compression-library regression: a fully supplied native zero float.
+# Retained for reference; its freed-memory output is excluded.
+[exact] [stderr] printf '\000\000\000\000' | wpccompress n1=1 n2=1
+# Failed reads expose C's count=FSIZE (4), independently of the sample count.
+[stderr] wpccompress n1=2 n2=3 < .
+[stderr] wpccompress n1=1 n2=1 < .
+[stderr] wpccompress n1=1 n2=7 < .
+[stderr] wpccompress n1=3 n2=5 < .
+[stderr] wpccompress n1=3 n2=5 verbose=1 < .
+[stderr] wpccompress n1=3 n2=5 unknown=1 < .

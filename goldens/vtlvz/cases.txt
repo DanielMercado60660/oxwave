@@ -1,0 +1,16 @@
+# All parameters are required; output is native floats.
+[f32] vtlvz nt=7 dt=0.004 v0=1500 a=0.8
+[f32] vtlvz nt=1 dt=0.5 v0=2300 a=3
+[f32] vtlvz nt=13 dt=-0.1 v0=-1200 a=0.7
+[f32] vtlvz nt=11 dt=0.1 v0=1000 a=-0.7
+[f32] vtlvz nt=9 dt=0 v0=0 a=0
+[f32] vtlvz nt=0 dt=1 v0=1 a=1
+[stderr] vtlvz nt=3 dt=0.2 v0=2 a=1 verbose=1
+[stderr] vtlvz nt=3 dt=0.2 v0=2 a=1 extra=4
+vtlvz
+vtlvz dt=1 v0=1 a=1
+vtlvz nt=1 v0=1 a=1
+vtlvz nt=1 dt=1 a=1
+vtlvz nt=1 dt=1 v0=1
+vtlvz nt=999999999999999999999 dt=1 v0=1 a=1
+[f32] vtlvz nt=5 dt=abc v0=1 a=1

@@ -1,0 +1,9 @@
+[package]
+name = "oxwave-cwp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]

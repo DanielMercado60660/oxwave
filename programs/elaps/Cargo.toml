@@ -1,0 +1,18 @@
+[package]
+name = "elaps"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "elaps"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-basic = { path = "../../crates/oxwave-f-basic" }
+oxwave-f-psaxesbox = { path = "../../crates/oxwave-f-psaxesbox" }
+oxwave-lib-tri = { path = "../../crates/oxwave-lib-tri" }

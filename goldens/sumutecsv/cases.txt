@@ -1,0 +1,31 @@
+# Mute modes, interpolation, extrapolation, and tapers
+suplane nt=127 ntr=5 | sumutecsv cdp=1 offs=0,1000 tims=20,80 ntaper=4
+suplane nt=127 ntr=5 | sumutecsv cdp=1,5 offs=0,1000 tims=0.03,0.07 tims=0.08,0.1 mode=1 ntaper=3 extrapi=2 extrapt=2
+suplane nt=101 ntr=3 | sushw key=offset a=-10 | sumutecsv cdp=1 offs=-100,100 tims=0.02,0.04 abs=0 mode=2 vel=1000 tzero=0.03 ntaper=2
+suplane nt=101 ntr=3 | sumutecsv cdp=1 offs=0,100 tims=0.02,0.04 mode=3 vel=1000 tzero=0.05 ntaper=2 offkey=cdp
+suplane nt=1 ntr=1 | sumutecsv cdp=1 offs=0 tims=0
+[stderr] suplane nt=51 ntr=2 | sumutecsv cdp=1 offs=0,100 tims=0.02,0.04 print=1 verbose=1
+suplane nt=20 ntr=1 | sumutecsv cdp=1 offs=100,0 tims=0.01,0.02
+suplane nt=20 ntr=1 | sumutecsv cdp=1,1 offs=0 tims=0.01 tims=0.02
+suplane nt=20 ntr=1 | sumutecsv mode=4
+suplane nt=20 ntr=1 | sumutecsv ntaper=-1
+suplane nt=20 ntr=1 | sumutecsv vel=0
+suplane nt=20 ntr=1 | sumutecsv extrapi=4
+suplane nt=20 ntr=1 | sumutecsv extrapc=-1
+suplane nt=20 ntr=1 | sumutecsv
+suplane nt=20 ntr=1 | sumutecsv qin=missing
+suplane nt=20 ntr=1 | sumutecsv rfile=missing
+sumutecsv cdp=1 offs=0 tims=0
+# Variable and fixed dimension Q-file inputs
+[stderr] printf 'C_SU_NDIMS,vary\nC_SU_NAMES\nC_SU_ID,cdp,offs,tims,offs,tims\nQ,1,0,0.02,1000,0.08\nQ,5,0,0.04,1000,0.1\n' > q.csv; suplane nt=128 ntr=5 | sumutecsv qin=q.csv print=1
+[stderr] suplane nt=128 ntr=4 | sumutecsv cdp=1,3,11,13 offs=0,100 tims=0.02,0.04 tims=0.03,0.05 tims=0.04,0.06 tims=0.05,0.07 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=40 grid_wb=10 grid_wc=10 check=1 extrapc=1 extrapi=3 extrapt=3
+suplane nt=30 ntr=1 | sushw key=trid a=130 | sushw key=d1 a=1 | sumutecsv cdp=1 offs=0 tims=5
+suplane nt=30 ntr=1 | sushw key=trid a=109 | sumutecsv cdp=1 offs=0 tims=0.02
+suplane nt=30 ntr=1 | sushw key=trid a=43 | sumutecsv cdp=1 offs=0 tims=0.02
+suplane nt=30 ntr=1 | sumutecsv grid_xa=0 cdp=1 offs=0 tims=0
+[stderr] printf 'C_SU_NDIMS,vary,,,,\nC_SU_NAMES\nC_SU_ID,cdp,offs,tims,offs,tims\nQ,1,0,0.02,1000,0.08\nQ,5,0,0.04,1000,0.1\n' > q.csv; suplane nt=128 ntr=5 | sumutecsv qin=q.csv print=1
+[stderr] suplane nt=128 ntr=4 | sushw key=cdp a=1 b=1 | sumutecsv cdp=1,3,11,13 offs=0,100 tims=0.02,0.04 tims=0.03,0.05 tims=0.04,0.06 tims=0.05,0.07 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=40 grid_wb=10 grid_wc=10 check=1 extrapc=1 extrapi=3 extrapt=3
+
+# Mode 1 mute before the trace start also overwrites the tail of the header.
+suplane nt=31 ntr=2 | sushw key=shortpad a=123 | sumutecsv cdp=1 offs=0 tims=-0.04 mode=1 ntaper=3
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=-0.008 mode=1

@@ -1,0 +1,20 @@
+# Defaults, single trace and odd lengths
+suspike nt=1 ntr=1 | sudeghost h=10
+suspike nt=73 ntr=3 | sudeghost h=10
+# Both filter modes, custom parameters and slowness-dependent headers
+suspike nt=91 ntr=4 | sushw key=f2,d2 a=0.0001,0.0001 | sudeghost h=12 v=1450 r=0.7 lambert=1 pnoise=0.01
+suspike nt=79 ntr=2 | sudeghost h=15 v=1600 r=0.3 lambert=0 deghost=0 pnoise=0.02
+# Sampling interval fallback, explicit dt, and nonseismic header
+[stderr] suspike nt=16 ntr=1 | sushw key=dt a=0 | sudeghost h=5 verbose=1
+[stderr] suspike nt=16 ntr=1 | sushw key=dt a=0 | sudeghost h=5 dt=0.002 verbose=1
+[stderr] suspike nt=16 ntr=1 | sushw key=trid,d1 a=30,0.003 | sudeghost h=5 verbose=2
+# Zero and negative parameters
+suspike nt=31 ntr=1 | sudeghost h=0 r=0 deghost=0
+suspike nt=31 ntr=1 | sudeghost h=-5 r=-0.2 lambert=0
+# Errors
+sudeghost h=1
+suspike nt=16 ntr=1 | sudeghost
+suspike nt=16 ntr=1 | sudeghost h=1e999
+# High slowness clamps the angular term; oversized FFT is rejected
+suspike nt=65 ntr=2 | sushw key=f2,d2 a=0.001,0.0001 | sudeghost h=10 pnoise=0.1
+sunull nt=65535 ntr=1 | sudeghost h=10

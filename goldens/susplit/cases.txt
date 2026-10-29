@@ -1,0 +1,23 @@
+# Default naming and a single sample and trace.
+sunull nt=1 ntr=1 | susplit; cat split_cdp0000000.su
+# Default key, repeated values and reopened append streams.
+sunull nt=5 ntr=5 | sushw key=cdp a=1 b=1 j=2 | susplit; cat split_cdp*.su
+# All filename parameters, negative keys, and zero width.
+sunull nt=3 ntr=3 | sushw key=offset a=-1 b=1 | susplit key=offset stem=part_ middle=x suffix=.dat numlength=0; cat part_*.dat
+# Width and negative number formatting; reporting each file.
+[stderr] sunull nt=3 ntr=3 | sushw key=cdp a=-2 b=1 | susplit numlength=4 verbose=1; cat split_*.su
+# Keep previously opened streams when revisiting a value.
+[stderr] sunull nt=7 ntr=6 | sushw key=cdp a=0 b=1 j=2 | susplit close=0 verbose=1; cat split_*.su
+# Distinct traces revisit a key while its earlier stream remains open.
+sunull nt=3 ntr=6 | sushw key=tracl a=1 b=1 | sushw key=cdp a=0 b=1 j=2 | susplit close=0; cat split_*.su
+# Custom key and default middle, nonzero close and short width.
+sunull nt=9 ntr=3 | sushw key=tracl a=1 b=1 | susplit key=tracl numlength=2 close=2; cat split_*.su
+# Floating point header converted to an integer.
+sunull nt=3 ntr=2 | sushw key=d1 a=1.5 b=1 | susplit key=d1; cat split_*.su
+# Invalid header key, empty input, and failed output open.
+sunull nt=1 ntr=1 | susplit key=notakey
+susplit key=cdp </dev/null
+sunull nt=1 ntr=1 | susplit stem=missing/part_
+# Unknown argument and numeric conversion failure.
+[stderr] sunull nt=1 ntr=1 | susplit unused=1; cat split_*.su
+sunull nt=1 ntr=1 | susplit numlength=999999999999999999999

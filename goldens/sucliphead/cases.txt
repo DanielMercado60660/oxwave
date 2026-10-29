@@ -1,0 +1,14 @@
+# Defaults leave omitted keys untouched, including negative values.
+sunull nt=1 ntr=1 | sushw key=cdp a=-4 | sucliphead
+sunull nt=7 ntr=5 | sushw key=cdp a=-4 b=3 | sucliphead key=cdp
+sunull nt=7 ntr=5 | sushw key=cdp a=-4 b=3 | sucliphead key=cdp min=-2 max=4
+sunull nt=1 ntr=1 | sushw key=offset a=10 | sucliphead key=offset max=0
+sunull nt=7 ntr=3 | sushw key=delrt a=-10 b=10 | sucliphead key=delrt min=-3 max=4
+sunull nt=7 ntr=3 | sushw key=d1 a=1 b=2 | sucliphead key=d1 min=1.5 max=3.5
+sunull nt=7 ntr=3 | sushw key=cdp,offset a=-2,8 b=4,-4 | sucliphead key=cdp,offset min=0,-1 max=3,2
+[stderr] sunull nt=1 ntr=1 | sucliphead key=cdp verbose=1
+sucliphead key=cdp </dev/null
+sucliphead min=1 </dev/null
+sucliphead key=cdp,offset min=1 </dev/null
+sucliphead key=cdp max=1,2 </dev/null
+sucliphead key=notakey </dev/null

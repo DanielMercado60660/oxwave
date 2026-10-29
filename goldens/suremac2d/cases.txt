@@ -1,0 +1,86 @@
+# Required arguments, parsing, validation, and file error paths.
+[stderr] suremac2d
+[stderr] suremac2d opflag=1
+[stderr] suremac2d opflag=1 nx=25
+[stderr] suremac2d opflag=1 nx=33 nz=33
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16,13 isz=16
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nx=17
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nz=17
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nx=0
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nx=-1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=0 isz=16 fmax=30
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=0 fmax=30
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 dtsnap=-1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nt=0
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nt=-1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 verbose=1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 sflag=0
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 velfile=absent
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0
+[stderr] sunull nt=33 ntr=33 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 fmax=100
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 vmaxu=1000
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=7
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 prec=2
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && touch wavelet.su && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=0
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suspike nt=16 | sushw key=dt a=0 > wavelet.su && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=0
+# Read every output file back to stdout to exercise samples and headers.
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 irx=16 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 dtsnap=0.016 && cat snap.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=1 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=1 irx=16 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=1 dtsnap=0.016 && cat snap.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2 irx=16 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2 dtsnap=0.016 && cat snap.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 irz=15,16,17 irx=15,16 w=2 amps=-2 fx=-25.25 fz=16.75 dx=8 dz=16 sepxname=x sepzname=z && cat x z
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 nt=1 dt=0.02 dtsnap=0.02 irx=16 irz=16 && cat sectx.su sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 w=-1 amps=0 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 isx=15,17 isz=16,13 amps=1,-0.7 w=1.5 vmaxu=1800 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 fsflag=1 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && sunull nt=33 ntr=33 | sugain bias=1000 | sustrip outpar=/dev/null > dens && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 fsflag=1 irx=16 w=2 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2 fsflag=1 dtsnap=0.032 && cat snap.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 iabso=1 nbwx=3 nbwz=5 abso=0.2 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 iabso=1 nbwx=5 nbwz=3 abso=0.2 irx=16 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 iabso=1 nbwx=0 nbwz=0 abso=0 irx=16 && cat sectz.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suspike nt=32 dt=0.004 > wavelet.su && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=0 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suspike nt=32 dt=0.002 > custom.su && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=0 sname=custom.su irx=16 && cat sectz.su
+sunull nt=45 ntr=45 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 nx=45 nz=45 isx=22 isz=22 irz=22 && cat sectx.su
+sunull nt=24 ntr=24 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 nx=24 nz=24 isx=11 isz=11 sflag=1 irz=11 && cat sectx.su
+sunull nt=33 ntr=30 | sugain bias=1800 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 nx=30 nz=33 isx=15 isz=16 sflag=1 irx=15 && cat sectz.su
+# Diagnostics include runtime CPU measurements; omit only those lines.
+[exact] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 verbose=1 jpfile=diag irx=16 irz=16 dtsnap=0.032 && sed /CPU.time/d diag
+[exact] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 verbose=2 jpfile=diag sflag=1 isx=15,17 isz=16,13 amps=1,-1 irz=16 vmaxu=1600 && sed /CPU.time/d diag
+# Persist and reuse Bessel coefficients, and reject mismatched metadata.
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 prec=1 irz=16 dtsnap=0.032 && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 prec=2 irz=16 dtsnap=0.032 && cat sectx.su
+[stderr] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 prec=1 && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 prec=2 dt=0.005
+[exact] sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 prec=1 && od -An -t f4 -N28 b_k
+# Heterogeneous models exercise density multiplication and transposition.
+sunull nt=33 ntr=33 | sugain bias=1500 | suaddnoise seed=7 sn=20 | sustrip outpar=/dev/null > v.bin && sunull nt=33 ntr=33 | sugain bias=1000 | suaddnoise seed=9 sn=10 | sustrip outpar=/dev/null > d.bin && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 velfile=v.bin densfile=d.bin sflag=1 w=2 fsflag=1 irz=12,16 iabso=1 nbwx=3 nbwz=4 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | suaddnoise seed=7 sn=20 | sustrip outpar=/dev/null > v.bin && sunull nt=33 ntr=33 | sugain bias=1000 | suaddnoise seed=9 sn=10 | sustrip outpar=/dev/null > d.bin && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=1 velfile=v.bin densfile=d.bin sflag=1 w=2 fsflag=1 irz=12,16 iabso=1 nbwx=3 nbwz=4 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | suaddnoise seed=7 sn=20 | sustrip outpar=/dev/null > v.bin && sunull nt=33 ntr=33 | sugain bias=1000 | suaddnoise seed=9 sn=10 | sustrip outpar=/dev/null > d.bin && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2 velfile=v.bin densfile=d.bin sflag=1 w=2 fsflag=1 irz=12,16 iabso=1 nbwx=3 nbwz=4 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 nt=1 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 nt=1 dt=0.0001 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 nt=1 dt=0 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 fmax=0 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 irz=16 sepxname=/dev/stdout
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 unknown=1 sflag=1 irz=16 && cat sectx.su
+sunull nt=33 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel && suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 sflag=1 nt=3 dt=0.016 irz=16 && cat sectx.su
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 nx=1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 nz=0
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 nz=-1
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=0 nx=24 nz=24 isx=0
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 isx=16 isz=16,17
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 opflag=2147483648
+[stderr] suremac2d opflag=1 nx=33 nz=33 nt=32 dx=10 dz=10 dt=0.004 isx=16 isz=16 fmax=30 iabso=0 dx=1e-310
+# In-place x derivatives: rectangular odd grids, multiple expansion terms,
+# heterogeneous coefficients, and the final unpaired row in all output modes.
+sunull nt=35 ntr=45 | sugain bias=1500 | suaddnoise seed=17 sn=20 | sustrip outpar=/dev/null > vel && sunull nt=35 ntr=45 | sugain bias=1000 | suaddnoise seed=19 sn=10 | sustrip outpar=/dev/null > dens && suremac2d opflag=0 nx=45 nz=35 nt=64 dx=10 dz=12 dt=0.004 isx=22 isz=17 fmax=30 sflag=1 w=2 iabso=0 irx=22 irz=17,34 dtsnap=0.064 && cat sectx.su sectz.su snap.su
+sunull nt=35 ntr=45 | sugain bias=1500 | suaddnoise seed=17 sn=20 | sustrip outpar=/dev/null > vel && suremac2d opflag=2 nx=45 nz=35 nt=64 dx=10 dz=12 dt=0.004 isx=22 isz=17 fmax=30 sflag=1 w=2 iabso=0 irx=22 irz=17,34 dtsnap=0.064 && cat sectx.su sectz.su snap.su

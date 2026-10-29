@@ -1,0 +1,326 @@
+{
+  "scope": "su/main/operations part 1 of 1",
+  "programs": [
+    {
+      "name": "suflip",
+      "path": "su/main/operations/suflip.c",
+      "purpose": "Rotate, transpose, or reverse a seismic data panel.",
+      "selfdoc_first_line": " SUFLIP - flip a data set in various ways\t\t\t",
+      "params": [
+        {
+          "name": "flip",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Direction: -1 or 1 rotates, 0 transposes, 2 reverses traces, and 3 reverses samples."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty",
+          "required": false,
+          "description": "Directory for temporary trace and header files; an empty value uses tmpfile."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print temporary-file and dimension information."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "err", "checkpars", "gettr", "etmpfile", "warn", "temporary_filename", "efopen", "efwrite", "erewind", "ealloc2float", "efread", "efclose", "eremove", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Samples are copied without arithmetic. For transposed output, the code reads one stored header per output trace even when there are more output traces than input headers; the checked read can fail.",
+      "c_lines": 272,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers the entire panel and rearranges samples and headers using temporary files.",
+      "test_cases": [
+        {"description": "Transpose a small panel.", "command": "suplane nt=16 ntr=8 | suflip flip=0"},
+        {"description": "Reverse trace order.", "command": "suplane nt=16 ntr=8 | suflip flip=2"},
+        {"description": "Reverse samples within traces.", "command": "suplane nt=16 ntr=8 | suflip flip=3"}
+      ],
+      "license_note": "",
+      "related_programs": ["supermute"]
+    },
+    {
+      "name": "sufwmix",
+      "path": "su/main/operations/sufwmix.c",
+      "purpose": "Mix traces within gathers in the frequency domain using header-based distances.",
+      "selfdoc_first_line": " SUFWMIX -  FX domain multidimensional Weighted Mix\t\t\t",
+      "params": [
+        {"name": "key", "type": "string array", "default": "", "required": false, "description": "Header keys defining distance dimensions; selfdoc calls this required, but the code does not enforce it."},
+        {"name": "dx", "type": "float array", "default": "", "required": true, "description": "Distance unit for each key."},
+        {"name": "keyg", "type": "string", "default": "ep", "required": false, "description": "Header key defining gathers."},
+        {"name": "vf", "type": "int", "default": "1", "required": false, "description": "Enable frequency-dependent distance limit; selfdoc incorrectly says default 0."},
+        {"name": "vmin", "type": "float", "default": "5000", "required": false, "description": "Velocity used for the frequency-dependent limit."},
+        {"name": "padd", "type": "float", "default": "25.0", "required": false, "description": "FFT padding percentage."},
+        {"name": "fac", "type": "float", "default": "1.0", "required": false, "description": "Distance scaling factor, clamped to at least 1."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparint", "getparfloat", "countparval", "getparstringarray", "hdtype", "getindex", "ealloc1float", "MUSTGETPARFLOAT", "checkpars", "get_gather", "err", "npfar", "ealloc1complex", "ealloc2complex", "pfarc", "crmul", "pfacr", "free2complex", "free1", "puttr", "free1float", "warn", "gethval", "vtof"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT results, float accumulation order, and double sqrt affect reproducibility. weightsum=+weight overwrites rather than accumulates; crmul's return value is discarded, so normalization has no effect. The frequency limit divides by zero at DC. The first trace is selected if no trace is marked.",
+      "c_lines": 271,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers gathers and performs multidimensional weighted mixing with forward and inverse FFTs.",
+      "test_cases": [
+        {"description": "Mix one gather without frequency limiting.", "command": "suplane nt=32 ntr=8 | sushw key=ep a=1 | sufwmiX key=tracl dx=1 vf=0"}
+      ],
+      "license_note": "Credits Potash Corporation, Balazs Nemeth, for code given to CWP in 2008.",
+      "related_programs": []
+    },
+    {
+      "name": "sumath",
+      "path": "su/main/operations/sumath.c",
+      "purpose": "Apply a scalar arithmetic operation to every sample and optionally duplicate traces.",
+      "selfdoc_first_line": " SUMATH - do math operation on su data \t\t",
+      "params": [
+        {"name": "op", "type": "string", "default": "mult", "required": false, "description": "Operation: add, sub, mult, div, pow, or spow."},
+        {"name": "a", "type": "float", "default": "1", "required": false, "description": "Scalar operand."},
+        {"name": "copy", "type": "int", "default": "1", "required": false, "description": "Number of copies of each output trace."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparstring", "getparfloat", "getparint", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "pow uses the platform math library and converts its double result to float; division by zero and invalid powers follow platform floating-point behavior.",
+      "c_lines": 133,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies independent sample operations and copies traces.",
+      "test_cases": [
+        {"description": "Add a constant and duplicate traces.", "command": "suplane nt=32 ntr=4 | sumath op=add a=2.5 copy=2"},
+        {"description": "Apply a signed power.", "command": "suplane nt=32 ntr=4 | sumath op=spow a=1.5"}
+      ],
+      "license_note": "",
+      "related_programs": ["suop"]
+    },
+    {
+      "name": "sumix",
+      "path": "su/main/operations/sumix.c",
+      "purpose": "Apply a weighted moving mix across successive traces.",
+      "selfdoc_first_line": " SUMIX - compute weighted moving average (trace MIX) on a panel\t",
+      "params": [
+        {"name": "mix", "type": "float array", "default": "0.6,1.0,1.0,1.0,0.6", "required": false, "description": "Weights, ordered from current trace to older traces; each is divided by the number of weights."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "countparval", "ealloc1float", "getparfloat", "checkpars", "ealloc2float", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Weights are divided by the number of traces, not their sum; products accumulate in float in weight order. The first nmix-1 traces pass unchanged.",
+      "c_lines": 146,
+      "difficulty": "medium",
+      "difficulty_reason": "It maintains a rolling buffer of multiple traces.",
+      "test_cases": [
+        {"description": "Use three unequal weights.", "command": "suplane nt=32 ntr=8 | sumix mix=1,2,1"},
+        {"description": "Use the default five-trace mix.", "command": "suplane nt=32 ntr=8 | sumix"}
+      ],
+      "license_note": "",
+      "related_programs": ["surecmo"]
+    },
+    {
+      "name": "suop",
+      "path": "su/main/operations/suop.c",
+      "purpose": "Apply a selected unary arithmetic, derivative, or window operation to each trace.",
+      "selfdoc_first_line": " SUOP - do unary arithmetic operation on segys \t\t",
+      "params": [
+        {"name": "op", "type": "string", "default": "abs", "required": false, "description": "Unary operation; choices include arithmetic and transcendental functions, derivatives, integration, extrema, and window statistics."},
+        {"name": "nw", "type": "int", "default": "21", "required": false, "description": "Window length for mean, std, var, and despike; even values are incremented."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparstring", "getparint", "checkpars", "ealloc1float", "puttr", "free1float", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Many operations use platform transcendental functions, float accumulations, and data-dependent divisions. slog2 falls through to slog10. Several extrema and derivative branches write tmp[nt] out of bounds; freq dereferences unallocated tmp1. Some branches use uninitialized edge values, and std/var retain the sum when accumulating squared deviations.",
+      "c_lines": 846,
+      "difficulty": "medium",
+      "difficulty_reason": "The many operation branches include windowed statistics, sorting, stateful integration, and irregular edge handling.",
+      "test_cases": [
+        {"description": "Apply a transcendental operation.", "command": "suplane nt=64 ntr=4 | suop op=slog10"},
+        {"description": "Compute a moving mean.", "command": "suplane nt=64 ntr=4 | suop op=mean nw=5"},
+        {"description": "Apply the median filter.", "command": "suplane nt=64 ntr=4 | suop op=despike nw=5"},
+        {"description": "Compute a centered derivative.", "command": "suplane nt=64 ntr=4 | suop op=diff"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumath", "suop2"]
+    },
+    {
+      "name": "suop2",
+      "path": "su/main/operations/suop2.c",
+      "purpose": "Combine two SU files with a binary sample operation or interleave their samples.",
+      "selfdoc_first_line": " SUOP2 - do a binary operation on two data sets\t\t\t",
+      "params": [
+        {"name": "op", "type": "string", "default": "diff", "required": false, "description": "Panel or panel-trace operation, zipper, or zippol."},
+        {"name": "w1", "type": "float", "default": "0.0", "required": false, "description": "First-file weight; panel scaling occurs only when both weights are nonzero."},
+        {"name": "w2", "type": "float", "default": "0.0", "required": false, "description": "Second-file weight; selfdoc says 1.0, but code initializes it to zero."},
+        {"name": "trid", "type": "int", "default": "111", "required": false, "description": "Output trace identification for zipper and zippol; FUNPACKNYQ is 111."}
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "efopen", "getparfloat", "getparstring", "err", "getparint", "checkpars", "fgettr", "warn", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "zippol uses platform sin and cos. Complex arithmetic has special and incomplete division branches. Panel-trace scaling uses nt before it is initialized from the first panel trace, so the first scaling loops do nothing.",
+      "c_lines": 387,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads two files and applies sample-wise binary operations.",
+      "test_cases": [
+        {"description": "Weighted panel sum.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=4 > in2.su && suop2 in1.su in2.su op=sum w1=0.5 w2=2"},
+        {"description": "Panel divided by one trace.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=1 > in2.su && suop2 in1.su in2.su op=ptquo"},
+        {"description": "Interleave polar samples.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=4 > in2.su && suop2 in1.su in2.su op=zippol trid=111"}
+      ],
+      "license_note": "",
+      "related_programs": ["suop"]
+    },
+    {
+      "name": "supermute",
+      "path": "su/main/operations/supermute.c",
+      "purpose": "Permute, reverse, and subsample the axes of a three-dimensional data cube.",
+      "selfdoc_first_line": " SUPERMUTE - permute or transpose a 3d datacube \t \t\t",
+      "params": [
+        {"name": "n1", "type": "int", "default": "computed: first trace ns header", "required": false, "description": "Input fast-axis size."},
+        {"name": "n2", "type": "int", "default": "computed: first trace ntr header", "required": false, "description": "Input middle-axis size."},
+        {"name": "n3", "type": "int", "default": "1", "required": false, "description": "Input slow-axis size."},
+        {"name": "o1", "type": "int", "default": "1", "required": false, "description": "Input axis used as output fast axis."},
+        {"name": "o2", "type": "int", "default": "2", "required": false, "description": "Input axis used as output middle axis."},
+        {"name": "o3", "type": "int", "default": "3", "required": false, "description": "Input axis used as output slow axis."},
+        {"name": "d1", "type": "int", "default": "1", "required": false, "description": "Output fast-axis stride; negative reverses the axis."},
+        {"name": "d2", "type": "int", "default": "1", "required": false, "description": "Output middle-axis stride; negative reverses the axis."},
+        {"name": "d3", "type": "int", "default": "1", "required": false, "description": "Output slow-axis stride; negative reverses the axis."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print dimensions and optionally individual mappings or output values."},
+        {"name": "check", "type": "int", "default": "0", "required": false, "description": "Enable mapping bounds checks and trace progress messages."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "warn", "checkpars", "alloc3float", "puttr", "free3float", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Samples are copied without arithmetic. Duplicate output axes are not rejected, which can leave cube elements uninitialized; the ntr header calculation has unusual integer precedence.",
+      "c_lines": 245,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers and remaps a complete three-dimensional cube.",
+      "test_cases": [
+        {"description": "Swap fast and middle axes.", "command": "suplane nt=16 ntr=8 | supermute n1=16 n2=8 n3=1 o1=2 o2=1 o3=3"},
+        {"description": "Reverse and subsample axes.", "command": "suplane nt=16 ntr=8 | supermute n1=16 n2=4 n3=2 o1=1 o2=3 o3=2 d1=-2 d2=1 d3=1 check=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suflip"]
+    },
+    {
+      "name": "surecmo",
+      "path": "su/main/operations/surecmo.c",
+      "purpose": "Mix each trace with preceding traces to compensate for a moving marine streamer.",
+      "selfdoc_first_line": " SURECMO - compensate for the continuously moving streamer in marine   ",
+      "params": [
+        {"name": "dt", "type": "int", "default": "computed: first trace dt header", "required": false, "description": "Sample interval in microseconds."},
+        {"name": "vb", "type": "float", "default": "0", "required": false, "description": "Boat speed in meters per second."},
+        {"name": "dx", "type": "float", "default": "0", "required": false, "description": "Channel spacing in meters."},
+        {"name": "fill", "type": "float", "default": "0.0", "required": false, "description": "Listed in selfdoc but never read or applied; padding is zero."},
+        {"name": "tmax", "type": "float", "default": "", "required": false, "description": "Listed in the usage line but never read or applied."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "ealloc1float", "checkpars", "ealloc2float", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Weights and sample products accumulate in float, with double constants in the weight expression. Default dx=0 causes division by zero or NaN; initial preceding traces are zero-filled.",
+      "c_lines": 130,
+      "difficulty": "medium",
+      "difficulty_reason": "It maintains a three-trace rolling buffer with time-varying weights.",
+      "test_cases": [
+        {"description": "Mix with explicit acquisition parameters.", "command": "suplane nt=64 ntr=8 | surecmo vb=2.5 dx=25 dt=4000"},
+        {"description": "Exercise weights beyond the first channel interval.", "command": "suplane nt=64 ntr=8 | surecmo vb=10 dx=1 dt=4000"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumix"]
+    },
+    {
+      "name": "susimmat",
+      "path": "su/main/operations/susimmat.c",
+      "purpose": "Compute a time-by-time similarity matrix between input traces and a trace from a file.",
+      "selfdoc_first_line": " SUSIMAT - Correlation similarity matrix for two traces.\t\t",
+      "params": [
+        {"name": "sufile", "type": "string", "default": "", "required": true, "description": "SU file supplying the comparison trace."},
+        {"name": "panel", "type": "int", "default": "0", "required": false, "description": "Listed in selfdoc, but never read; code always uses the first file trace."},
+        {"name": "mt", "type": "int", "default": "21", "required": false, "description": "Correlation window length; values other than 1 and 21 are rounded up to odd."},
+        {"name": "eps", "type": "float", "default": "1e-3", "required": false, "description": "Stabilizer for normalized measures."},
+        {"name": "taper", "type": "int", "default": "0", "required": false, "description": "Set to 1 for exponential window taper."},
+        {"name": "method", "type": "int", "default": "1", "required": false, "description": "Similarity method: correlation, normalized angle, regression, or vector angle."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print method and adjusted window information."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "warn", "err", "getparfloat", "gettr", "ealloc1float", "ealloc2float", "MUSTGETPARSTRING", "efopen", "fgettr", "linear_regression", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Window products accumulate in float; exp, sqrt, acos, and regression affect reproducibility. Method 2 overwrites normalized correlation with an angle. Taper alpha uses integer division. High-edge window handling can index beyond the valid trace samples.",
+      "c_lines": 295,
+      "difficulty": "medium",
+      "difficulty_reason": "It builds a full similarity matrix with sliding correlation windows and optional regression.",
+      "test_cases": [
+        {"description": "Compute a small correlation matrix.", "command": "suplane nt=16 ntr=1 > ref.su && suplane nt=16 ntr=1 | susimmat sufile=ref.su mt=5 method=1"},
+        {"description": "Compute tapered vector angles.", "command": "suplane nt=16 ntr=1 > ref.su && suplane nt=16 ntr=1 | susimmat sufile=ref.su mt=5 method=4 taper=1 eps=0.01"}
+      ],
+      "license_note": "The header cites papers in The Leading Edge and GEOPHYSICS as references.",
+      "related_programs": []
+    },
+    {
+      "name": "suvcat",
+      "path": "su/main/operations/suvcat.c",
+      "purpose": "Append corresponding traces from two files with an optional overlap.",
+      "selfdoc_first_line": " SUVCAT -  append one data set to another, with or without an  ",
+      "params": [
+        {"name": "taplen", "type": "int", "default": "0", "required": false, "description": "Number of overlapping samples."},
+        {"name": "taptype", "type": "int", "default": "0", "required": false, "description": "Overlap combination: average, maximum magnitude, cosine, or sum."}
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "checkpars", "err", "efopen", "fgettr", "alloc1float", "puttr", "warn", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Overlap arithmetic uses float and cosine uses platform libm. The cosine taper computes i/(taplen-1) using integer division; taplen=1 causes integer division by zero. Invalid overlap lengths can cause out-of-bounds access.",
+      "c_lines": 194,
+      "difficulty": "easy",
+      "difficulty_reason": "It combines corresponding traces with a small selection of overlap formulas.",
+      "test_cases": [
+        {"description": "Concatenate with averaged overlap.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=4 > in2.su && suvcat in1.su in2.su taplen=4 taptype=0"},
+        {"description": "Use cosine overlap.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=4 > in2.su && suvcat in1.su in2.su taplen=4 taptype=2"},
+        {"description": "Sum the overlap.", "command": "suplane nt=32 ntr=4 > in1.su && suplane nt=32 ntr=4 > in2.su && suvcat in1.su in2.su taplen=4 taptype=3"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suvlength",
+      "path": "su/main/operations/suvlength.c",
+      "purpose": "Pad or truncate variable-length input traces to a common sample count.",
+      "selfdoc_first_line": " SUVLENGTH - Adjust variable length traces to common length   \t",
+      "params": [
+        {"name": "ns", "type": "int", "default": "computed: first trace ns header", "required": false, "description": "Number of samples in every output trace."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "fvgettr", "err", "getparint", "checkpars", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Existing samples are copied unchanged and padding is zero.",
+      "c_lines": 62,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads variable-length traces and pads or truncates their samples.",
+      "test_cases": [
+        {"description": "Pad traces.", "command": "suplane nt=32 ntr=4 | suvlength ns=48"},
+        {"description": "Truncate traces.", "command": "suplane nt=32 ntr=4 | suvlength ns=16"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

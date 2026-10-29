@@ -1,0 +1,17 @@
+# Default parameters and single trace
+suimp2d
+# All geometry parameters, oblique offsets and odd size
+suimp2d nshot=2 nrec=3 nt=117 c=2200 dt=0.002 x0=120 z0=80 sxmin=-25 szmin=11 gxmin=4 gzmin=7 dsx=-12 dsz=9 dgx=17 dgz=-4
+# Horizontal and vertical signed offsets, including negative step directions
+suimp2d nt=99 nshot=2 nrec=3 dsx=-30 dgx=25 x0=100 z0=40
+suimp2d nt=91 nshot=2 nrec=3 dsx=0 dsz=-20 dgx=0 dgz=15 x0=100 z0=40
+suimp2d nt=1 nrec=1
+suimp2d nshot=0
+suimp2d nrec=-1
+suimp2d nt=65535
+suimp2d nt=999999999999999999999
+suimp2d verbose=1 nt=31
+# Allocation failure and infinite travel times
+suimp2d nt=-1
+suimp2d c=0
+suimp2d c=0 nshot=2 nrec=2 nt=117

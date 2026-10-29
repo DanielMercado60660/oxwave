@@ -1,0 +1,15 @@
+# Default ntr from header and default scaling, with zero offsets.
+susorty nt=7 nshot=1 noff=3 doff=20 | sushw key=ntr a=3 > a && susorty nt=7 nshot=1 noff=5 doff=10 > b && sumixgathers a b
+# Single trace and sample; zero offset is not considered a match.
+sunull nt=1 ntr=1 | sushw key=ntr a=1 > a && sunull nt=1 ntr=1 > b && sumixgathers a b
+# Negative offsets and scaling, including matching and nonmatching traces.
+[stderr] susorty nt=7 nshot=1 noff=3 | sushw key=offset a=-1000 b=1000 > a && susorty nt=7 nshot=1 noff=5 | sushw key=offset a=-1005 b=500 > b && sumixgathers a b ntr=3 scaling=1 verbose=1
+# Explicit zero ntr and missing ntr.
+sunull nt=3 ntr=1 > a && cp a b && sumixgathers a b ntr=0
+sunull nt=3 ntr=1 > a && cp a b && sumixgathers a b
+# Empty first or second file and missing file.
+: > a && sunull nt=3 ntr=1 > b && sumixgathers a b ntr=1
+sunull nt=3 ntr=1 > a && : > b && sumixgathers a b ntr=1
+sumixgathers missing other ntr=1
+# Nonzero negative scaling and unknown argument.
+[stderr] susorty nt=5 nshot=1 noff=1 | sushw key=offset a=1000 > a && susorty nt=5 nshot=1 noff=1 | sushw key=offset a=2000 > b && sumixgathers a b ntr=1 scaling=-1 extra=1

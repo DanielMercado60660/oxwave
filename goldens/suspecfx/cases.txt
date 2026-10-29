@@ -1,0 +1,15 @@
+# Single sample and trace, and non-power-of-two sizes.
+suspike nt=1 ntr=1 | suspecfx
+suspike nt=17 ntr=1 | suspecfx
+suplane nt=101 ntr=3 | suspecfx
+# Header interval, missing interval, and explicit interval values.
+[stderr] sunull nt=16 ntr=1 | sushw key=dt a=0 | suspecfx
+[stderr] suspike nt=31 ntr=2 | suspecfx dt=0
+suspike nt=31 ntr=2 | suspecfx dt=-0.002
+suspike nt=31 ntr=2 | suspecfx dt=0.001
+# Parameter diagnostics and error paths.
+[stderr] suplane nt=32 ntr=1 | suspecfx verbose=1
+[stderr] suplane nt=32 ntr=1 | suspecfx unknown=1
+suspecfx </dev/null
+sunull nt=65535 ntr=1 | suspecfx
+suplane nt=32 ntr=1 | suspecfx dt=1e999

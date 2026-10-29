@@ -1,0 +1,21 @@
+# Defaults, one trace and one sample, padding on both sides.
+suplane nt=1 ntr=1 | sushw key=ep,tracf a=7,2 | supad min=1 max=3
+# Multiple panels, gaps and out-of-range traces.
+suplane nt=7 ntr=7 | sushw key=ep,tracf a=1,0 b=0,2 c=1,0 j=3,0 | supad min=1 max=9
+# Alternate keys, floating key and custom flag.
+suplane nt=5 ntr=3 | sushw key=offset,d1 a=4,1 b=0,2 | supad key1=offset key2=d1 key3=nhs val3=-3 min=0 max=6 d=0.5
+# Negative flag assigned to an unsigned header.
+suplane nt=3 ntr=1 | supad key1=offset key2=tracl key3=dt val3=-3 min=1 max=2
+# Descending keys and negative spacing, as implemented by the original.
+suplane nt=3 ntr=3 | sushw key=tracf a=3 b=-1 | supad min=1 max=3 d=-1
+# All input traces outside the requested range.
+suplane nt=3 ntr=2 | sushw key=tracf a=20 b=1 | supad min=1 max=3
+# Explicit verbose and unknown parameter diagnostics.
+[stderr] suplane nt=3 ntr=2 | supad key1=offset key2=tracl min=1 max=3 verbose=1 extra=1
+# Required arguments and invalid boundaries.
+supad
+supad min=1
+supad min=1 max=2 d=0
+supad min=3 max=2
+supad min=1 max=3 key1=notakey
+supad min=1 max=3

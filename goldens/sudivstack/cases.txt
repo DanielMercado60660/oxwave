@@ -1,0 +1,18 @@
+# Defaults, distinct adjacent groups and single trace/sample.
+suplane nt=37 ntr=7 | sudivstack
+suplane nt=37 ntr=7 | sushw key=cdp a=1 b=1 | sudivstack key=cdp
+suplane nt=1 ntr=1 | sudivstack
+suplane nt=37 ntr=1 | sudivstack peak=1
+# Windowed average and peak powers, including an exact window boundary.
+suplane nt=37 ntr=5 | suaddnoise seed=42 | sushw key=cdp a=2 | sudivstack key=cdp winlen=0.016
+suplane nt=41 ntr=5 | suaddnoise seed=9 | sushw key=cdp a=2 | sudivstack key=cdp winlen=0.016 peak=1
+suplane nt=40 ntr=4 | sushw key=tracf a=1 | sudivstack winlen=0.016 peak=-1
+suplane nt=17 ntr=3 | sushw key=tracf a=1 | sudivstack winlen=0 peak=0
+suplane nt=17 ntr=3 | sushw key=tracf a=1 | sudivstack winlen=-0.001
+[stderr] suplane nt=17 ntr=3 | sudivstack winlen=-0.02
+sunull nt=17 ntr=3 | sushw key=tracf a=1 | sudivstack winlen=0.012
+[stderr] suplane nt=37 ntr=3 | sudivstack winlen=100 verbose=1
+# Empty input and invalid header keyword.
+sudivstack
+suplane nt=8 ntr=1 | sudivstack key=notakey
+suplane nt=8 ntr=1 | sudivstack peak=999999999999999999999

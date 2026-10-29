@@ -1,0 +1,19 @@
+[package]
+name = "psmovie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "psmovie"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-byte-interp = { path = "../../crates/oxwave-byte-interp" }
+oxwave-f-basic = { path = "../../crates/oxwave-f-basic" }
+oxwave-f-psaxesbox3 = { path = "../../crates/oxwave-f-psaxesbox3" }
+oxwave-sort = { path = "../../crates/oxwave-sort" }

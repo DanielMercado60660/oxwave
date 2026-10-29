@@ -1,0 +1,57 @@
+# Explicit spike locations keep small ntr/nt cases nonzero and in bounds.
+# Explicit filters, single and odd trace sizes, and panel with an ASCII filter.
+suspike nspk=1 ix1=1 it1=1 nt=1 ntr=1 | suconv filter=2
+suspike nspk=1 ix1=1 it1=1 nt=7 ntr=3 | suconv filter=1,-0.5,0,2 panel=1
+suspike nspk=1 ix1=1 it1=1 nt=11 ntr=1 | suconv filter=0
+# Filter files, header delays, precedence, and a short panel file.
+suspike nspk=1 ix1=1 it1=1 nt=3 ntr=1 | sushw key=delrt a=12 > f.su && suspike nspk=1 ix1=1 it1=1 nt=7 ntr=2 | sushw key=delrt a=-5 | suconv sufile=f.su
+# Two distinct filters and three nonzero inputs expose last-filter reuse at EOF.
+[stderr] suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=3 | sushw key=delrt a=3 b=5 > f.su && suspike nt=7 ntr=3 nspk=3 ix1=1 it1=7 ix2=2 it2=7 ix3=3 it3=7 | sushw key=delrt a=-1 b=7 | suconv sufile=f.su panel=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=3 ntr=1 > f.su && suspike nspk=1 ix1=1 it1=1 nt=7 ntr=1 | suconv sufile=f.su filter=3 panel=0
+# Diagnostics, empty input, and missing or invalid input files.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1 verbose=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv
+[stderr] suconv filter=1 </dev/null
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv sufile=missing.su
+suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=
+# Negative coefficients, nonstandard panel values, and getpar array parsing.
+suspike nspk=1 ix1=1 it1=1 nt=9 ntr=2 | suconv filter=-1,0,0.25 panel=-1
+suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1,,2
+suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=abc
+suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=7 filter=1,-2 panel=
+# Dense data, a filter longer than the input, and filter lengths above 30.
+suplane nt=37 ntr=2 | suaddnoise seed=230 sn=2 > f.su && suplane nt=13 ntr=2 | suconv sufile=f.su panel=1
+# Panel filters change between traces; check delay addition and short wrapping.
+suspike nspk=1 ix1=1 it1=1 nt=5 ntr=3 | sushw key=delrt a=32760 b=10 > f.su && suspike nspk=1 ix1=1 it1=1 nt=7 ntr=3 | sushw key=delrt a=20 b=-30 | suconv sufile=f.su panel=1
+# Every error path before convolution, including invalid numeric parameters.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1e-310
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1 panel=2147483648
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1 unknown=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv sufile=
+[stderr] touch empty.su && suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv sufile=empty.su panel=0
+[stderr] touch empty.su && suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv sufile=empty.su panel=1
+# Explicit quiet mode uses the same SU output mode.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv filter=1 panel=0 verbose=0
+# Both operands exceed 30 samples, exercising the long convolution path.
+# Seeded dense samples make accumulation order observable for odd/even filters.
+suplane nt=31 ntr=2 | suaddnoise seed=231 sn=2 > f.su && suplane nt=47 ntr=2 | suaddnoise seed=232 sn=2 | suconv sufile=f.su panel=1
+suplane nt=32 ntr=1 | suaddnoise seed=233 sn=2 > f.su && suplane nt=35 ntr=2 | suaddnoise seed=234 sn=2 | suconv sufile=f.su panel=0
+# sufile with panel=2 leaves a null filter and crashes unstably in the original;
+# negative/empty panel parsing is covered above using ASCII filters instead.
+# Complete first headers with missing sample data: input and filter diagnostics.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 > full.su && dd if=full.su of=header.su bs=240 count=1 2>/dev/null && suconv filter=1 < header.su
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=3 ntr=1 > full.su && dd if=full.su of=header.su bs=240 count=1 2>/dev/null && suspike nspk=1 ix1=1 it1=1 nt=5 ntr=1 | suconv sufile=header.su panel=1
+# Last-sample impulse exposes the complete asymmetric filter and output tail.
+suspike nt=7 ntr=1 nspk=1 ix1=1 it1=7 | suconv filter=2,-1,0.5,3
+# Parameter-file values are loaded before command-line overrides.
+[stderr] printf '%s\n' 'filter=9,8 panel=1' > params && suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 | suconv par=params filter=1,-2,0.5 panel=0
+# One input sample with a longer filter exercises operand swapping and its tail.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suconv filter=0.25,-2,3
+# Dense convolution at the short-path boundary and long-path operand swapping.
+suplane nt=30 ntr=1 | suaddnoise seed=235 sn=2 > f.su && suplane nt=43 ntr=2 | suaddnoise seed=236 sn=2 | suconv sufile=f.su
+suplane nt=47 ntr=2 | suaddnoise seed=237 sn=2 > f.su && suplane nt=31 ntr=2 | suaddnoise seed=238 sn=2 | suconv sufile=f.su panel=1
+# panel=0 ignores later, distinct filter traces and preserves other input headers.
+suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=3 | sushw key=delrt a=8 b=12 > f.su && suspike nt=7 ntr=2 nspk=2 ix1=1 it1=7 ix2=2 it2=1 | sushw key=dt,delrt,offset,trid a=2000,-6,100,1 b=0,4,25,0 | suconv sufile=f.su panel=0
+# Fixed-length trace readers reject changes in input or panel-filter ns.
+[stderr] suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 > in.su && suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 >> in.su && suconv filter=1,-0.5 < in.su
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 > f.su && suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 >> f.su && suspike nt=7 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=7 | suconv sufile=f.su panel=1

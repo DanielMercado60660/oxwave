@@ -1,0 +1,19 @@
+[package]
+name = "sukdsyn2d"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sukdsyn2d"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-convolution = { path = "../../crates/oxwave-f-convolution" }
+oxwave-f-modeling = { path = "../../crates/oxwave-f-modeling" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-finite-difference = { path = "../../crates/oxwave-finite-difference" }
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }

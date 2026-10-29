@@ -1,0 +1,18 @@
+[package]
+name = "subincsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "subincsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-grid-geometry = { path = "../../crates/oxwave-grid-geometry" }
+oxwave-header-case = { path = "../../crates/oxwave-header-case" }
+oxwave-k-file = { path = "../../crates/oxwave-k-file" }

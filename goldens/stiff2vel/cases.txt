@@ -1,0 +1,15 @@
+# Default filenames and verbose, odd 3 by 1 grid; inspect all four outputs.
+[f32] [stderr] python3 -c 'import struct; [(open(n+".bin","wb").write(struct.pack("3f",*v))) for n,v in [("rho",[2,4,8]),("c11",[12,25,50]),("c13",[2,4,8]),("c33",[10,20,40]),("c44",[2,4,8])]]' && stiff2vel nx=3 nz=1 && cat vp.bin vs.bin eps.bin delta.bin
+# All explicit filenames, quiet, one sample and negative stiffness.
+[f32] python3 -c 'import struct; [(open(n,"wb").write(struct.pack("f",v))) for n,v in [("r",2),("a",12),("b",-2),("c",10),("d",2)]]' && stiff2vel nx=1 nz=1 rho_file=r c11_file=a c13_file=b c33_file=c c44_file=d vp_file=p vs_file=s eps_file=e delta_file=t verbose=0 && cat p s e t
+# Missing dimensions and absent or truncated input files.
+stiff2vel nz=1
+stiff2vel nx=1
+stiff2vel nx=1 nz=1
+touch rho.bin && stiff2vel nx=1 nz=1
+python3 -c 'import struct; open("rho.bin","wb").write(struct.pack("f",1))' && touch c11.bin && stiff2vel nx=1 nz=1
+python3 -c 'import struct; [(open(n+".bin","wb").write(struct.pack("f",1))) for n in ["rho","c11"]]' && touch c13.bin && stiff2vel nx=1 nz=1
+python3 -c 'import struct; [(open(n+".bin","wb").write(struct.pack("f",1))) for n in ["rho","c11","c13"]]' && touch c33.bin && stiff2vel nx=1 nz=1
+python3 -c 'import struct; [(open(n+".bin","wb").write(struct.pack("f",1))) for n in ["rho","c11","c13","c33"]]' && touch c44.bin && stiff2vel nx=1 nz=1
+# Zero and negative values exercise IEEE results.
+[f32] python3 -c 'import struct; [(open(n+".bin","wb").write(struct.pack("3f",*v))) for n,v in [("rho",[0,-2,1]),("c11",[0,2,-1]),("c13",[0,1,1]),("c33",[0,4,-4]),("c44",[0,4,1])]]' && stiff2vel nx=1 nz=3 verbose=0 && cat vp.bin vs.bin eps.bin delta.bin

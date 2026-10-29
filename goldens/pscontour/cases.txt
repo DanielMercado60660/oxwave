@@ -1,0 +1,11 @@
+# Remove timestamps and process-specific creator metadata from PostScript.
+suplane nt=32 ntr=8 | sustrip outpar=/dev/null | pscontour n1=32 n2=8 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=5 | sustrip outpar=/dev/null | pscontour n1=9 n2=5 d1=0.5 f1=-2 d2=2 f2=-3 nc=3 dc=0.2 fc=-0.2 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=4 | sustrip outpar=/dev/null | pscontour x1=0,1,2,3,4,5,6,7 x2=0,1,2,3 c=-0.5,0,0.5 cwidth=2,3 cgray=0.2,0.8 cdash=2,0 ccolor=red,blue labelcf=2 labelcper=2 nlabelc=1 labelcsize=9 labelcfont=Courier labelccolor=green nplaces=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=4 | sustrip outpar=/dev/null | pscontour n1=8 n2=4 xbox=2 ybox=1 wbox=4 hbox=5 x1beg=2 x1end=7 d1num=1 f1num=2 n1tic=2 grid1=dot label1=Time x2beg=1 x2end=4 d2num=1 f2num=1 n2tic=2 grid2=dash label2=Distance labelfont=Courier labelsize=14 title=Example titlefont=Times-Bold titlesize=20 titlecolor=red axescolor=blue gridcolor=green axeswidth=2 ticwidth=0.5 gridwidth=0.8 style=normal nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null > grid.bin; pscontour n1=7 grid1=solid grid2=solid verbose=1 < grid.bin | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | pscontour n1=1 n2=1 x1end=2 x2end=2 nc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | pscontour n1=7 n2=3 d1=-1 d2=-1 c=-1,0,1 cgray=0.5 cwidth=0 cdash=0 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pscontour n2=3
+[stderr] pscontour n1=3 n2=3
+[stderr] printf 'abc' | pscontour n1=3

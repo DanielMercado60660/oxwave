@@ -1,0 +1,26 @@
+# Defaults and single gather
+suplane nt=127 ntr=5 | sushw key=d1,f1,offset a=2,0,0 b=0,0,8 | surelan
+# Multiple gathers, positive first depth and negative offsets
+[stderr] suplane nt=73 ntr=7 | sushw key=d1,f1,offset,cdp a=1.5,10,-15,1 b=0,0,5,1 | surelan nr=3 dr=0.04 fr=-0.02 dzratio=3 nsmooth=4 smute=1.8 verbose=1
+# One trace and one sample
+suspike nt=1 ntr=1 | sushw key=d1 a=2 | surelan nr=1 fr=0 dzratio=1 nsmooth=1
+# Zero traces and invalid mute
+surelan
+[stderr] suplane nt=20 ntr=2 | surelan smute=1
+[stderr] suplane nt=20 ntr=2 | surelan smute=-1
+# Zero trial parameters and zero smoothing
+suplane nt=31 ntr=3 | sushw key=d1 a=2 | surelan nr=0
+# Negative trial counts fail in the original allocator
+[stderr] suplane nt=31 ntr=1 | surelan nr=-1
+[stderr] suplane nt=31 ntr=1 | surelan nr=-2147483648 verbose=1
+suplane nt=31 ntr=3 | sushw key=d1 a=2 | surelan nr=2 fr=0 dr=0 nsmooth=0 dzratio=1
+# Zero sampling ratio follows target integer division semantics
+suplane nt=31 ntr=2 | sushw key=d1 a=2 | surelan nr=2 fr=0 dzratio=0
+# Unknown option diagnostics
+[stderr] suplane nt=31 ntr=2 | sushw key=d1 a=2 | surelan nr=1 fr=0 bogus=1 verbose=1
+# Nonzero sample interpolation and repeated gather transitions
+suspike nt=101 ntr=6 k1=20,45,70 mag=1,-2,3 | suaddnoise seed=17 sn=3 | sushw key=d1,f1,offset,cdp a=2,5,-10,1 b=0,0,4,1 c=0,0,0,2 | surelan nr=7 fr=-0.06 dr=0.03 dzratio=7 nsmooth=9
+# Negative smoothing gives an empty window
+suplane nt=37 ntr=2 | sushw key=d1 a=2 | surelan nr=1 fr=0 nsmooth=-3
+# Empty numeric value uses the default
+suplane nt=25 ntr=1 | sushw key=d1 a=2 | surelan nr=1 dr= fr=0

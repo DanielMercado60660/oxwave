@@ -1,0 +1,89 @@
+# Selfdoc is added automatically. The program has a single SU output mode.
+# Required parameters, empty input, numeric parsing, and exact warning order.
+[stderr] sumigpspi
+[stderr] sumigpspi nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz= dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz= vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=2147483648 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=1e-310 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi dt=1e-310 nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi dx=1e-310 nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing verbose=2147483648
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing tmpdir=does-not-exist
+[stderr] sunull nt=7 ntr=1 | CWP_TMPDIR=does-not-exist sumigpspi nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 dt=0 | sumigpspi
+[stderr] sunull nt=7 ntr=1 | sushw key=d2 a=12.5 | sumigpspi
+[stderr] sunull nt=7 ntr=1 dt=0 | sushw key=d2 a=12.5 | sumigpspi nz=3
+[stderr] sunull nt=7 ntr=1 dt=0 | sumigpspi dt=0.002 dx=12.5 nz=3
+# Missing velocity file is opened after the FFT sizing stage in the C.
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=
+# Defaults: dt header / 0.004 fallback, d2 header / 1.0 fallback, verbose=0.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sumigpspi nz=6 dz=10 vfile=v
+[stderr] python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sumigpspi nz=6 dz=10 vfile=v verbose=0 dt=0.004 dx=1 tmpdir=
+[stderr] python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sushw key=dt a=0 | sumigpspi nz=6 dz=10 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sushw key=d2 a=25 | sumigpspi nz=6 dz=10 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sushw key=dt,d2 a=0,0 | sumigpspi nz=6 dz=10 vfile=v dt=0.002 dx=12.5
+# Diagnostics and unknown arguments are compared in full.
+[stderr] python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sumigpspi nz=6 dz=10 vfile=v verbose=1
+[stderr] python3 -c 'import struct;open("v","wb").write(struct.pack("=24f",*([2000.0]*24)))'; suspike nt=16 ntr=4 | sumigpspi nz=6 dz=10 vfile=v verbose=2 unknown=7
+# Unit and odd dimensions; nonzero spikes explicitly stay inside the input.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=f",2000.0))'; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpspi nz=1 dz=10 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=5f",*([2000.0]*5)))'; suspike nt=7 ntr=1 nspk=1 ix1=1 it1=3 | sumigpspi nz=5 dz=10 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=15f",*([2000.0]*15)))'; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | sumigpspi nz=5 dz=10 vfile=v dx=20
+python3 -c 'import struct;open("v","wb").write(struct.pack("=35f",*([2000.0]*35)))'; sunull nt=19 ntr=7 | sumigpspi nz=5 dz=7.5 vfile=v
+# Lateral variation: PSPI interpolation, overlapping tapers, full taper width.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=15f",*([1500.0,2000.0,2500.0]*5)))'; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | sumigpspi nz=5 dz=10 vfile=v dx=20
+python3 -c 'import struct;open("v","wb").write(struct.pack("=192f",*([1500.0+i*25.0 for i in range(48)]*4)))'; suspike nt=33 ntr=48 | sumigpspi nz=4 dz=8 vfile=v dx=15
+python3 -c 'import struct;open("v","wb").write(struct.pack("=20f",*([2000.0,2001.0,2002.0,2003.0]*5)))'; suspike nt=17 ntr=4 | sumigpspi nz=5 dz=10 vfile=v dx=20
+python3 -c 'import struct;open("v","wb").write(struct.pack("=20f",*([1800.0]*4+[1800.0,2200.0,2500.0,2100.0]+[2200.0]*4+[2000.0,1700.0,2300.0,2100.0]+[2500.0]*4)))'; suspike nt=17 ntr=4 | suaddnoise seed=2026 | sumigpspi nz=5 dz=8 vfile=v dx=25
+# Depth-only variation and differing input/output lengths preserve headers.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=20f",*([1800.0]*4+[1900.0]*4+[2000.0]*4+[2100.0]*4+[2200.0]*4)))'; suspike nt=17 ntr=4 | sushw key=delrt,d1,d2 a=123,0.25,10 | sumigpspi nz=5 dz=10 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=6 dz=0 vfile=v
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=6 dz=-10 vfile=v dx=10
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=6 dz=10 vfile=v dt=-0.004 dx=-10
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; sunull nt=7 ntr=2 | sumigpspi nz=6 dz=10 vfile=v dt=0 dx=0
+# File short reads are not errors in efread. With nz=1 the image is formed
+# before uninitialized velocity values affect the wavefield.
+python3 -c 'open("v","wb").close()'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=1 dz=10 vfile=v
+# Temporary-file paths and environment precedence. Verify cleanup via listing.
+[stderr] mkdir tmp; python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=6 dz=10 vfile=v tmpdir=tmp verbose=1 && ls -A tmp
+[stderr] mkdir tmp; python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | CWP_TMPDIR=tmp sumigpspi nz=6 dz=10 vfile=v verbose=1 && ls -A tmp
+[stderr] python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | CWP_TMPDIR=does-not-exist sumigpspi nz=6 dz=10 vfile=v tmpdir= verbose=1
+# Last value wins; parameter-file values precede command-line overrides.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi nz=1 nz=6 dz=20 dz=10 vfile=bad vfile=v dx=10
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)));open("par","w").write("nz=2 dz=20 vfile=v dt=0.004 dx=10\n")'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | sumigpspi par=par nz=6 dz=10
+# Output longer than input; zero and negative output counts (C allocation edge cases).
+python3 -c 'import struct;open("v","wb").write(struct.pack("=14f",*([2000.0]*14)))'; suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 | sumigpspi nz=7 dz=10 vfile=v dx=25
+python3 -c 'import struct;open("v","wb").write(struct.pack("=f",2000.0))'; sunull nt=7 ntr=1 | sumigpspi nz=0 dz=10 vfile=v
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=-1 dz=10 vfile=missing
+# Spatial FFT padding, longer continuation, and reference velocities
+# around the 1% switch. Keep standard sample tolerances for both PSPI branches.
+python3 -c 'import struct;open("v","wb").write(struct.pack("=136f",*([1900.0]*136)))'; suspike nt=23 ntr=17 nspk=1 ix1=9 it1=7 | sumigpspi nz=8 dz=9.5 vfile=v dx=17.5
+python3 -c 'import struct;open("v","wb").write(struct.pack("=136f",*([1600.0+60*i for i in range(17)]*8)))'; suspike nt=23 ntr=17 nspk=1 ix1=9 it1=7 | suaddnoise seed=19 | sumigpspi nz=8 dz=9.5 vfile=v dx=17.5
+python3 -c 'import struct;open("v","wb").write(struct.pack("=352f",*([2000.0]*352)))'; suspike nt=65 ntr=11 | suaddnoise seed=23 | sumigpspi nz=32 dz=5 vfile=v dt=0.003 dx=12
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0,2020.0]*6)))'; suspike nt=9 ntr=2 nspk=1 ix1=1 it1=4 | sumigpspi nz=6 dz=10 vfile=v dx=20
+python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0,2019.0]*6)))'; suspike nt=9 ntr=2 nspk=1 ix1=1 it1=4 | sumigpspi nz=6 dz=10 vfile=v dx=20
+python3 -c 'import struct;open("v","wb").write(struct.pack("=9f",*([1500.0,2000.0,2500.0]*3)))'; suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sumigpspi nz=3 dz=5 vfile=v dx=20
+# Explicit tmpdir overrides the environment; zero samples retain each header.
+[stderr] mkdir tmp; python3 -c 'import struct;open("v","wb").write(struct.pack("=12f",*([2000.0]*12)))'; suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | CWP_TMPDIR=missing sumigpspi nz=6 dz=10 vfile=v tmpdir=tmp verbose=1 && ls -A tmp
+python3 -c 'open("v","wb").close()'; sunull nt=5 ntr=3 | sumigpspi nz=0 dz=0 vfile=v dx=1
+# Invalid temporary destinations and velocity files retain C diagnostics.
+[stderr] touch tmp; sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing tmpdir=tmp verbose=1
+[stderr] mkdir tmp; chmod 555 tmp; sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing tmpdir=tmp
+[stderr] sunull nt=7 ntr=1 | sumigpspi nz=3 dz=10 vfile=missing verbose=1 unknown=1
+
+# Original Phase_Shift_Plus_Interpolation demo flows, including
+# their velocity generators/layouts and 100 depth continuation steps.
+# PSdemo retains coverage of cwp_cexp's f32 intermediate rounding after
+# repeated depth continuation, with the default sample tolerance.
+makevel nx=100 nz=100 dvdx=.005 dvdz=.005 > vfile; susynlv nt=300 dt=0.004 ft=0 fpeak=20 ls=1 verbose=1 smooth=0 nxm=100 dxm=0.01 fxm=0 dvdx=0.5 dvdz=0.5 v00=2.0 ref="1:0.3,0.3;0.6,0.3" ref="1:0.3,0.5;0.6,0.6" | sumigpspi nz=100 dz=0.01 vfile=vfile
+makevel nx=150 nz=100 dvdx=.2 dvdz=.5 dx=.01 dz=.01 | transp n1=150 > vfile; susynlv nt=300 dt=0.004 ft=0 fpeak=20 ls=1 verbose=1 smooth=0 nxm=150 dxm=0.01 fxm=0 dvdx=0.2 dvdz=0.5 v00=2.0 ref="1:0.3,0.3;0.6,0.3" ref="1:0.3,0.5;0.6,0.6" | sumigpspi nz=100 dz=0.01 vfile=vfile
+
+# access(W_OK) rejects root-owned directories even with owner write
+# permission. Check explicit and environment paths, before checkpars diagnostics.
+[stderr] sunull nt=7 ntr=1 | sushw key=d2 a=10 | sumigpspi nz=3 dz=10 vfile=missing tmpdir=/
+[stderr] sunull nt=7 ntr=1 | sushw key=d2 a=10 | CWP_TMPDIR=/ sumigpspi nz=3 dz=10 vfile=missing verbose=1 unknown=7

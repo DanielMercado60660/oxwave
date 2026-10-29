@@ -1,0 +1,83 @@
+# Defaults and header-provided spacing
+[stderr] suspike nt=31 ntr=7 | sukfilter
+[stderr] suspike nt=31 ntr=7 | sushw key=trid,d1,d2 a=30,2,3 | sukfilter verbose=1
+# Custom breakpoints, amplitudes, spacing, and constant response
+[stderr] suspike nt=33 ntr=5 | sukfilter d1=2 d2=3 k=0,0.02,0.1 amps=1,1,0 verbose=0
+[stderr] suspike nt=16 ntr=4 | sukfilter k=0,0.2 amps=1,1
+# Small and non-power-of-two dimensions
+[stderr] suspike nt=1 ntr=1 | sukfilter d1=1 d2=1
+[stderr] suspike nt=17 ntr=1 | sukfilter d1=-1 d2=0
+# Invalid and missing input
+[stderr] sukfilter
+[stderr] suspike nt=16 ntr=4 | sukfilter k=-1,0.1
+[stderr] suspike nt=16 ntr=4 | sukfilter k=0.2,0.1
+[stderr] suspike nt=16 ntr=4 | sukfilter k=0,0.1 amps=1
+[stderr] suspike nt=16 ntr=4 | sukfilter k=0,0.1 amps=-1,1
+[stderr] suspike nt=16 ntr=4 | sukfilter k=0,0.1 amps=0,0
+# d1/d2 fallbacks are independent; verbose is parsed but unused by the C code.
+[stderr] suspike nt=19 ntr=3 | sushw key=trid,d1,d2 a=30,2,0 | sukfilter d2=3 verbose=0
+[stderr] suspike nt=19 ntr=3 | sushw key=trid,d1,d2 a=30,0,3 | sukfilter d1=2 verbose=1
+[stderr] suspike nt=19 ntr=3 | sushw key=trid,d1,d2 a=30,-2,-3 | sukfilter verbose=-1
+# The only output mode is the filtered SU panel. Exercise taper branches,
+# equal/repeated breakpoints, endpoint extension, and a single breakpoint.
+[stderr] suspike nt=37 ntr=11 | sukfilter d1=1 d2=1 k=0.02,0.1,0.2,0.3 amps=0,1,1,0 verbose=0
+[stderr] suspike nt=37 ntr=11 | sukfilter d1=1 d2=1 k=0,0.1,0.1,0.3 amps=1,1,0,0 verbose=1
+[stderr] suspike nt=37 ntr=11 | sukfilter d1=1 d2=1 k=0,0.2,0.8 amps=2,1,2
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=1 d2=1 k=0 amps=1
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=1 d2=1 k=0.1
+# A zero spacing rounds to dx=0 in the original; both axes may be zero.
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=0 d2=0
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=0 d2=1
+# Explicit empty arrays and repeated parameters use getpar's original rules.
+[stderr] suspike nt=17 ntr=3 | sukfilter k= amps= verbose=
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=4 d1=1 d2=1 k=0,0.2 amps=0,0 amps=1,1
+# Fractional amplitudes are accumulated into an int in C.
+[stderr] suspike nt=17 ntr=3 | sukfilter k=0,0.1,0.2 amps=0.4,0.4,0.4
+# Additional array-length, parsing, and padded-size errors.
+[stderr] suspike nt=17 ntr=3 | sukfilter amps=1,1
+[stderr] suspike nt=17 ntr=3 | sukfilter k=0,0.1 amps=1,1,1
+[stderr] suspike nt=17 ntr=3 | sukfilter verbose=2147483648
+[stderr] sunull nt=65535 ntr=1 | sukfilter d1=1 d2=1
+
+# The built segy.h uses TRID_DEPTH=130; the selfdoc still says 30.
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter verbose=1
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter k=0.2,0.1 verbose=0
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=30,1,1 | sukfilter k=0.2,0.1 verbose=0
+# Single-sample and single-trace inputs with a real spike (generator defaults
+# put no spike in ntr=1); two samples and 17 traces also exercise FFT padding.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sukfilter d1=1 d2=1 k=0,1 amps=1,1
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sukfilter d1=-1 d2=0
+[stderr] suspike nt=2 ntr=17 nspk=1 ix1=9 it1=2 | sukfilter d1=1 d2=1 k=0,1 amps=1,1
+# Padded slow axis, nonzero broadband data, and changing trace headers.
+[stderr] suspike nt=35 ntr=19 | suaddnoise seed=1701 sn=3 | sushw key=trid,d1,d2,offset a=130,1,2,-90 b=0,0,0,10 | sukfilter verbose=1
+# Independently use default k and default amps.
+[stderr] suspike nt=41 ntr=17 | sukfilter d1=1 d2=1 amps=1,2,2,1
+[stderr] suspike nt=41 ntr=17 | sukfilter d1=1 d2=1 k=0,0.05,0.2,0.4
+# Each missing spacing falls back independently and emits its own warning.
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=130,2,0 | sukfilter
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=130,0,3 | sukfilter
+# Fractional spacings round to an integer before constructing the filter.
+[stderr] suspike nt=23 ntr=5 | sukfilter d1=0.49 d2=0 k=0,0.1,0.2 amps=0,1,0
+[stderr] suspike nt=23 ntr=5 | sukfilter d1=0.51 d2=0 k=0,0.1,0.2 amps=0,1,0
+# C never calls checkpars: an unrecognized argument emits no diagnostic.
+[stderr] suspike nt=23 ntr=5 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter unknown=1 verbose=1
+# Parameter conversion and inconsistent trace sizes fail before filtering.
+[stderr] suspike nt=17 ntr=3 | sukfilter d1=1e-310
+[stderr] (suspike nt=8 ntr=1; suspike nt=9 ntr=1) | sukfilter d1=1 d2=1
+
+# The polar input always has exactly one angle and da=0. Exercise its radial
+# interpolation with nonzero data on long single-trace and single-sample panels.
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=63 | sukfilter d1=1 d2=1 k=0,0.05,0.15,0.4 amps=1,1,0,0
+[stderr] suspike nt=1 ntr=31 nspk=1 ix1=16 it1=1 | sukfilter d1=1 d2=2 k=0,0.03,0.08,0.2 amps=0,1,1,0
+# Finite, nonconstant radial response across padded axes, including repeated k
+# and fractional amplitudes that pass the original integer accumulator check.
+[stderr] suspike nt=67 ntr=23 | suaddnoise seed=5005 sn=2 | sukfilter d1=0.6 d2=-0.8 k=0,0.05,0.05,0.2,0.4 amps=0.25,2,1,1,0 verbose=1
+
+# A single positive breakpoint leaves its integerized bin at the initial zero.
+[stderr] suspike nt=29 ntr=7 nspk=1 ix1=4 it1=15 | sukfilter d1=1 d2=1 k=0.07 amps=2
+# Empty spacing parameters still use the first trace's header values.
+[stderr] suspike nt=29 ntr=7 | sushw key=trid,d1,d2 a=130,2,3 | sukfilter d1= d2= verbose=0
+# Parameter-file arrays and command-line overrides share getpar precedence.
+[stderr] printf 'd1=2 d2=3 k=0,0.03,0.08,0.2 amps=0,1,1,0 verbose=0\n' > filter.par; suspike nt=29 ntr=7 | sukfilter par=filter.par d2=1 verbose=1
+# Both explicit endpoint amplitudes default to zero for two breakpoints.
+[stderr] suspike nt=29 ntr=7 | sukfilter d1=1 d2=1 k=0,0.2

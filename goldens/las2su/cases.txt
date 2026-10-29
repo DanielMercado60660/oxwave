@@ -1,0 +1,29 @@
+# Automatic curve count and comments
+printf '~C\n# curve list\nDEPT .FT\nGR .API\n~P\n~A\n10 2\n10.5 -999.25\n11 4\n' | las2su
+# Explicit count, metric, odd sample count, verbose and subsampling
+[stderr] printf '~C\nDEPT\nGR\n~P\n~A\n1 2\n2 3\n3 4\n4 5\n5 6\n6 7\n7 8\n' | las2su ncurve=2 m=1 dz=2 ss=1 verbose=1
+# Header file content
+[exact] printf '~V\nVERS. 2\n~C\nDEPT\n~P\n~A\n3\n' | las2su outhdr=header > /dev/null && cat header
+# Single sample and negative interval
+printf '~C\nDEPT\n~P\n~A\n-2\n' | las2su dz=-1 ncurve=1
+# Zero interval and nonstandard nonzero metric flag
+printf '~C\nDEPT\n~P\n~A\n1\n2\n3\n' | las2su dz=0 m=2 ss=2
+# Output open failure
+[stderr] printf '~A\n' | las2su outhdr=/no/such/directory/header
+# Unknown nskip is ignored
+[stderr] printf '~C\nDEPT\n~P\n~A\n1\n' | las2su nskip=1
+# Header without data rows
+[stderr] printf '~C\nDEPT\n~P\n~A\n' | las2su ncurve=1
+# Parameter conversion error
+[stderr] printf '~A\n' | las2su ncurve=999999999999999999999999
+# Large interval wraps the 16-bit dt header after conversion
+printf '~C\nDEPT\n~P\n~A\n1\n2\n' | las2su dz=100
+# Negative curve counts must match the reference allocation failure, not panic
+[stderr] printf '~A\n' | las2su ncurve=-1
+[stderr] printf '~A\n' | las2su ncurve=-2147483648 verbose=1
+# The same allocation failure when counting finds no curve section
+[stderr] printf '~A\n' | las2su
+[stderr] printf '~A\n' | las2su ncurve=-2 verbose=1
+# Last valid row index, with and without both explicit subsampling passes
+[stderr] python3 -c 'print("~A"); print("\n".join("%d %d" % (i, 2*i) for i in range(65535)))' | las2su ncurve=2
+[stderr] python3 -c 'print("~A"); print("\n".join("%d %d" % (i, 2*i) for i in range(65535)))' | las2su ncurve=2 ss=1 verbose=1

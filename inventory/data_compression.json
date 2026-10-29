@@ -1,0 +1,276 @@
+{
+  "scope": "su/main/data_compression part 1 of 1",
+  "programs": [
+    {
+      "name": "sudctcomp",
+      "path": "su/main/data_compression/sudctcomp.c",
+      "purpose": "Compress a specified grid of SU trace samples using block discrete cosine transforms and entropy coding.",
+      "selfdoc_first_line": " DCTCOMP - Compression by Discrete Cosine Transform\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples in the fast dimension."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of traces in the slow dimension."
+        },
+        {
+          "name": "blocksize1",
+          "type": "int",
+          "default": "16",
+          "required": false,
+          "description": "Transform block size in the fast dimension."
+        },
+        {
+          "name": "blocksize2",
+          "type": "int",
+          "default": "16",
+          "required": false,
+          "description": "Transform block size in the slow dimension."
+        },
+        {
+          "name": "error",
+          "type": "float",
+          "default": "0.01",
+          "required": false,
+          "description": "Acceptable error passed to uniform quantization."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "err",
+        "checkpars",
+        "alloc2float",
+        "alloc1int",
+        "dctAlloc",
+        "gettr",
+        "dct_2",
+        "uniQuant",
+        "pEncode",
+        "buffAlloc1",
+        "buffRewind",
+        "codeSilence",
+        "buffRealloc1",
+        "huffCompress"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "DCT table generation and transform accumulation, followed by floating-point quantization, can affect encoded bytes near quantization boundaries. The output includes native int and float representations. The code does not check gettr success or that each trace has n1 samples.",
+      "c_lines": 137,
+      "difficulty": "hard",
+      "difficulty_reason": "The program combines block transforms, quantization, prefix and run-length encoding, and Huffman compression into a custom binary format.",
+      "test_cases": [
+        {
+          "description": "Compress a grid with default transform blocks and error.",
+          "command": "suplane nt=64 ntr=16 | sudctcomp n1=64 n2=16 > compressed.bin"
+        },
+        {
+          "description": "Exercise padding, non-default block sizes, and a different error tolerance.",
+          "command": "suplane nt=63 ntr=13 | sudctcomp n1=63 n2=13 blocksize1=8 blocksize2=4 error=0.05 > compressed.bin"
+        }
+      ],
+      "license_note": "Credits Tong Chen and a 2015 fix by Graham Ganssle, Sandstone Oil & Gas.",
+      "related_programs": []
+    },
+    {
+      "name": "supack1",
+      "path": "su/main/data_compression/supack1.c",
+      "purpose": "Pack SU trace samples into signed bytes after a power transform and per-trace scaling.",
+      "selfdoc_first_line": " SUPACK1 - pack segy trace data into chars\t\t\t",
+      "params": [
+        {
+          "name": "gpow",
+          "type": "float",
+          "default": "0.5",
+          "required": false,
+          "description": "Positive exponent used to compress trace dynamic range."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "checkpars",
+        "err",
+        "gettr",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The square-root and general power paths use double-precision library functions and store results as floats; platform math and rounding can change scaled values and integer truncation. The packed representation and headers are intended for local use. Sample count comes from the first trace.",
+      "c_lines": 145,
+      "difficulty": "easy",
+      "difficulty_reason": "Each trace is transformed, scaled, and converted to bytes independently.",
+      "test_cases": [
+        {
+          "description": "Exercise the default square-root transform.",
+          "command": "suplane nt=64 ntr=8 | supack1 gpow=0.5 > packed.su"
+        },
+        {
+          "description": "Exercise the identity transform and zero-amplitude scaling.",
+          "command": "sunull nt=64 ntr=8 | supack1 gpow=1 > packed.su"
+        },
+        {
+          "description": "Exercise the general power transform.",
+          "command": "suplane nt=64 ntr=8 | supack1 gpow=0.7 > packed.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "supack2",
+        "suunpack1"
+      ]
+    },
+    {
+      "name": "supack2",
+      "path": "su/main/data_compression/supack2.c",
+      "purpose": "Pack SU trace samples into two-byte values after a power transform and per-trace scaling.",
+      "selfdoc_first_line": " SUPACK2 - pack segy trace data into 2 byte shorts\t\t",
+      "params": [
+        {
+          "name": "gpow",
+          "type": "float",
+          "default": "0.5",
+          "required": false,
+          "description": "Positive exponent used to compress trace dynamic range."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "checkpars",
+        "err",
+        "gettr",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The square-root and general power paths use double-precision library functions and store results as floats; platform math and rounding can change scaled values and integer truncation. Right shift of a negative signed integer is implementation-defined. Packed samples use explicitly ordered bytes, while headers are intended for local use. Sample count comes from the first trace.",
+      "c_lines": 155,
+      "difficulty": "easy",
+      "difficulty_reason": "Each trace is transformed, scaled, and encoded as two bytes per sample independently.",
+      "test_cases": [
+        {
+          "description": "Exercise the default square-root transform.",
+          "command": "suplane nt=64 ntr=8 | supack2 gpow=0.5 > packed.su"
+        },
+        {
+          "description": "Exercise the identity transform and zero-amplitude scaling.",
+          "command": "sunull nt=64 ntr=8 | supack2 gpow=1 > packed.su"
+        },
+        {
+          "description": "Exercise the general power transform.",
+          "command": "suplane nt=64 ntr=8 | supack2 gpow=0.7 > packed.su"
+        }
+      ],
+      "license_note": "Credits Stewart A. Levin of Mobil for revising the encoding to ensure a two-byte length.",
+      "related_programs": [
+        "supack1",
+        "suunpack2"
+      ]
+    },
+    {
+      "name": "suunpack1",
+      "path": "su/main/data_compression/suunpack1.c",
+      "purpose": "Restore approximate floating-point SU samples from byte-packed traces.",
+      "selfdoc_first_line": "SUUNPACK1 - unpack segy trace data from chars to floats\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The general inverse-power path uses the platform pow function and rounds its double result to float. The sample count and inverse exponent are taken from the first trace, while unscale is read per trace. Packed input and headers are intended for local use.",
+      "c_lines": 115,
+      "difficulty": "easy",
+      "difficulty_reason": "The program expands packed samples and applies per-sample inverse scaling and power transforms.",
+      "test_cases": [
+        {
+          "description": "Exercise the square inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack1 gpow=0.5 | suunpack1 > unpacked.su"
+        },
+        {
+          "description": "Exercise the identity inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack1 gpow=1 | suunpack1 > unpacked.su"
+        },
+        {
+          "description": "Exercise the general inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack1 gpow=0.7 | suunpack1 > unpacked.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "suunpack2",
+        "supack1"
+      ]
+    },
+    {
+      "name": "suunpack2",
+      "path": "su/main/data_compression/suunpack2.c",
+      "purpose": "Restore approximate floating-point SU samples from two-byte packed traces.",
+      "selfdoc_first_line": " SUUNPACK2 - unpack segy trace data from shorts to floats\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The general inverse-power path uses the platform pow function and rounds its double result to float. Conversion of the unsigned decoded negative value to signed int is implementation-defined when it is outside the signed range. The sample count and inverse exponent are taken from the first trace, while unscale is read per trace. Headers are intended for local use.",
+      "c_lines": 133,
+      "difficulty": "easy",
+      "difficulty_reason": "The program decodes two-byte samples and applies per-sample inverse scaling and power transforms.",
+      "test_cases": [
+        {
+          "description": "Exercise the square inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack2 gpow=0.5 | suunpack2 > unpacked.su"
+        },
+        {
+          "description": "Exercise the identity inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack2 gpow=1 | suunpack2 > unpacked.su"
+        },
+        {
+          "description": "Exercise the general inverse-power path.",
+          "command": "suplane nt=64 ntr=8 | supack2 gpow=0.7 | suunpack2 > unpacked.su"
+        }
+      ],
+      "license_note": "Credits Stewart A. Levin of Mobil for revising the decoding to match the two-byte encoding.",
+      "related_programs": [
+        "suunpack1",
+        "supack2"
+      ]
+    }
+  ]
+}

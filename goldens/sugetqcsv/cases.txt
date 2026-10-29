@@ -1,0 +1,17 @@
+# Default output file and header-only mode, with one trace and one sample.
+[exact] sunull nt=1 ntr=1 | sugetqcsv keys=tracl,ns,dt && cat qhed.csv
+# Sample selection, custom output path and formats, odd trace and sample counts.
+[exact] suspike nt=7 ntr=3 | sugetqcsv keys=tracl,dt fsamp=1 lsamp=5 formxy=%.3f formsv=%.4e qout=out.csv && cat out.csv
+[exact] suspike nt=5 ntr=1 | sugetqcsv keys=tracl lsamp=99 && cat qhed.csv
+[exact] suspike nt=5 ntr=1 | sugetqcsv keys=tracl fsamp=0 lsamp=0 verbose=1 && cat qhed.csv
+# All special keys and positive and negative scalars.
+[exact] sunull nt=3 ntr=2 | sushw key=sx,sy,gx,gy,grnlof,gaps,selev,gelev,sdepth,sdel,gdel,swdep,gwdep,scalco,scalel a=101,202,303,404,11,22,1,2,3,4,5,6,7,-10,3 | sugetqcsv keys=sx,sy,gx,gy,mx,my,mg,selev,gelev,sdepth,sdel,gdel,swdep,gwdep,scalco,scalel && cat qhed.csv
+[exact] sunull nt=3 ntr=1 | sushw key=sx,gx,selev,scalco,scalel a=-3,5,-7,2,-10 | sugetqcsv keys=sx,gx,mx,selev && cat qhed.csv
+# Parameter and input errors.
+[stderr] sugetqcsv
+[stderr] sugetqcsv keys=unknown
+[stderr] sugetqcsv keys=tracl qout=/nonexistent/dir/file
+[stderr] sugetqcsv keys=tracl fsamp=-1
+[stderr] sugetqcsv keys=tracl lsamp=-2
+[stderr] sugetqcsv keys=tracl
+[stderr] sunull nt=3 ntr=1 | sugetqcsv keys=tracl fsamp=2 lsamp=1

@@ -1,0 +1,17 @@
+[package]
+name = "suktmig2d"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suktmig2d"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-sinc-interp = { path = "../../crates/oxwave-sinc-interp" }

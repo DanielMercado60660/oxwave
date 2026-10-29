@@ -1,0 +1,17 @@
+[package]
+name = "sutihaledmo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sutihaledmo"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-vnd = { path = "../../crates/oxwave-f-vnd" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }

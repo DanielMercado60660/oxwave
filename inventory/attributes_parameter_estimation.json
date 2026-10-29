@@ -1,0 +1,507 @@
+{
+  "scope": "su/main/attributes_parameter_estimation part 1 of 1",
+  "programs": [
+    {
+      "name": "suattributes",
+      "path": "su/main/attributes_parameter_estimation/suattributes.c",
+      "purpose": "Compute instantaneous attributes of seismic traces using a Hilbert transform.",
+      "selfdoc_first_line": " SUATTRIBUTES - instantaneous trace ATTRIBUTES \t\t\t",
+      "params": [
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "amp",
+          "required": false,
+          "description": "Attribute: amp, phase, uphase, freq, freqw, thin, bandwidth, normamp, fdenv, sdenv, or q."
+        },
+        {
+          "name": "unwrap",
+          "type": "float",
+          "default": "computed: 0 for mode=phase; 1 for mode=freq, uphase, q, freqw, or thin",
+          "required": false,
+          "description": "Phase-unwrapping sensitivity; zero disables unwrapping. Read only for the listed modes."
+        },
+        {
+          "name": "wint",
+          "type": "int",
+          "default": "3",
+          "required": false,
+          "description": "Window half-width in samples for mode=freqw or mode=thin; read only for those modes."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "warn",
+        "getparstring",
+        "getparfloat",
+        "getparint",
+        "ealloc1float",
+        "ealloc1complex",
+        "hilbert",
+        "cmplx",
+        "puttr",
+        "free1float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Hilbert filtering, float accumulation and differentiation, phase unwrapping, and sqrt, atan2 and cos affect reproducibility. bandwidth and q loop to 2*nt-1 over arrays allocated for nt samples, causing out-of-bounds reads and writes; differentiation and windowing also require sufficiently long traces. uphase adds frequency values to the original samples rather than performing a conventional integration. Per-trace temporary allocations are not freed.",
+      "c_lines": 716,
+      "difficulty": "medium",
+      "difficulty_reason": "The program combines Hilbert filtering, phase unwrapping, differentiation and windowed attributes across many modes.",
+      "test_cases": [
+        {
+          "description": "Envelope traces.",
+          "command": "suplane nt=128 ntr=8 | suattributes mode=amp"
+        },
+        {
+          "description": "Unwrapped instantaneous frequency.",
+          "command": "suplane nt=128 ntr=8 | suattributes mode=freq unwrap=2"
+        },
+        {
+          "description": "Windowed frequency-weighted envelope.",
+          "command": "suplane nt=128 ntr=8 | suattributes mode=freqw unwrap=1 wint=2"
+        },
+        {
+          "description": "Second envelope derivative.",
+          "command": "suplane nt=128 ntr=8 | suattributes mode=sdenv"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sucmp",
+      "path": "su/main/attributes_parameter_estimation/sucmp.c",
+      "purpose": "Compare two SU files by trace headers and sample values within a fractional tolerance.",
+      "selfdoc_first_line": " SUCMP   - CoMPare two seismic data sets, returns 0 to the shell\t",
+      "params": [
+        {
+          "name": "file_A",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "First input file, supplied as the first positional argument."
+        },
+        {
+          "name": "file_B",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Second input file, supplied as the second positional argument."
+        },
+        {
+          "name": "limit",
+          "type": "float",
+          "default": "1.0e-4",
+          "required": false,
+          "description": "Fractional sample comparison threshold."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "checkpars",
+        "efopen",
+        "err",
+        "fgettr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Comparison bounds use float arithmetic. A zero sample in file A is never compared against B, and NaNs do not trigger the sample comparisons. Headers are compared byte for byte, including any padding or unused fields.",
+      "c_lines": 184,
+      "difficulty": "easy",
+      "difficulty_reason": "It streams two files and compares headers and samples.",
+      "test_cases": [
+        {
+          "description": "Compare identical generated files.",
+          "command": "suplane nt=128 ntr=8 > in.su && sucmp in.su in.su limit=0.0001"
+        },
+        {
+          "description": "Compare different generated trace data.",
+          "command": "suplane nt=128 ntr=8 > in.su && suspike nt=128 ntr=8 > other.su && sucmp in.su other.su limit=0.01"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suhistogram",
+      "path": "su/main/attributes_parameter_estimation/suhistogram.c",
+      "purpose": "Compute amplitude histograms for a whole section or for each sample position.",
+      "selfdoc_first_line": " SUHISTOGRAM - create histogram of input amplitudes\t\t",
+      "params": [
+        {
+          "name": "min",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Lower histogram bound."
+        },
+        {
+          "name": "max",
+          "type": "float",
+          "default": "",
+          "required": true,
+          "description": "Upper histogram bound."
+        },
+        {
+          "name": "bins",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of histogram bins."
+        },
+        {
+          "name": "trend",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "0 outputs a section histogram, 1 outputs per-position cumulative picks, and other nonzero values output histogram traces."
+        },
+        {
+          "name": "datum",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Header key used as a datum shift in trend modes."
+        },
+        {
+          "name": "clip",
+          "type": "float",
+          "default": "1e38",
+          "required": false,
+          "description": "In trend modes, include only samples strictly below this value."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt multiplied by 1e-3",
+          "required": false,
+          "description": "Sample spacing used for datum-shift indexing in trend modes."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparfloat",
+        "getparint",
+        "getparstring",
+        "checkpars",
+        "ealloc1float",
+        "ealloc2int",
+        "gethdval",
+        "hdtype",
+        "vtof",
+        "fputtr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Bin selection truncates float-to-int conversions; accumulation uses floats for counts, sums and squared sums. trend=1 uses sqrt and can divide by zero for one observation; its else-if chain can omit percentile picks. Its printed time uses the final trace header dt rather than the dt parameter. trend=0 ignores clip and clamps outliers; trend modes exclude out-of-range values.",
+      "c_lines": 302,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers a two-dimensional histogram across traces and supports several output forms.",
+      "test_cases": [
+        {
+          "description": "Whole-section ASCII histogram.",
+          "command": "suplane nt=128 ntr=8 | suhistogram min=-2 max=2 bins=16 trend=0"
+        },
+        {
+          "description": "Per-sample cumulative picks with clipping.",
+          "command": "suplane nt=128 ntr=8 | suhistogram min=-2 max=2 bins=16 trend=1 clip=1.5 dt=4"
+        },
+        {
+          "description": "Histogram traces.",
+          "command": "suplane nt=128 ntr=8 | suhistogram min=-2 max=2 bins=16 trend=2 datum=delrt dt=4"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sumax",
+      "path": "su/main/attributes_parameter_estimation/sumax.c",
+      "purpose": "Find trace and section extrema, RMS values, or threshold picks.",
+      "selfdoc_first_line": " SUMAX - get trace by trace local/global maxima, minima, or absolute maximum",
+      "params": [
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Enable per-trace and descriptive global output; 2 identifies traces by header keys."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "default": "ascii",
+          "required": false,
+          "description": "Output form: ascii to outpar, binary float pairs to stdout, or segy SU traces to stdout."
+        },
+        {
+          "name": "key1",
+          "type": "string",
+          "default": "fldr",
+          "required": false,
+          "description": "First trace identification header key for verbose=2."
+        },
+        {
+          "name": "key2",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Second trace identification header key for verbose=2."
+        },
+        {
+          "name": "mode",
+          "type": "string",
+          "default": "maxmin",
+          "required": false,
+          "description": "Quantity: maxmin, max, min, abs, rms, or thd. Binary output changes maxmin to max."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving ASCII results and binary pair counts."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt divided by 1000000.0",
+          "required": false,
+          "description": "Sample interval in seconds for reported times and threshold search."
+        },
+        {
+          "name": "threshamp",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Amplitude threshold, read only for mode=thd."
+        },
+        {
+          "name": "threshtime",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Search start time, read only for mode=thd."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "err",
+        "warn",
+        "efopen",
+        "gettr",
+        "getparfloat",
+        "checkpars",
+        "gethdval",
+        "hdtype",
+        "vtoi",
+        "efwrite",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "RMS sums use float accumulation and sqrt; the first sample of the first trace is counted twice in the global RMS sum. Per-trace extrema and threshold sample indices are not reset between traces, so their locations can be stale when the first sample is the extremum or no threshold pick is found. The first input sample is not zeroed in trace output.",
+      "c_lines": 458,
+      "difficulty": "easy",
+      "difficulty_reason": "It streams traces and computes extrema and sums with simple per-sample arithmetic.",
+      "test_cases": [
+        {
+          "description": "Report per-trace and global extrema to a file.",
+          "command": "suplane nt=128 ntr=8 | sumax output=ascii mode=maxmin verbose=1 outpar=max.txt"
+        },
+        {
+          "description": "Output binary RMS pairs.",
+          "command": "suplane nt=128 ntr=8 | sumax output=binary mode=rms outpar=max.txt"
+        },
+        {
+          "description": "Output threshold picks as traces.",
+          "command": "suplane nt=128 ntr=8 | sumax output=segy mode=thd threshamp=0.1 threshtime=0.02 dt=0.004 outpar=max.txt"
+        },
+        {
+          "description": "Report absolute maxima identified by header keys.",
+          "command": "suplane nt=128 ntr=8 | sumax output=ascii mode=abs verbose=2 key1=fldr key2=ep outpar=max.txt"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sumean",
+      "path": "su/main/attributes_parameter_estimation/sumean.c",
+      "purpose": "Compute a power mean for each trace and average those trace means over the section.",
+      "selfdoc_first_line": " SUMEAN - get the mean values of data traces\t\t\t\t",
+      "params": [
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to write individual trace means as well as the section mean."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the reported means."
+        },
+        {
+          "name": "abs",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to take sample absolute values before raising them to power; the selfdoc incorrectly says the default is 1."
+        },
+        {
+          "name": "power",
+          "type": "float",
+          "default": "2.0",
+          "required": false,
+          "description": "Exponent used for the power mean."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "err",
+        "getparstring",
+        "efopen",
+        "getparfloat",
+        "checkpars",
+        "gettr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "pow and fabs operate with double arguments while trace and section accumulators are floats; rounding depends on accumulation order and the math library. Negative samples with nonintegral powers can produce NaNs, and power=0 causes division by zero.",
+      "c_lines": 122,
+      "difficulty": "easy",
+      "difficulty_reason": "It streams traces and accumulates a simple power mean.",
+      "test_cases": [
+        {
+          "description": "Default quadratic mean.",
+          "command": "suplane nt=128 ntr=8 | sumean power=2 abs=0 verbose=0 outpar=mean.txt"
+        },
+        {
+          "description": "Per-trace mean absolute amplitude.",
+          "command": "suplane nt=128 ntr=8 | sumean power=1 abs=1 verbose=1 outpar=mean.txt"
+        },
+        {
+          "description": "Signed arithmetic mean.",
+          "command": "suplane nt=128 ntr=8 | sumean power=1 abs=0 verbose=1 outpar=mean.txt"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suquantile",
+      "path": "su/main/attributes_parameter_estimation/suquantile.c",
+      "purpose": "Report selected sample quantiles or ranks for each trace or the entire input section.",
+      "selfdoc_first_line": " SUQUANTILE - display some quantiles or ranks of a data set            ",
+      "params": [
+        {
+          "name": "panel",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Use the whole section when nonzero; zero processes each trace separately."
+        },
+        {
+          "name": "quantiles",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Report quantiles when nonzero, or selected ranks when zero."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Report temporary-file details when nonzero."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string",
+          "required": false,
+          "description": "Temporary-file directory for panel mode; an empty string uses tmpfile()."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparstring",
+        "checkpars",
+        "ealloc1int",
+        "ealloc1float",
+        "etmpfile",
+        "warn",
+        "temporary_filename",
+        "efopen",
+        "efwrite",
+        "erewind",
+        "efread",
+        "efclose",
+        "eremove",
+        "free1",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Indirect qsort compares float differences; ties can have platform-dependent order, affecting reported sample locations, and NaNs compare as equal. The qsort element size is FSIZE rather than sizeof(int), assuming they match. Reports go to stderr; no traces are written to stdout. Trace-by-trace mode skips marked traces.",
+      "c_lines": 236,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers and indirectly sorts samples, using temporary storage for whole-section processing.",
+      "test_cases": [
+        {
+          "description": "Whole-section quantiles.",
+          "command": "suplane nt=128 ntr=8 | suquantile panel=1 quantiles=1 verbose=1"
+        },
+        {
+          "description": "Per-trace ranks.",
+          "command": "suplane nt=128 ntr=8 | suquantile panel=0 quantiles=0 verbose=0"
+        },
+        {
+          "description": "Whole-section ranks using a named temporary directory.",
+          "command": "suplane nt=128 ntr=8 | suquantile panel=1 quantiles=0 tmpdir=/tmp verbose=1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

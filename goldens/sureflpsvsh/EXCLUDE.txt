@@ -1,0 +1,12 @@
+# These cases' goldens come from undefined behaviour in the original SU (ASan: heap
+# out-of-bounds reads/writes in auxil.c, psvreflect.c, compute.c:230 SH argument swap). With lobs<=1 or
+# lsource<=1 the C reads its free-surface arrays unfilled and writes NaN/zeros. The Rust rejects these
+# inputs with guards. Evidence: audits/claude-sureflpsvsh.md (2026-10-29).
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 outf=info nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lobs=0 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wfp=p.su wfr=r.su wfz=z.su
+sureflpsvsh m0=1 stype=1 delta=45 lambda=90 phis=0 phi=30 wtype=2 win=1 verbose=2 outf=info nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lobs=0 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wft=t.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 outf=info nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lobs=0 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wfp=p.su wfr=r.su wfz=z.su && cat p.su r.su z.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lsource=0 lobs=1 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wfp=p.su wfr=r.su wfz=z.su && cat p.su r.su z.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lsource=2 lobs=0 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wfp=p.su wfr=r.su wfz=z.su && cat p.su r.su z.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lsource=1 lobs=1 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wfp=p.su wfr=r.su wfz=z.su && cat p.su r.su z.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lsource=2 lobs=1 nor=1 nx=2 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wtype=2 wft=t.su
+sureflpsvsh m0=1 stype=2 m1=1 m2=0 m3=1 verbose=2 nlayers=2 cl=2,3 ct=1,1.5 ql=100,100 qt=50,50 rho=2,2.2 t=1,1 lobs=0 nor=1 nx=64 nt=64 tsec=0.256 dt=0.004 nw=16 nf=16 np=32 wtype=2 wft=t.su && cat t.su

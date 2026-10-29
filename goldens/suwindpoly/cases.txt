@@ -1,0 +1,29 @@
+# Polyline, vertical and diagonal segments, custom keys and scaling
+[stderr] sunull nt=5 ntr=7 | sushw key=fldr,ep a=0,0 b=1,1 | suwindpoly x=0,3,6 y=0,3,3 file=o; cat o
+[stderr] sunull nt=1 ntr=1 | suwindpoly x=0,0 y=-2,2 file=o dw=0; cat o
+[stderr] sunull nt=7 ntr=9 | sushw key=cdp,offset a=-3,-2 b=1,1 | suwindpoly x=-2,2,5 y=-2,2,4 file=o xkey=cdp ykey=offset ilkey=cdpt xlkey=tracf dx=2 dy=0.5 dw=4 verbose=1; cat o
+# Interior and exterior, multiple polygons, closed and open vertices
+[stderr] sunull nt=3 ntr=7 | sushw key=fldr,ep a=-2,0 b=1,0 | suwindpoly pass=1 x=-1,2,2,-1 y=-1,-1,1,1 x=1,4,4,1,1 y=-1,-1,1,1,-1 file=a file=b dx=2 dy=3; cat a b
+[stderr] sunull nt=3 ntr=7 | sushw key=fldr a=-2 b=1 | suwindpoly pass=2 x=-1,2,2,-1 y=-1,-1,1,1 file=o; cat o
+# Errors and empty input
+[stderr] suwindpoly
+[stderr] suwindpoly x=0,1
+[stderr] suwindpoly x=0,1 y=0,1 x=2,3 file=o
+[stderr] suwindpoly pass=1 x=0,1 y=0 file=o
+[stderr] suwindpoly pass=1 x=0,1 y=0,1
+[stderr] suwindpoly pass=2 x=0,1 y=0,1
+[stderr] suwindpoly pass=-1 x=0,1 y=0,1 file=o
+[stderr] suwindpoly x=0,1 y=0,1 file=o
+[stderr] sunull nt=1 ntr=1 | suwindpoly x=0,1 y=0,1 file=/no/such/path/o
+[stderr] suwindpoly pass=1 x=0,1 file=o
+[stderr] suwindpoly pass=1 y=0,1 file=o
+[stderr] suwindpoly pass=1 x=0 y=0,1 file=o
+[stderr] sunull nt=1 ntr=1 | suwindpoly x=0 y=0 file=o; cat o
+[stderr] sunull nt=3 ntr=3 | sushw key=fldr a=-1 b=1 | suwindpoly x=-1,1 y=0,0 dw=-1 dx=-1 dy=0 file=o; cat o
+# Missing output file is harmless if no trace is selected.
+[stderr] sunull nt=1 ntr=1 | suwindpoly x=0,1 y=0,0 dw=-1
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+suplane nt=8 ntr=16 | suaddnoise seed=9 | sushw key=sx,gx a=0,0 b=1,0 c=0,1 j=4,4 | suwindpoly xkey=sx ykey=gx x=0,3,3 y=0,1,3 dx=4 dy=2 dw=3 ilkey=nvs xlkey=nhs file=o; cat o
+suplane nt=8 ntr=16 | suaddnoise seed=9 | sushw key=offset,cdp a=0,0 b=1,0 c=0,1 j=4,4 | suwindpoly pass=2 xkey=offset ykey=cdp x=-1,1,1,-1 y=-1,-1,1,1 x=2,4,4 y=2,2,4 file=o; cat o
+suplane nt=8 ntr=16 | suaddnoise seed=9 | sushw key=fldr,ep a=0,0 b=1,0 c=0,1 j=4,4 | suwindpoly pass=1 x=0,3,3,1.5,0 y=0,0,3,1,3 file=o; cat o

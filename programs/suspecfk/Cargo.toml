@@ -1,0 +1,17 @@
+[package]
+name = "suspecfk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suspecfk"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-tempfile = { path = "../../crates/oxwave-tempfile" }

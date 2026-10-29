@@ -1,0 +1,43 @@
+# Default geometry and single-sample input
+sunull nt=1 ntr=1 | sushw key=fldr,tracf a=1,1 | sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=-10 streamercross=0 streamerinline=-100 channelstart=1 channelend=1 channelspacing=12.5
+# Multiple guns and streamers, explicit keys, reversed channels, verbose and custom scale
+[stderr] sunull nt=7 ntr=6 | sushw key=ep,tracf,cdpt a=2,1,10 b=0,1,0 | sunomstreamers shotkey=ep gunkey=cdpt gunmod=2 gunid=0,1 guncross=-20,20 guninline=-10,-5 streamercross=-50,50 streamerinline=-100,-110 channelstart=3,4 channelend=1,6 channelspacing=10,12.5 shotspacing=25 cdpspacing=5 scalco=-100 verbose=1
+# Identified streamers and overlapping channel ranges
+sunull nt=3 ntr=4 | sushw key=fldr,tracf,ep a=1,1,10 b=0,1,0 | sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=0 streamercross=0,50 streamerinline=-100 streameridnt=10,20 streamerkey=ep channelstart=1 channelend=4 channelspacing=10 offpi=0 linelocs=0 scalco=0 cdpspacing=0
+# Replicate a non-first input trace
+suspike nt=7 ntr=2 k1=3 | sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=-10 streamercross=0,20 streamerinline=-100 channelstart=1 channelend=2 channelspacing=10 create=2 firstshot=3 spikes=2
+# Creation without input uses a terminal for stdin.
+python3 -c 'import os,pty,subprocess,sys; m,s=pty.openpty(); p=subprocess.run(sys.argv[1:],stdin=s); sys.exit(p.returncode)' sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=-10 streamercross=0 streamerinline=-100 channelstart=1 channelend=3 channelspacing=10 create=1
+python3 -c 'import os,pty,subprocess,sys; m,s=pty.openpty(); p=subprocess.run(sys.argv[1:],stdin=s); sys.exit(p.returncode)' sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=-10 streamercross=0 streamerinline=-100 channelstart=1 channelend=3 channelspacing=10 create=1 spikes=4,0.25,12,2,20,-1
+# Missing and invalid parameters
+# Maximum representable trace sample count and final spike index.
+python3 -c 'import os,pty,subprocess,sys; m,s=pty.openpty(); p=subprocess.run(sys.argv[1:],stdin=s); sys.exit(p.returncode)' sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=0 streamercross=0 streamerinline=0 channelstart=1 channelend=1 channelspacing=10 create=1 spikes=1,0,65535,1
+sunomstreamers
+sunomstreamers verbose=2
+sunomstreamers offpi=-1
+sunomstreamers linelocs=2
+sunomstreamers scalco=3
+sunomstreamers shotkey=bad
+sunomstreamers shotspacing=0
+sunomstreamers shotspacing=25
+sunomstreamers shotspacing=25 guncross=0
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 gunmod=0
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 channelkey=bad
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 streameridnt=1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 idntkey=ep
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=0
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10 cdpspacing=-1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10 create=-1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10 spikes=1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10 create=1 spikes=4,0,8
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10 create=1
+sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10
+sunull nt=3 ntr=1 | sushw key=tracf a=8 | sunomstreamers shotspacing=25 guncross=0 guninline=0 gunid=0 streamercross=0 streamerinline=0 channelstart=1 channelend=2 channelspacing=10
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+[stderr] sunull nt=3 ntr=12 | sushw key=fldr,tracf a=1,1 b=0,1 c=1,0 j=6,6 | sunomstreamers shotspacing=25 gunid=1,0 guncross=-25,25 guninline=-15 streamercross=-50,50 streamerinline=-120,-130 channelstart=1 channelend=3 channelspacing=12.5 offpi=1
+[stderr] sunull nt=2 ntr=8 | sushw key=fldr,tracf a=3,1 b=0,1 | sunomstreamers shotspacing=37.5 gunid=0 guncross=10 guninline=-8 streamercross=-30,30 streamerinline=-90 channelstart=4 channelend=1 channelspacing=15
+[stderr] sunull nt=2 ntr=8 | sushw key=fldr,ep,tracr a=5,7,3 b=0,1,0 c=1,0,0 j=4,4,4 | sunomstreamers shotspacing=50 gunid=0 guncross=0 guninline=-20 streamercross=-75,-25,25,75 streamerinline=-100 streamerkey=ep streameridnt=7,8,9,10 channelkey=tracr channelstart=3 channelend=3 channelspacing=12.5 scalco=1
+[stderr] sunull nt=2 ntr=3 | sushw key=fldr,tracf a=0,1 b=0,1 | sunomstreamers shotspacing=25 gunid=0 guncross=0 guninline=0 streamercross=0 streamerinline=-100 channelstart=1 channelend=3 channelspacing=50 cdpspacing=0
+[stderr] python3 -c 'import os,pty,subprocess,sys; m,s=pty.openpty(); p=subprocess.run(sys.argv[1:],stdin=s); sys.exit(p.returncode)' sunomstreamers shotspacing=25 gunkey=ep gunid=0,1 guncross=-20,20 guninline=-10 streamercross=-40,40 streamerinline=-100 channelstart=1 channelend=2 channelspacing=12.5 create=3 firstshot=10 spikes=4,0.5,10,1,22,-1

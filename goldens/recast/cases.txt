@@ -1,0 +1,59 @@
+# All supported pairs, signed values, rounding, and odd counts.
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=uchar outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5f",-2.5,-0.5,0.0,0.5,2.5))' | recast in=float out=ulong outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=uchar outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5d",-2.5,-0.5,0.0,0.5,2.5))' | recast in=double out=ulong outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5i",-129,-1,0,2,127))' | recast in=int out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5i",-129,-1,0,2,127))' | recast in=int out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5i",-129,-1,0,2,127))' | recast in=int out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5i",-129,-1,0,2,127))' | recast in=int out=uchar outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5i",-129,-1,0,2,127))' | recast in=int out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=int out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=int out=ulong outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5b",-128,-1,0,1,127))' | recast in=char out=ulong outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5B",0,1,127,128,255))' | recast in=uchar out=ulong outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5h",-129,-1,0,2,32767))' | recast in=short out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5h",-129,-1,0,2,32767))' | recast in=short out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5h",-129,-1,0,2,32767))' | recast in=short out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5h",-129,-1,0,2,32767))' | recast in=short out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5h",-129,-1,0,2,32767))' | recast in=short out=long outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=long out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=long out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=long out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=long out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5q",-129,-1,0,2,32767))' | recast in=long out=short outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5Q",0,1,127,128,65535))' | recast in=ulong out=double outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5Q",0,1,127,128,65535))' | recast in=ulong out=float outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5Q",0,1,127,128,65535))' | recast in=ulong out=int outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5Q",0,1,127,128,65535))' | recast in=ulong out=char outpar=count && cat count
+[exact] [stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("=5Q",0,1,127,128,65535))' | recast in=ulong out=short outpar=count && cat count
+[exact] [stderr] printf "\000\000\200\077x" | recast outpar=count && cat count
+[exact] [stderr] recast outpar=count </dev/null && cat count
+[exact] [stderr] printf "\000\000\200\077" | recast outpar=count > data; cat data count
+[stderr] recast outpar=count in=bad out=bad </dev/null
+[stderr] recast outpar=count in=bad out=float </dev/null
+[stderr] recast outpar=count in=float out=float </dev/null
+[stderr] recast outpar=count in=short out=uchar </dev/null
+[stderr] recast outpar=count verbose=1 mystery=3 </dev/null
+[stderr] recast </dev/null
+[stderr] recast outpar=/nonexistent/path/count </dev/null

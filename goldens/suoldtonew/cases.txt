@@ -1,0 +1,11 @@
+# Native little-endian headers and samples; ns is the unsigned short at byte 114.
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=i",h,0,17); struct.pack_into("=H",h,114,3); sys.stdout.buffer.write((h+struct.pack("=3f",1,-2,3))*2)' | suoldtonew
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h+struct.pack("=f",-0.5))' | suoldtonew verbose=1
+[stderr] suoldtonew </dev/null
+[stderr] python3 -c 'import sys; sys.stdout.buffer.write(bytes(17))' | suoldtonew
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h)' | suoldtonew
+[stderr] python3 -c 'import sys; sys.stdout.buffer.write(bytes(240))' | suoldtonew
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,3); sys.stdout.buffer.write(h+struct.pack("=f",2))' | suoldtonew
+# Error on a later header with no samples, and a partial final sample.
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h+struct.pack("=f",3)+h)' | suoldtonew
+[stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h+b"\x00\x01")' | suoldtonew

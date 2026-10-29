@@ -1,0 +1,90 @@
+# Defaults, including nxpad=h/dx, ntpad=0, option=1, file=vnmo, e=d=0.
+[stderr] suspike | sutihaledmo nxmax=32
+[stderr] suspike nt=33 ntr=7 | sutihaledmo nxmax=7 option=1 dx=50 v=1500 h=200 e=0 d=0 ntpad=0 nxpad=4 file=vnmo
+# All six operators, with nonzero impulses at odd sizes.
+[stderr] suspike nt=65 ntr=7 dt=0.002 | sutihaledmo nxmax=7 option=1 dx=25 h=100 v=1800 ntpad=11 nxpad=5
+[stderr] suspike nt=65 ntr=7 dt=0.002 | sutihaledmo nxmax=7 option=2 dx=25 h=100 v=1800 ntpad=11 nxpad=5
+[stderr] suspike nt=65 ntr=7 dt=0.002 | sutihaledmo nxmax=7 option=3 dx=25 h=100 v=1800 ntpad=11 nxpad=5
+[stderr] suspike nt=65 ntr=7 dt=0.002 | sutihaledmo nxmax=7 option=4 dx=25 h=100 v=1800 ntpad=11 nxpad=5
+[stderr] sutivel np=201 nangle=301 > vnmo; suspike nt=65 ntr=7 | sutihaledmo nxmax=7 option=5
+[stderr] sutivel np=251 nangle=401 a=1800 b=900 e=0.15 d=0.04 > velocity.txt; suspike nt=65 ntr=7 | sutihaledmo nxmax=7 option=5 file=velocity.txt dx=25 h=100 ntpad=7 nxpad=3
+[stderr] suspike nt=65 ntr=7 | sutihaledmo nxmax=7 option=6 v=1800 e=0.15 d=0.04 dx=25 h=100 ntpad=7 nxpad=3
+[stderr] suspike nt=65 ntr=7 | sutihaledmo nxmax=7 option=6
+# Negative fac selects the first stable time in both anisotropic operators.
+[stderr] printf '6\n0.0002\n2000\n1600\n1400\n1200\n1100\n1000\n' > table; suspike nt=41 ntr=5 | sutihaledmo nxmax=5 option=5 file=table h=50
+[stderr] suspike nt=41 ntr=5 | sutihaledmo nxmax=5 option=6 h=50 e=-0.5 d=0.5
+# Header preservation and broadband data, including FFT factors 7, 11, 13.
+[stderr] suplane nt=73 ntr=17 dt=0.003 taper=1 | suaddnoise seed=42 sn=2 | sushw key=cdp,offset,delrt a=100,777,-50 b=2,0,0 | sutihaledmo nxmax=17 option=2 h=250 dx=35 v=2200 nxpad=5 ntpad=13
+[stderr] suspike nt=91 ntr=13 | suaddnoise seed=17 sn=1 | sutihaledmo nxmax=13 option=3 nxpad=13 ntpad=9 h=80 v=1250
+# Minimum sizes, empty signal, and padding absent.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sutihaledmo nxmax=1
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sutihaledmo nxmax=1 option=3 nxpad=0
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sutihaledmo nxmax=1 option=4 nxpad=0
+[stderr] sunull nt=19 ntr=3 | sutihaledmo nxmax=3
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 nxpad=0
+# C deliberately saves one more than nxmax before breaking.
+[stderr] suspike nt=17 ntr=7 | sutihaledmo nxmax=3
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sutihaledmo nxmax=0
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sutihaledmo nxmax=-1
+# Zero/negative inputs that have defined arithmetic behavior.
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 h=0
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 h=-100 nxpad=2
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 dx=-50 nxpad=2
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 v=0
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 v=-1500
+[stderr] suspike nt=32 ntr=3 | sutihaledmo nxmax=3 ntpad=-1 nxpad=0
+[stderr] suspike nt=17 ntr=3 | sutihaledmo nxmax=5 nxpad=-1
+# Unrecognized options perform only the spatial FFT round trip.
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 option=0
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 option=7
+[stderr] suspike nt=17 ntr=5 | sutihaledmo nxmax=5 option=-1
+# Verbose and unknown parameter diagnostics.
+[stderr] suspike nt=17 ntr=3 | sutihaledmo nxmax=3 verbose=1
+[stderr] suspike nt=17 ntr=3 | sutihaledmo nxmax=3 mystery=2
+# Error exits and parameter conversion.
+[stderr] sutihaledmo nxmax=5
+[stderr] sutihaledmo
+[stderr] sunull nt=17 ntr=1 | sutihaledmo
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=3 v=0
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=3 v=-1
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=6 v=0
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=6 v=-1
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=5
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 option=5 file=missing
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=9999999999999999999999
+[stderr] sunull nt=17 ntr=1 | sutihaledmo nxmax=1 v=1e-310
+# Last duplicate wins, empty defaults and nonnumeric integer.
+[stderr] suspike nt=17 ntr=3 | sutihaledmo nxmax=1 nxmax=3 h= e= d= dx= ntpad= nxpad= option=
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sutihaledmo nxmax=abc
+# Panels larger than the original VND 100000-byte memory budget.
+[stderr] suspike nt=33 ntr=1025 | sutihaledmo nxmax=1025 option=2 dx=25 h=100
+[stderr] suspike nt=513 ntr=51 | sutihaledmo nxmax=51 option=4 dx=25 h=100 ntpad=31 nxpad=7
+# Explicit zero spacing, with a finite explicit nxpad.
+[stderr] suspike nt=17 ntr=3 | sutihaledmo nxmax=3 dx=0 nxpad=0
+# Negative padding is valid when the selected FFT length still covers nt.
+# Exercise every operator; nt=65, ntpad=-5 selects ntfft=84 in SU.
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=1
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=2
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=3
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=4
+[stderr] sutivel np=201 nangle=301 > vnmo; suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=5
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-5 option=6 e=0.1 d=0.05
+# Undersized time FFTs are defined when an operator returns early or is unused.
+# The active-operator out-of-bounds path is undefined in C and checked separately.
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-64 h=0 option=1
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-64 h=0 option=2
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-64 h=0 option=4
+[stderr] sutivel np=201 nangle=301 > vnmo; suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-64 h=0 option=5
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-64 h=0 option=6
+[stderr] suspike nt=65 ntr=5 | sutihaledmo nxmax=5 ntpad=-100 option=0
+# Exercise both sides of the 100000-byte VND budget with seeded broadband
+# samples and varying headers, then disk-backed panels for remaining operators.
+[stderr] suplane nt=193 ntr=125 | suaddnoise seed=43 sn=2 | sushw key=cdp,offset a=500,100 b=3,2 | sutihaledmo nxmax=125 nxpad=0 option=0
+[stderr] suplane nt=199 ntr=125 | suaddnoise seed=43 sn=2 | sushw key=cdp,offset a=500,100 b=3,2 | sutihaledmo nxmax=125 nxpad=0 option=0
+[stderr] suspike nt=513 ntr=51 | sutihaledmo nxmax=51 option=1 nxpad=7
+[stderr] suspike nt=513 ntr=51 | sutihaledmo nxmax=51 option=3 nxpad=7
+[stderr] sutivel np=201 nangle=301 > vnmo; suspike nt=513 ntr=51 | sutihaledmo nxmax=51 option=5 nxpad=7
+[stderr] suspike nt=513 ntr=51 | sutihaledmo nxmax=51 option=6 nxpad=7 e=0.15 d=0.04
+# The extra input trace may occupy the untouched real FFT end slots.
+[stderr] suspike nt=33 ntr=5 | sutihaledmo nxmax=4 nxpad=0

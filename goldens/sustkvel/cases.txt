@@ -1,0 +1,18 @@
+# File output, default and explicit dip, one layer and odd layer counts.
+sustkvel v=5000 h=1000 outpar=stkpar && cat stkpar
+sustkvel v=5000,6000,8000 h=1000,1200,1300 outpar=stkpar && cat stkpar
+sustkvel v=1500,2200,3100,4000,5500 h=125,250,375,500,625 dip=15 outpar=stkpar && cat stkpar
+sustkvel v=1500,2500 h=100,200 dip=-30 outpar=stkpar && cat stkpar
+sustkvel v=1500 h=100 dip=90 outpar=stkpar && cat stkpar
+printf 'v=1800,2400,3300\nh=100,200,300\ndip=10\n' > model && sustkvel par=model outpar=stkpar && cat stkpar
+[stderr] sustkvel v=2000 h=100 outpar=stkpar verbose=1 unknown=1 && cat stkpar
+# Missing parameters, mismatch, non-positive values and default output path.
+sustkvel outpar=stkpar
+sustkvel v=2000 outpar=stkpar
+sustkvel v=2000,3000 h=100 outpar=stkpar
+sustkvel v=0 h=100 outpar=stkpar
+sustkvel v=-1 h=100 outpar=stkpar
+sustkvel v=2000 h=0 outpar=stkpar
+sustkvel v=2000 h=-10 outpar=stkpar
+sustkvel v=2000 h=100
+sustkvel v=2000 h=100 outpar=/no/such/directory/output

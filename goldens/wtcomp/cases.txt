@@ -1,0 +1,14 @@
+# Compressed output is a native binary stream, including its header.
+[exact] [stderr] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wtcomp n1=128 n2=16
+[exact] [stderr] suspike nt=100 ntr=9 | sustrip outpar=/dev/null | wtcomp n1=100 n2=9 nfilter=11 nstage1=2 nstage2=2 error=0.03
+[exact] [stderr] suplane nt=32 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=32 n2=8 nfilter=4 error=0.1 verbose=1
+[exact] [stderr] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | wtcomp n1=17 n2=3 nstage1=0 nstage2=0
+[exact] [stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=1 n2=1
+[exact] [stderr] suspike nt=16 ntr=4 | sustrip outpar=/dev/null | wtcomp n1=16 n2=4 error=0
+[exact] [stderr] suspike nt=16 ntr=4 | sustrip outpar=/dev/null | wtcomp n1=16 n2=4 error=-0.1
+[stderr] wtcomp n1=1 n2=1 </dev/null
+[stderr] wtcomp n2=1
+[stderr] wtcomp n1=1
+# Exercise each stage parameter independently, leaving the other at its default.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=16 n2=8 nstage1=1
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=16 n2=8 nstage2=1

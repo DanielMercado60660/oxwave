@@ -1,0 +1,14 @@
+# Exercise the actual output, defaults, even window, and verbose diagnostics.
+suplane nt=80 ntr=60 | sugprfb
+suplane nt=64 ntr=12 | sugprfb nx=5 fbt=20
+[stderr] suplane nt=64 ntr=12 | sugprfb nx=4 fbt=30 verbose=1
+sunull nt=31 ntr=7 | sugprfb nx=3 fbt=15
+suplane nt=63 ntr=9 | sugprfb nx=1 fbt=21
+sunull nt=1 ntr=1 | sugprfb nx=1 fbt=1
+sugprfb nx=3 fbt=10 </dev/null
+suplane nt=64 ntr=9 | sugprfb nx=3 fbt=20 extra=1
+# Negative sizes fail through the original allocator.
+sunull nt=20 ntr=3 | sugprfb nx=-3 fbt=10
+sunull nt=20 ntr=3 | sugprfb nx=3 fbt=-1
+# Zero nx is adjusted to one by the original.
+sunull nt=20 ntr=3 | sugprfb nx=0 fbt=10

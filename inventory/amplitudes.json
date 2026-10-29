@@ -1,0 +1,324 @@
+{
+  "scope": "su/main/amplitudes part 1 of 1",
+  "programs": [
+    {
+      "name": "suai2r",
+      "path": "su/main/amplitudes/suai2r.c",
+      "purpose": "Convert acoustic impedance traces to reflectivity traces.",
+      "selfdoc_first_line": " suai2r <stdin >sdout \t\t\t\t\t\t",
+      "params": [
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Parsed but unused."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "warn", "puttr"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Adjacent samples are combined with float arithmetic and divided by their sum; a zero sum produces a nonfinite result. The first trace's sample count is used for all traces.",
+      "c_lines": 76,
+      "difficulty": "easy",
+      "difficulty_reason": "The program applies a simple adjacent-sample formula to each trace.",
+      "test_cases": [
+        {"description": "Convert a constant impedance trace.", "command": "suplane nt=64 ntr=4 | sugain bias=2 | suai2r verbose=0"},
+        {"description": "Convert traces containing impedance changes.", "command": "suspike nt=64 ntr=4 k1=20 mag=1 | sugain bias=2 | suai2r verbose=1"}
+      ],
+      "license_note": "The source credits Shuki Ronen and describes a partial implementation of Aki and Richards.",
+      "related_programs": ["sur2ai"]
+    },
+    {
+      "name": "sucentsamp",
+      "path": "su/main/amplitudes/sucentsamp.c",
+      "purpose": "Replace oscillation lobes with samples at their estimated centroids.",
+      "selfdoc_first_line": " SUCENTSAMP - CENTRoid SAMPle seismic traces\t\t\t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: from first trace header dt in seconds; 0.004 if zero", "required": false, "description": "Sample interval used in centroid calculations."},
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Enable the missing-dt advisory."},
+        {"name": "nvals_min", "type": "int", "default": "1", "required": false, "description": "Minimum number of samples in a lobe to include it."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "getparfloat", "checkpars", "warn", "ealloc1float", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Centroid moments and sums accumulate in float. Zero sums can cause division by zero, and the computed centroid index is not bounds checked. Lobe state flags persist across traces, and the final lobe is not explicitly flushed.",
+      "c_lines": 261,
+      "difficulty": "medium",
+      "difficulty_reason": "The lobe detector maintains state and calculates moments across samples.",
+      "test_cases": [
+        {"description": "Centroid a small synthetic plane-wave section.", "command": "suplane nt=128 ntr=4 | sucentsamp dt=0.004 verbose=0 nvals_min=1"},
+        {"description": "Exclude single-sample lobes.", "command": "suspike nt=64 ntr=4 k1=20 mag=2 | sucentsamp dt=0.004 verbose=0 nvals_min=2"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sudipdivcor",
+      "path": "su/main/amplitudes/sudipdivcor.c",
+      "purpose": "Apply dip-dependent or conventional divergence correction to a seismic section.",
+      "selfdoc_first_line": " SUDIPDIVCOR - Dip-dependent Divergence (spreading) correction\t",
+      "params": [
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance in meters between successive CDPs."},
+        {"name": "np", "type": "int", "default": "50", "required": false, "description": "Number of reflection slopes."},
+        {"name": "trans", "type": "int", "default": "0", "required": false, "description": "Include transmission factors when set to 1."},
+        {"name": "norm", "type": "int", "default": "1", "required": false, "description": "Normalize the correction table when set to 1."},
+        {"name": "conv", "type": "int", "default": "0", "required": false, "description": "Use the conventional correction when set to 1."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic information."},
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary file containing one velocity per time sample; overrides velocity picks."},
+        {"name": "tmig", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for the velocity picks; used when vfile is absent."},
+        {"name": "vmig", "type": "float array", "default": "1500.0", "required": false, "description": "Velocities at tmig; its count must equal the tmig count."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "ealloc1float", "getparstring", "countparval", "intlin", "cmonot", "intcub", "checkpars", "npfar", "npfa", "ealloc2complex", "ealloc1", "ealloc2float", "efread", "pfa2rc", "pfa2cr", "puttr", "ealloc1complex", "pfacc", "free1complex"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Monotone cubic interpolation, FFTs, ray tracing, and Crank–Nicolson updates mix float intermediates with pow and sqrt. The dip filter converts a division by zero to an integer for one slope before overriding the result, which is undefined behavior. The code uses time from zero despite the selfdoc's delrt claim; extreme parameters can also produce invalid square roots or divisions.",
+      "c_lines": 485,
+      "difficulty": "hard",
+      "difficulty_reason": "The program combines section buffering, FFT dip filtering, interpolation, and iterative ray-based correction.",
+      "test_cases": [
+        {"description": "Apply dip-dependent correction with constant velocity.", "command": "suplane nt=128 ntr=8 | sudipdivcor dxcdp=25 np=8 tmig=0 vmig=1500 verbose=0"},
+        {"description": "Apply conventional correction with a varying velocity and transmission factors.", "command": "suplane nt=128 ntr=8 | sudipdivcor dxcdp=25 np=8 tmig=0,0.4 vmig=1500,2000 conv=1 trans=1 norm=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudivcor"]
+    },
+    {
+      "name": "sudivcor",
+      "path": "su/main/amplitudes/sudivcor.c",
+      "purpose": "Apply a time- and velocity-dependent divergence correction to traces.",
+      "selfdoc_first_line": " SUDIVCOR - Divergence (spreading) correction\t\t\t\t",
+      "params": [
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary velocity file; when supplied, velocity picks are ignored."},
+        {"name": "trms", "type": "float array", "default": "computed: 0.0 and first trace header dt in seconds", "required": false, "description": "Increasing times corresponding to vrms; one supplied value is extended by dt."},
+        {"name": "vrms", "type": "float array", "default": "1500.0,1500.0", "required": false, "description": "RMS velocity picks; one supplied value is duplicated. Its supplied count must equal the trms count."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "ealloc1float", "getparstring", "countparval", "getparfloat", "intlin", "efopen", "efread", "checkpars", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation and correction use float values with some double constants. A single supplied pick allocates only one element but writes index 1, causing out-of-bounds access; zero normalization denominators also produce nonfinite values.",
+      "c_lines": 141,
+      "difficulty": "medium",
+      "difficulty_reason": "The program interpolates a velocity function and applies a precomputed correction vector.",
+      "test_cases": [
+        {"description": "Use the default constant velocity.", "command": "suplane nt=128 ntr=4 | sudivcor"},
+        {"description": "Use multiple velocity picks.", "command": "suplane nt=128 ntr=4 | sudivcor trms=0,0.4 vrms=1500,2000"}
+      ],
+      "license_note": "",
+      "related_programs": ["sudipdivcor"]
+    },
+    {
+      "name": "sugain",
+      "path": "su/main/amplitudes/sugain.c",
+      "purpose": "Apply selectable gain, clipping, balancing, and scaling operations to traces or a whole section.",
+      "selfdoc_first_line": " SUGAIN - apply various types of gain  \t\t\t\t  \t",
+      "params": [
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string", "required": false, "description": "Directory for named temporary files in panel mode."},
+        {"name": "dt", "type": "float", "default": "computed: first trace header dt in seconds", "required": false, "description": "Required when the first trace header dt is zero; otherwise the header value is used."},
+        {"name": "tpow", "type": "float", "default": "0.0", "required": false, "description": "Time-power gain; jon overrides it."},
+        {"name": "epow", "type": "float", "default": "0.0", "required": false, "description": "Exponential gain coefficient."},
+        {"name": "etpow", "type": "float", "default": "1.0", "required": false, "description": "Power of time in the exponential gain."},
+        {"name": "gpow", "type": "float", "default": "1.0", "required": false, "description": "Signed amplitude power; jon overrides it."},
+        {"name": "vred", "type": "float", "default": "0.0", "required": false, "description": "Reducing velocity used with time-power gain."},
+        {"name": "trap", "type": "float", "default": "0.0", "required": false, "description": "Zero samples exceeding this magnitude when positive."},
+        {"name": "clip", "type": "float", "default": "0.0", "required": false, "description": "Clip magnitudes to this value when positive."},
+        {"name": "pclip", "type": "float", "default": "FLT_MAX", "required": false, "description": "Upper clipping value."},
+        {"name": "nclip", "type": "float", "default": "-FLT_MAX", "required": false, "description": "Lower clipping value."},
+        {"name": "qclip", "type": "float", "default": "1.0", "required": false, "description": "Magnitude quantile for clipping or balancing; jon overrides it."},
+        {"name": "scale", "type": "float", "default": "1.0", "required": false, "description": "Overall output multiplier."},
+        {"name": "norm", "type": "float", "default": "0.0", "required": false, "description": "When nonzero, divides scale by this value."},
+        {"name": "bias", "type": "float", "default": "0.0", "required": false, "description": "Constant added to each sample before gain."},
+        {"name": "wagc", "type": "float", "default": "0.5", "required": false, "description": "AGC window length in seconds."},
+        {"name": "agc", "type": "int", "default": "0", "required": false, "description": "Enable box-window AGC."},
+        {"name": "gagc", "type": "int", "default": "0", "required": false, "description": "Enable Gaussian-window AGC."},
+        {"name": "pbal", "type": "int", "default": "0", "required": false, "description": "Balance by RMS amplitude."},
+        {"name": "qbal", "type": "int", "default": "0", "required": false, "description": "Balance by the selected magnitude quantile."},
+        {"name": "mbal", "type": "int", "default": "0", "required": false, "description": "Subtract the mean."},
+        {"name": "panel", "type": "int", "default": "0", "required": false, "description": "Apply gain to the concatenated section when nonzero."},
+        {"name": "jon", "type": "int", "default": "0", "required": false, "description": "Override tpow, gpow, and qclip with 2, 0.5, and 0.95."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostic messages."},
+        {"name": "maxbal", "type": "int", "default": "0", "required": false, "description": "Subtract the maximum sample."},
+        {"name": "mark", "type": "int", "default": "0", "required": false, "description": "Select unmarked traces when zero or marked traces when nonzero in trace mode."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "err", "gettr", "getparfloat", "getparint", "checkpars", "warn", "ealloc1float", "puttr", "etmpfile", "temporary_filename", "efopen", "efwrite", "erewind", "efread", "efclose", "eremove", "free1", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Powers, exponentials, square roots, quantile selection, and float accumulation depend on operation order and math libraries. Box AGC uses data[i] for its first output after the initial summation, and a one-sample rounded window yields a zero half-window and divisions by zero. Panel mode concatenates traces and ignores mark selection.",
+      "c_lines": 877,
+      "difficulty": "medium",
+      "difficulty_reason": "The many ordered gain modes include quantile selection, windowed AGC, and full-section buffering.",
+      "test_cases": [
+        {"description": "Exercise time and exponential gain with clipping.", "command": "suplane nt=128 ntr=4 | sugain tpow=1 epow=0.5 etpow=2 gpow=0.5 clip=2 scale=1.5"},
+        {"description": "Exercise box AGC and mean balancing.", "command": "suplane nt=128 ntr=4 | sugain agc=1 wagc=0.04 mbal=1"},
+        {"description": "Exercise Gaussian AGC and quantile balancing over a panel.", "command": "suplane nt=128 ntr=4 | sugain panel=1 gagc=1 wagc=0.04 qbal=1 qclip=0.9"},
+        {"description": "Exercise the preset and asymmetric clipping.", "command": "suplane nt=128 ntr=4 | sugain jon=1 bias=0.1 pclip=1 nclip=-1"}
+      ],
+      "license_note": "The source credits SEP's Jon Claerbout and cites his Imaging the Earth.",
+      "related_programs": []
+    },
+    {
+      "name": "sunan",
+      "path": "su/main/amplitudes/sunan.c",
+      "purpose": "Replace nonfinite trace samples with a specified value.",
+      "selfdoc_first_line": " SUNAN - remove NaNs & Infs from the input stream\t\t",
+      "params": [
+        {"name": "verbose", "type": "int", "default": "1", "required": false, "description": "Report nonfinite sample locations."},
+        {"name": "interp", "type": "int", "default": "0", "required": false, "description": "Attempt neighbor interpolation; the result is subsequently overwritten by value."},
+        {"name": "value", "type": "float", "default": "0.0", "required": false, "description": "Replacement value."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "checkpars", "warn", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation is always overwritten by value. Its boundary branches can access negative or out-of-range indices, especially for short traces.",
+      "c_lines": 105,
+      "difficulty": "easy",
+      "difficulty_reason": "The main operation tests each sample and assigns a replacement.",
+      "test_cases": [
+        {"description": "Pass finite samples through silently.", "command": "suplane nt=64 ntr=4 | sunan verbose=0 value=3"},
+        {"description": "Replace nonfinite reflectivity samples while exercising interpolation mode.", "command": "sunull nt=64 ntr=4 | suai2r | sunan interp=1 value=2 verbose=0"}
+      ],
+      "license_note": "The source credits Reginald H. Beardsley and attributes the interpolation idea to a version modified by Balasz Nemeth at Potash Corporation.",
+      "related_programs": []
+    },
+    {
+      "name": "sunormalize",
+      "path": "su/main/amplitudes/sunormalize.c",
+      "purpose": "Normalize or median-balance traces using a selected time window.",
+      "selfdoc_first_line": " SUNORMALIZE - Trace NORMALIZation by rms, max, or median       ",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: first trace header dt in seconds", "required": false, "description": "Required if the first trace header dt is zero; ignored when the header is nonzero."},
+        {"name": "ns", "type": "int", "default": "computed: first trace header ns", "required": false, "description": "Required if the first trace header ns is zero; ignored when the header is nonzero."},
+        {"name": "t0", "type": "float", "default": "0", "required": false, "description": "Start of the normalization window in seconds."},
+        {"name": "t1", "type": "float", "default": "computed: ns * dt", "required": false, "description": "End of the normalization window in seconds; the sample at this index is excluded."},
+        {"name": "norm", "type": "string", "default": "rms", "required": false, "description": "One of rms, max, med, median, or balmed."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "fgettr", "err", "getparfloat", "getparint", "ealloc1float", "getparstring", "checkpars", "puttr", "gettr", "CWP_Exit", "qksort"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "RMS accumulates in float and its accumulator is not reset between traces. For even windows the median uses indices n/2 and n/2+1, which is off by one and can read out of bounds. A zero median is replaced by 1 even in balmed mode; window bounds are not checked.",
+      "c_lines": 291,
+      "difficulty": "medium",
+      "difficulty_reason": "Median modes sort a selected window and RMS mode carries an accumulator across traces.",
+      "test_cases": [
+        {"description": "Normalize by RMS over a specified window.", "command": "suplane nt=128 ntr=4 | sunormalize norm=rms t0=0.04 t1=0.4"},
+        {"description": "Normalize by maximum magnitude.", "command": "suplane nt=128 ntr=4 | sunormalize norm=max t0=0 t1=0.4"},
+        {"description": "Subtract a median using an odd-length window.", "command": "suplane nt=128 ntr=4 | sunormalize norm=balmed t0=0 t1=0.404"}
+      ],
+      "license_note": "The embedded cwp_div implementation is derived from Berkeley div code copyrighted by the Regents of the University of California, with its own redistribution terms.",
+      "related_programs": []
+    },
+    {
+      "name": "supgc",
+      "path": "su/main/amplitudes/supgc.c",
+      "purpose": "Compute a shared gain function from a scan of an input file and apply it to all its traces.",
+      "selfdoc_first_line": " SUPGC   -   Programmed Gain Control--apply agc like function\t",
+      "params": [
+        {"name": "ntrscan", "type": "int", "default": "200", "required": false, "description": "Maximum number of traces used to estimate gain."},
+        {"name": "file", "type": "string", "default": "NULL", "required": true, "description": "Input SU trace file; the code passes NULL to fopen if omitted."},
+        {"name": "lwindow", "type": "float", "default": "1.0", "required": false, "description": "Gain window length in seconds."}
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "getparfloat", "checkpars", "err", "fgettr", "warn", "ealloc1float", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Absolute amplitudes and window sums accumulate in float, with output dependent on summation order. A zero-length rounded half-window produces zero gain.",
+      "c_lines": 96,
+      "difficulty": "medium",
+      "difficulty_reason": "The program scans and rewinds a trace file to build a shared windowed gain function.",
+      "test_cases": [
+        {"description": "Estimate gain from a subset of traces.", "command": "suplane nt=128 ntr=8 > in.su && supgc file=in.su ntrscan=4 lwindow=0.04"},
+        {"description": "Estimate gain from a spike section.", "command": "suspike nt=64 ntr=4 k1=20 mag=2 > in.su && supgc file=in.su ntrscan=4 lwindow=0.08"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sur2ai",
+      "path": "su/main/amplitudes/sur2ai.c",
+      "purpose": "Convert reflectivity traces to relative acoustic impedance traces.",
+      "selfdoc_first_line": " sur2ai <stdin >sdout \t\t\t\t\t\t",
+      "params": [
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Parsed but unused."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "warn", "err", "puttr"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The impedance recurrence accumulates rounding error and mixes float values with double constants. Reflectivity of exactly -1 is accepted but causes division by zero. Only the first trace header is copied to the output header.",
+      "c_lines": 87,
+      "difficulty": "easy",
+      "difficulty_reason": "The conversion is a simple sample-by-sample recurrence.",
+      "test_cases": [
+        {"description": "Invert a small reflectivity spike.", "command": "suspike nt=64 ntr=4 k1=20 mag=0.2 | sur2ai verbose=0"},
+        {"description": "Round-trip a positive impedance section.", "command": "suspike nt=64 ntr=4 k1=20 mag=1 | sugain bias=2 | suai2r | sur2ai verbose=1"}
+      ],
+      "license_note": "The source credits Shuki Ronen and describes a partial implementation of Aki and Richards.",
+      "related_programs": ["suai2r"]
+    },
+    {
+      "name": "suweight",
+      "path": "su/main/amplitudes/suweight.c",
+      "purpose": "Weight each trace using one of its header values.",
+      "selfdoc_first_line": " SUWEIGHT - weight traces by header parameter, such as offset\t\t",
+      "params": [
+        {"name": "key", "type": "string", "default": "offset", "required": false, "description": "Header field used in the linear weighting formula."},
+        {"name": "a", "type": "float", "default": "1.0", "required": false, "description": "Constant term in the linear weight."},
+        {"name": "b", "type": "float", "default": ".0005", "required": false, "description": "Header-value multiplier in the linear weight."},
+        {"name": "key2", "type": "string", "default": "NULL", "required": false, "description": "If supplied, use this header field directly as the weight."},
+        {"name": "scale", "type": "float", "default": "0.0001", "required": false, "description": "Scale for key2; parsed only when key2 is supplied."},
+        {"name": "inv", "type": "int", "default": "0", "required": false, "description": "Divide by the weight instead of multiplying when nonzero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparfloat", "hdtype", "getindex", "getparint", "checkpars", "gettr", "err", "gethval", "vtof", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values are converted to float before weighting. Inverse weighting can divide by zero.",
+      "c_lines": 161,
+      "difficulty": "easy",
+      "difficulty_reason": "The program reads header values and applies a simple per-trace weight.",
+      "test_cases": [
+        {"description": "Apply a linear trace-number weight.", "command": "suplane nt=64 ntr=4 | suweight key=tracl a=1 b=0.1"},
+        {"description": "Apply an inverse scaled header weight.", "command": "suplane nt=64 ntr=4 | suweight key2=tracl scale=0.5 inv=1"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suzero",
+      "path": "su/main/amplitudes/suzero.c",
+      "purpose": "Set samples in an inclusive index window to a constant.",
+      "selfdoc_first_line": " SUZERO -- zero-out (or set constant) data within a time window\t",
+      "params": [
+        {"name": "itmax", "type": "int", "default": "", "required": true, "description": "Last sample index to set, inclusive."},
+        {"name": "itmin", "type": "int", "default": "0", "required": false, "description": "First sample index to set, inclusive."},
+        {"name": "value", "type": "float", "default": "0.0", "required": false, "description": "Value assigned to samples in the window."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "checkpars", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The bounds check permits itmax equal to nt, so the inclusive loop writes one sample beyond the trace's declared data.",
+      "c_lines": 75,
+      "difficulty": "easy",
+      "difficulty_reason": "The program assigns a constant to a selected sample range.",
+      "test_cases": [
+        {"description": "Zero an initial window.", "command": "suplane nt=64 ntr=4 | suzero itmax=10"},
+        {"description": "Set an interior window to a nonzero value.", "command": "suplane nt=64 ntr=4 | suzero itmin=10 itmax=20 value=-2"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

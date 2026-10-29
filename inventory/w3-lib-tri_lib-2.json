@@ -1,0 +1,149 @@
+{
+  "scope": "tri/lib part 2",
+  "functions": [
+    {
+      "name": "distanceToEdge",
+      "file": "tri/lib/distance.c",
+      "signature": "float distanceToEdge (Edge *e, float x, float y);",
+      "purpose": "Return the distance from a point to the closest point on an edge segment.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float arithmetic for the projection and squared distance, then calls the C library sqrt with a double argument and converts the result to float. A zero-length edge causes division by zero; NaNs and rounding near the segment endpoints affect clamping.",
+      "c_lines": 16,
+      "difficulty": "easy",
+      "group": "edge-projection",
+      "license_note": ""
+    },
+    {
+      "name": "fixEdgeBetweenVertices",
+      "file": "tri/lib/fixedges.c",
+      "signature": "int fixEdgeBetweenVertices (Vertex *v1, Vertex *v2);",
+      "purpose": "Fix a connection between two vertices, creating edges and retriangulating adjacent regions as needed.",
+      "calls": [
+        "fixExistingEdgesBetween",
+        "killEdgesBetween",
+        "makeEdgeFace",
+        "triangFaceNextToEdge"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Its static helpers traverse and mutate mesh topology, use float intersection and cotangent calculations with exact comparisons, and recursively retriangulate; near-degenerate geometry and traversal order can change the resulting mesh. Helpers also call vertexBetweenVertices, killEdge, and circumTri, and invoke model callbacks.",
+      "c_lines": 23,
+      "difficulty": "hard",
+      "group": "fixed-edges",
+      "license_note": ""
+    },
+    {
+      "name": "unfixEdge",
+      "file": "tri/lib/fixedges.c",
+      "signature": "int unfixEdge(Edge *e);",
+      "purpose": "Unfix an interior edge and restore the surrounding triangulation.",
+      "calls": [
+        "correctTrisAroundVertex"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The recursive helper tests circumcircle membership and swaps edges, so float boundary decisions and traversal order can change topology; it calls inCircumTri, killEdge, makeEdgeFace, and circumTri and invokes model callbacks.",
+      "c_lines": 13,
+      "difficulty": "hard",
+      "group": "fixed-edges",
+      "license_note": ""
+    },
+    {
+      "name": "inCircum",
+      "file": "tri/lib/inside.c",
+      "signature": "int inCircum (float x, float y, float xc, float yc, float rs);",
+      "purpose": "Test whether a point lies strictly inside a circumcircle.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float squared distances with an early comparison and a special exact comparison against TRI_INFINITY; points on the circle are excluded, and rounding near the boundary affects the result.",
+      "c_lines": 15,
+      "difficulty": "easy",
+      "group": "triangle-containment",
+      "license_note": ""
+    },
+    {
+      "name": "inCircumTri",
+      "file": "tri/lib/inside.c",
+      "signature": "int inCircumTri (float x, float y, Tri *t);",
+      "purpose": "Test whether a point lies strictly inside a triangle's circumcircle.",
+      "calls": [
+        "inCircum"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inherits inCircum's float boundary comparisons and TRI_INFINITY handling.",
+      "c_lines": 1,
+      "difficulty": "easy",
+      "group": "triangle-containment",
+      "license_note": ""
+    },
+    {
+      "name": "in3Vertices",
+      "file": "tri/lib/inside.c",
+      "signature": "int in3Vertices (float x, float y, Vertex *v1, Vertex *v2, Vertex *v3);",
+      "purpose": "Test whether a point lies within the triangle defined by three vertices.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Computes float cross products and compares their products to zero; rounding, underflow, and degeneracy affect classification. Despite the comment saying edges are inside, the <= 0 tests exclude points exactly on an edge.",
+      "c_lines": 11,
+      "difficulty": "easy",
+      "group": "triangle-containment",
+      "license_note": ""
+    },
+    {
+      "name": "inTri",
+      "file": "tri/lib/inside.c",
+      "signature": "int inTri (float x, float y, Tri *t);",
+      "purpose": "Test whether a point lies within a triangle using its three vertices.",
+      "calls": [
+        "in3Vertices"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Inherits in3Vertices' float cross-product behavior, including exclusion of exact edge points despite the comment.",
+      "c_lines": 6,
+      "difficulty": "easy",
+      "group": "triangle-containment",
+      "license_note": ""
+    },
+    {
+      "name": "nearestEdgeInModel",
+      "file": "tri/lib/nearest.c",
+      "signature": "Edge* nearestEdgeInModel (Model *m, Edge *start, float x, float y);",
+      "purpose": "Find the nearest edge among the edges of the triangle containing a point.",
+      "calls": [
+        "insideTriInModel",
+        "distanceToEdge"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Compares float distances in edge traversal order and retains the first edge on ties; triangle-location and distance calculations can affect choices near boundaries.",
+      "c_lines": 25,
+      "difficulty": "medium",
+      "group": "nearest-mesh",
+      "license_note": ""
+    },
+    {
+      "name": "nearestVertexInModel",
+      "file": "tri/lib/nearest.c",
+      "signature": "Vertex* nearestVertexInModel (Model *m, Vertex *start, float x, float y);",
+      "purpose": "Find a nearest vertex by repeatedly moving to a closer adjacent vertex.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Iteratively compares float squared distances; strict comparison and adjacency traversal order determine tie behavior, while rounding can change the path or selected vertex.",
+      "c_lines": 28,
+      "difficulty": "medium",
+      "group": "nearest-mesh",
+      "license_note": ""
+    },
+    {
+      "name": "projectToEdge",
+      "file": "tri/lib/project.c",
+      "signature": "void projectToEdge (Edge *e, float *x, float *y);",
+      "purpose": "Project a point onto the closest point of an edge segment in place.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float arithmetic and clamps the projection parameter to the segment; a zero-length edge causes division by zero, and rounding near endpoints affects clamping.",
+      "c_lines": 13,
+      "difficulty": "easy",
+      "group": "edge-projection",
+      "license_note": ""
+    }
+  ]
+}

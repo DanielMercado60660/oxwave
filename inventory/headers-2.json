@@ -1,0 +1,420 @@
+{
+  "scope": "su/main/headers part 2 of 2",
+  "programs": [
+    {
+      "name": "sugethw",
+      "path": "su/main/headers/sugethw.c",
+      "purpose": "Print selected trace header values as text or binary floats.",
+      "selfdoc_first_line": " SUGETHW - sugethw writes the values of the selected key words\t\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "",
+          "required": true,
+          "description": "Header words to print; positional header names are also accepted."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "default": "ascii",
+          "required": false,
+          "description": "Output format: ascii, binary, or geom."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print diagnostic messages."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "countparval",
+        "getparstringarray",
+        "warn",
+        "err",
+        "getparstring",
+        "checkpars",
+        "gettr",
+        "gethdval",
+        "printfval",
+        "hdtype",
+        "vtof",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Binary output converts header values to float, potentially losing integer precision.",
+      "c_lines": 150,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads traces and formats selected header values.",
+      "test_cases": [
+        {
+          "description": "Print two header words in geometry format.",
+          "command": "suplane nt=32 ntr=4 | sugethw key=tracl,cdp output=geom"
+        },
+        {
+          "description": "Write header values as binary floats.",
+          "command": "suplane nt=32 ntr=4 | sugethw key=tracl,ns output=binary"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "sukeycount",
+        "surange"
+      ]
+    },
+    {
+      "name": "suhtmath",
+      "path": "su/main/headers/suhtmath.c",
+      "purpose": "Apply arithmetic to each trace using a scaled header value.",
+      "selfdoc_first_line": " SUHTMATH - do unary arithmetic operation on segy traces with \t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "tracl",
+          "required": false,
+          "description": "Header word used in the arithmetic."
+        },
+        {
+          "name": "op",
+          "type": "string",
+          "default": "nop",
+          "required": false,
+          "description": "Operation: add, mult, or div. Although documented, nop is rejected by the code."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Multiplier for the header value."
+        },
+        {
+          "name": "const",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Constant added to the scaled header value."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparfloat",
+        "getparstring",
+        "hdtype",
+        "getindex",
+        "checkpars",
+        "err",
+        "gettr",
+        "gethval",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values are converted to float before the arithmetic; division by zero is not checked. The first trace's sample count is used for every trace.",
+      "c_lines": 158,
+      "difficulty": "easy",
+      "difficulty_reason": "It performs simple per-sample arithmetic using a header value.",
+      "test_cases": [
+        {
+          "description": "Add a scaled trace number.",
+          "command": "suplane nt=32 ntr=4 | suhtmath key=tracl op=add scale=0.5 const=1"
+        },
+        {
+          "description": "Divide by a nonzero header-derived value.",
+          "command": "suplane nt=32 ntr=4 | suhtmath key=tracl op=div scale=1 const=2"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "supaste",
+      "path": "su/main/headers/supaste.c",
+      "purpose": "Combine saved trace headers with binary sample data to reconstruct SU traces.",
+      "selfdoc_first_line": " SUPASTE - paste existing SU headers on existing binary data\t",
+      "params": [
+        {
+          "name": "ns",
+          "type": "int",
+          "default": "",
+          "required": true,
+          "description": "Number of samples per output trace."
+        },
+        {
+          "name": "head",
+          "type": "string",
+          "default": "headers",
+          "required": false,
+          "description": "File containing saved trace headers."
+        },
+        {
+          "name": "ftn",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to skip Fortran record markers."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Report the number of traces pasted."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "err",
+        "checkpars",
+        "efopen",
+        "efread",
+        "warn",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Binary sample and record-marker formats depend on native representation.",
+      "c_lines": 110,
+      "difficulty": "easy",
+      "difficulty_reason": "It pairs saved headers with fixed-size sample records.",
+      "test_cases": [
+        {
+          "description": "Strip and restore ordinary C-format sample records.",
+          "command": "suplane nt=32 ntr=4 | sustrip head=headers outpar=strip.par > samples.bin && supaste ns=32 head=headers verbose=1 < samples.bin"
+        },
+        {
+          "description": "Strip and restore Fortran-style records.",
+          "command": "suplane nt=32 ntr=4 | sustrip head=headers outpar=strip.par ftn=1 > samples.bin && supaste ns=32 head=headers ftn=1 < samples.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "sustrip"
+      ]
+    },
+    {
+      "name": "surandhw",
+      "path": "su/main/headers/surandhw.c",
+      "purpose": "Set or perturb a trace header using random values.",
+      "selfdoc_first_line": " surandhw - set header word to random variable \t\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "tstat",
+          "required": false,
+          "description": "Header word to update."
+        },
+        {
+          "name": "a",
+          "type": "double",
+          "default": "1",
+          "required": false,
+          "description": "Multiplier for the existing header value; the self-doc incorrectly states a default of 0."
+        },
+        {
+          "name": "min",
+          "type": "double",
+          "default": "0",
+          "required": false,
+          "description": "Lower bound or Gaussian scaling endpoint."
+        },
+        {
+          "name": "max",
+          "type": "double",
+          "default": "1",
+          "required": false,
+          "description": "Upper bound or Gaussian scaling endpoint."
+        },
+        {
+          "name": "noise",
+          "type": "string",
+          "default": "gauss",
+          "required": false,
+          "description": "Random distribution: gauss or flat."
+        },
+        {
+          "name": "seed",
+          "type": "uint",
+          "default": "computed: current time in seconds",
+          "required": false,
+          "description": "Random generator seed."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getpardouble",
+        "getparuint",
+        "err",
+        "checkpars",
+        "srannor",
+        "sranuni",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "frannor",
+        "franuni",
+        "gethval",
+        "puthval",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "Random sequences depend on the SU generator implementation; arithmetic mixes generator results and doubles before conversion to the header type. The double-header case falls through to an error.",
+      "c_lines": 185,
+      "difficulty": "easy",
+      "difficulty_reason": "It generates one random value and updates one header per trace.",
+      "test_cases": [
+        {
+          "description": "Set a header from a reproducible uniform distribution.",
+          "command": "suplane nt=32 ntr=4 | surandhw key=tstat a=0 noise=flat min=0 max=100 seed=42"
+        },
+        {
+          "description": "Add reproducible Gaussian noise to a header.",
+          "command": "suplane nt=32 ntr=4 | surandhw key=tstat a=1 noise=gauss min=-10 max=10 seed=42"
+        }
+      ],
+      "license_note": "Credits Eric Verschuur, Delft University of Technology; based on sushw.",
+      "related_programs": [
+        "sushw"
+      ]
+    },
+    {
+      "name": "sustrip",
+      "path": "su/main/headers/sustrip.c",
+      "purpose": "Remove SU trace headers and write the sample data as binary records.",
+      "selfdoc_first_line": " SUSTRIP - remove the SEGY headers from the traces\t\t",
+      "params": [
+        {
+          "name": "head",
+          "type": "string",
+          "default": "/dev/null",
+          "required": false,
+          "description": "File in which to save trace headers."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving sample count, trace count, and sample interval."
+        },
+        {
+          "name": "ftn",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to write Fortran-style record markers."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "filestat",
+        "warn",
+        "pagedoc",
+        "getparstring",
+        "getparint",
+        "err",
+        "checkpars",
+        "efopen",
+        "gettr",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sample bytes and Fortran record markers use native representation; packed trace types output bytes or shorts rather than floats.",
+      "c_lines": 130,
+      "difficulty": "easy",
+      "difficulty_reason": "It separates headers and fixed-size sample records.",
+      "test_cases": [
+        {
+          "description": "Save headers and ordinary sample data.",
+          "command": "suplane nt=32 ntr=4 | sustrip head=headers outpar=strip.par > samples.bin"
+        },
+        {
+          "description": "Write Fortran-style records.",
+          "command": "suplane nt=32 ntr=4 | sustrip head=headers outpar=strip.par ftn=1 > samples.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "supaste"
+      ]
+    },
+    {
+      "name": "sutrcount",
+      "path": "su/main/headers/sutrcount.c",
+      "purpose": "Count the traces in an SU input stream.",
+      "selfdoc_first_line": " SUTRCOUNT - SU program to count the TRaces in infile\t\t",
+      "params": [
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/stdout",
+          "required": false,
+          "description": "File receiving the ASCII trace count."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "",
+      "c_lines": 66,
+      "difficulty": "easy",
+      "difficulty_reason": "It counts traces in a single pass.",
+      "test_cases": [
+        {
+          "description": "Write the trace count to stdout.",
+          "command": "suplane nt=32 ntr=4 | sutrcount"
+        },
+        {
+          "description": "Write the count to a file.",
+          "command": "suplane nt=64 ntr=8 | sutrcount outpar=count.txt"
+        }
+      ],
+      "license_note": "Credits B. Nemeth, Potash Corporation, Saskatchewan; given to CWP in 2008 with permission of Potash Corporation.",
+      "related_programs": [
+        "sukeycount"
+      ]
+    }
+  ]
+}

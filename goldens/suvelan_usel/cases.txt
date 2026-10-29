@@ -1,0 +1,16 @@
+# Explicit sampling, selection, velocity and power parameters; odd trace length.
+suplane nt=127 ntr=8 | sushw key=offset a=100 b=25 | suvelan_usel nx=8 dx=25 nv=5 dv=75 fv=1200 tau=0.2 smute=3 dtratio=3 nsmooth=9 pwr=2
+# Defaults read from headers.
+suplane nt=101 ntr=8 | sushw key=cdpt,d2,offset a=8,20,0 b=0,0,20 | suvelan_usel
+# All correlations and diagnostics.
+[stderr] suplane nt=99 ntr=8 | sushw key=offset a=0 b=20 | suvelan_usel nx=8 dx=20 nv=2 tau=0 verbose=1
+# Zero velocities and zero smoothing window.
+suplane nt=31 ntr=8 | suvelan_usel nx=8 dx=20 nv=0
+suplane nt=31 ntr=8 | suvelan_usel nx=8 dx=20 nv=2 nsmooth=0
+# Single time sample and single trace with no output velocities.
+sunull nt=1 ntr=1 | suvelan_usel nx=1 dx=1 nv=0
+# Parameter validation and empty input.
+suvelan_usel
+suplane nt=16 ntr=8 | suvelan_usel nx=8 dx=20 smute=1
+suplane nt=16 ntr=8 | suvelan_usel nx=8 dx=20 pwr=-1
+suplane nt=16 ntr=8 | suvelan_usel nx=8 dx=20 pwr=0

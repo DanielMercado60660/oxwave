@@ -1,0 +1,17 @@
+# Defaults and carried RMS across traces, including zero and negative samples.
+suplane nt=127 ntr=3 | sunormalize
+sunull nt=9 ntr=2 | sunormalize norm=rms
+suspike nt=9 ntr=1 k1=3 mag=-4 | sunormalize norm=max
+suplane nt=127 ntr=3 | sunormalize norm=med t0=0.004 t1=0.104
+suplane nt=127 ntr=3 | sunormalize norm=median t0=0.004 t1=0.108
+sunull nt=9 ntr=1 | sunormalize norm=balmed
+suspike nt=1 ntr=1 mag=2 | sunormalize norm=max
+suspike nt=1 ntr=1 mag=2 | sunormalize norm=med
+suspike nt=9 ntr=1 mag=2 | sunormalize norm=rms t0=0.004 t1=0.020
+suplane nt=32 ntr=1 | sunormalize norm=max verbose=1
+suplane nt=32 ntr=1 | sunormalize norm=bad
+sunormalize
+sunull nt=9 ntr=1 | sushw key=dt a=0 | sunormalize
+sunull nt=9 ntr=1 | sushw key=dt a=0 | sunormalize dt=0.004 norm=max
+suplane nt=32 ntr=1 | sunormalize dt=0.002 ns=10 norm=max
+sunull nt=9 ntr=1 | sunormalize t0=0.020 t1=0.004

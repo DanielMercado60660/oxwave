@@ -1,0 +1,26 @@
+# Default and variable-length traces, including stale-sample padding.
+(suspike nt=5 ntr=1 k1=2; suspike nt=2 ntr=1 k1=1; suspike nt=7 ntr=1 k1=3) | suvlength
+(suspike nt=5 ntr=1 k1=2; suspike nt=2 ntr=1 k1=1; suspike nt=7 ntr=1 k1=3) | suvlength ns=4
+suspike nt=1 ntr=1 | suvlength ns=1
+suspike nt=1 ntr=1 | suvlength ns=7
+suplane nt=7 ntr=3 | suvlength ns=3
+suplane nt=7 ntr=3 | suvlength ns=0
+suplane nt=7 ntr=1 | suvlength ns=-1
+suplane nt=7 ntr=1 | suvlength ns=abc
+suplane nt=7 ntr=1 | suvlength ns=3 ns=5
+[stderr] suplane nt=7 ntr=1 | suvlength ns=3 verbose=1
+[stderr] suplane nt=7 ntr=1 | suvlength bogus=1
+suvlength ns=3
+suplane nt=7 ntr=1 | suvlength ns=2147483648
+
+# Maximum safe padding and unsigned header conversion for negative lengths.
+suspike nt=1 ntr=1 | suvlength ns=65535
+(suspike nt=5 ntr=1 k1=2; suspike nt=1 ntr=1) | suvlength ns=65535
+# Maximum-length input is valid both with the default and when truncating.
+suspike nt=65535 ntr=1 k1=65535 | suvlength
+(suspike nt=65535 ntr=1 k1=65535; suspike nt=1 ntr=1) | suvlength ns=3
+suspike nt=1 ntr=1 | suvlength ns=-65536
+suspike nt=1 ntr=1 | suvlength ns=-65537
+suspike nt=1 ntr=1 | suvlength ns=-2147483648
+# Values above 65535 overrun the C buffer; verify clean rejection separately.
+

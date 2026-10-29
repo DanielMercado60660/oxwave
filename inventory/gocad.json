@@ -1,0 +1,129 @@
+{
+  "scope": "su/main/gocad part 1 of 1",
+  "programs": [
+    {
+      "name": "su2voxet",
+      "path": "su/main/gocad/su2voxet.c",
+      "purpose": "Convert a sorted 3D SU trace volume into a Gocad Voxet header and binary amplitude file.",
+      "selfdoc_first_line": "    SU2VOXET  - convert 3D data volume to Gocad VOXET object           ",
+      "params": [
+        {
+          "name": "fname",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "Base name for the output files, fname.vo and fname_amplitude@@."
+        },
+        {
+          "name": "u",
+          "type": "string",
+          "default": "cdp",
+          "required": false,
+          "description": "Trace header key identifying the u coordinate."
+        },
+        {
+          "name": "v",
+          "type": "string",
+          "default": "ep",
+          "required": false,
+          "description": "Trace header key identifying the v coordinate."
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Time data flag; the code reads it but does not use it."
+        },
+        {
+          "name": "bendian",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When zero, swap the bytes of each sample before writing; otherwise write samples without swapping."
+        },
+        {
+          "name": "datum",
+          "type": "float",
+          "default": "computed: negative delrt header of the first trace",
+          "required": false,
+          "description": "Vertical coordinate of the Voxet origin."
+        },
+        {
+          "name": "dz",
+          "type": "float",
+          "default": "computed: negative dt header of the last trace divided by 1000.0",
+          "required": false,
+          "description": "Vertical sample spacing in the Voxet header."
+        },
+        {
+          "name": "maxu",
+          "type": "int",
+          "default": "1000",
+          "required": false,
+          "description": "Allocated size of the u dimension and initial value used when finding the smallest u index."
+        },
+        {
+          "name": "maxv",
+          "type": "int",
+          "default": "1000",
+          "required": false,
+          "description": "Allocated size of the v dimension and initial value used when finding the smallest v index."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, print counts as new u and v values are encountered."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "MUSTGETPARSTRING",
+        "hdtype",
+        "getindex",
+        "ealloc1int",
+        "ealloc2float",
+        "efopen",
+        "gettr",
+        "err",
+        "getparfloat",
+        "gethval",
+        "vtoi",
+        "swap_float_4",
+        "checkpars",
+        "efclose",
+        "free1int",
+        "free2float"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Coordinates use pow(10.0, tr.scalco) in double precision, cast to float and multiplied in float; axis differences are computed in float before conversion to double. The default dz is computed in double and rounded to float. If both dimensions have only one distinct value, all four horizontal axis components remain uninitialized. Coordinate arrays are indexed directly by header values minus one without bounds checks, and missing grid positions can leave coordinate values uninitialized. The filename buffers can lack termination or overflow for long names. Sample byte swapping depends on the bendian parameter rather than detecting the host byte order.",
+      "c_lines": 276,
+      "difficulty": "medium",
+      "difficulty_reason": "The program buffers a multi-trace coordinate grid and derives Voxet geometry while writing a separate binary amplitude file.",
+      "test_cases": [
+        {
+          "description": "Convert a single-u line with explicit positive indices and default sample byte swapping.",
+          "command": "suplane nt=32 ntr=4 | sushw key=cdp,ep,gx,gy a=1,1,100,200 b=0,1,10,20 | su2voxet fname=line_v maxu=4 maxv=4"
+        },
+        {
+          "description": "Convert a single-v line using alternate header keys, explicit geometry options, and unswapped samples.",
+          "command": "suplane nt=32 ntr=4 | sushw key=tracf,fldr,gx,gy a=1,1,100,200 b=1,0,10,20 | su2voxet fname=line_u u=tracf v=fldr maxu=4 maxv=4 datum=50 dz=-2 bendian=1 time=1 verbose=1"
+        },
+        {
+          "description": "Convert a sorted two-dimensional grid with two values on each horizontal axis.",
+          "command": "suplane nt=32 ntr=4 | sushw key=cdp,ep,gx,gy a=1,1,100,200 b=0,1,0,10 c=1,0,20,0 j=2,2,2,2 | su2voxet fname=grid maxu=2 maxv=2"
+        }
+      ],
+      "license_note": "The author note credits B. Nemeth of Potash Corporation of Saskatoon and says the program is from the Potash_SU collection.",
+      "related_programs": []
+    }
+  ]
+}

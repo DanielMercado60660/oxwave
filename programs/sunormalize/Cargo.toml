@@ -1,0 +1,16 @@
+[package]
+name = "sunormalize"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sunormalize"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-sort = { path = "../../crates/oxwave-sort" }

@@ -1,0 +1,16 @@
+[package]
+name = "sulcthw"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sulcthw"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-segy-scalar = { path = "../../crates/oxwave-segy-scalar" }

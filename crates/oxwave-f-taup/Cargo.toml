@@ -1,0 +1,19 @@
+[package]
+name = "oxwave-f-taup"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-convolution = { path = "../oxwave-f-convolution" }
+oxwave-f-vnd = { path = "../oxwave-f-vnd" }
+oxwave-linear-interp = { path = "../oxwave-linear-interp" }
+oxwave-pfa-fft = { path = "../oxwave-pfa-fft" }
+oxwave-sinc-interp = { path = "../oxwave-sinc-interp" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

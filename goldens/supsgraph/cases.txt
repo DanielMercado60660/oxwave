@@ -1,0 +1,13 @@
+# Remove variable PostScript metadata before comparison.
+suplane nt=64 ntr=8 | supsgraph verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=64 ntr=8 | supsgraph nplot=8 style=normal d1=0.004 f1=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | supsgraph ntr=3 d1=0.002 d2=2 f1=-1 f2=4 title=Graph | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=2 | sushw key=ntr a=2 | supsgraph style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=3 | sushw key=trid a=30 | supsgraph tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=1 ntr=1 | supsgraph nplot=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=1 | supsgraph tmpdir=/no/such/directory
+supsgraph </dev/null
+suplane nt=9 ntr=1 | env -u CWPROOT -u CWPBIN supsgraph
+[stderr] suplane nt=11 ntr=3 | sushw key=dt,trid a=0,30 | supsgraph verbose=1 tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | sushw key=dt,delrt a=0,-20 | env CWP_TMPDIR=. supsgraph d2=-2 f2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=2 | sushw key=trid,d1,f1 a=30,2,-3 | supsgraph nplot=2 ntr=2 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

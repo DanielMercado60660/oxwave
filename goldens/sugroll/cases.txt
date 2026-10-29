@@ -1,0 +1,74 @@
+# Defaults, both outputs, and non-power-of-two sample/trace counts.
+[stderr] suplane nt=127 ntr=7 | sugroll
+[stderr] suplane nt=127 ntr=7 | sugroll dt=0.004 nx=7 sb=0 verbose=0 nrot=3 tmpdir=
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=1 sb=1
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=2 sb=0
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=0 sb=0
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=0 sb=1
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=5 sb=1
+[stderr] suplane nt=63 ntr=5 | sugroll nrot=9 sb=-2
+# nx is the upper bound for zeroing rows, rather than a trace count override.
+[stderr] suplane nt=65 ntr=5 | sugroll nrot=1 nx=3 sb=1
+[stderr] suplane nt=65 ntr=5 | sugroll nrot=1 nx=0
+[stderr] suplane nt=65 ntr=5 | sugroll nrot=1 nx=-1
+[stderr] suplane nt=65 ntr=5 | sugroll nrot=5 nx=2
+# Full-rank gathers exercise the Jacobi rotations and float accumulation.
+[stderr] suplane nt=79 ntr=7 | suaddnoise seed=123 sn=3 | sugroll nrot=2
+[stderr] suplane nt=79 ntr=7 | suaddnoise seed=123 sn=3 | sugroll nrot=2 sb=1
+[stderr] suplane nt=97 ntr=11 | suaddnoise seed=7 noise=flat sn=1 | sugroll nrot=4
+[stderr] suspike nt=33 ntr=5 nspk=3 ix1=1,3,5 it1=2,9,25 | sugroll nrot=2 sb=1
+# Degenerate data, repeated eigenvalues, and minimum sizes.
+[stderr] sunull nt=17 ntr=5 | sugroll
+[stderr] sunull nt=17 ntr=5 | sugroll sb=1
+[stderr] sunull nt=1 ntr=1 | sugroll
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sugroll sb=1
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sugroll nrot=0
+[stderr] suspike nt=1 ntr=5 nspk=1 ix1=3 it1=1 | sugroll nrot=1 sb=1
+[stderr] suplane nt=35 ntr=1 | sugroll
+# dt validation, override, negative value, and unchanged output headers.
+[stderr] suplane nt=31 ntr=3 | sushw key=dt a=0 | sugroll
+[stderr] suplane nt=31 ntr=3 | sushw key=dt a=0 | sugroll dt=0.002 sb=1
+[stderr] suplane nt=31 ntr=3 | sugroll dt=0
+[stderr] suplane nt=31 ntr=3 | sugroll dt=-0.001
+[stderr] suplane nt=31 ntr=3 | sugroll dt=abc
+# Anonymous/named temp files, environment fallback, and verbose diagnostics.
+[stderr] suplane nt=31 ntr=3 | sugroll verbose=1
+[stderr] suplane nt=31 ntr=3 | sugroll verbose=-1 tmpdir=. sb=1
+[stderr] suplane nt=31 ntr=3 | CWP_TMPDIR=. sugroll verbose=1
+[stderr] suplane nt=31 ntr=3 | CWP_TMPDIR=/not/a/sugroll/directory sugroll tmpdir= verbose=1
+[stderr] sugroll tmpdir=/not/a/sugroll/directory
+[stderr] CWP_TMPDIR=/not/a/sugroll/directory sugroll
+# Empty/invalid input, missing sampling interval, parser overflow.
+[stderr] sugroll
+[stderr] sugroll verbose=1
+[stderr] sunull nt=0 ntr=1 | sugroll
+[stderr] suplane nt=31 ntr=3 | sugroll nrot=2147483648
+[stderr] suplane nt=31 ntr=3 | sugroll dt=1e-310
+# Unknown parameters are silently ignored because the C never calls checkpars.
+[stderr] suplane nt=31 ntr=3 | sugroll unknown=1 verbose=1
+[stderr] suplane nt=31 ntr=3 | sugroll nrot=0 nrot=1 sb=0 sb=1
+# Preserve varying headers and report inconsistent trace lengths from gettr.
+[stderr] suplane nt=67 ntr=5 | sushw key=offset,cdp,dt a=-20,100,2000 b=10,1,100 | sugroll nrot=2 sb=1
+[stderr] (sunull nt=7 ntr=1; sunull nt=9 ntr=1) | sugroll
+# Nonfinite covariance exhausts all 50 Jacobi sweeps and exits -2 (254).
+[stderr] sunull nt=3 ntr=2 | sugain scale=nan | sugroll
+# Empty numeric arguments use defaults; malformed integers parse as zero.
+[stderr] suplane nt=23 ntr=5 | sugroll dt= nx= nrot= sb= verbose=
+[stderr] suplane nt=23 ntr=5 | sugroll nx=abc nrot=abc sb=abc
+# Parameter files are read before command-line overrides.
+[stderr] printf 'nrot=0 sb=0 nx=5 dt=0.002\n' > params; suplane nt=23 ntr=5 | sugroll par=params nrot=2 sb=1
+# NaN passes dt's equality check; infinity overflows in the parameter parser.
+[stderr] suplane nt=23 ntr=5 | sugroll dt=nan
+[stderr] suplane nt=23 ntr=5 | sugroll dt=inf
+# Named temporary files are removed after successful output.
+[stderr] mkdir scratch; suplane nt=23 ntr=5 | sugroll tmpdir=scratch verbose=1; find scratch -type f
+# Unwritable mode bits and a path whose parent is missing fail before input.
+[stderr] mkdir locked; chmod 555 locked; sugroll tmpdir=locked; result=$?; chmod 755 locked; exit "$result"
+[stderr] sugroll tmpdir=missing/child
+# Small noisy gathers exercise all component choices, including equal bounds.
+[stderr] suplane nt=3 ntr=2 | suaddnoise seed=91 sn=1 | sugroll nrot=1 sb=1
+[stderr] suplane nt=5 ntr=3 | suaddnoise seed=17 sn=1 | sugroll nrot=2 nx=2 sb=1
+# Out-of-range component rows cause SIGSEGV in the original; shell messages
+# contain varying process IDs, so compare exit code and the standard first line.
+sunull nt=7 ntr=2 | sugroll nrot=-1
+sunull nt=7 ntr=2 | sugroll nx=3 nrot=1

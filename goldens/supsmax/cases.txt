@@ -1,0 +1,18 @@
+# Strip run-dependent PostScript metadata.
+# sumax opens /dev/tty unconditionally; use a wrapper to supply its outpar in the non-tty harness.
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=64 ntr=9 | CWPBIN="$PWD/bin" supsmax mode=max | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=63 ntr=7 | CWPBIN="$PWD/bin" supsmax mode=min verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=33 ntr=5 | CWPBIN="$PWD/bin" supsmax mode=abs d1=.002 d2=2 f1=-1 f2=4 title=Test | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=5 | supsmax outpar=/dev/null | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=31 ntr=7 | supsmax outpar=/dev/null mode=min verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | supsmax outpar=/dev/null mode=abs d1=.002 d2=2 f1=-1 f2=4 title='Test plot' | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=1 ntr=1 | supsmax outpar=/dev/null | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | supsmax outpar=/dev/null n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | supsmax outpar=/dev/null ntr=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | supsmax outpar=/dev/null tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | CWP_TMPDIR=. supsmax outpar=/dev/null | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | supsmax tmpdir=/no/such/directory
+suplane nt=16 ntr=3 | env -u CWPROOT -u CWPBIN supsmax
+supsmax </dev/null
+suplane nt=16 ntr=3 | supsmax outpar=/dev/null mode=invalid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=16 ntr=3 | supsmax outpar=/dev/null n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

@@ -1,0 +1,70 @@
+# Defaults and multiple input traces
+suspike nt=64 ntr=2 | sucwt
+# All wavelet and scale parameters; odd input length
+suspike nt=63 ntr=1 | sucwt base=2 first=-1 last=1 expinc=0.2 nwavelet=128 xmin=-5 xcenter=0.2 xmax=5 sigma=2 wtype=0
+# Holder modes
+suspike nt=64 ntr=1 | sucwt holder=1 divisor=1 nwavelet=256 xmin=-5 xcenter=0 xmax=5 first=-1 last=0 expinc=0.05
+suspike nt=64 ntr=1 | sucwt holder=1 divisor=2 nwavelet=256 xmin=-5 xcenter=0 xmax=5 first=-1 last=0 expinc=0.05
+# Diagnostics and invalid settings
+[stderr] suspike nt=16 ntr=1 | sucwt verbose=1 nwavelet=64 first=-1 last=-0.5 expinc=0.2
+sucwt wtype=1
+sucwt nwavelet=1
+sucwt expinc=0
+sucwt
+suspike nt=1 ntr=1 | sucwt nwavelet=64 first=-1 last=-0.5 expinc=0.2
+
+# Explicit effective defaults: omitting xcenter in C overwrites xmin with zero.
+suspike nt=32 ntr=1 | sucwt base=10 first=-1 expinc=0.01 last=1.5 wtype=0 nwavelet=1024 xmin=0 xcenter=0 xmax=20 sigma=1 verbose=0 holder=0 divisor=1
+# Omitted xcenter also overwrites a user-provided xmin.
+suspike nt=17 ntr=1 | sucwt xmin=-9 nwavelet=128 first=-1 last=0 expinc=0.1
+# Nonzero wavelet center, negative sigma, odd wavelet and trace sizes.
+suspike nt=31 ntr=1 | sucwt base=2 first=0 last=1 expinc=0.25 nwavelet=127 xmin=-5 xcenter=3 xmax=5 sigma=-1
+# Nontrivial input and preserved headers; enough scales for both regression paths.
+sunull nt=127 ntr=2 | suaddnoise seed=137 | sushw key=cdpt,d2,f2 a=42,0.5,-7 | sucwt holder=1 divisor=1 nwavelet=1024 xmin=-10 xcenter=10 xmax=10 first=-0.5 last=0.8 expinc=0.02
+sunull nt=127 ntr=2 | suaddnoise seed=137 | sucwt holder=1 divisor=2.5 nwavelet=1024 xmin=-10 xcenter=10 xmax=10 first=-0.5 last=0.8 expinc=0.02
+# Zero input and a nonzero holder value other than one.
+sunull nt=15 ntr=2 | sucwt holder=-1 first=-1 last=0 expinc=0.1
+# The divisor check occurs during Holder processing, after convolution.
+[stderr] suspike nt=16 ntr=1 | sucwt holder=1 divisor=0.5 first=-1 last=0 expinc=0.2
+# All unsupported wavelet choices and the zero-size wavelet error.
+[stderr] sucwt wtype=2
+[stderr] sucwt wtype=-1
+[stderr] sucwt nwavelet=0
+# Scale counts terminate with the C error for non-increasing exponents or base one.
+[stderr] sucwt expinc=-0.1
+[stderr] sucwt base=1
+# Verbose preprocessing can be compared fully even without input.
+[stderr] sucwt verbose=1 nwavelet=64 first=-1 last=-0.5 expinc=0.2 unknown=9
+
+# Negative counts fail allocation before the wavelet-type/size validation.
+[stderr] sucwt nwavelet=-1
+[stderr] sucwt nwavelet=-1 wtype=1
+[stderr] sucwt nwavelet=-2147483648 verbose=1
+# Error precedence, numeric conversion, and empty numeric defaults.
+[stderr] sucwt nwavelet=0 wtype=1 verbose=1
+[stderr] sucwt nwavelet=abc
+[stderr] sucwt nwavelet=2147483648
+[stderr] sucwt nwavelet=1 verbose=1 base= first= last= expinc=
+# Base zero produces no scales; empty input still reaches the trace-reader error.
+[stderr] sucwt base=0
+# Nonzero verbose values print program diagnostics; only one enables the XDR line.
+[stderr] sucwt verbose=-1 nwavelet=64 first=-1 last=-0.5 expinc=0.2
+
+# One-sample filters: the C centering loop reads a zero immediately before
+# its convolution buffer. Exercise both multiple scales and a single sample.
+suspike nt=31 ntr=2 | sucwt first=-2 last=-1 expinc=0.25
+suspike nt=1 ntr=1 | sucwt first=-2 last=-2 expinc=1
+# Nontrivial amplitude data and convolution lengths on both sides of 30.
+sunull nt=65 ntr=2 | suaddnoise seed=349 | sucwt base=2 first=0 last=2 expinc=0.25 nwavelet=255 xmin=-4 xcenter=4 xmax=4 sigma=0.8
+# Smallest supported wavelet and exactly one scale in both output modes.
+suspike nt=7 ntr=1 | sucwt nwavelet=2 xmin=0 xcenter=0 xmax=1 base=2 first=0 last=0 expinc=1
+suspike nt=9 ntr=1 | sucwt holder=1 nwavelet=2 xmin=0 xcenter=0 xmax=1 base=2 first=0 last=0 expinc=1
+# Zero sigma follows C floating-point arithmetic, producing NaN amplitudes.
+[stderr] suspike nt=9 ntr=1 | sucwt sigma=0 first=-1 last=0 expinc=0.25
+# Amplitude output preserves d2/f2, replaces cdpt, and ignores divisor.
+sunull nt=31 ntr=2 | suaddnoise seed=349 | sushw key=cdpt,d2,f2 a=42,0.5,-7 | sucwt first=-1 last=0 expinc=0.25 divisor=0
+# Zero and negative divisors fail only when computing Holder regularity.
+[stderr] suspike nt=9 ntr=1 | sucwt holder=1 divisor=0 first=-1 last=0 expinc=0.25
+[stderr] suspike nt=9 ntr=1 | sucwt holder=1 divisor=-2 first=-1 last=0 expinc=0.25
+# Zero xmax with a nonzero coordinate span, including a one-sample filter.
+suspike nt=15 ntr=1 | sucwt xmin=-4 xcenter=0 xmax=0 first=-0.5 last=0.5 expinc=0.25

@@ -1,0 +1,3 @@
+# Programs exempt from the rule that every program has at least 3 golden cases with real output, with the reason.
+psepsi  needs Ghostscript (gs), which is not installed on the build machine, so the original cannot succeed here
+t       prints the current date and time, so no recorded output stays valid; see goldens/t/EXCLUDE.txt

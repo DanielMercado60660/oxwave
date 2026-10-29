@@ -1,0 +1,92 @@
+# Defaults, explicit defaults, nonzero offsets, odd sizes, and nonzero delay.
+[stderr] suplane nt=257 ntr=7 | sunmocsv cdp=1 tnmo=0,0.4 vnmo=1500,2200
+[stderr] suplane nt=257 ntr=7 | sunmocsv cdp=1 tnmo=0,0.4 vnmo=1500,2200 smute=1.5 lmute=25 sscale=1 invert=0 upward=0 check=0 print=0
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500 sscale=0
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500 lmute=0
+suplane nt=333 ntr=5 dt=0.002 | sushw key=offset,delrt a=-300,117 b=125,0 | sunmocsv cdp=1 tnmo=0,0.3,0.8 vnmo=1450,2100,2700 smute=2 lmute=11
+suplane nt=257 ntr=3 | sushw key=delrt a=-20 | sunmocsv cdp=1 tnmo=0,0.6 vnmo=1500,2200 lmute=0 sscale=0
+suplane nt=257 ntr=5 | sushw key=offset a=120 b=75 | sunmocsv cdp=1 tnmo=0,0.2,0.5 vnmo=1500,2200,2800 smute=3 lmute=0
+suplane nt=257 ntr=5 | sushw key=offset a=120 b=-75 | sunmocsv cdp=1 tnmo=0,0.2,0.5 vnmo=1500,2200,2800 smute=3 lmute=-1 sscale=0
+suplane nt=257 ntr=5 | sushw key=offset a=600 b=100 | sunmocsv cdp=1 tnmo=0,0.2,0.6 vnmo=2200,2800,1600 upward=1 smute=2
+suplane nt=257 ntr=5 | sushw key=offset a=150 b=100 | sunmocsv cdp=1 tnmo=0,0.2,0.6 vnmo=1500,2100,2600 invert=1
+suplane nt=257 ntr=5 | sushw key=offset a=150 b=100 | sunmocsv cdp=1 tnmo=0,0.2,0.6 vnmo=1500,2100,2600 invert=1 sscale=0 upward=1
+suplane nt=257 ntr=3 | sushw key=offset,delrt a=200,123 b=100,0 | sunmocsv cdp=1 tnmo=0,0.2,0.6 vnmo=1500,2100,2600 invert=1
+suplane nt=257 ntr=3 | sushw key=offset a=0 | sunmocsv cdp=1 tnmo=0 vnmo=0 lmute=0
+suplane nt=257 ntr=3 | sushw key=offset a=0 | sunmocsv cdp=1 tnmo=0 vnmo=-1500 lmute=0
+# Multiple spatial functions: sorting, linear interpolation, extrapolation, repeated CDPs/offsets.
+[stderr] suplane nt=257 ntr=9 | sushw key=cdp,offset a=0,100 b=1,40 | sunmocsv cdp=7,2 tnmo=0,0.4 vnmo=2000,2500 vnmo=1400,1900 print=1 verbose=1
+[stderr] suplane nt=257 ntr=7 | sushw key=cdp,offset a=1,150 b=1,0 | sunmocsv cdp=2,6 tnmo=0,0.2,0.6 tnmo=0,0.7 vnmo=1400,1700,2300 vnmo=2000,3000 print=1
+[stderr] suplane nt=257 ntr=5 | sushw key=cdp a=1 b=1 | sunmocsv cdp=2,4 tnmo=0,200,600 tnmo=0,700 vnmo=1400,1700,2300 vnmo=2000,3000 print=1
+suplane nt=257 ntr=8 | sushw key=cdp,offset a=1,150 b=1,0 j=2,0 | sunmocsv cdp=1,5 tnmo=0,0.6 vnmo=1500,2300 vnmo=2000,2800
+suplane nt=257 ntr=8 | sushw key=cdp,offset a=1,150 b=1,0 j=2,0 | sunmocsv cdp=1,5 tnmo=0,0.6 vnmo=1500,2300 vnmo=2000,2800 invert=1
+# Raw velocity outputs are checked explicitly after redirecting SU traces.
+[f32] suplane nt=33 ntr=5 | sunmocsv cdp=1 tnmo=0,0.4 vnmo=1500,2300 voutfile=v.bin > /dev/null; cat v.bin
+[f32] suplane nt=65 ntr=8 | sushw key=cdp a=1 b=1 j=2 | sunmocsv cdp=1,5 tnmo=0,0.4 vnmo=1500,2300 vnmo=2000,2800 voutfile=v.bin > /dev/null; cat v.bin
+[f32] suplane nt=65 ntr=5 | sunmocsv cdp=1 tnmo=0,400 vnmo=1500,2300 invert=1 sscale=0 voutfile=v.bin > /dev/null; cat v.bin
+# Parameter and I/O failures.
+[stderr] sunmocsv
+[stderr] sunmocsv cdp=1 tnmo=0 vnmo=1500
+[stderr] sunmocsv smute=0
+[stderr] sunmocsv smute=-1
+[stderr] sunull nt=17 ntr=1 | sunmocsv
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=0
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 vnmo=1500
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=0,1 vnmo=1500
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1,2 tnmo=0,1 vnmo=1500,2000
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1,2 tnmo=0 tnmo= vnmo=1500 vnmo=2000
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=1,0 vnmo=1500,2000
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1,2 tnmo=0,1 tnmo=1,0 vnmo=1500,2000 vnmo=1700,2500
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1,1 tnmo=0 vnmo=1500 vnmo=2000
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=0 vnmo=1500 qin=missing.q
+[stderr] sunull nt=17 ntr=1 | sunmocsv qin=
+[stderr] sunmocsv rfile=missing.k
+[stderr] sunmocsv grid_xa=0
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=0 vnmo=1500 voutfile=missing/vel.bin
+[stderr] sunull nt=17 ntr=1 | sunmocsv cdp=1 tnmo=0 vnmo=1500 unknown=1 verbose=1
+# Full 3D grids, single-axis degenerate grids, invalid grids and CDPs.
+[stderr] suplane nt=257 ntr=25 | sushw key=cdp,offset a=1,200 b=1,0 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,5,21,25 tnmo=0,0.6 vnmo=1500,2000 vnmo=1800,2400 vnmo=2100,2600 vnmo=2400,3000 check=1 print=1
+suplane nt=257 ntr=25 | sushw key=cdp,offset a=1,200 b=1,0 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,5,21,25 tnmo=0,0.6 vnmo=1500,2000 vnmo=1800,2400 vnmo=2100,2600 vnmo=2400,3000 invert=1
+suplane nt=257 ntr=25 | sushw key=cdp,offset a=1,200 b=1,0 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,5 tnmo=0,0.6 vnmo=1500,2000 vnmo=2400,3000
+suplane nt=257 ntr=25 | sushw key=cdp,offset a=1,200 b=1,0 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,21 tnmo=0,0.6 vnmo=1500,2000 vnmo=2400,3000
+[stderr] sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 rfile=missing.k
+[stderr] sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=0 grid_wc=100
+[stderr] sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=-1
+[stderr] sunmocsv grid_xa=0 grid_ya=0 grid_xb=50 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100
+[stderr] sunull nt=17 ntr=1 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=26 tnmo=0 vnmo=1500
+[stderr] sunull nt=17 ntr=1 | sushw key=cdp a=26 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,25 tnmo=0 vnmo=1500 vnmo=2000
+[stderr] sunull nt=17 ntr=1 | sunmocsv grid_xa=0 grid_ya=0 grid_xb=400 grid_yb=0 grid_xc=0 grid_yc=400 grid_wb=100 grid_wc=100 cdp=1,5,22,25 tnmo=0 vnmo=1500 vnmo=2000 vnmo=2300 vnmo=2600
+# Q-file varying pairs and fixed shared dimension; malformed records.
+# Minimum valid varying records: one time/velocity pair, alone and after a longer record.
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nQ,1,0,1500\n' > input.csv; suplane nt=17 ntr=1 | sunmocsv qin=input.csv print=1
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nQ,1,0,1500,0.4,2100\nQ,5,0,1800\n' > input.csv; suplane nt=33 ntr=7 | sushw key=cdp,offset a=0,150 b=1,0 | sunmocsv qin=input.csv print=1 invert=1
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo,tnmo,vnmo\nQ,1,0,1500,0.3,2100,0.8,2700\nQ,5,0,1800,0.7,3000\n' > input.csv; suplane nt=257 ntr=7 | sushw key=cdp,offset a=0,200 b=1,0 | sunmocsv qin=input.csv print=1
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,vnmo,vnmo,vnmo\nC_SU_NDIMS,tnmo,0,300,800\nQ,1,1500,2100,2700\nQ,5,1800,2400,3000\n' > input.csv; suplane nt=257 ntr=7 | sushw key=cdp,offset a=0,200 b=1,0 | sunmocsv qin=input.csv print=1 invert=1
+[stderr] printf '%b' '' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nbad\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp\nQ,1\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,vnmo,vnmo\nQ,1,1500,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nC_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nQ,1,0,1500,1,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nC_SU_NDIMS,tnmo,,0,0,1,1\nC_SU_NDIMS,tnmo,,0,0,1,1\nQ,1,0,1500,1,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nQ,1,0,1500,abc,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,vnmo\nQ,1,1,1500,0,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,vnmo,vnmo\nC_SU_NDIMS,tnmo,bad,1\nQ,1,1500,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,vnmo,vnmo\nC_SU_NDIMS,tnmo,,1\nQ,1,1500,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,vnmo,vnmo\nC_SU_NDIMS,tnmo,0\nQ,1,1500,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+[stderr] printf '%b' 'C_SU_NAMES\nC_SU_ID,cdp,tnmo,vnmo,tnmo,cdp\nQ,1,0,1500,1,2000\n' > input.csv; sunull nt=17 ntr=1 | sunmocsv qin=input.csv
+# K-file grids with command-line overrides and malformed files.
+[stderr] printf '%b' 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%g,%g,%g,%g,%g,%g,%g,%g\nC_SU_NAMES\nC_SU_ID,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,0,0,400,0,0,400,100,100\n' > input.csv; suplane nt=257 ntr=25 | sushw key=cdp,offset a=1,200 b=1,0 | sunmocsv rfile=input.csv cdp=1,5,21,25 tnmo=0,0.6 vnmo=1500,2000 vnmo=1800,2400 vnmo=2100,2600 vnmo=2400,3000 check=1
+[stderr] printf '%b' 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%g,%g,%g,%g,%g,%g,%g,%g\nC_SU_NAMES\nC_SU_ID,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,0,0,400,0,0,400,100,100\n' > input.csv; suplane nt=257 ntr=5 | sushw key=cdp a=1 b=1 | sunmocsv rfile=input.csv grid_wc=200 cdp=1 tnmo=0,0.6 vnmo=1500,2000 check=1
+[stderr] printf '%b' '' > input.csv; sunmocsv rfile=input.csv
+[stderr] printf '%b' 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%g\nC_SU_NAMES\nC_SU_ID,grid_xa\nK,0\n' > input.csv; sunmocsv rfile=input.csv
+
+# One-sample inverse NMO exercises the original negative mute index.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=0
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=1
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=1 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=0
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=1 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=1
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=400 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=0
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=400 | sunmocsv cdp=1 tnmo=0 vnmo=1500 invert=1 sscale=1

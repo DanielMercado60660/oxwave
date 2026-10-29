@@ -1,0 +1,16 @@
+[package]
+name = "sugetqcsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sugetqcsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-header-case = { path = "../../crates/oxwave-header-case" }

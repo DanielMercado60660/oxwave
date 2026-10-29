@@ -1,0 +1,15 @@
+# Defaults and all parameters, including fractional and negative geometry.
+susorty
+susorty nt=13 nshot=3 noff=5 dt=0.0025 dshot=12.75 doff=7.5
+susorty nt=7 nshot=2 noff=3 dt=0.001 dshot=-3.5 doff=-4.25
+susorty nt=1 nshot=1 noff=1
+susorty nt=2 nshot=1 noff=1 dshot=0 doff=0 dt=0
+susorty nt=0 nshot=1 noff=1
+susorty nshot=0
+susorty nshot=-1
+susorty noff=0
+susorty noff=-1
+[stderr] susorty nt=5 nshot=1 noff=1 verbose=1
+[stderr] susorty nshot=0 unknown=1
+susorty nt=65536
+susorty nt=2147483648

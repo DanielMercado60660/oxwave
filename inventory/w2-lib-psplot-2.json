@@ -1,0 +1,120 @@
+{
+  "scope": "psplot/lib part 2 of 2",
+  "functions": [
+    {
+      "name": "psContour",
+      "file": "psplot/lib/psContour.c",
+      "signature": "void psContour (float c, int nx, float x[], int ny, float y[], float z[],\n\t\tfloat lcs, char *lcf, char *lcc, float *w, int nplaces);",
+      "purpose": "Trace and optionally label a contour of a two-dimensional grid using PostScript.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Contour traversal and label placement depend on comparison boundaries, interpolation, traversal order, and updates to w; unsuffixed constants introduce double arithmetic in some expressions. The function and its static helpers alter the two least significant bits of float grid values through int-pointer casts, which are explicitly described as nonportable and also raise C aliasing concerns. Static helpers emit PostScript through gsave, newpath, stroke, moveto, lineto, grestore, setcolor, rectfill, setfont, rotate, and show.",
+      "c_lines": 225,
+      "difficulty": "hard",
+      "group": "ps-contour",
+      "license_note": ""
+    },
+    {
+      "name": "psDrawCurve",
+      "file": "psplot/lib/psDrawCurve.c",
+      "signature": "void psDrawCurve(\n\tfloat x, float y, float width, float height,\n\tfloat x1Beg, float x1End, float p1Beg, float p1End,\n\tfloat x2Beg, float x2End, float p2Beg, float p2End,\n\tfloat *x1curve, float *x2curve, int ncurve,\n\tchar *curveColor, float curvewidth, int curvedash, int style);",
+      "purpose": "Transform, clip, and draw a styled curve within a PostScript axes box.",
+      "calls": [
+        "gsave",
+        "translate",
+        "rotate",
+        "newpath",
+        "setcolor",
+        "setlinewidth",
+        "setdash",
+        "rectclip",
+        "moveto",
+        "lineto",
+        "stroke",
+        "grestore"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Float scale and bias calculations and their evaluation order determine transformed coordinates; dash lengths are multiplied by the line width before drawing. Zero axis ranges can cause division by zero.",
+      "c_lines": 105,
+      "difficulty": "medium",
+      "group": "ps-curve",
+      "license_note": "Attributed to Brian Macy of Phillips Petroleum Co.; adapted after Dave Hale and others' psAxesBox routine."
+    },
+    {
+      "name": "psLegendBox",
+      "file": "psplot/lib/psLegendBox.c",
+      "signature": "void psLegendBox(\n\tfloat x, float y, float width, float height,\n\tfloat x1Beg, float x1End, float p1Beg, float p1End,\n\tfloat d1Num, float f1Num, int n1Tic, int grid1, char *label1,\n\tchar *labelFont, float labelSize,\n\tchar *axesColor, char *gridColor,\n\tint style);",
+      "purpose": "Draw a PostScript legend box with a labeled axis, ticks, and optional grid.",
+      "calls": [
+        "fontheight",
+        "fontwidth",
+        "fontascender",
+        "fontdescender",
+        "scaxis",
+        "gsave",
+        "translate",
+        "newpath",
+        "setfont",
+        "setcolor",
+        "moveto",
+        "justshow",
+        "show",
+        "stroke",
+        "lineto",
+        "rotate",
+        "setdash",
+        "grestore"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Number and tick loops repeatedly accumulate float increments, so rounding can affect loop endpoints and displayed ticks. log10 and pow operate in double precision with results stored in float; formatting and exponent-selection thresholds can change labels near boundaries. Invalid or zero increments and tick counts can cause division by zero or nonterminating loops.",
+      "c_lines": 260,
+      "difficulty": "hard",
+      "group": "ps-legend",
+      "license_note": ""
+    },
+    {
+      "name": "psLegendBBox",
+      "file": "psplot/lib/psLegendBox.c",
+      "signature": "void psLegendBBox(float x, float y, float width, float height,\n\tchar *labelFont, float labelSize,\n\tint style, int bbox[]);",
+      "purpose": "Estimate an integer bounding box for a PostScript legend box.",
+      "calls": [
+        "fontheight",
+        "fontwidth",
+        "fontascender",
+        "fontdescender"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Expressions mix float values with double literals, then use the local IROUND macro or direct conversion to int; results near integer and half-integer boundaries depend on the specified evaluation and conversion behavior.",
+      "c_lines": 30,
+      "difficulty": "easy",
+      "group": "ps-legend",
+      "license_note": ""
+    },
+    {
+      "name": "psWiggle",
+      "file": "psplot/lib/psWiggle.c",
+      "signature": "void psWiggle (\n\tint n, float z[], float zmin, float zmax, float zbase,\n\tfloat yzmin, float yzmax, float xfirst, float xlast, int ifill,\n\tconst char *tracecolor);",
+      "purpose": "Draw a clipped seismic wiggle trace with optional solid and gray area fills.",
+      "calls": [
+        "gsave",
+        "translate",
+        "newpath",
+        "setlinejoin",
+        "yclip",
+        "setrgbcolor",
+        "moveto",
+        "lineto",
+        "fill",
+        "setcolor",
+        "stroke",
+        "grestore"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The routine processes overlapping segments and uses exact equality at the fill baseline and a float tolerance to suppress line segments; clipping intersections and operation order affect output. Unsuffixed constants can promote expressions to double, and static scratch arrays make concurrent calls unsafe.",
+      "c_lines": 140,
+      "difficulty": "hard",
+      "group": "ps-wiggle",
+      "license_note": ""
+    }
+  ]
+}

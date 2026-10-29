@@ -1,0 +1,69 @@
+# Compare all four volumes, including default file names and options.
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d  && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d ntraces=1 angle_inc=10 taperwin=4 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d ntraces=3 angle_inc=1 taperwin=0 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d angle_inc=0 taperwin=1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d angle_inc=-5 taperwin=-1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d angle_inc=7.5 ntraces=2 maxlag=1000 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d maxlag=0 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d maxlag=-1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmin=0.04 tmax=0.16 taper=-1 taperwin=4 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmin=0.04 tmax=0.16 taper=0 taperwin=4 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmin=0.04 tmax=0.16 taper=3 taperwin=4 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmin=0.04 taper=2 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmax=0.16 taper=-1 taperwin=4 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d tmin=0 tmax=0.256 taper=3 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d Az_key=cdp Q_key=offset lag_key=ep xcorr_key=d1 INPUTQ_key=f1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d Az_key=dt Q_key=trwf lag_key=laga xcorr_key=ungpow INPUTQ_key=sx && cat S11_out S12_out S21_out S22_out
+# Explicit output paths, zero data, nt=1/ntr=1, delayed headers, and progress.
+sunull nt=31 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a outS11=x outS12=y outS21=z outS22=w && cat x y z w
+suspike nt=1 ntr=1 ix1=1 it1=1 nspk=1 > a; sualford inS11=a inS12=a inS21=a inS22=a taperwin=0 ntraces=1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=3 | suaddnoise seed=51 | sushw key=delrt a=100 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=0.14 tmax=0.24 taper=1 taperwin=0 && cat S11_out S12_out S21_out S22_out
+[stderr] sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d verbose=1 surprise=2 && cat S11_out
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d Total=4
+sunull nt=65 ntr=7 | suaddnoise seed=11 > a; sunull nt=65 ntr=7 | suaddnoise seed=23 > b; sunull nt=65 ntr=7 | suaddnoise seed=37 > c; sunull nt=65 ntr=7 | suaddnoise seed=41 > d; sualford inS11=a inS12=b inS21=c inS22=d Total=-2
+# Missing required parameters, failed opens, empty input, and invalid gates/keys.
+[stderr] sualford 
+[stderr] sualford inS11=a
+[stderr] sualford inS11=a inS12=b
+[stderr] sualford inS11=a inS12=b inS21=c
+[stderr] sualford inS11=none inS12=b inS21=c inS22=d
+[stderr] sualford inS11= inS12=b inS21=c inS22=d
+[stderr] sualford ntraces=0
+[stderr] sualford ntraces=-1
+[stderr] touch a; sualford inS11=a inS12=a inS21=a inS22=a
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=-0.01
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=0.2 tmax=0.1
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a tmax=1000
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a Az_key=invalid
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a Q_key=invalid
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a outS11=/nonexistent/path
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a outS12=/nonexistent/path
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a outS21=/nonexistent/path
+[stderr] sunull nt=65 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a outS22=/nonexistent/path
+[stderr] sunull nt=65 ntr=1 > a; sunull nt=67 ntr=1 > b; sualford inS11=a inS12=b inS21=a inS22=a
+# Stop at the shortest input volume, in the original read order.
+sunull nt=33 ntr=3 | suaddnoise seed=31 > a; sunull nt=33 ntr=1 | suaddnoise seed=51 > b; sualford inS11=a inS12=a inS21=a inS22=b taperwin=2 && cat S11_out S12_out S21_out S22_out
+
+# Known shear delays, diagonal amplitudes, and a single-sample analysis window.
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sualford inS11=a inS12=z inS21=z inS22=d ntraces=1  && cat S11_out S12_out S21_out S22_out
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sualford inS11=a inS12=z inS21=z inS22=d ntraces=1 maxlag=4 && cat S11_out S12_out S21_out S22_out
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sualford inS11=a inS12=z inS21=z inS22=d ntraces=1 tmin=0.04 tmax=0.16 taper=0 && cat S11_out S12_out S21_out S22_out
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sualford inS11=a inS12=z inS21=z inS22=d ntraces=1 tmin=0.08 tmax=0.08 taper=-1 taperwin=0 && cat S11_out S12_out S21_out S22_out
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sualford inS11=d inS12=z inS21=z inS22=a ntraces=1 && cat S11_out S12_out S21_out S22_out
+suspike nt=65 ntr=1 nspk=1 ix1=1 it1=20 > a; suspike nt=65 ntr=1 nspk=1 ix1=1 it1=24 > d; sunull nt=65 ntr=1 > z; sugain < a scale=2 > b; sualford inS11=a inS12=z inS21=z inS22=b ntraces=1 && cat S11_out S12_out S21_out S22_out
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 > a; sualford inS11=a inS12=a inS21=a inS22=a && cat S11_out S12_out S21_out S22_out
+sunull nt=1 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a ntraces=0 && cat S11_out S12_out S21_out S22_out
+[stderr] sunull nt=17 ntr=1 > a; sualford inS11=a inS12=a inS21=a inS22=a ntraces=-1
+[stderr] sunull nt=63 ntr=1 > a; sunull nt=65 ntr=1 > b; sualford inS11=a inS12=b inS21=a inS22=a
+[stderr] sunull nt=63 ntr=1 > a; sunull nt=65 ntr=1 > b; sualford inS11=a inS12=a inS21=b inS22=a
+[stderr] sunull nt=63 ntr=1 > a; sunull nt=65 ntr=1 > b; sualford inS11=a inS12=a inS21=a inS22=b
+# Overlap extends before sample zero; guard storage preserves real samples.
+sunull nt=65 ntr=3 | suaddnoise seed=11 > a; sualford inS11=a inS12=a inS21=a inS22=a tmax=0.16 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=1 | suaddnoise seed=11 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=0.004 tmax=0.12 && cat S11_out S12_out S21_out S22_out
+# Valid boundaries adjacent to the rejected out-of-bounds windows and one-angle
+# search. Undefined C inputs are tested directly by the Rust CLI regression test.
+sunull nt=65 ntr=1 | suaddnoise seed=11 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=0.256 tmax=0.256 taperwin=0 taper=-1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=1 | suaddnoise seed=11 | sushw key=delrt a=100 > a; sualford inS11=a inS12=a inS21=a inS22=a tmin=0.356 tmax=0.356 taperwin=0 taper=-1 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=1 | suaddnoise seed=11 > a; sunull nt=65 ntr=1 | suaddnoise seed=23 > b; sualford inS11=a inS12=b inS21=b inS22=a angle_inc=90 ntraces=1 taperwin=0 && cat S11_out S12_out S21_out S22_out
+sunull nt=65 ntr=1 | suaddnoise seed=11 > a; sunull nt=65 ntr=1 | suaddnoise seed=23 > b; sualford inS11=a inS12=b inS21=b inS22=a angle_inc=89.99999 ntraces=1 taperwin=0 && cat S11_out S12_out S21_out S22_out

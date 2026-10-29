@@ -1,0 +1,23 @@
+# Interleaved logs, default sampling and one output trace.
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n30 2100 2.3\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr
+# Paired input, explicit sampling, multiple traces and verbose diagnostics.
+[stderr] printf '0 2000\n10 2200\n20 2400\n' | a2b n1=2 > dv && printf '0 2\n10 2.1\n20 2.2\n' | a2b n1=2 > dr && suwellrf nval=3 dvfile=dv drfile=dr dtout=.003 ntr=2 verbose=1
+# Separate files, nonuniform spacing and odd output size.
+printf '0\n10\n25\n' | a2b n1=1 > d && printf '2000\n2500\n3000\n' | a2b n1=1 > v && printf '2\n2.2\n2.4\n' | a2b n1=1 > rho && suwellrf nval=3 dfile=d vfile=v rhofile=rho dtout=.004
+# File precedence and no output traces.
+printf '0 2000 2\n10 2200 2.1\n' | a2b n1=3 > dvr && suwellrf nval=2 dvrfile=dvr dvfile=missing ntr=0
+suwellrf
+suwellrf nval=3 dvrfile=missing
+suwellrf nval=3 dvfile=missing
+printf '10 2000 2\n0 2200 2.1\n' | a2b n1=3 > dvr && suwellrf nval=2 dvrfile=dvr
+printf '' > empty && suwellrf nval=3 dvrfile=empty
+# Single log sample and zero trace count.
+printf '0 2000 2\n' | a2b n1=3 > dvr && suwellrf nval=1 dvrfile=dvr ntr=0
+# Output sample limit warning.
+[stderr] printf '0 2000 2\n100 2200 2.1\n200 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.000001
+printf '0 2000 2\n10 2200 2.1\n' | a2b n1=3 > dvr && suwellrf nval=2 dvrfile=dvr ntr=-1
+suwellrf nval=0 ntr=0
+suwellrf nval=-1 ntr=0
+# The most negative input count must also fail without allocation overflow.
+suwellrf nval=-2147483648 ntr=0
+suwellrf nval=3 dvfile=/dev/null

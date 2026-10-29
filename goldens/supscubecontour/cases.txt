@@ -1,0 +1,16 @@
+# Strip PostScript metadata that changes between runs.
+suplane nt=32 ntr=9 | supscubecontour | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=33 ntr=9 | supscubecontour n2=3 verbose=1 d1=0.002 d2=2 d3=3 f1=-0.5 f2=10 f3=7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=12 | supscubecontour n3=3 tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=12 | supscubecontour n2=4 n3=3 title='Cube plot' ncont=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | sushw key=ntr a=9 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | sushw key=d1,d2,f1,f2 a=0.02,4,-1,5 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | sushw key=trid,dt,d1,tracr,tracl a=30,0,0,0,0 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | sushw key=dt,delrt a=0,-20 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=1 ntr=1 | supscubecontour n2=1 n3=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+supscubecontour </dev/null
+suplane nt=32 ntr=9 | supscubecontour tmpdir=/nonexistent/oxwave | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | env -u CWPROOT -u CWPBIN supscubecontour | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=32 ntr=9 | supscubecontour n2=3 verbose=1 d1=-0.02 d2=0 d3=-2 f1=-1 f2=0 f3=9 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | env CWP_TMPDIR=. supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=9 | supscubecontour n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

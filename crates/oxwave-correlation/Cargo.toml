@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-correlation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-f-convolution = { path = "../oxwave-f-convolution" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+
+[dev-dependencies]
+oxwave-cref.workspace = true

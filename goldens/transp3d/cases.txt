@@ -1,0 +1,17 @@
+# All axis orders, odd dimensions, and default byte size.
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=1 nbpe=4 perm=123 scratchdir=.
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=2 nbpe=2 scratchdir=. perm=132
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=2 nbpe=2 scratchdir=. perm=213
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=2 nbpe=2 scratchdir=.
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=2 nbpe=2 scratchdir=. perm=312
+[exact] printf 'abcdefghijklmnopqrstuvwx' | transp3d n1=3 n2=2 n3=2 nbpe=2 scratchdir=. perm=321
+[exact] printf 'abcdefghijklmnopqrstuvwx' > input && transp3d n1=3 n2=2 perm=321 scratchdir=. < input
+[exact] printf 'abcdef' | transp3d n1=1 n2=3 n3=2 nbpe=1 scratchdir=.,. scratchstem=case
+[stderr] printf 'abcdef' | transp3d n1=1 n2=3 n3=2 nbpe=1 scratchdir=. verbose=1
+transp3d n2=1 n3=1
+transp3d n1=1 n3=1
+transp3d n1=1 n2=1 n3=1
+printf a | transp3d n1=1 n2=1 n3=1 nbpe=1 scratchdir=. perm=999
+printf a | transp3d n1=1 n2=1 scratchdir=.
+[exact] transp3d n1=1 n2=1 n3=0 scratchdir=.
+[exact] transp3d n1=2 n2=2 n3=-1 scratchdir=.

@@ -1,0 +1,9 @@
+# All byte values, including the boundaries of printable ASCII and high bytes.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256)))' | ctrlstrip
+# One byte and an odd-sized input.
+[exact] printf '\177' | ctrlstrip
+[exact] printf 'a\000b\033c' | ctrlstrip
+# The original ignores command-line arguments, including verbose and unknown names.
+[exact] printf 'x\r\ny\t' | ctrlstrip verbose=1 unknown=abc
+# Locale environment does not change the C program's initial C locale.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes([32,126,127,128,160,255]))' | LC_ALL=C ctrlstrip

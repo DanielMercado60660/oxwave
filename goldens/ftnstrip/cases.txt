@@ -1,0 +1,12 @@
+# Empty input and command-line arguments (the original has no parameters).
+[exact] ftnstrip </dev/null
+[exact] ftnstrip verbose=1 unused=3 </dev/null
+# Native-endian record markers with odd payload sizes and mismatched trailers.
+[exact] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",1)+b"X"+struct.pack("=i",1)+struct.pack("=i",5)+b"abcde"+struct.pack("=i",99))' | ftnstrip
+[exact] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",3)+b"abc")' | ftnstrip
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(b"\x03\x00")' | ftnstrip
+# Invalid sizes report the allocator or zero-size read error.
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",0))' | ftnstrip
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",-1))' | ftnstrip
+# Round trip raw float samples through Fortran records.
+[exact] suspike nt=7 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=7 outpar=/dev/null | ftnstrip

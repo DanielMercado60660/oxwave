@@ -1,0 +1,18 @@
+[package]
+name = "elamodel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "elamodel"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-cubic-interp = { path = "../../crates/oxwave-cubic-interp" }
+oxwave-f-cubicspline = { path = "../../crates/oxwave-f-cubicspline" }
+oxwave-lib-tri = { path = "../../crates/oxwave-lib-tri" }

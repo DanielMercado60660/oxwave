@@ -1,0 +1,49 @@
+# Defaults, explicit defaults, and both FFT frequency selections.
+[stderr] suplane nt=128 ntr=5 | sushw key=offset a=100 b=25 | suphasevel
+[stderr] suplane nt=128 ntr=5 | sushw key=offset a=100 b=25 | suphasevel dt=0.004 fv=330 dv=25 nv=100 out=0 norm=0 fmax=50 verbose=0 tmpdir=
+[stderr] suplane nt=75 ntr=3 | sushw key=offset a=-120 b=70 | suphasevel fv=700 dv=125 nv=3 fmax=0
+[stderr] suplane nt=81 ntr=7 | suaddnoise seed=2026 | sushw key=offset a=-300 b=95 | suphasevel fv=250 dv=31 nv=7 norm=1 fmax=45
+# out is parsed but unused; norm only acts when exactly 1.
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=200 b=30 | suphasevel out=1 nv=2 fmax=0
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=200 b=30 | suphasevel out=2 nv=2 norm=2 fmax=0
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=200 b=30 | suphasevel out=-1 nv=2 norm=-1 fmax=0
+# Odd/small dimensions, zero spectra and division by zero.
+[stderr] sunull nt=1 ntr=1 | sushw key=offset a=10 | suphasevel nv=1 fmax=0
+[stderr] suspike nt=3 ntr=1 | sushw key=offset a=-10 | suphasevel nv=2 fmax=0 norm=1
+[stderr] suspike nt=17 ntr=1 | sushw key=offset a=100 | suphasevel nv=3 fv=0 dv=0 fmax=0
+[stderr] sunull nt=31 ntr=3 | sushw key=offset a=20 b=-20 | suphasevel nv=2 norm=1 fmax=0
+[stderr] suplane nt=65 ntr=3 | sushw key=offset a=-100 b=20 | suphasevel nv=3 fv=-500 dv=-25 fmax=0
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=1 fmax=0.1
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=1 fmax=-20
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=0
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=-2
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=1 dt=0 fmax=50
+[stderr] suplane nt=16 ntr=1 | sushw key=offset a=10 | suphasevel nv=1 dt=-0.004 fmax=0
+# Header dt override, warning messages, and temp file paths/cleanup.
+[stderr] suplane nt=33 ntr=3 | sushw key=offset,dt a=40,0 b=10,0 | suphasevel dt=0.002 nv=2 fmax=0 verbose=1
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=40 b=10 | suphasevel nv=2 verbose=1
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=40 b=10 | suphasevel nv=2 tmpdir=. verbose=1; ls -A
+[stderr] suplane nt=64 ntr=3 | sushw key=offset a=40 b=10 | CWP_TMPDIR=. suphasevel nv=2 verbose=1; ls -A
+[stderr] suplane nt=64 ntr=1 | sushw key=offset a=40 | CWP_TMPDIR=/does/not/exist suphasevel nv=1 tmpdir=
+# Errors occur in original statement order.
+[stderr] suphasevel
+[stderr] sunull nt=16 ntr=1 | sushw key=dt a=0 | suphasevel
+[stderr] sunull nt=16 ntr=1 | suphasevel
+[stderr] sunull nt=16 ntr=1 | suphasevel tmpdir=/does/not/exist
+[stderr] sunull nt=65535 ntr=1 | sushw key=offset a=1 | suphasevel nv=1
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=2147483648
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel dt=1e-310
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=1 fmax=0 unknown=3 verbose=1
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=abc fmax=0
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=1 nv=2 dt= fmax=0
+# Regression boundaries: long sample intervals, the last available FFT bin,
+# the largest offset table, and a full-band output near the trace capacity.
+# fmax=150 still truncates to the 9 allocated bins at nt=16, dt=0.004;
+# rejecting fmax merely for exceeding Nyquist would change defined C behavior.
+[stderr] suspike nt=17 ntr=3 | sushw key=offset,dt a=10,20000 b=10,0 | suphasevel nv=2 fmax=0
+[stderr] suspike nt=17 ntr=3 | sushw key=offset,dt a=10,20000 b=10,0 | suphasevel nv=2 fmax=20 norm=1
+[stderr] suspike nt=16 ntr=3 | sushw key=offset a=10 b=10 | suphasevel nv=2 fmax=150 norm=1
+# No bin is accessed when both output and normalization are disabled.
+[stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=0 fmax=1000
+[stderr] sunull nt=1 ntr=10000 | sushw key=offset a=1 | suphasevel nv=1 fmax=0
+[stderr] sunull nt=65520 ntr=1 | sushw key=offset a=1 | suphasevel nv=1 fmax=0

@@ -1,0 +1,10 @@
+# Set all cleared fields and other headers that must survive.
+suspike nt=7 ntr=3 | sushw key=f1,d1,f2,d2,ungpow,unscale,ntr,mark,cdp,offset a=1.5,-2.5,3.5,-4.5,5.5,-6.5,17,-19,123,-456 | segyclean
+# Small traces and odd sample counts.
+suspike nt=1 ntr=1 | segyclean
+sunull nt=13 ntr=5 | segyclean
+# No parameters are read, including verbose and unrecognized arguments.
+suspike nt=3 ntr=1 | segyclean verbose=1 unexpected=42
+# Empty and incomplete input.
+segyclean
+printf '\001\002\003' | segyclean

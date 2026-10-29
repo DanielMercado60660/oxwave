@@ -1,0 +1,21 @@
+# Default window and parameters with enough samples for the endpoint handling.
+suplane nt=256 ntr=3 | suop op=abs | sugain bias=2000 | subackus
+# All optional output traces, a non-default angle and even window.
+suplane nt=127 ntr=3 | suop op=abs | sugain bias=1800 | subackus navg=8 all=1 ang=60
+# Small windows and an angle of zero.
+suplane nt=31 ntr=3 | suop op=abs | sugain bias=1000 | subackus navg=1 all=1 ang=0
+suplane nt=31 ntr=3 | suop op=abs | sugain bias=1000 | subackus navg=0 all=2 ang=-20
+# Single input trace exercises the original's stale trace behavior at EOF.
+suplane nt=31 ntr=1 | sugain bias=2000 | subackus navg=3 all=1
+# Parameter diagnostics and empty input.
+[stderr] suplane nt=31 ntr=3 | sugain bias=2000 | subackus navg=3 verbose=1
+subackus navg=3 </dev/null
+subackus navg=999999999999999999999 </dev/null
+# Vary samples throughout the averaging window.
+sunull nt=101 ntr=3 | suaddnoise seed=37 | sugain bias=3 | subackus navg=7 all=1 ang=75
+# Zero inputs produce the original nonfinite elastic ratios.
+sunull nt=21 ntr=3 | subackus navg=3 all=1
+# A negative averaging parameter follows the C integer arithmetic.
+suplane nt=31 ntr=3 | sugain bias=2000 | subackus navg=-2 all=1
+# One-sample trace and window.
+sunull nt=1 ntr=3 | sugain bias=2 | subackus navg=1

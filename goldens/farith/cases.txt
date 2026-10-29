@@ -1,0 +1,46 @@
+# Native float inputs include negative, zero, and non-power-of-two sizes.
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=neg
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=abs
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=scale
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=scale scale=-2.5
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=bias
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=bias bias=2.5
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=signum isig=2
+[f32] printf '%s\n' 2 | a2b n1=1 | farith op=signum isig=-1
+[f32] printf '%s\n' -1 0 1 | a2b n1=1 | farith op=exp
+[f32] printf '%s\n' -1 0 1 | a2b n1=1 | farith op=sin
+[f32] printf '%s\n' -1 0 1 | a2b n1=1 | farith op=cos
+[f32] printf '%s\n' 0.25 1 4 | a2b n1=1 | farith op=log
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=sqrt
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=sqr
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=sloth
+[f32] printf '%s\n' -180 0 90 | a2b n1=1 | farith op=degrad
+[f32] printf '%s\n' -3 0 1 | a2b n1=1 | farith op=raddeg
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=pinv
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=pinvsqr
+[f32] printf '%s\n' -4 -1 0 1 4 | a2b n1=1 | farith op=pinvsqrt
+[f32] printf '%s\n' -1 0 2 | a2b n1=1 | farith op=add in2=2.5
+[f32] printf '%s\n' -1 0 2 | a2b n1=1 | farith op=sub in2=-2
+[f32] printf '%s\n' -1 0 2 | a2b n1=1 | farith op=mul in2=2
+[f32] printf '%s\n' -1 0 2 | a2b n1=1 | farith op=div in2=-2
+[f32] printf '%s\n' 2 0 4 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=div in2=second
+[f32] printf '%s\n' 2 3 4 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=add in2=second
+[f32] printf '%s\n' 2 3 4 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=sub in2=second
+[f32] printf '%s\n' 2 3 4 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=slowp in2=second
+[f32] printf '%s\n' 2 3 4 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=slothp in2=second
+[f32] printf '%s\n' 2 3 | a2b n1=1 > second; printf '%s\n' 1 2 3 | a2b n1=1 | farith op=cartprod n=3 in2=second
+[f32] printf '%s\n' 1 2 3 | a2b n1=1 > first; farith in=first out=result op=neg; cat result
+[f32] farith op=noop </dev/null
+[stderr] printf '%s\n' 0 1 | a2b n1=1 | farith op=sloth verbose=1
+farith op=bogus
+farith in=missing
+farith out=/missing/path
+farith op=add
+farith op=add in2=missing
+farith op=div in2=0
+farith op=signum
+farith op=cartprod in2=1
+printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 1 | a2b n1=1 | farith op=cartprod in2=second n=2
+printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 1 2 | a2b n1=1 | farith op=mul in2=second
+printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 0 | a2b n1=1 | farith op=slowp in2=second

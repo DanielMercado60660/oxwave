@@ -1,0 +1,59 @@
+# Default mix and zero shifts.
+suplane nt=31 ntr=9 | sumedian xshift=1,9 tshift=0,0
+# Median mode, even window and diagnostics.
+[stderr] suplane nt=31 ntr=9 | sumedian xshift=1,9 tshift=0,0 median=1 nmed=4 verbose=1
+# Header key, explicit temporary directory, nonuniform weights and direction.
+suplane nt=31 ntr=9 | sushw key=offset a=10 b=10 | sumedian key=offset xshift=10,90 tshift=0,0.008 mix=1,2,1 sign=1 subtract=0 tmpdir=.
+# Single sample and single trace with a one-trace window.
+suspike nt=1 ntr=1 | sumedian xshift=1 tshift=0 mix=1
+# Negative weights and zero sign.
+suplane nt=19 ntr=7 | sumedian xshift=1,7 tshift=0,0.004 mix=-1,0,1 sign=0
+# File-based coordinates in native floats.
+python3 -c 'import struct; open("x", "wb").write(struct.pack("ff",1,9)); open("t", "wb").write(struct.pack("ff",0,0.004))' && suplane nt=31 ntr=9 | sumedian xfile=x tfile=t nshift=2
+sumedian
+sumedian xshift=1
+sumedian xshift=1,2 tshift=0
+sumedian xshift=1 tshift=0 mix=1,1
+sumedian xfile=missing tfile=missing nshift=1
+sumedian xfile=missing tfile=missing
+sumedian xshift=1 tshift=0 tmpdir=/no/such/directory
+sumedian xshift=1 tshift=0
+sunull nt=8 ntr=5 | sushw key=dt a=0 | sumedian xshift=1 tshift=0
+# Varying delay headers follow the original header-reading order.
+suplane nt=31 ntr=9 | sushw key=delrt a=0 b=1 | sumedian xshift=1,9 tshift=0.004,0.004 mix=1 verbose=1
+# Incomplete and missing curve files.
+python3 -c 'open("x", "wb").write(b"x")' && sumedian xfile=x tfile=t nshift=1
+python3 -c 'import struct; open("x", "wb").write(struct.pack("f",1))' && sumedian xfile=x tfile=missing nshift=1
+
+# Environment temporary directory and default median window.
+[stderr] suplane nt=19 ntr=7 | CWP_TMPDIR=. sumedian xshift=1,7 tshift=0,0 median=1 subtract=0 verbose=1
+# Explicit empty tmpdir overrides the environment.
+suplane nt=19 ntr=7 | CWP_TMPDIR=/no/such/directory sumedian xshift=1,7 tshift=0,0 mix=1 tmpdir=
+
+# Negative times that round to zero samples are defined even for nt=1.
+[stderr] suspike nt=1 ntr=1 | sumedian xshift=1 tshift=-0.001 mix=1 verbose=1
+suplane nt=17 ntr=9 | sumedian xshift=1,9 tshift=-0.001,-0.001 median=1 nmed=3 subtract=0
+# Larger negative shifts fail C's allocation; compare its full diagnostics.
+[stderr] sunull nt=17 ntr=9 | sumedian xshift=1 tshift=-0.1 mix=1 verbose=1
+[stderr] sunull nt=17 ntr=9 | sumedian xshift=1 tshift=-1e20 median=1 nmed=3 verbose=1
+# Negative curve lengths fail the original allocation before opening files.
+[stderr] sumedian xfile=missing tfile=missing nshift=-1
+[stderr] sumedian xfile=missing tfile=missing nshift=-2147483648
+# With zero curve length, preserve file-open and empty-input error order.
+[stderr] sumedian xfile=missing tfile=missing nshift=0
+[stderr] python3 -c 'open("x", "wb").close(); open("t", "wb").close()' && sumedian xfile=x tfile=t nshift=0
+# Zero nmed is increased to one, with the original warning.
+[stderr] suplane nt=17 ntr=9 | sumedian xshift=1,9 tshift=0,0 median=1 nmed=0 subtract=0 verbose=1
+# Negative windows preserve input-error and allocation-error ordering.
+[stderr] sumedian xshift=1 tshift=0 median=1 nmed=-1
+[stderr] suplane nt=17 ntr=9 | sumedian xshift=1 tshift=0 median=1 nmed=-1 verbose=1
+# Read only nshift floats even when files contain additional values.
+python3 -c 'import struct; open("x", "wb").write(struct.pack("fff",1,9,99)); open("t", "wb").write(struct.pack("fff",0,0,99))' && suplane nt=17 ntr=9 | sumedian xfile=x tfile=t nshift=2 mix=1
+# Many short traces exercise disk-backed header/sample storage.
+sunull nt=1 ntr=10001 | sumedian xshift=1 tshift=0 mix=1
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=8 dip1=4 len1=15 | suaddnoise seed=41 sn=5 | sumedian xshift=1,15 tshift=0,0.056 median=1
+suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=8 dip1=4 len1=15 | suaddnoise seed=42 sn=5 | sumedian xshift=1,15 tshift=0,0.056 mix=0.5,1,2,1,0.5
+suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=10 dip1=3 len1=15 | suaddnoise seed=43 sn=4 | sushw key=offset a=100 b=50 | sumedian key=offset xshift=100,450,800 tshift=0,0.016,0.044 median=1 nmed=7 subtract=0 tmpdir=.
+suplane npl=2 nt=48 ntr=31 dt=0.004 ct1=6 dip1=1 len1=31 ct2=40 dip2=-1 len2=31 | suaddnoise seed=44 sn=8 | sumedian xshift=1,31 tshift=0,0.12 median=1 nmed=9

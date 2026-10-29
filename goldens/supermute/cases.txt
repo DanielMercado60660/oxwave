@@ -1,0 +1,22 @@
+# Header defaults, singleton and odd dimensions.
+suplane nt=5 ntr=3 | sushw key=ntr a=3 | supermute
+suplane nt=1 ntr=1 | supermute n2=1
+suplane nt=7 ntr=6 | supermute n1=7 n2=3 n3=2 o1=3 o2=2 o3=1 d1=-1 d2=-2 d3=-3
+suplane nt=5 ntr=6 | supermute n2=2 n3=3 o1=2 o2=3 o3=1 d1=2 d2=2 d3=2
+# Diagnostic output modes and mapping checks.
+[stderr] suplane nt=3 ntr=2 | supermute n2=2 verbose=1 check=1
+[stderr] suplane nt=3 ntr=2 | supermute n2=2 verbose=2
+[stderr] suplane nt=3 ntr=2 | supermute n2=2 verbose=3
+# Input and parameter errors.
+supermute n2=1 < /dev/null
+suplane nt=3 ntr=2 | supermute n2=0
+suplane nt=3 ntr=2 | supermute n2=2 n3=0
+suplane nt=3 ntr=2 | supermute n1=0 n2=2
+suplane nt=3 ntr=2 | supermute n2=2 o1=0
+suplane nt=3 ntr=2 | supermute n2=2 o2=4
+suplane nt=3 ntr=2 | supermute n2=2 o3=-1
+suplane nt=3 ntr=2 | supermute n2=2 d1=0
+suplane nt=3 ntr=2 | supermute n2=2 d2=0
+suplane nt=3 ntr=2 | supermute n2=2 d3=0
+suplane nt=3 ntr=2 | supermute n2=3 check=1
+suplane nt=3 ntr=2 | supermute n2=-1

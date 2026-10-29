@@ -1,0 +1,17 @@
+# Defaults and single trace; nonzero data and zero offset.
+suplane nt=127 ntr=1 | suvel2df tn=0.2 offsetm=100
+# Multiple gathers, nonzero negative offsets, custom grid and diagnostic output.
+[stderr] suplane nt=129 ntr=7 | sushw key=cdp a=1 b=1 | sushw key=offset a=-40 b=15 | suvel2df tn=0.2 offsetm=100 nv=3 nvh=5 fv=1300 dv=125 fvh=1450 dvh=75 xod=2 dtratio=2 vavg=1600 verbose=1
+# Explicit smoothing and offset limit, including excluded traces.
+suplane nt=101 ntr=5 | sushw key=offset a=0 b=30 | suvel2df tn=0.15 offsetm=120 nv=2 nvh=3 nsmooth=3 offsetmax=45
+# Nonzero samples around the analysis window, with interpolation and clipping.
+[stderr] suspike nt=101 ntr=5 dt=0.004 k1=51 mag=2 | sushw key=offset a=0 b=40 | suvel2df tn=0.2 offsetm=160 nv=3 nvh=3 fv=1200 dv=250 fvh=1300 dvh=200 nsmooth=9 offsetmax=200 verbose=1
+# One sample and one velocity in each dimension.
+sunull nt=1 ntr=1 | suvel2df tn=0 offsetm=0 nv=1 nvh=1 nsmooth=1
+# Negative limit excludes every trace.
+suplane nt=51 ntr=3 | suvel2df tn=0.1 offsetm=-1 nv=2 nvh=2 offsetmax=-1
+# Required parameters and empty input.
+suvel2df tn=0.2 offsetm=100
+suplane nt=10 ntr=1 | suvel2df offsetm=1
+suplane nt=10 ntr=1 | suvel2df tn=0.1
+suplane nt=10 ntr=1 | suvel2df tn=0.1 offsetm=1 nv=999999999999999999999

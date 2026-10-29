@@ -1,0 +1,62 @@
+# REMOVED (2026-10-28): undefined behaviour in SU's C (pfacc on a length that is not a valid
+# complex prime-factor length reads/writes past its buffer). The original binary's output depends on heap layout,
+# so these cannot be compared with goldens; OxWave rejects such lengths by design.
+# Default dt from header, default full amplitude output, and explicit defaults.
+[stderr] suspike nt=64 ntr=1 dt=0.004 | sust
+[stderr] suspike nt=64 ntr=1 dt=0.004 | sust dt=0.004 fmin=0 fmax=125 verbose=0
+# Nonzero waveforms, restricted and single-bin frequency ranges.
+suplane nt=120 ntr=3 | sust fmin=12.5 fmax=45
+# UB-removed: suplane nt=96 ntr=1 | sust fmin=25 fmax=25
+suspike nt=64 ntr=2 | sust fmax=0
+suspike nt=64 ntr=1 | sust fmin=10
+# Odd and padded sizes, including a single sample and one trace.
+suspike nt=1 ntr=1 | sust
+suspike nt=3 ntr=1 | sust
+suspike nt=17 ntr=1 | sust
+sunull nt=63 ntr=2 | suaddnoise seed=17 | sust fmin=4 fmax=60
+suplane nt=127 ntr=2 | sust fmin=4 fmax=40
+# nt=95 and nt=96 select nfft=96, outside pfacc's complex domain.
+# Keep both nonzero-data regressions: compatibility must cover the forward FFT,
+# every inverse FFT, and consecutive input traces without changing nfft or d1.
+# UB-removed: sunull nt=96 ntr=1 | suaddnoise seed=19 | sust fmin=25 fmax=25
+# UB-removed: sunull nt=95 ntr=2 | suaddnoise seed=19 | sust fmin=4 fmax=60
+# Control: nt=192 selects the valid complex length nfft=210.
+sunull nt=192 ntr=1 | suaddnoise seed=19 | sust fmin=25 fmax=25
+# Nonzero full-band and narrow-band transforms at larger lengths.
+sunull nt=64 ntr=2 | suaddnoise seed=19 | sust
+sunull nt=257 ntr=2 | suaddnoise seed=23 | sust fmin=5 fmax=100
+sunull nt=1000 ntr=1 | suaddnoise seed=37 | sust fmin=10 fmax=15
+# Verbosity, unknown parameters, and nonseismic warning.
+[stderr] suspike nt=64 ntr=1 | sust verbose=1
+[stderr] suspike nt=64 ntr=1 | sust verbose=2 unused=7
+[stderr] suspike nt=64 ntr=1 | sushw key=trid a=30 | sust verbose=1
+[stderr] suspike nt=64 ntr=1 | sushw key=trid a=109 | sust
+# dt override when the trace header has no sampling interval.
+[stderr] suspike nt=64 ntr=1 | sushw key=dt a=0 | sust dt=0.002 fmax=60
+# Empty input and zero/invalid dt: original errors before parameter checking.
+[stderr] sust
+[stderr] sust dt=0.004
+[stderr] suspike nt=64 ntr=1 | sushw key=dt a=0 | sust
+[stderr] suspike nt=64 ntr=1 | sust dt=0
+[stderr] suspike nt=64 ntr=1 | sust dt=abc
+[stderr] suspike nt=64 ntr=1 | sust dt=1e-310
+[stderr] suspike nt=64 ntr=1 | sust verbose=999999999999999999999
+# Negative sampling and a small negative frequency (no added validation in C).
+suspike nt=64 ntr=1 | sust dt=-0.004 fmin=0 fmax=0
+suspike nt=64 ntr=1 | sust fmin=-0.1 fmax=10
+# Zero frequency count and reversed frequency range.
+suspike nt=64 ntr=1 | sust fmin=20 fmax=16
+[stderr] suspike nt=64 ntr=1 | sust fmin=40 fmax=10
+# Largest trace that exceeds the padded transform limit, before allocation.
+[stderr] sunull nt=65535 ntr=1 | sust
+# Parameter precedence, empty numeric parameters, and header preservation.
+[stderr] suspike nt=64 ntr=1 | sust dt=0 dt=0.004 fmin= fmax= verbose=
+suspike nt=64 ntr=2 | sushw key=tracr,gx,f2,d2,d1,ntr a=42,99,12,13,14,2 | sust fmin=10 fmax=30
+# Single-wrap boundaries: with nt=8 and dt=1/64, nfft=8 and d1=8 Hz exactly.
+# Bin zero is legal; bin nfft is also legal and wraps to the full spectrum.
+sunull nt=8 ntr=1 | suaddnoise seed=29 | sust dt=0.015625 fmin=-8 fmax=0
+sunull nt=8 ntr=1 | suaddnoise seed=29 | sust dt=0.015625 fmin=56 fmax=56
+sunull nt=8 ntr=1 | suaddnoise seed=29 | sust dt=0.015625 fmin=48 fmax=56
+# An empty range outside the spectrum performs no spectrum accesses.
+suspike nt=8 ntr=1 | sust dt=0.015625 fmin=-16 fmax=-32
+suspike nt=8 ntr=1 | sust dt=0.015625 fmin=72 fmax=64

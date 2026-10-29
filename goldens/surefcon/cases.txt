@@ -1,0 +1,55 @@
+# Default offset, unequal sample counts and one-trace input.
+suspike nt=5 ntr=1 k1=2 > forward.su && suspike nt=3 ntr=1 k1=1 | surefcon sufile=forward.su
+# Single sample, odd trace count, offset and verbose diagnostics.
+[stderr] suspike nt=1 ntr=3 > forward.su && suspike nt=1 ntr=2 | surefcon sufile=forward.su xy=1 verbose=1
+# Nonzero data and stream exhaustion.
+suspike nt=7 ntr=2 k1=3 | suaddnoise seed=42 > forward.su && suspike nt=5 ntr=4 k1=2 | surefcon sufile=forward.su xy=0
+# Required file and invalid offset.
+[stderr] suspike nt=3 ntr=1 | surefcon
+[stderr] suspike nt=3 ntr=1 | surefcon xy=-1 sufile=missing
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=missing
+# Offset past available traces.
+[stderr] suspike nt=3 ntr=1 > forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su xy=2
+# Empty input.
+[stderr] surefcon sufile=missing xy=0
+# The sole output mode is an SU stream. Preserve all stdin headers except ns/dt,
+# floor odd dt on division, and report the selected tracf pair and output CDP.
+[stderr] suspike nt=9 ntr=4 k1=5 | sushw key=tracf a=10 b=3 > forward.su && suspike nt=7 ntr=2 k1=3 | sushw key=tracf,cdp,dt,delrt a=-3,42,1001,-7 b=2,1,0,0 | surefcon sufile=forward.su xy=2 verbose=0
+# Reverse the unequal lengths; both inputs carry signed nontrivial data.
+suspike nt=3 ntr=2 k1=2 | suaddnoise seed=19 > forward.su && suspike nt=9 ntr=2 k1=5 | suaddnoise seed=23 | surefcon sufile=forward.su xy=0
+# Exercise the longer convolution path and exhaustion of the stdin stream first.
+suspike nt=33 ntr=3 k1=17 | suaddnoise seed=5 > forward.su && suspike nt=37 ntr=2 k1=19 | suaddnoise seed=7 | surefcon sufile=forward.su
+# Zero sample interval remains zero. Empty xy uses its default, last sufile wins.
+[stderr] suspike nt=1 ntr=1 | sushw key=dt a=0 > forward.su && surefcon < forward.su sufile=missing sufile=forward.su xy=
+# Empty or malformed forward file, and an empty filename.
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=/dev/null xy=0
+[stderr] printf bad > forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=
+# Full diagnostics for validation order, unknown parameters and integer overflow.
+[stderr] suspike nt=3 ntr=1 | surefcon xy=-2
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=missing unknown=1 verbose=1
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=missing xy=2147483648
+# Negative earlier occurrence is superseded by the final value.
+suspike nt=3 ntr=1 > forward.su && suspike nt=5 ntr=1 | surefcon sufile=forward.su xy=-1 xy=0
+# Last available offset produces exactly one pair; dt=1 rounds down to zero.
+[stderr] suspike nt=3 ntr=3 k1=2 | sushw key=tracf a=20 b=2 > forward.su && suspike nt=5 ntr=1 k1=3 | sushw key=tracf,dt a=1073741824,1 | surefcon sufile=forward.su xy=2
+# Parameter-file values and command-line precedence, with full success diagnostics.
+[stderr] printf 'sufile=forward.su xy=1\n' > args.par && suspike nt=3 ntr=1 k1=2 > forward.su && suspike nt=5 ntr=1 k1=3 | surefcon par=args.par xy=0 unknown=1
+# Detect a changed forward ns while seeking the offset, before convolving.
+[stderr] suspike nt=3 ntr=1 > forward.su && suspike nt=5 ntr=1 >> forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su xy=1
+# Stdin EOF short-circuits the forward read, leaving its changed ns unread.
+[stderr] suspike nt=3 ntr=1 > forward.su && suspike nt=5 ntr=1 >> forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su
+# The loop reads stdin before noticing forward EOF, so a changed stdin ns errors
+# after emitting the first convolved trace.
+[stderr] suspike nt=3 ntr=1 > forward.su && { suspike nt=3 ntr=1; suspike nt=5 ntr=1; } | surefcon sufile=forward.su
+# A changed forward ns also errors after the first output when stdin continues.
+[stderr] suspike nt=3 ntr=1 > forward.su && suspike nt=5 ntr=1 >> forward.su && suspike nt=3 ntr=2 | surefcon sufile=forward.su
+# Convolution switches algorithms above 30 samples in its shorter input.
+# Test both sides, both input orders, and even/odd lengths with signed samples.
+suspike nt=30 ntr=2 k1=15 | suaddnoise seed=101 > forward.su && suspike nt=35 ntr=2 k1=17 | suaddnoise seed=103 | surefcon sufile=forward.su
+suspike nt=32 ntr=2 k1=16 | suaddnoise seed=107 > forward.su && suspike nt=31 ntr=2 k1=15 | suaddnoise seed=109 | surefcon sufile=forward.su
+suspike nt=32 ntr=2 k1=16 | suaddnoise seed=113 > forward.su && suspike nt=34 ntr=2 k1=17 | suaddnoise seed=127 | surefcon sufile=forward.su
+# Zero-valued input must produce zeros over the entire output trace.
+sunull nt=31 ntr=2 > forward.su && suspike nt=33 ntr=2 k1=17 | suaddnoise seed=131 | surefcon sufile=forward.su xy=0
+# A nonnumeric xy parses as zero, like getparint in the original.
+[stderr] suspike nt=5 ntr=1 k1=3 > forward.su && suspike nt=7 ntr=1 k1=4 | surefcon sufile=forward.su xy=abc

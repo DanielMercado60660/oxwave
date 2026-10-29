@@ -1,0 +1,15 @@
+# Replacement preserves trailing bytes and ignores extra text bytes.
+[exact] python3 -c 'open("text", "wb").write(bytes(range(256))*13); open("data", "wb").write(b"X"*3200+b"tail")' && segyhdrmod text=text data=data && cat data
+# A short destination is extended.
+[exact] python3 -c 'open("text", "wb").write(b"A"*3200); open("data", "wb").write(b"z")' && segyhdrmod data=data text=text && cat data
+# Short and empty replacement headers.
+[stderr] python3 -c 'open("text", "wb").write(b"A"*3199); open("data", "wb").write(b"z")' && segyhdrmod text=text data=data
+[stderr] python3 -c 'open("text", "wb").close(); open("data", "wb").close()' && segyhdrmod text=text data=data
+# Required parameters, nonexistent files, and empty filenames.
+[stderr] segyhdrmod data=missing extra=1
+[stderr] segyhdrmod text=missing extra=1
+[stderr] segyhdrmod text=missing data=missing
+[stderr] python3 -c 'open("text", "wb").write(b"A"*3200)' && segyhdrmod text=text data=missing
+[stderr] segyhdrmod text= data=missing
+# checkpars diagnostics and last-parameter-wins behavior.
+[stderr] python3 -c 'open("text", "wb").write(b"B"*3200); open("data", "wb").write(b"tail")' && segyhdrmod text=missing text=text data=data verbose=1 unused=1 && cat data

@@ -1,0 +1,38 @@
+# Defaults and odd sizes
+suspike nt=1 ntr=1 | sugain
+suplane nt=127 ntr=3 | sugain
+suplane nt=127 ntr=3 | sugain tpow=-1 epow=2 etpow=0.5 gpow=3 vred=1500
+suplane nt=127 ntr=3 | sugain bias=-0.3 trap=0.5 clip=0.4 pclip=0.2 nclip=-0.1 scale=2 norm=3
+suplane nt=127 ntr=3 | sugain qclip=0.7
+suplane nt=127 ntr=3 | sugain qclip=0.7 qbal=1
+suplane nt=127 ntr=3 | sugain qbal=1 pbal=1 mbal=1 maxbal=1
+suplane nt=127 ntr=3 | sugain gpow=2
+suplane nt=127 ntr=3 | sugain agc=1 wagc=0.04 verbose=1
+suplane nt=127 ntr=3 | sugain gagc=1 wagc=0.04
+suplane nt=127 ntr=3 | sugain panel=1 tmpdir=/tmp verbose=1 jon=1
+suplane nt=127 ntr=3 | sushw key=mark a=1 | sugain mark=1 bias=2
+suplane nt=127 ntr=3 | sushw key=mark a=1 | sugain bias=2
+sunull nt=10 ntr=1 | sushw key=dt a=0 | sugain dt=0.004
+sunull nt=10 ntr=1 | sushw key=dt a=0 | sugain
+sugain </dev/null
+suplane nt=32 ntr=1 | sugain vred=-1
+suplane nt=32 ntr=1 | sugain trap=-1
+suplane nt=32 ntr=1 | sugain clip=-1
+suplane nt=32 ntr=1 | sugain qclip=1.1
+suplane nt=32 ntr=1 | sugain agc=1 wagc=0
+suplane nt=32 ntr=1 | sugain gagc=1 wagc=2
+suplane nt=32 ntr=1 | sugain tmpdir=/no/such/directory
+[stderr] suplane nt=33 ntr=2 | sugain agc=1 wagc=0.04 verbose=1
+[stderr] suplane nt=33 ntr=2 | sugain panel=1 verbose=1 qbal=1
+suplane nt=33 ntr=2 | sushw key=offset a=-100 b=200 | sugain tpow=1.3 vred=1500
+suspike nt=7 ntr=1 | sugain agc=1 wagc=0.004
+suplane nt=33 ntr=2 | sugain qclip=0
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain agc=1 wagc=0.05 norm=2
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain gagc=1 wagc=0.03 trap=1.5 maxbal=1
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain panel=1 tpow=1 qclip=0.9
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain gpow=0.5 pbal=1 mbal=1
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sushw key=mark a=0 b=1 | sugain mark=1 jon=1
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sushw key=offset a=-300 b=200 | sugain vred=2000 tpow=2 epow=1.5 etpow=1 gpow=1.5 qbal=1 qclip=0.8
+suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain panel=1 agc=1 wagc=0.1 qbal=1 qclip=0.95

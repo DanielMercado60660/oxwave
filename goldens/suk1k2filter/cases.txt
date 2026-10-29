@@ -1,0 +1,20 @@
+# Defaults and header-derived spacing
+suplane nt=31 ntr=7 | suk1k2filter
+suplane nt=31 ntr=7 | sushw key=trid,d1,d2 a=30,2,3 | suk1k2filter
+# Quadrants, explicit filters, verbosity and temporary directory
+suplane nt=31 ntr=7 | suk1k2filter d1=2 d2=3 k1=0,0.05,0.12,0.2 amps1=1,1,0,0 k2=0,0.03,0.1,0.15 amps2=1,1,0,0 quad=2 verbose=1 tmpdir=.
+suplane nt=31 ntr=7 | suk1k2filter quad=3
+suplane nt=1 ntr=1 | suk1k2filter
+suplane nt=17 ntr=1 | suk1k2filter quad=1
+suplane nt=16 ntr=5 | suk1k2filter k1=0,0.2 amps1=1,1 k2=0,0.2 amps2=1,1
+# Parameter errors and empty input
+suk1k2filter
+suplane nt=16 ntr=4 | suk1k2filter k1=0.2,0.1
+suplane nt=16 ntr=4 | suk1k2filter k2=-1,0
+suplane nt=16 ntr=4 | suk1k2filter k1=0,0.1 amps1=1
+suplane nt=16 ntr=4 | suk1k2filter k2=0,0.1 amps2=1
+suplane nt=16 ntr=4 | suk1k2filter amps1=0,0,0,0
+suplane nt=16 ntr=4 | suk1k2filter amps2=0,0,0,0
+suplane nt=16 ntr=4 | suk1k2filter amps1=-1,1,1,0
+suplane nt=16 ntr=4 | suk1k2filter amps2=-1,1,1,0
+suplane nt=16 ntr=4 | suk1k2filter tmpdir=/no/such/directory

@@ -1,0 +1,20 @@
+# Explicit parameter values and verbose diagnostics
+[stderr] suplane nt=127 ntr=8 | sushw key=offset a=0 b=20 | suvelan_nsel nx=8 dx=20 nv=4 dv=75 fv=1200 tau=0.2 smute=3 dtratio=3 nsmooth=5 pwr=2 verbose=1
+# Defaults from first trace headers
+suplane nt=64 ntr=8 | sushw key=cdpt,d2,offset a=8,20,0 b=0,0,20 | suvelan_nsel
+suplane nt=51 ntr=8 | sushw key=offset a=0 b=20 | suvelan_nsel nx=8 dx=20 nv=2 tau=0 dtratio=1 nsmooth=3
+suplane nt=1 ntr=8 | suvelan_nsel nx=8 dx=20 nv=1
+[stderr] suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 smute=1
+[stderr] suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 pwr=0
+[stderr] suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 pwr=-1
+suvelan_nsel nx=8 dx=20
+# Single sample avoids the original's out-of-bounds correlation for one trace
+suplane nt=1 ntr=1 | suvelan_nsel nx=1 dx=20 nv=1
+suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 nv=0
+suplane nt=1 ntr=8 | suvelan_nsel nx=8 dx=20 nv=1 dtratio=0
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | suvelan_nsel nx=8 dx=50 nv=6 fv=1600 dv=200 tau=0.3 smute=1.5 dtratio=2
+susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | suaddnoise seed=31 sn=6 | sushw key=offset,delrt a=-400,20 b=50,0 | suvelan_nsel nx=8 dx=50 nv=5 fv=1800 dv=150 tau=0.7 nsmooth=9 dtratio=3 pwr=3
+susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | sushw key=cdpt,d2 a=8,50 | suvelan_nsel
+susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | sushw key=offset a=50 b=12 | suvelan_nsel nx=8 dx=12.5 nv=4 fv=1900 dv=40 tau=0.1 dtratio=1 nsmooth=3 smute=3

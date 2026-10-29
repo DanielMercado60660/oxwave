@@ -1,0 +1,19 @@
+[package]
+name = "unisam"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "unisam"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-cubic-interp = { path = "../../crates/oxwave-cubic-interp" }
+oxwave-f-cubicspline = { path = "../../crates/oxwave-f-cubicspline" }
+oxwave-f-smooth = { path = "../../crates/oxwave-f-smooth" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }

@@ -1,0 +1,24 @@
+[package]
+name = "suharlan"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suharlan"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-convolution = { path = "../../crates/oxwave-f-convolution" }
+oxwave-f-frannor = { path = "../../crates/oxwave-f-frannor" }
+oxwave-f-franuni = { path = "../../crates/oxwave-f-franuni" }
+oxwave-f-smooth = { path = "../../crates/oxwave-f-smooth" }
+oxwave-f-taup = { path = "../../crates/oxwave-f-taup" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-correlation = { path = "../../crates/oxwave-correlation" }
+oxwave-hilbert = { path = "../../crates/oxwave-hilbert" }
+oxwave-index-search = { path = "../../crates/oxwave-index-search" }
+oxwave-tempfile = { path = "../../crates/oxwave-tempfile" }

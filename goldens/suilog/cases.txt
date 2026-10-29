@@ -1,0 +1,22 @@
+# Explicit reconstruction parameters and multiple traces.
+suplane nt=37 ntr=3 dt=0.004 | suilog nt=53 ntmin=3 dt=4000
+suspike nt=31 ntr=1 | suilog nt=17 ntmin=1 dt=2000
+# Single output sample and a zero minimum index.
+suspike nt=3 ntr=1 | suilog nt=1 ntmin=1 dt=1
+suspike nt=7 ntr=1 | suilog nt=9 ntmin=0 dt=0
+suspike nt=7 ntr=1 | suilog nt=9 ntmin=1 dt=-1
+# A zero stretched sample interval and fractional output header interval.
+suspike nt=9 ntr=1 | sushw key=dt a=0 | suilog nt=13 ntmin=2 dt=2500.5
+# Diagnostic output and unknown parameters.
+[stderr] suplane nt=17 ntr=1 | suilog nt=19 ntmin=2 dt=4000 verbose=1 extra=7
+# Required parameters and invalid sample count.
+suspike nt=5 ntr=1 | suilog ntmin=1 dt=4
+suspike nt=5 ntr=1 | suilog nt=5 dt=4
+suspike nt=5 ntr=1 | suilog nt=5 ntmin=1
+suspike nt=5 ntr=1 | suilog nt=65536 ntmin=1 dt=4
+suspike nt=5 ntr=1 | suilog nt=-1 ntmin=1 dt=4
+# Rust-only checks (the original writes out of bounds, so these are not goldens):
+# suspike nt=5 ntr=1 | suilog nt=5 ntmin=-1 dt=4  # exit 1: ntmin must be between 0 and nt
+# suspike nt=5 ntr=1 | suilog nt=5 ntmin=6 dt=4   # exit 1: ntmin must be between 0 and nt
+suspike nt=5 ntr=1 | suilog nt=0 ntmin=0 dt=4
+suilog nt=5 ntmin=1 dt=4

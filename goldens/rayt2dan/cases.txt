@@ -1,0 +1,87 @@
+# Default tolerance tightened to an absolute 1e-6 in traveltime tables so
+# INITIAL=1e8 does not hide errors in the computed, sub-second samples.
+# Required-parameter parsing and complete diagnostics.
+[stderr] rayt2dan
+[stderr] rayt2dan VP0file=v
+[stderr] rayt2dan VP0file=v nt=3
+[stderr] rayt2dan VP0file=v nt=3 nx=5
+[stderr] rayt2dan VP0file= nt=3 nx=5 nz=5
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5
+[stderr] rayt2dan VP0file=/dev/null nt=3 nx=5 nz=5
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 fsx=-1
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 fsx=401
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 nsx=4
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 nsx=2 dsx=-1
+[stderr] rayt2dan VP0file=missing nt=999999999999999999999 nx=5 nz=5
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 dt=1e-310
+[stderr] rayt2dan VP0file=missing nt=3 nx=5 nz=5 unknown=4 verbose=1
+# Raw stdout, console-only output with tfile, singleton nt, and full defaults.
+[exact][stderr] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2dan VP0file=v nx=5 nz=5 nt=1
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=1 tfile=t verbose=1
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 SV=1 na=11 fa=-50 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=1 fa=0 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=7 fa=-30 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nsx=3 dsx=200 fsx=600 na=11 fa=-50 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 fxo=300 nxo=15 dxo=50 fzo=0 nzo=43 dzo=15 na=11 fa=-50 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 fac=0.05 na=13 fa=-60 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 fac=0 na=3 fa=-10 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 fac=-0.01 na=3 fa=-10 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 amin=20 amax=40 na=11 fa=-50 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=0 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=-1 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nsx=0 na=2 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nsx=-1 na=2 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 dt=0 na=3 fa=-5 da=5 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 dt=-0.004 na=3 fa=-5 da=5 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nt=2 na=3 fa=-5 da=5 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nt=3 na=1 fa=0 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 aperx=0 na=3 fa=-5 da=5 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 aperx=-1 na=3 fa=-5 da=5 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 fx=100 fsx=900 fz=-100 dx=80 dz=75 na=7 fa=-30 da=10 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 nxo=1 nzo=1 fxo=800 fzo=0 na=1 fa=0 tfile=t > /dev/null; cat t
+# Full ray/time/output defaults on an odd grid; nx=nz=1 and boundary extrapolation.
+[f32][rtol=0][atol=1e-6] makevel nx=5 nz=7 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=7 nt=11 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=1 nz=1 v000=1500 > v; rayt2dan VP0file=v nx=1 nz=1 nt=1 na=1 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=3 nz=3 v000=1500 > v; rayt2dan VP0file=v nx=3 nz=3 nt=9 na=3 fa=0 da=30 tfile=t > /dev/null; cat t
+# Gradient models exercise interpolation derivatives and all four RK stages.
+[f32][rtol=0][atol=1e-6] makevel nx=21 nz=23 dx=80 dz=60 v000=1500 dvdx=0.03 dvdz=0.2 > v; rayt2dan VP0file=v nx=21 nz=23 dx=80 dz=60 nt=83 dt=0.006 fsx=800 SV=0 na=9 fa=-40 da=10 fac=0.03 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=21 nz=23 dx=80 dz=60 v000=1500 dvdx=0.03 dvdz=0.2 > v; rayt2dan VP0file=v nx=21 nz=23 dx=80 dz=60 nt=83 dt=0.006 fsx=800 SV=1 na=9 fa=-40 da=10 fac=0.03 tfile=t > /dev/null; cat t
+# Thomsen grids, individually and together, plus all general anisotropy grids.
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 deltafile=d tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 epsilonfile=e tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 deltafile=d epsilonfile=e tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 deltafile=d epsilonfile=e SV=1 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 a1111file=c11 a1133file=c13 VS0file=vs a1113file=c15 a3313file=c35 tfile=t > /dev/null; cat t
+[f32][rtol=0][atol=1e-6] makevel nx=17 nz=19 v000=1500 > v; makevel nx=17 nz=19 v000=0.05 > d; makevel nx=17 nz=19 v000=0.1 > e; makevel nx=17 nz=19 v000=2600000 > c11; makevel nx=17 nz=19 v000=900000 > c13; makevel nx=17 nz=19 v000=800 > vs; makevel nx=17 nz=19 v000=20000 > c15; makevel nx=17 nz=19 v000=-10000 > c35; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=11 fa=-50 da=10 a1111file=c11 a1133file=c13 VS0file=vs a1113file=c15 a3313file=c35 SV=1 tfile=t > /dev/null; cat t
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1111file=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1111file=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1133file=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1133file=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 VS0file=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 VS0file=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1113file=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a1113file=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a3313file=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 a3313file=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 deltafile=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 deltafile=/dev/null
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 epsilonfile=missing
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 epsilonfile=/dev/null
+
+# Zero and negative counts accepted by the C implementation.
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=0 na=1
+[stderr] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=-1 na=0 tfile=t
+[exact] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 nxo=0 na=1
+[exact] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 nzo=0 na=1
+[exact] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 nxo=-1 na=0
+[exact] makevel nx=5 nz=5 v000=1500 > v; rayt2dan VP0file=v nx=5 nz=5 nt=3 nzo=-1 na=0
+[stderr] rayt2dan VP0file=missing nx=0 nz=5 nt=3
+# The stdout mode retains both the angle text and the following native-float table.
+[exact] makevel nx=17 nz=19 v000=1500 > v; rayt2dan VP0file=v nx=17 nz=19 nt=101 dt=0.004 fsx=800 na=1 fa=0
+# An exact allocator boundary reads the following velocity-array allocation.
+[f32][rtol=0][atol=1e-6] makevel nx=13 nz=17 v000=1500 > v; rayt2dan VP0file=v nx=13 nz=17 nt=24 dt=.002 dx=25 dz=25 fsx=150 na=3 fa=45 da=-15 tfile=t > /dev/null; cat t
+# Parameter files, duplicate arguments, empty numeric values, and unknown argument warnings.
+[stderr] printf 'VP0file=missing nt=3 nx=5 nz=5 na=1\n' > p; rayt2dan par=p unknown=2
+[stderr] rayt2dan VP0file=missing nt= nx=5 nz=5
+[stderr] rayt2dan VP0file=missing nt=2 nt=3 nx=5 nz=5 verbose=1

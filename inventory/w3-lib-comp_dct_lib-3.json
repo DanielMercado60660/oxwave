@@ -1,0 +1,83 @@
+{
+  "scope": "comp/dct/lib part 3",
+  "functions": [
+    {
+      "name": "codeSilence",
+      "file": "comp/dct/lib/rle.c",
+      "signature": "void codeSilence (void *inb, void *outb);",
+      "purpose": "Encode runs of silent bytes using a marker and run length.",
+      "calls": ["buffGetc", "buffMerge", "buffPutc"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Integer and byte operations only; preserves an eight-byte look-ahead buffer and splits runs at 255 bytes.",
+      "c_lines": 61,
+      "difficulty": "medium",
+      "group": "silence-rle",
+      "license_note": ""
+    },
+    {
+      "name": "codeDesilence",
+      "file": "comp/dct/lib/rle.c",
+      "signature": "void codeDesilence ( void *inb, void *outb);",
+      "purpose": "Decode silence markers into runs of zero bytes.",
+      "calls": ["buffGetc", "buffPutc"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Integer and byte operations only; a marker consumes the following byte as its run length.",
+      "c_lines": 13,
+      "difficulty": "easy",
+      "group": "silence-rle",
+      "license_note": ""
+    },
+    {
+      "name": "wavePack_1",
+      "file": "comp/dct/lib/wavepack1.c",
+      "signature": "int wavePack_1(float *x, float *y, waveFilter *filter, \n\tint twopow, int stage, int type);",
+      "purpose": "Decompose or reconstruct a one-dimensional signal using a wavelet packet transform.",
+      "calls": ["alloc1float", "free1float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Multistage float filter convolutions accumulate paired products in loop order; reconstruction scatters additions into output samples. Preserve band ordering, periodic indexing, and arithmetic grouping; contraction or excess precision can affect results.",
+      "c_lines": 166,
+      "difficulty": "hard",
+      "group": "wavelet-packet",
+      "license_note": ""
+    },
+    {
+      "name": "wavePack_2",
+      "file": "comp/dct/lib/wavepack2.c",
+      "signature": "int wavePack_2(float **x, float **y, waveFilter *filter1, \n\twaveFilter *filter2, int twopow1, int twopow2,\n\tint stage1, int stage2, int type);",
+      "purpose": "Decompose or reconstruct a two-dimensional array using wavelet packet transforms along both dimensions.",
+      "calls": ["alloc2float", "wavePack_1", "free2float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The static slower-dimension helper performs multistage float convolutions and ordered reconstruction accumulations; preserve its band ordering, periodic indexing, and the order of dimension transforms.",
+      "c_lines": 43,
+      "difficulty": "hard",
+      "group": "wavelet-packet",
+      "license_note": ""
+    },
+    {
+      "name": "waveTrans_1",
+      "file": "comp/dct/lib/wavetrans1.c",
+      "signature": "int waveTrans_1(float *x, float *y, waveFilter *filter, \n\tint twopow, int stage, int type);",
+      "purpose": "Decompose or reconstruct a one-dimensional signal using a multistage wavelet transform.",
+      "calls": ["alloc1float", "free1float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Multistage float filter convolutions accumulate paired products in loop order; reconstruction scatters additions into output samples. Preserve coefficient layout, periodic indexing, and arithmetic grouping; contraction or excess precision can affect results.",
+      "c_lines": 112,
+      "difficulty": "hard",
+      "group": "wavelet-transform",
+      "license_note": ""
+    },
+    {
+      "name": "waveTrans_2",
+      "file": "comp/dct/lib/wavetrans2.c",
+      "signature": "int waveTrans_2(float **x, float **y, waveFilter *filter, \n\tint twopow1, int twopow2, int stage1, int stage2, int type);",
+      "purpose": "Decompose or reconstruct a two-dimensional array using tensor-product wavelet transforms.",
+      "calls": ["alloc2float", "waveTrans_1", "free2float"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The static slower-dimension helper performs multistage float convolutions and ordered reconstruction accumulations; preserve coefficient layout, periodic indexing, and the order of dimension transforms. The function returns EXIT_SUCCESS after processing, but also returns 0 for invalid stages.",
+      "c_lines": 31,
+      "difficulty": "hard",
+      "group": "wavelet-transform",
+      "license_note": ""
+    }
+  ]
+}

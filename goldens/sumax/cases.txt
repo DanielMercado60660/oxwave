@@ -1,0 +1,34 @@
+# ASCII modes, first-sample and stale-location behavior, and custom headers.
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats verbose=1; cat stats
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats mode=max verbose=2 key1=tracl key2=tracr dt=0.01; cat stats
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats mode=min; cat stats
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats mode=abs verbose=1; cat stats
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats mode=rms verbose=1; cat stats
+suspike nt=7 ntr=3 k1=2,5 mag=2,-3 | sumax outpar=stats mode=thd threshamp=1 threshtime=0.004 dt=0.002 verbose=1; cat stats
+sunull nt=1 ntr=1 | sumax outpar=stats mode=thd threshamp=-1 dt=0; cat stats
+sunull nt=5 ntr=1 | sumax outpar=stats; cat stats
+# Binary data and sidecar output.
+[f32] suspike nt=9 ntr=2 | sumax output=binary outpar=stats
+[f32] suspike nt=9 ntr=2 | sumax output=binary mode=min outpar=stats
+[f32] suspike nt=9 ntr=2 | sumax output=binary mode=abs outpar=stats
+[f32] suspike nt=9 ntr=2 | sumax output=binary mode=rms outpar=stats
+[f32] suspike nt=9 ntr=2 | sumax output=binary mode=thd outpar=stats
+suspike nt=9 ntr=2 | sumax output=binary mode=max outpar=stats > /dev/null; cat stats
+# SU trace output modes.
+suspike nt=9 ntr=2 | sumax output=segy outpar=stats
+suspike nt=9 ntr=2 | sumax output=segy mode=max outpar=stats
+suspike nt=9 ntr=2 | sumax output=segy mode=min outpar=stats
+suspike nt=9 ntr=2 | sumax output=segy mode=abs outpar=stats
+suspike nt=9 ntr=2 | sumax output=segy mode=thd outpar=stats
+[stderr] sumax output=invalid
+[stderr] sumax mode=invalid
+[stderr] sumax output=segy mode=rms
+[stderr] sumax outpar=/dev/stdout
+[stderr] suspike nt=5 ntr=1 | sumax outpar=stats verbose=1 unknown=1; cat stats
+[stderr] sumax outpar=stats
+# First-sample extrema, default header keys, and threshold defaults.
+suspike nt=5 ntr=1 k1=1 mag=-4 | sumax outpar=stats mode=rms verbose=1; cat stats
+suspike nt=5 ntr=1 k1=1,3 mag=-4,2 | sumax output=segy mode=abs outpar=stats
+suspike nt=5 ntr=2 k1=2 mag=3 | sumax outpar=stats mode=max verbose=2; cat stats
+suspike nt=5 ntr=1 k1=2 mag=3 | sumax outpar=stats mode=thd verbose=1; cat stats
+[stderr] sumax outpar=/no-such-directory/stats

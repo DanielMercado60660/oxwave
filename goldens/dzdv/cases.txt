@@ -1,0 +1,18 @@
+# Raw float outputs, including depth file, interpolation, clamping and windows.
+[f32] sunull nt=5 ntr=9 | suop op=exp | sustrip outpar=/dev/null > afile && dzdv nx=3 nz=5 dx=1 dz=1 off0=0 doff=1 noff=3 cip=0,2,0 < afile
+[f32] sunull nt=5 ntr=9 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=3 nz=5 dx=2 dz=0.5 fx=-1 fz=1 off0=-2 doff=2 noff=3 cip=-1,1,-1 cip=3,5,0.4 nxw=9 nzw=9 afile=a dfile=depth < a > /dev/null && cat depth
+[f32] sunull nt=5 ntr=9 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=3 nz=5 dx=2 dz=0.5 fx=-1 fz=1 off0=-2 doff=2 noff=3 cip=-1,1,-1 cip=3,5,0.4 nxw=1 nzw=1 afile=a dfile=depth < a
+[f32] sunull nt=1 ntr=1 | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=0 noff=1 cip=0,0,0 < afile
+[stderr] sunull nt=1 ntr=1 | suop op=exp | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=0 noff=1 cip=0,0,0 verbose=1 < afile
+[stderr] dzdv nx=1
+[stderr] dzdv nx=1 nz=1
+[stderr] dzdv nx=1 nz=1 dx=1
+[stderr] dzdv nx=1 nz=1 dx=1 dz=1
+[stderr] dzdv nx=1 nz=1 dx=1 dz=1 off0=0
+[stderr] dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=1
+[stderr] dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=1 noff=1
+[stderr] dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=1 noff=1 cip=0,0,0
+# Nonuniform, signed amplitudes exercise the ordered least-squares sums.
+[f32] python3 -c 'import struct; open("p","wb").write(struct.pack("45f",*[((i%11)-5)*0.25 for i in range(45)])); open("a","wb").write(struct.pack("45f",*[(i%7)*0.3-0.8 for i in range(45)]))' && dzdv nx=3 nz=5 dx=1 dz=1 off0=-1 doff=1 noff=3 cip=0,1,0.2 cip=2,3,0.5 nxw=1 nzw=1 afile=a < p
+[f32] python3 -c 'import struct; open("a","wb").write(struct.pack("45f",*[((i%11)-5)*0.25 for i in range(45)]))' && dzdv nx=3 nz=5 dx=1 dz=1 off0=0 doff=1 noff=3 cip=0,2,0 nxw=-1 nzw=-1 afile=a < a
+[stderr] python3 -c 'import struct; open("p","wb").write(struct.pack("f",1)); open("a","wb").close()' && dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=0 noff=1 cip=0,0,0 afile=a < p

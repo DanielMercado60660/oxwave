@@ -1,0 +1,16 @@
+# Native float output; each interpolation method is exercised on both axes.
+[f32] suspike nt=5 ntr=3 nspk=2 ix1=1 it1=2 ix2=3 it2=4 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=3 n1=7 n2=5
+[f32] suspike nt=5 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=5 | sustrip outpar=/dev/null | unisam2 x1=0,1,2,4,7 x2=-2,0,3,5 n1=9 n2=7 method1=mono method2=mono
+[f32] suspike nt=5 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=5 | sustrip outpar=/dev/null | unisam2 x1=0,1,2,4,7 x2=-2,0,3,5 n1=9 n2=7 method1=akima method2=akima
+[f32] suspike nt=5 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=5 | sustrip outpar=/dev/null | unisam2 x1=0,1,2,4,7 x2=-2,0,3,5 n1=9 n2=7 method1=spline method2=spline
+[f32] suspike nt=3 ntr=5 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | unisam2 nx1=3 dx1=-2 fx1=4 nx2=5 dx2=-1 fx2=3 n1=7 d1=1 f1=-1 n2=7 d2=1 f2=-2 method1=mono method2=spline
+[f32] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2
+[f32] suspike nt=1 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=1 nx2=3 n1=3 n2=5 method1=akima method2=spline
+[f32] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=1 n1=5 n2=3 method1=spline method2=mono
+[f32] suspike nt=3 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=3 n1=4 n2=4 d1=0 d2=0 f1=-1 f2=9 verbose=1
+[f32] suspike nt=3 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=3 n1=0 n2=2
+[stderr] unisam2 method1=bad
+[stderr] unisam2 method2=bad
+[stderr] unisam2 method1=
+[stderr] unisam2
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=2

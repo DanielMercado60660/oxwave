@@ -1,0 +1,12 @@
+# The input is a binary header, so compare its bytes exactly.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256))+bytes(range(144)))' | swapbhed
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256))+bytes(range(144)))' | swapbhed | swapbhed
+# Short and empty input are accepted and the rest of the global header is zeroed.
+[exact] swapbhed </dev/null
+[exact] printf '\001\002\003\004\005' | swapbhed
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(255)))' | swapbhed
+# Extra input is ignored; the program does not parse options or call checkpars.
+[exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256))*3)' | swapbhed verbose=1 unknown=-1
+[exact] suplane nt=1 ntr=1 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary
+# An input stream error reports one 400-byte item.
+[stderr] swapbhed < .

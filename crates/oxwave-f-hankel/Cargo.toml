@@ -1,0 +1,16 @@
+[package]
+name = "oxwave-f-hankel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-abel = { path = "../oxwave-abel" }
+oxwave-pfa-fft = { path = "../oxwave-pfa-fft" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

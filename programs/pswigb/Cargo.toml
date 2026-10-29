@@ -1,0 +1,21 @@
+[package]
+name = "pswigb"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "pswigb"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-basic = { path = "../../crates/oxwave-f-basic" }
+oxwave-f-psaxesbox = { path = "../../crates/oxwave-f-psaxesbox" }
+oxwave-f-psdrawcurve = { path = "../../crates/oxwave-f-psdrawcurve" }
+oxwave-sort = { path = "../../crates/oxwave-sort" }
+oxwave-strings = { path = "../../crates/oxwave-strings" }
+oxwave-wiggle-raster = { path = "../../crates/oxwave-wiggle-raster" }

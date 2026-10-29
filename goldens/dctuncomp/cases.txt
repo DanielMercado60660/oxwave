@@ -1,0 +1,41 @@
+# No decoder parameters or alternate output modes: headers carry all settings.
+# Compare native float stdout directly (inventory cases redirect it to a file).
+[f32] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=32 n2=4 | dctuncomp
+[f32] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | dctuncomp
+# Explicit compressor defaults, full blocks, and multiple blocks in both axes.
+[f32] suplane nt=32 ntr=32 | sustrip outpar=/dev/null | dctcomp n1=32 n2=32 blocksize1=16 blocksize2=16 error=0.01 | dctuncomp
+[f32] suplane nt=17 ntr=19 | sustrip outpar=/dev/null | dctcomp n1=17 n2=19 | dctuncomp
+# Odd and non-power-of-two transform lengths and rectangular blocks.
+[f32] suspike nt=13 ntr=7 | sustrip outpar=/dev/null | dctcomp n1=13 n2=7 blocksize1=3 blocksize2=5 | dctuncomp
+[f32] suplane nt=27 ntr=11 | sustrip outpar=/dev/null | dctcomp n1=27 n2=11 blocksize1=9 blocksize2=3 error=0.1 | dctuncomp
+# Single sample/trace, unit transform dimensions, and padding larger than input.
+# Very small/unit blocks can make the original compressor emit nsize=-1;
+# the decoder then SIGSEGVs on its unchecked failed allocation.
+[f32] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1 | dctuncomp
+[f32] suplane nt=17 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=17 n2=1 blocksize1=8 blocksize2=1 | dctuncomp
+[f32] suplane nt=1 ntr=7 | sustrip outpar=/dev/null | dctcomp n1=1 n2=7 blocksize1=1 blocksize2=4 | dctuncomp
+[f32] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1 blocksize1=1 blocksize2=1 | dctuncomp
+# Constant zero and negative samples; seeded noise exercises prefix magnitudes.
+[f32] sunull nt=23 ntr=9 | sustrip outpar=/dev/null | dctcomp n1=23 n2=9 | dctuncomp
+[f32] suspike nt=19 ntr=7 | sugain scale=-3 | sustrip outpar=/dev/null | dctcomp n1=19 n2=7 blocksize1=8 blocksize2=4 | dctuncomp
+[f32] suplane nt=33 ntr=17 | suaddnoise seed=281 sn=2 | sustrip outpar=/dev/null | dctcomp n1=33 n2=17 error=0.005 | dctuncomp
+# No checkpars/getpar: verbose and even unknown/invalid arguments are ignored.
+[f32] [stderr] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | dctuncomp verbose=1
+[f32] [stderr] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | dctuncomp n1=0 n2=-1 error=abc blocksize1=0 output=ascii verbose=0
+# Empty input and truncated headers take the original Inconsistent data exit.
+[stderr] dctuncomp
+[stderr] printf '\000\000\000\000\000\000\000\000\000\000\000\000' | dctuncomp
+# Complete native headers with missing/invalid Huffman data.
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",0,4,4,4,4,0.,1.))' | dctuncomp
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",1,4,4,4,4,0.,1.)+b"\0")' | dctuncomp
+# Zero and negative dimensions and zero block sizes, with absent payload.
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",0,0,4,4,4,0.,1.))' | dctuncomp
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",0,-1,4,4,4,0.,1.))' | dctuncomp
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",0,4,-1,4,4,0.,1.))' | dctuncomp
+[stderr] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("5i2f",0,4,4,0,4,0.,1.))' | dctuncomp
+# Valid Huffman stream but dimensions demand more prefix values than provided.
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("i",b,4,33);sys.stdout.buffer.write(b)' | dctuncomp
+# Partial Huffman payload; retain original declared byte count.
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import sys;b=sys.stdin.buffer.read();sys.stdout.buffer.write(b[:29])' | dctuncomp
+# Only one compressed image is consumed; trailing bytes are ignored.
+[f32] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | python3 -c 'import sys;sys.stdout.buffer.write(sys.stdin.buffer.read()+b"trailing bytes")' | dctuncomp

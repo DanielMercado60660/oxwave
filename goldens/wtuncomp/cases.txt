@@ -1,0 +1,13 @@
+# Raw native floats; vary dimensions, filter, stages, and compressor error.
+[f32] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wtcomp n1=128 n2=16 | wtuncomp
+[f32] suspike nt=100 ntr=9 | sustrip outpar=/dev/null | wtcomp n1=100 n2=9 nstage1=2 nstage2=2 error=0.03 | wtuncomp
+[f32] suspike nt=32 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=32 n2=8 nfilter=0 nstage1=1 nstage2=1 error=0.1 | wtuncomp verbose=1
+[f32] suspike nt=17 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=17 n2=1 | wtuncomp
+[f32] suspike nt=1 ntr=9 | sustrip outpar=/dev/null | wtcomp n1=1 n2=9 | wtuncomp
+# A complete header with an empty Huffman payload must report inconsistent data.
+[stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6i2f",0,8,8,11,3,3,0,1))' | wtuncomp
+# A real compressor overflow produces a negative payload size and SIGSEGV.
+[stderr] sunull nt=128 ntr=1 | suaddnoise seed=129 | sugain scale=1000 | sustrip outpar=/dev/null | wtcomp n1=128 n2=1 error=0.001 | python3 -c 'import subprocess,sys; r=subprocess.run([sys.argv[1]],input=sys.stdin.buffer.read()); sys.exit(128-r.returncode if r.returncode < 0 else r.returncode)' wtuncomp
+# Invalid filter is only dereferenced after successful decoding.
+[stderr] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wtcomp n1=128 n2=16 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("=i",b,12,99); sys.stdout.buffer.write(b)' | python3 -c 'import subprocess,sys; r=subprocess.run([sys.argv[1]],input=sys.stdin.buffer.read()); sys.exit(128-r.returncode if r.returncode < 0 else r.returncode)' wtuncomp
+[stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6i2f",0,8,8,99,3,3,0,1))' | wtuncomp

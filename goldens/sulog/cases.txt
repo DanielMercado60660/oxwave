@@ -1,0 +1,20 @@
+# Defaults, odd sizes, single trace, and output parameter contents
+suplane nt=101 ntr=3 | sulog outpar=logpar
+suspike nt=17 ntr=1 | sulog ntmin=1 m=1 ntau=23 outpar=logpar
+[exact] suplane nt=101 ntr=1 | sulog ntmin=9 m=2 ntau=211 outpar=logpar > /dev/null; cat logpar
+# Zero and negative minimum sample and multiplier, explicit zero output size
+suspike nt=11 ntr=1 | sulog ntmin=0 ntau=16 outpar=logpar
+suspike nt=11 ntr=1 | sulog ntmin=-1 ntau=16 outpar=logpar
+suspike nt=1 ntr=1 | sulog ntau=4 outpar=logpar
+suspike nt=11 ntr=1 | sulog ntmin=2 m=0 ntau=16 outpar=logpar
+suspike nt=11 ntr=1 | sulog ntmin=2 m=-1 ntau=16 outpar=logpar
+# Diagnostics, missing input, invalid output destination and oversized output
+[stderr] suplane nt=32 ntr=1 | sulog outpar=logpar verbose=1 bogus=1
+sulog outpar=logpar < /dev/null
+suplane nt=32 ntr=1 | sulog
+suplane nt=32 ntr=1 | sulog outpar=/no/such/directory/logpar
+suplane nt=32 ntr=1 | sulog outpar=logpar ntau=65536
+# Default padded output exceeds the trace limit; a large multiplier with an
+# explicit output length still uses the multiplier for the sampling interval.
+suplane nt=32 ntr=1 | sulog outpar=logpar m=1025
+suspike nt=11 ntr=1 | sulog ntmin=2 m=100000000 ntau=16 outpar=logpar

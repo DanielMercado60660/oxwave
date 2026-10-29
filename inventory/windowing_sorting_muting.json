@@ -1,0 +1,217 @@
+{
+  "scope": "su/main/windowing_sorting_muting part 1 of 1",
+  "programs": [
+    {
+      "name": "sukill",
+      "path": "su/main/windowing_sorting_muting/sukill.c",
+      "purpose": "Zero selected traces by trace number or header value.",
+      "selfdoc_first_line": " SUKILL - zero out traces\t\t\t\t\t",
+      "params": [
+        {
+          "name": "min",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "One-based first trace to zero; a positive value selects trace-number mode."
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of traces to zero in trace-number mode."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "default": "trid",
+          "required": false,
+          "description": "Header used to select traces when min is zero."
+        },
+        {
+          "name": "a",
+          "type": "double",
+          "default": "2",
+          "required": false,
+          "description": "Header value identifying traces to zero."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparstring",
+        "getpardouble",
+        "checkpars",
+        "err",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "puttr",
+        "gethval",
+        "vtod",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header selection compares the converted double value exactly against a. In trace-number mode, the first selected trace's sample count is reused for subsequent selected traces.",
+      "c_lines": 111,
+      "difficulty": "easy",
+      "difficulty_reason": "The program selects traces and zeros their samples. This inventory is incomplete: the other 15 requested programs have not been fully verified.",
+      "test_cases": [
+        {
+          "description": "Zero a range of traces.",
+          "command": "suplane nt=64 ntr=8 | sukill min=2 count=3"
+        },
+        {
+          "description": "Zero traces selected by a header value.",
+          "command": "suplane nt=64 ntr=8 | sukill key=tracl a=4"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sumixgathers",
+      "path": "su/main/windowing_sorting_muting/sumixgathers.c",
+      "purpose": "Combine two gather files, retaining traces from the first file when offsets match.",
+      "selfdoc_first_line": " SUMIXGATHERS - mix two gathers\t\t\t\t\t",
+      "params": [
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "computed: from the first input trace's ntr header",
+          "required": false,
+          "description": "Allocation size for the first gather; required when its ntr header is zero."
+        },
+        {
+          "name": "scaling",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, scale unmatched traces from the second file by an offset-dependent factor."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "efopen",
+        "etmpfile",
+        "getparint",
+        "fgettr",
+        "err",
+        "checkpars",
+        "ealloc1float",
+        "efwrite",
+        "erewind",
+        "warn",
+        "puttr",
+        "efread",
+        "efclose",
+        "free1float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Offset matching uses asymmetric floating-point tolerances, and optional scaling mixes float samples with double constants before assignment. The offset array can overflow if ntr is smaller than the first file's actual trace count.",
+      "c_lines": 129,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers one gather and compares each trace of the second gather against its offsets.",
+      "test_cases": [
+        {
+          "description": "Combine two generated gathers.",
+          "command": "susorty nt=64 nshot=1 noff=4 doff=20 > in1.su && susorty nt=64 nshot=1 noff=6 doff=10 > in2.su && sumixgathers in1.su in2.su ntr=4 scaling=0"
+        },
+        {
+          "description": "Scale unmatched traces from the second gather.",
+          "command": "susorty nt=64 nshot=1 noff=3 doff=1000 > in1.su && susorty nt=64 nshot=1 noff=5 doff=500 > in2.su && sumixgathers in1.su in2.su ntr=3 scaling=1"
+        }
+      ],
+      "license_note": "Copyright (c) University of British Columbia, 1999; all rights reserved.",
+      "related_programs": []
+    },
+    {
+      "name": "susorty",
+      "path": "su/main/windowing_sorting_muting/susorty.c",
+      "purpose": "Generate a small shot-ordered trace set whose samples show acquisition geometry.",
+      "selfdoc_first_line": " SUSORTY - make a small 2-D common shot off-end  \t\t",
+      "params": [
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of samples per trace."
+        },
+        {
+          "name": "nshot",
+          "type": "int",
+          "default": "10",
+          "required": false,
+          "description": "Number of shots."
+        },
+        {
+          "name": "noff",
+          "type": "int",
+          "default": "24",
+          "required": false,
+          "description": "Number of offsets per shot; the selfdoc says 20, but the code uses 24."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "0.004",
+          "required": false,
+          "description": "Sample interval in seconds."
+        },
+        {
+          "name": "dshot",
+          "type": "float",
+          "default": "10",
+          "required": false,
+          "description": "Shot spacing."
+        },
+        {
+          "name": "doff",
+          "type": "float",
+          "default": "20",
+          "required": false,
+          "description": "Offset increment."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "checkpars",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Geometry is calculated as float and converted to integer header fields; dt is converted to microseconds. The tracl formula uses ishot*nshot rather than ishot*noff.",
+      "c_lines": 107,
+      "difficulty": "easy",
+      "difficulty_reason": "It generates trace headers and fills four sample ranges with geometry values.",
+      "test_cases": [
+        {
+          "description": "Generate a small geometry dataset.",
+          "command": "susorty nt=64 nshot=3 noff=4 dt=0.002 dshot=10 doff=20"
+        },
+        {
+          "description": "Exercise fractional geometry and a sample count not divisible by four.",
+          "command": "susorty nt=65 nshot=2 noff=3 dt=0.001 dshot=12.5 doff=7.5"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

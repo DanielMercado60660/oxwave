@@ -1,0 +1,18 @@
+suplane nt=16 ntr=16 | sustrip outpar=/dev/null | pscubecontour n1=16 n2=4 n3=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=8 ntr=16 | sustrip outpar=/dev/null | pscubecontour n1=8 n2=4 n3=4 faces=1 c=-0.5,0.5 ccolor=red,blue nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=15 | sustrip outpar=/dev/null | pscubecontour n1=7 n2=3 n3=5 d1=.2 f1=-1 d2=2 f2=1 d3=3 f3=1 nc=3 dc=.3 fc=-.2 cwidth=1,2 cgray=.3 cdash=2 ccolor=red,blue labelcf=2 labelcper=2 nlabelc=2 labelcsize=8 labelcfont=Courier labelccolor=red nplaces=4 angle=30 size1=3 size2=4 size3=2 xbox=2 ybox=2 x1end=1 d1num=.5 f1num=0 n1tic=2 grid1=dot label1=One x2beg=2 d2num=1 f2num=2 n2tic=2 grid2=dash label2=Two x3end=10 d3num=2 f3num=1 n3tic=2 grid3=solid label3=Three labelfont=Courier labelsize=12 title=Cube titlefont=Courier titlesize=16 titlecolor=red axescolor=blue gridcolor=green verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pscubecontour n1=2 n2=2 n3=1
+pscubecontour n1=2 n2=2 n3=2
+pscubecontour n1=2 n2=2 n3=2 faces=1
+pscubecontour n1=2 n2=2 n3=2 front=missing
+pscubecontour n1=2 n2=2 n3=2 front=missing side=missing top=missing
+suplane nt=3 ntr=6 | sustrip outpar=/dev/null | pscubecontour n1=3 n2=2 n3=3 d1=-1 d2=-2 d3=-3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("60f",*[float((i*7)%19) for i in range(60)]))' | pscubecontour n1=5 n2=4 n3=3 c=2,7,13 ccolor=red,none,blue cdash=0,2 cwidth=.5,2 labelcsize=9 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct; open("front","wb").write(struct.pack("6f",*range(6))); open("side","wb").write(struct.pack("6f",*range(6))); open("top","wb").write(struct.pack("4f",*range(4)))' && pscubecontour n1=3 n2=2 n3=2 front=front side=side top=top | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pscubecontour n1=2
+pscubecontour n1=2 n2=2
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+python3 -c 'import math,struct,sys; sys.stdout.buffer.write(b"".join(struct.pack("f",math.sin(.5*i1)*math.cos(.4*i2)+.3*i3) for i3 in range(6) for i2 in range(7) for i1 in range(9)))' | pscubecontour n1=9 n2=7 n3=6 d1=.1 d2=.2 d3=.3 faces=1 angle=60 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import math,struct,sys; sys.stdout.buffer.write(b"".join(struct.pack("f",math.sin(.5*i1)*math.cos(.4*i2)+.3*i3) for i3 in range(6) for i2 in range(7) for i1 in range(9)))' | pscubecontour n1=9 n2=7 n3=6 x1beg=1 x1end=6 x2beg=1.5 x2end=5 x3beg=0.5 x3end=4 nc=4 labelcper=2 nlabelc=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import math,struct; open("front","wb").write(struct.pack("20f",*[math.sin(i*.7) for i in range(20)])); open("side","wb").write(struct.pack("15f",*[math.cos(i*.5) for i in range(15)])); open("top","wb").write(struct.pack("12f",*[i/6-1 for i in range(12)]))' && pscubecontour n1=5 n2=4 n3=3 front=front side=side top=top c=-2,-.5,0,.25,.5,3 grid1=dash grid2=dot grid3=none | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

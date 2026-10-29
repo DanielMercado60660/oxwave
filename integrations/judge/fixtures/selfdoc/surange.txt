@@ -1,0 +1,18 @@
+ 								
+ SURANGE - get max and min values for non-zero header entries	
+ 								
+ surange <stdin	 					
+								
+ Optional parameters:						
+	key=		Header key(s) to range (default=all)	
+	dim=0		dim seismic flag	
+	    		0 = not dim, 1 = coord in ft, 2 = coord in m	
+ 								
+ Note: Gives partial results if interrupted			
+ 								
+ Output is: 							
+ number of traces 						
+ keyword min max (first - last) 				
+ north-south-east-west limits of shot, receiver and midpoint   
+ if dim then also midpoint interval and line length   
+ 								

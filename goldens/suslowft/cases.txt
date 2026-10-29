@@ -1,0 +1,18 @@
+# Defaults and header-derived sampling interval; odd sizes and multiple traces.
+[stderr] suspike nt=15 ntr=3 dt=0.002 | suslowft
+[stderr] suspike nt=1 ntr=1 | suslowft sign=-1
+# Explicit sampling intervals including zero fallback and negative values.
+[stderr] suspike nt=17 ntr=2 | suslowft dt=0
+[stderr] suspike nt=13 ntr=1 | suslowft dt=-0.003 sign=-1
+[stderr] suspike nt=9 ntr=1 | sushw key=dt a=0 | suslowft
+# Invalid signs, empty input, and an unused verbose argument.
+[stderr] suspike nt=8 ntr=1 | suslowft sign=0
+[stderr] suspike nt=8 ntr=1 | suslowft sign=2
+[stderr] suslowft sign=1 </dev/null
+[stderr] suspike nt=7 ntr=1 | suslowft verbose=1
+# Nontrivial values and downstream output modes.
+suspike nt=19 ntr=2 | suaddnoise seed=123 | suslowft sign=1 dt=0.001
+suspike nt=16 ntr=1 | suslowft | suamp mode=amp
+suspike nt=16 ntr=1 | suslowft | suamp mode=phase
+suspike nt=16 ntr=1 | suslowft | suamp mode=real
+suspike nt=16 ntr=1 | suslowft | suamp mode=imag

@@ -1,0 +1,71 @@
+# Every successful plot reaches stdout and strips only run-dependent DSC metadata.
+# Default grayscale and default verbose clipping report.
+[stderr] suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=5 | sustrip outpar=/dev/null > data; psimage n1=17 verbose=0 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Inventory scenarios with the resulting PostScript actually compared.
+suplane nt=64 ntr=8 | sustrip outpar=/dev/null | psimage n1=64 n2=8 d1s=0.5 d2s=0.5 legend=1 lstyle=horibottom verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=64 ntr=8 | sustrip outpar=/dev/null > attr.bin; suplane nt=64 ntr=8 | sustrip outpar=/dev/null | psimage n1=64 n2=8 infile=attr.bin bckgr=0.3 brgb=0,0,1 grgb=1,1,1 wrgb=1,0,0 bps=24 clip=2 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# RGB, 12/24-bit, odd/even row widths, default endpoints and two/three colors.
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 brgb=0,0,1 grgb=1,1,1 wrgb=1,0,0 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=4 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=4 brgb=0,0,1 wrgb=1,0.5,0 bps=24 threecolor=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=4 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=4 wrgb=1,0,0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 brgb=-1,0.2,2 grgb=0.3,1.5,-2 wrgb=0.9,0.2,1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 brgb=0,0,0 wrgb=1,1,1 bps=24 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# HLS interpolation, hue wrap, saturation/lightness bounds and grayscale special case.
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 bhls=0.65,0.3,1 ghls=0.3,0.5,0.9 whls=0,0.8,1 bps=24 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=4 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=4 bhls=-1.1,-0.2,2 whls=2,1.1,-1 threecolor=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 whls=0.6,0.7,1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=5 | suaddnoise seed=47 | sustrip outpar=/dev/null | psimage n1=13 n2=5 bhls=0,0,0 whls=0,1,0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Percentile paths, clipping boundaries, degenerate and reversed clips.
+[stderr] sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 perc=75 bperc=90 wperc=12 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 bperc=200 wperc=-10 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 bclip=0.1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 wclip=-0.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 clip=0.2 bclip=0.3 wclip=-0.4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=3 ntr=3 | sustrip outpar=/dev/null | psimage n1=3 n2=3 clip=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=63 | sustrip outpar=/dev/null | psimage n1=17 n2=5 clip=-0.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Sampling, cropping, reverse axes and resampling in both directions.
+sunull nt=17 ntr=5 | suaddnoise seed=7 | sustrip outpar=/dev/null | psimage n1=17 n2=5 d1=0.004 f1=0.1 d2=25 f2=100 x1beg=0.11 x1end=0.15 x2beg=200 x2end=120 d1s=0.6 d2s=0.4 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=7 | sustrip outpar=/dev/null | psimage n1=17 n2=5 d1=-0.1 f1=2 d2=-3 f2=25 d1s=-0.5 d2s=-0.75 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=7 | sustrip outpar=/dev/null | psimage n1=17 n2=5 x1beg=100 x1end=-20 x2beg=-20 x2end=100 d1s=2 d2s=3 style=other | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psimage n1=1 n2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=1 ntr=5 | suaddnoise seed=8 | sustrip outpar=/dev/null | psimage n1=1 n2=5 brgb=0,0,1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=7 ntr=1 | suaddnoise seed=8 | sustrip outpar=/dev/null | psimage n1=7 n2=1 style=normal d1s=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Axes positions, aliases, explicit ticks, all grid types, fonts and colors.
+suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 xbox=2 ybox=2.5 wbox=5 width=4 hbox=7 height=6 d1num=4 f1num=1 n1tic=4 d2num=2 f2num=0 n2tic=2 grid1=dot grid2=dash label1=Time label2=Distance labelfont=Times-Roman labelsize=12 title='Image (test)' titlefont=Courier-Bold titlesize=18 titlecolor=red axescolor=blue gridcolor='#255' axeswidth=2 ticwidth=0.6 gridwidth=0.3 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 wbox=4 hbox=5 grid1=dash grid2=solid axeswidth=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 grid1=solid grid2=dot | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Legends: each orientation, supplied/unsupplied bounds, styles and layout overrides.
+[stderr] sunull nt=17 ntr=5 | suaddnoise seed=41 | sustrip outpar=/dev/null | psimage n1=17 n2=5 legend=1 verbose=2 units=mV legendfont=Courier lstyle=vertleft | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=41 | sustrip outpar=/dev/null | psimage n1=17 n2=5 legend=1 lstyle=vertright lbeg=-0.5 lend=0.5 ldnum=0.25 lfnum=-0.25 lntic=4 lgrid=dot lwidth=0.2 lheight=4 lx=8 ly=2 brgb=0,0,1 wrgb=1,0,0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=41 | sustrip outpar=/dev/null | psimage n1=17 n2=5 legend=1 lstyle=horibottom lgrid=dash lbeg=-0.5 bhls=0.6,0.3,1 whls=0,0.8,1 bps=24 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=41 | sustrip outpar=/dev/null | psimage n1=17 n2=5 legend=1 lnice=1 lx=4 ybox=1 width=4 height=5 lstyle=vertright lgrid=solid lend=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=17 ntr=5 | suaddnoise seed=41 | sustrip outpar=/dev/null | psimage n1=17 n2=5 legend=1 lstyle=invalid lgrid=invalid verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Curves: defaults, arrays, repetition of the final entry, both axis styles.
+printf '0 0\n8 2\n16 4\n' > curve; suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 curve=curve npair=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n8 2\n16 4\n' > curve; suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 curve=curve,curve,curve npair=3,3,3 curvecolor=red,blue curvewidth=0.5,2 curvedash=1,3 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n16 4\n' > curve; suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 curve=curve,curve npair=2,2 curvecolor=red,blue,green curvewidth=1,2,3 curvedash=8,11,2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Second attribute: nonconstant data, both color systems, resampling, grayscale bypass.
+python3 -c 'import struct; open("attr", "wb").write(struct.pack("65f", *[(i%5)/4 for i in range(65)]))'; sunull nt=13 ntr=5 | suaddnoise seed=5 | sustrip outpar=/dev/null | psimage n1=13 n2=5 infile=attr brgb=0.1,0.3,0.8 grgb=0.8,0.1,0.2 wrgb=0.9,0.8,0.1 bps=24 d1s=0.5 d2s=0.5 bckgr=0.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+python3 -c 'import struct; open("attr", "wb").write(struct.pack("52f", *[(i%5)/4 for i in range(52)]))'; sunull nt=13 ntr=4 | suaddnoise seed=5 | sustrip outpar=/dev/null | psimage n1=13 n2=4 infile=attr bhls=0.6,0.2,1 ghls=0.3,0.4,0.8 whls=0,0.8,1 bps=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=7 ntr=3 | sustrip outpar=/dev/null > attr; sunull nt=7 ntr=3 | suaddnoise seed=5 | sustrip outpar=/dev/null | psimage n1=7 n2=3 infile=attr | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Errors and getpar/checkpars behavior.
+[stderr] psimage n1=-2 n2=3
+[stderr] psimage n1=2 n2=-3
+[stderr] psimage n1=0 n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] psimage n1=2 n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] psimage n1=2 < /dev/null | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n16 4\n' > curve; suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 curve=curve npair=2 curvedash=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n16 4\n' > curve; suplane nt=17 ntr=5 | sustrip outpar=/dev/null | psimage n1=17 n2=5 curve=curve npair=2 curvedash=12 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] psimage
+[stderr] psimage n1=2 n2=3
+[stderr] printf '' | psimage n1=2
+[stderr] psimage n1=2 n2=3 brgb=0,0,1 bps=8
+[stderr] psimage n1=2 n2=3 bhls=0,0.2,1 bps=16
+[stderr] psimage n1=2 n2=3 infile=missing
+[stderr] sunull nt=2 ntr=3 | sustrip outpar=/dev/null | psimage n1=2 n2=3 infile=/dev/null
+[stderr] python3 -c 'import struct; open("attr","wb").write(struct.pack("6f",-1,0,0,0,0,0))'; sunull nt=2 ntr=3 | sustrip outpar=/dev/null | psimage n1=2 n2=3 infile=attr
+[stderr] python3 -c 'import struct; open("attr","wb").write(struct.pack("6f",0,0,2,0,0,0))'; sunull nt=2 ntr=3 | sustrip outpar=/dev/null | psimage n1=2 n2=3 infile=attr
+[stderr] psimage n1=2 n2=3 curve=missing npair=2
+[stderr] sunull nt=7 ntr=3 | sustrip outpar=/dev/null | psimage n1=7 n2=3 legend=1 unknown=1 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] sunull nt=7 ntr=3 | sustrip outpar=/dev/null | psimage n1=7 n2=3 unknown=1 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

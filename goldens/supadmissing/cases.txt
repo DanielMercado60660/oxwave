@@ -1,0 +1,20 @@
+# Defaults and gaps with the default cdp key.
+suplane nt=7 ntr=5 | sushw key=cdp a=1 b=2 | supadmissing
+# Explicit range before, within, and after the input.
+suplane nt=7 ntr=5 | sushw key=cdp a=2 b=2 | supadmissing minval=-1 maxval=12 incval=1
+suplane nt=7 ntr=5 | sushw key=cdp a=2 b=2 | supadmissing minval=5 maxval=7
+suplane nt=7 ntr=5 | sushw key=cdp a=2 b=2 | supadmissing minval=20 maxval=23
+suplane nt=7 ntr=5 | sushw key=cdp a=10 b=2 | supadmissing minval=0 maxval=3
+suplane nt=1 ntr=1 | sushw key=cdp a=3 | supadmissing minval=1 maxval=5
+# Floating header and fractional increments.
+suplane nt=5 ntr=4 | sushw key=d2 a=0.5 b=1 | supadmissing keyloc=d2 incval=0.5 minval=0 maxval=4
+suplane nt=3 ntr=3 | sushw key=tracl a=-3 b=2 | supadmissing keyloc=tracl incval=2 verbose=1
+# Invalid parameters and empty input.
+supadmissing keyloc=bad
+supadmissing keyloc=cdp,tracl
+supadmissing incval=0
+supadmissing incval=-1
+supadmissing keyloc=tracl < /dev/null
+suplane nt=3 ntr=1 | supadmissing minval=3 maxval=2
+suplane nt=3 ntr=3 | sushw key=cdp a=3 b=-1 | supadmissing
+suplane nt=3 ntr=3 | sushw key=cdp a=3 b=0 | supadmissing minval=5

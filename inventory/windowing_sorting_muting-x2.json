@@ -1,0 +1,201 @@
+{
+  "scope": "su/main/windowing_sorting_muting (re-scout batch 2)",
+  "programs": [
+    {
+      "name": "sumute",
+      "path": "su/main/windowing_sorting_muting/sumute.c",
+      "purpose": "Mute samples above, below, or around a curve defined by a trace header value.",
+      "selfdoc_first_line": " SUMUTE - MUTE above (or below) a user-defined polygonal curve with\t",
+      "params": [
+        {"name": "xmute", "type": "float array", "default": "", "required": false, "description": "Curve positions; required unless hmute or both xfile and tfile are supplied."},
+        {"name": "tmute", "type": "float array", "default": "", "required": false, "description": "Curve times or mute widths; required with xmute."},
+        {"name": "xfile", "type": "string", "default": "", "required": false, "description": "Binary float positions file, used together with tfile and nmute."},
+        {"name": "tfile", "type": "string", "default": "", "required": false, "description": "Binary float times file, used together with xfile and nmute."},
+        {"name": "nmute", "type": "int", "default": "", "required": false, "description": "Number of pairs in xfile and tfile; required when both files are supplied."},
+        {"name": "hmute", "type": "string", "default": "", "required": false, "description": "Header word containing mute time in milliseconds; replaces curve input."},
+        {"name": "key", "type": "string", "default": "offset", "required": false, "description": "Header word used for curve positions; ignored when hmute is supplied."},
+        {"name": "ntaper", "type": "int", "default": "0", "required": false, "description": "Number of sine-squared taper samples."},
+        {"name": "mode", "type": "int", "default": "0", "required": false, "description": "Mute above, below, around a straight line, hyperbola, or polygon for modes 0 through 4."},
+        {"name": "below", "type": "int", "default": "", "required": false, "description": "Obsolete alias that overrides mode after curve parameters are read."},
+        {"name": "absolute", "type": "int", "default": "1", "required": false, "description": "Use absolute header value for line and hyperbola calculations."},
+        {"name": "linvel", "type": "float", "default": "330", "required": false, "description": "Velocity for modes 2 and 3."},
+        {"name": "tm0", "type": "float", "default": "0", "required": false, "description": "Time shift for modes 2 and 3."},
+        {"name": "twindow", "type": "float array", "default": "", "required": false, "description": "Mute widths; required with vector input in mode 4."},
+        {"name": "twfile", "type": "string", "default": "", "required": false, "description": "Documented mode 4 widths file; the code never reads this parameter."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "countparval", "getparfloat", "ealloc1float", "err", "warn", "checkpars", "hdtype", "getindex", "gettr", "gethval", "vtof", "intlin", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Interpolation, rounding, float/double mixing, sin and sqrt affect sample boundaries and taper values. Mode 4 interpolates using uninitialized twfval; its file path never reads twfile or allocates twindow. Some mute and taper bounds can access outside the trace, and hmute with mode 4 lacks window data.",
+      "c_lines": 345,
+      "difficulty": "medium",
+      "difficulty_reason": "Several interpolation-based mute modes and edge cases share trace and header state.",
+      "test_cases": [
+        {"description": "Mute above a curve with taper.", "command": "suplane nt=128 ntr=8 | sumute key=tracl xmute=1,8 tmute=0.02,0.08 ntaper=4"},
+        {"description": "Mute below a curve.", "command": "suplane nt=128 ntr=8 | sumute key=tracl xmute=1,8 tmute=0.1,0.2 mode=1"},
+        {"description": "Mute around a hyperbola.", "command": "suplane nt=128 ntr=8 | sumute key=tracl xmute=1,8 tmute=0.02,0.04 mode=3 linvel=1000 tm0=0.05 ntaper=3"}
+      ],
+      "license_note": "",
+      "related_programs": ["sumutecsv"]
+    },
+    {
+      "name": "sumutecsv",
+      "path": "su/main/windowing_sorting_muting/sumutecsv.c",
+      "purpose": "Mute traces using offset-dependent curves interpolated between CDP locations.",
+      "selfdoc_first_line": " SUMUTECSV - MUTE above (or below) bilinearly interpolated polygonal curves ",
+      "params": [
+        {"name": "qin", "type": "string", "default": "", "required": false, "description": "Q-file containing mute functions; otherwise cdp, offs and tims are required."},
+        {"name": "cdp", "type": "double array", "default": "", "required": false, "description": "Mute function CDPs; required without qin."},
+        {"name": "offs", "type": "double array", "default": "", "required": false, "description": "Offset values, supplied once or once per CDP; required without qin."},
+        {"name": "tims", "type": "double array", "default": "", "required": false, "description": "Repeated time arrays, one per CDP; required without qin."},
+        {"name": "rfile", "type": "string", "default": "", "required": false, "description": "K-file with 3D grid definition."},
+        {"name": "grid_xa", "type": "double", "default": "", "required": false, "description": "Grid corner A x; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_ya", "type": "double", "default": "", "required": false, "description": "Grid corner A y; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_xb", "type": "double", "default": "", "required": false, "description": "Grid corner B x; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_yb", "type": "double", "default": "", "required": false, "description": "Grid corner B y; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_xc", "type": "double", "default": "", "required": false, "description": "Grid corner C x; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_yc", "type": "double", "default": "", "required": false, "description": "Grid corner C y; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_wb", "type": "double", "default": "", "required": false, "description": "Grid cell width along B; required for a command-line grid unless supplied by rfile."},
+        {"name": "grid_wc", "type": "double", "default": "", "required": false, "description": "Grid cell width along C; required for a command-line grid unless supplied by rfile."},
+        {"name": "offkey", "type": "string", "default": "offset", "required": false, "description": "Offset header word."},
+        {"name": "abs", "type": "int", "default": "1", "required": false, "description": "Use absolute offset when equal to 1."},
+        {"name": "ntaper", "type": "int", "default": "0", "required": false, "description": "Number of sine-squared taper samples."},
+        {"name": "mode", "type": "int", "default": "0", "required": false, "description": "Mute above, below, around a straight line, or around a hyperbola, for modes 0 through 3."},
+        {"name": "vel", "type": "float", "default": "330", "required": false, "description": "Velocity for modes 2 and 3."},
+        {"name": "tzero", "type": "float", "default": "0", "required": false, "description": "Time shift for modes 2 and 3, in the same units inferred for tims."},
+        {"name": "extrapi", "type": "int", "default": "0", "required": false, "description": "Inline extrapolation option."},
+        {"name": "extrapc", "type": "int", "default": "0", "required": false, "description": "Crossline extrapolation option."},
+        {"name": "extrapt", "type": "int", "default": "0", "required": false, "description": "Offset extrapolation option; its range check mistakenly checks extrapc."},
+        {"name": "check", "type": "int", "default": "0", "required": false, "description": "Print grid checks and mute locations."},
+        {"name": "print", "type": "int", "default": "0", "required": false, "description": "Print input mute functions."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparint", "getparfloat", "ealloc1float", "ealloc1", "ealloc1int", "err", "warn", "hdtype", "getindex", "gridcommand", "gridread", "gridset", "gridcheck", "gettr", "getviacommand", "getviaqfile", "checkpars", "gridcdpic", "gridicgridxy", "gridicrawxy", "qsplit", "gethval", "vtof", "binterpvalue", "binterpfind", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Bilinear and offset interpolation use doubles before conversion to float; lrint, NINT, sin and sqrt affect results. Time units switch when any input time exceeds 100. Mute and taper bounds can access outside the trace.",
+      "c_lines": 785,
+      "difficulty": "medium",
+      "difficulty_reason": "Q-file and grid parsing, spatial interpolation, and multiple mute modes require substantial state handling.",
+      "test_cases": [
+        {"description": "Single CDP mute with taper.", "command": "suplane nt=128 ntr=8 | sumutecsv cdp=1 offs=0,1000 tims=0.02,0.08 ntaper=3"},
+        {"description": "Interpolate two CDP functions and mute below.", "command": "suplane nt=128 ntr=8 | sumutecsv cdp=1,10 offs=0,1000 tims=0.1,0.2 tims=0.15,0.25 mode=1 extrapi=1 extrapt=1"},
+        {"description": "Mute around a straight line.", "command": "suplane nt=128 ntr=8 | sumutecsv cdp=1 offs=0,1000 tims=0.02,0.04 mode=2 vel=1000 tzero=0.05 abs=0"}
+      ],
+      "license_note": "Credits say it started as a copy of sunmocsv, itself derived from sunmo, with portions copied from sumute; credits include SEP, DELPHI and USBG contributors.",
+      "related_programs": ["sumute", "sunmocsv"]
+    },
+    {
+      "name": "supad",
+      "path": "su/main/windowing_sorting_muting/supad.c",
+      "purpose": "Pad each input ensemble with zero traces at missing trace-key positions.",
+      "selfdoc_first_line": " SUPAD - Pad zero traces\t\t\t\t\t\t",
+      "params": [
+        {"name": "min", "type": "double", "default": "", "required": true, "description": "Lower trace-key boundary."},
+        {"name": "max", "type": "double", "default": "", "required": true, "description": "Upper trace-key boundary."},
+        {"name": "key1", "type": "string", "default": "ep", "required": false, "description": "Ensemble key."},
+        {"name": "key2", "type": "string", "default": "tracf", "required": false, "description": "Trace position key."},
+        {"name": "key3", "type": "string", "default": "trid", "required": false, "description": "Padded-trace flag key."},
+        {"name": "val3", "type": "double", "default": "2", "required": false, "description": "Flag value assigned to padded traces."},
+        {"name": "d", "type": "double", "default": "1", "required": false, "description": "Trace-key spacing."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getpardouble", "err", "checkpars", "hdtype", "getindex", "gettr", "gethval", "vtod", "puthval", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Double spacing is repeatedly accumulated and converted to the chosen header type. Negative spacing uses the same dmin and dmax loop boundaries as positive spacing, despite the selfdoc's descending-order description.",
+      "c_lines": 218,
+      "difficulty": "medium",
+      "difficulty_reason": "Padding depends on ensemble transitions, header types, and trace-key ordering.",
+      "test_cases": [
+        {"description": "Append zero traces to a panel.", "command": "suplane nt=64 ntr=8 | supad key1=offset key2=tracl min=1 max=10 d=1"},
+        {"description": "Insert intermediate traces and use a custom flag.", "command": "suplane nt=64 ntr=8 | supad key1=offset key2=tracl key3=nhs val3=0 min=1 max=8 d=0.5"}
+      ],
+      "license_note": "",
+      "related_programs": ["supadmissing"]
+    },
+    {
+      "name": "supadmissing",
+      "path": "su/main/windowing_sorting_muting/supadmissing.c",
+      "purpose": "Insert zero traces for missing values of an increasing header key.",
+      "selfdoc_first_line": " SUPADMISSING - Add Dead Traces For Missing Key Values.                ",
+      "params": [
+        {"name": "keyloc", "type": "string", "default": "cdp", "required": false, "description": "Increasing input header key."},
+        {"name": "incval", "type": "double", "default": "1.0", "required": false, "description": "Positive key increment."},
+        {"name": "minval", "type": "double", "default": "computed: keyloc of first input trace", "required": false, "description": "Minimum output key."},
+        {"name": "maxval", "type": "double", "default": "computed: no upper padding; internally 1.0e30", "required": false, "description": "Maximum output key; when omitted, output stops at the last input trace."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "countparval", "getparstring", "ealloc1", "GetCase", "getpardouble", "err", "checkpars", "gettr", "fromhead", "tohead", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Double key positions are repeatedly incremented and compared exactly, then converted to the header type. End padding relies on the trace buffer retaining the last trace after a failed gettr.",
+      "c_lines": 215,
+      "difficulty": "medium",
+      "difficulty_reason": "Trace filtering and padding depend on ordered keys and first- and last-trace state.",
+      "test_cases": [
+        {"description": "Pad before and after input traces.", "command": "suplane nt=64 ntr=8 | supadmissing keyloc=tracl incval=1 minval=0 maxval=10"},
+        {"description": "Insert fractional-key positions using an integer header.", "command": "suplane nt=64 ntr=8 | supadmissing keyloc=tracl incval=0.5 minval=1 maxval=8"}
+      ],
+      "license_note": "",
+      "related_programs": ["supad"]
+    },
+    {
+      "name": "suputgthr",
+      "path": "su/main/windowing_sorting_muting/suputgthr.c",
+      "purpose": "Split successive input gathers into files named for a header key.",
+      "selfdoc_first_line": " SUPUTGTHR - split the stdout flow to gathers on the bases of given\t",
+      "params": [
+        {"name": "dir", "type": "string", "default": "", "required": true, "description": "Existing output directory."},
+        {"name": "key", "type": "string", "default": "ep", "required": false, "description": "Gather header key."},
+        {"name": "suffix", "type": "string", "default": ".hsu", "required": false, "description": "Output filename suffix."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print file information."},
+        {"name": "numlength", "type": "int", "default": "7", "required": false, "description": "Minimum width of the numeric filename component."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparint", "checkpars", "hdtype", "getindex", "gettr", "temporary_filename", "err", "warn", "gethval", "valcmp", "vtoi", "fgettr", "fputtr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Gather keys are converted to int for filenames, so distinct floating-point keys can collide. The boundary trace is counted in the preceding gather's ntr, while the new gather count starts at zero; empty input is not checked before its trace is used.",
+      "c_lines": 228,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers gathers in temporary files and manages boundary transitions and output filenames.",
+      "test_cases": [
+        {"description": "Write one gather with a custom suffix.", "command": "suplane nt=64 ntr=8 | suputgthr dir=. key=ep suffix=.su numlength=3"},
+        {"description": "Split each trace into a separate gather.", "command": "suplane nt=64 ntr=8 | suputgthr dir=. key=tracl suffix=.su numlength=3 verbose=1"}
+      ],
+      "license_note": "Credits identify Balazs Nemeth of Potash Corporation, who gave the program to CWP in 2008.",
+      "related_programs": []
+    },
+    {
+      "name": "susort",
+      "path": "su/main/windowing_sorting_muting/susort.c",
+      "purpose": "Sort traces by one or more header keys in ascending or descending order.",
+      "selfdoc_first_line": " SUSORT - sort on any segy header keywords\t\t\t",
+      "params": [
+        {"name": "[+-]key", "type": "string array", "default": "cdp", "required": false, "description": "Positional header keys, optionally prefixed with + or -, in priority order."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "err", "filestat", "etmpfile", "temporary_filename", "efopen", "ealloc1int", "ealloc1", "getindex", "hdtype", "gettr", "erealloc", "gethval", "efwrite", "gettra", "puttr", "efread", "efseeko", "efclose", "eremove", "valcmp", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Equal keys compare equal and qsort does not guarantee stable ordering. Descending signed-key negation can overflow at the minimum value; unsigned reversal and floating NaNs have type-dependent behavior. Pipe input requires disk output and assumes a constant trace size.",
+      "c_lines": 317,
+      "difficulty": "medium",
+      "difficulty_reason": "It sorts buffered header values and uses different random-access paths for disk and pipe input.",
+      "test_cases": [
+        {"description": "Sort disk input by the default key.", "command": "suplane nt=64 ntr=8 > in.su && susort < in.su > out.su"},
+        {"description": "Sort pipe input by descending trace number and a secondary key.", "command": "suplane nt=64 ntr=8 | susort -tracl +offset > out.su"}
+      ],
+      "license_note": "Credits include SEP contributors; the source notes earlier SEP tape support.",
+      "related_programs": []
+    }
+  ]
+}

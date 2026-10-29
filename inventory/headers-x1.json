@@ -1,0 +1,205 @@
+{
+  "scope": "su/main/headers (re-scout batch 1)",
+  "programs": [
+    {
+      "name": "subinbigcsv",
+      "path": "su/main/headers/subinbigcsv.c",
+      "purpose": "Keep traces near selected CDPs and optionally renumber their headers to form larger bins.",
+      "selfdoc_first_line": " SUBINBIGCSV - Make Some CDPs Larger and Delete All Traces Outside Them.    ",
+      "params": [
+        {"name":"rfile","type":"string","default":"","required":false,"description":"Input grid K-file; alternatively supply a complete grid on the command line."},
+        {"name":"grid_xa, grid_ya, grid_xb, grid_yb, grid_xc, grid_yc, grid_wb, grid_wc","type":"double","default":"","required":false,"description":"Grid definition parameters, required together when defining a grid on the command line."},
+        {"name":"igiout","type":"int array","default":"","required":false,"description":"Three integers specifying first, last and increment; required unless igilist is supplied."},
+        {"name":"igilist","type":"int array","default":"","required":false,"description":"Selected inline indices; alternative to igiout."},
+        {"name":"igcout","type":"int array","default":"","required":false,"description":"Three integers specifying crossline first, last and increment; required for a grid unless igclist is supplied."},
+        {"name":"igclist","type":"int array","default":"","required":false,"description":"Selected crossline indices; alternative to igcout."},
+        {"name":"igiext","type":"int array","default":"0,0","required":false,"description":"Low and high inline extents; a single value supplies both."},
+        {"name":"igcext","type":"int array","default":"0,0","required":false,"description":"Low and high crossline extents; a single value supplies both."},
+        {"name":"intype","type":"int","default":"0","required":false,"description":"Input location mode; 0 selects 3 with a grid or -2 without one."},
+        {"name":"qout","type":"string","default":"","required":false,"description":"Optional output Q-file of selected locations."},
+        {"name":"recdp","type":"int","default":"1","required":false,"description":"Reset CDP to the selected center."},
+        {"name":"reigi","type":"int","default":"1","required":false,"description":"Reset inline index; unavailable without a grid."},
+        {"name":"reigc","type":"int","default":"1","required":false,"description":"Reset crossline index; unavailable without a grid."},
+        {"name":"check","type":"int","default":"0","required":false,"description":"Print grid checks."}
+      ],
+      "stdin":"su_traces",
+      "stdout":"su_traces",
+      "lib_calls":["initargs","requestdoc","getparstring","gridcommand","getparint","gridread","gridset","gridcheck","countparval","ealloc1int","err","warn","gridcdpic","gridiccdp","gridiccdp90","gridicgridxy","gridicrawxy","gridrawxycdpic","gettr","puttr","checkpars"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Grid coordinate calculations use double precision and rounding at cell boundaries can change assignments. Integer range calculations mix floating-point and integer arithmetic.",
+      "c_lines":600,
+      "difficulty":"medium",
+      "difficulty_reason":"Grid conversion, selection ranges and lists, and several input-header modes require substantial state and branching.",
+      "test_cases":[
+        {"description":"Select 2D CDP centers with an extent.","command":"suplane nt=64 ntr=16 | subinbigcsv igiout=1,15,4 igiext=1 recdp=1 > out.su"},
+        {"description":"Select an explicit 2D center list without renumbering.","command":"suplane nt=64 ntr=16 | subinbigcsv igilist=2,8,14 igiext=1 recdp=0 > out.su"}
+      ],
+      "license_note":"",
+      "related_programs":["subincsv","subinqcsv","subinxxcsv"]
+    },
+    {
+      "name":"subincsv",
+      "path":"su/main/headers/subincsv.c",
+      "purpose":"Resolve a 3D grid or point-number definition and use it to assign trace bin headers.",
+      "selfdoc_first_line":" SUBINCSV - 3D Grid Resolve and output and assign traces to cdps (cells). ",
+      "params":[
+        {"name":"rfile","type":"string","default":"","required":false,"description":"Input K-file; command-line values override it."},
+        {"name":"wfile","type":"string","default":"","required":false,"description":"Output K-file; required when there are no input traces."},
+        {"name":"bintype","type":"int","default":"-1","required":false,"description":"Binning mode; may also be read from the K-file."},
+        {"name":"offset","type":"int","default":"computed: 1 for bintype 30 or 20, otherwise 0","required":false,"description":"Whether to recompute offset."},
+        {"name":"check","type":"int","default":"0","required":false,"description":"Print grid checks."},
+        {"name":"grid_xa, grid_ya, grid_xb, grid_yb, grid_xc, grid_yc, grid_wb, grid_wc","type":"double","default":"","required":false,"description":"Grid corners and cell widths; required for grid modes unless supplied by rfile."},
+        {"name":"point_crz, point_cru, point_csz, point_csu","type":"double","default":"","required":false,"description":"Receiver and source point-to-CDP coefficients; required for bintype 20 unless supplied by rfile."},
+        {"name":"rpkey","type":"string","default":"gaps","required":false,"description":"Receiver point header for bintype 20."},
+        {"name":"spkey","type":"string","default":"grnlof","required":false,"description":"Source point header for bintype 20."}
+      ],
+      "stdin":"su_traces",
+      "stdout":"su_traces",
+      "lib_calls":["initargs","requestdoc","getparstring","getparint","getpardouble","ealloc1","err","warn","readkfile","writekfile","gridset","gridcheck","gridcdpic","gridiccdp","gridicgridxy","gridicrawxy","gridgridxyrawxy","gridrawxycdpic","gridrawxygridxy","GetCase","fromhead","gettr","puttr"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Grid geometry uses double precision, square roots and rounding; coordinates on cell boundaries and lrint results can depend on rounding and platform math.",
+      "c_lines":1057,
+      "difficulty":"medium",
+      "difficulty_reason":"Multiple binning modes, grid geometry, K-file handling and header conversions require substantial branching.",
+      "test_cases":[
+        {"description":"Assign bins from midpoint coordinates.","command":"suplane nt=64 ntr=16 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 offset=0 > out.su"},
+        {"description":"Compute 2D CDPs from point headers.","command":"suplane nt=64 ntr=16 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=gaps spkey=grnlof > out.su"}
+      ],
+      "license_note":"",
+      "related_programs":["subinbigcsv","subinqcsv","subinxxcsv"]
+    },
+    {
+      "name":"subinqcsv",
+      "path":"su/main/headers/subinqcsv.c",
+      "purpose":"Interpolate spatially indexed parameter records and write them as a Q-file.",
+      "selfdoc_first_line":" SUBINQCSV - Input Q-records or parameters. interpolate, output Q-records.  ",
+      "params":[
+        {"name":"rfile","type":"string","default":"","required":false,"description":"Input 3D grid K-file; without it the program uses 2D locations."},
+        {"name":"qin","type":"string","default":"","required":false,"description":"Input Q-file; alternatively supply location and value parameters."},
+        {"name":"qout","type":"string","default":"","required":true,"description":"Output Q-file."},
+        {"name":"extrapi","type":"int","default":"0","required":false,"description":"Inline or 2D spatial extrapolation mode."},
+        {"name":"extrapc","type":"int","default":"0","required":false,"description":"Crossline extrapolation mode."},
+        {"name":"extrapt","type":"int","default":"0","required":false,"description":"Independent-dimension extrapolation mode."},
+        {"name":"inloc","type":"int","default":"1","required":false,"description":"Input location representation."},
+        {"name":"keyloc","type":"string","default":"cdp","required":false,"description":"2D input location name."},
+        {"name":"check","type":"int","default":"0","required":false,"description":"Print grid checks."},
+        {"name":"iecho","type":"int","default":"0","required":false,"description":"Output all requested locations, or echo input locations with or without tuple interpolation."},
+        {"name":"igiout","type":"int array","default":"computed: minimum input or grid index, maximum input or grid index, 1","required":false,"description":"Output inline or 2D location range."},
+        {"name":"igcout","type":"int array","default":"computed: grid crossline range and increment 1; 1,1,1 without a grid","required":false,"description":"Output crossline range."},
+        {"name":"outind","type":"double array","default":"","required":false,"description":"Output independent-dimension range; unspecified trailing values are 3000 and 1000."},
+        {"name":"outlist","type":"double array","default":"","required":false,"description":"Explicit output independent-dimension values."},
+        {"name":"invp2","type":"string","default":"v","required":false,"description":"Select names whose values use inverse-square weighting."},
+        {"name":"ename","type":"string array","default":"","required":false,"description":"Names to omit from output."},
+        {"name":"formxy","type":"string","default":"%.2f","required":false,"description":"Output coordinate format."},
+        {"name":"formtv","type":"string","default":"%.2f","required":false,"description":"Output value format."},
+        {"name":"cdp and supported non-tuple header names, numa, numb, vuma, vumb","type":"double array","default":"","required":false,"description":"Input location and scalar-value lists when qin is absent; the names required by inloc must be present."},
+        {"name":"tupa, offs, tims, tnmo, dpth, vels, vnmo, tupb, vupa","type":"double array","default":"","required":false,"description":"Repeated input tuple lists when qin is absent."}
+      ],
+      "stdin":"none",
+      "stdout":"none",
+      "lib_calls":["initargs","requestdoc","gridcommand","getparstring","getparint","countparval","countparname","getpardouble","getparstringarray","ealloc1","ealloc1int","ealloc1double","err","warn","gridread","gridset","gridcheck","gridcdpic","gridcdpic90","gridiccdp","gridiccdp90","gridicgridxy","gridicrawxy","gridgridxyrawxy","gridrawxycdpic","getviacommand","getviaqfile","binterpfind","binterpapply","linterpd","qelementout","qsplit","checkpars","CWP_Exit"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Interpolation and inverse-square weighting use double precision and square roots; sorting, rounding and floating-point evaluation order affect output. Several string allocations are too small for their terminating NUL, including the default invp2 string, causing undefined behavior.",
+      "c_lines":1574,
+      "difficulty":"hard",
+      "difficulty_reason":"The program combines Q-file parsing, multidimensional interpolation, tuple handling and grid geometry across more than 1500 lines.",
+      "test_cases":[
+        {"description":"Interpolate two 2D scalar locations; run with stdin and stdout attached to a terminal.","command":"subinqcsv qout=out.csv cdp=1,5 numa=10,20 igiout=1,5,1"},
+        {"description":"Echo velocity tuples; run with stdin and stdout attached to a terminal.","command":"subinqcsv qout=out.csv cdp=1,5 tims=0,1000 vels=1500,2000 vels=1600,2100 iecho=2"}
+      ],
+      "license_note":"",
+      "related_programs":["subincsv","subinbigcsv","subinxxcsv"]
+    },
+    {
+      "name":"subinxxcsv",
+      "path":"su/main/headers/subinxxcsv.c",
+      "purpose":"Expand or shrink a 3D grid and exchange its corners.",
+      "selfdoc_first_line":" SUBINXXCSV - Expand Size and Exchange Corners of 3D Grid Definition.       ",
+      "params":[
+        {"name":"rfile","type":"string","default":"","required":false,"description":"Input grid K-file; required when wfile is supplied by the current code."},
+        {"name":"wfile","type":"string","default":"","required":true,"description":"Output K-file, different from rfile."},
+        {"name":"bintype","type":"double","default":"0","required":false,"description":"Copied bin type."},
+        {"name":"grid_xa, grid_ya, grid_xb, grid_yb, grid_xc, grid_yc, grid_wb, grid_wc","type":"double","default":"","required":false,"description":"Grid definition values, normally read from rfile."},
+        {"name":"igilow","type":"int","default":"0","required":false,"description":"Cells added at the low inline end."},
+        {"name":"igihigh","type":"int","default":"computed: igilow","required":false,"description":"Cells added at the high inline end."},
+        {"name":"igclow","type":"int","default":"0","required":false,"description":"Cells added at the low crossline end."},
+        {"name":"igchigh","type":"int","default":"computed: igclow","required":false,"description":"Cells added at the high crossline end."},
+        {"name":"iflip","type":"int","default":"0","required":false,"description":"Corner exchange mode."},
+        {"name":"check","type":"int","default":"0","required":false,"description":"Print grid checks."}
+      ],
+      "stdin":"none",
+      "stdout":"none",
+      "lib_calls":["initargs","requestdoc","getparstring","getparint","getpardouble","gridcommand","readkfile","writekfile","ealloc1","err","warn","checkpars","gridset","gridcheck","gridicrawxy"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Double-precision grid calculations and coordinate rounding can change cell assignments. Some gvals elements are read without initialization if expected values are missing; several allocations do not leave space for terminating NUL characters.",
+      "c_lines":384,
+      "difficulty":"medium",
+      "difficulty_reason":"Grid geometry, K-file updates and several corner exchange modes require nontrivial state.",
+      "test_cases":[
+        {"description":"Expand a grid and flip its axes; both programs require terminal stdin and stdout.","command":"subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 wfile=in.csv && subinxxcsv rfile=in.csv wfile=out.csv igilow=1 igchigh=2 iflip=1"},
+        {"description":"Shrink and reverse a grid; both programs require terminal stdin and stdout.","command":"subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 wfile=in.csv && subinxxcsv rfile=in.csv wfile=out.csv igilow=-1 igihigh=0 iflip=-1"}
+      ],
+      "license_note":"",
+      "related_programs":["subincsv","subinbigcsv","subinqcsv"]
+    },
+    {
+      "name":"sucdpbin",
+      "path":"su/main/headers/sucdpbin.c",
+      "purpose":"Assign each trace to the nearest CDP bin along a piecewise straight line.",
+      "selfdoc_first_line":" SUCDPBIN - Compute CDP bin number\t\t\t\t\t",
+      "params":[
+        {"name":"xline","type":"float array","default":"","required":true,"description":"Increasing X coordinates defining the line."},
+        {"name":"yline","type":"float array","default":"","required":true,"description":"Y coordinates defining the line."},
+        {"name":"dcdp","type":"float","default":"","required":true,"description":"Distance between bin centers."},
+        {"name":"verbose","type":"int","default":"0","required":false,"description":"Print diagnostic information."},
+        {"name":"cdpmin","type":"int","default":"1001","required":false,"description":"First bin number."},
+        {"name":"distmax","type":"float","default":"computed: dcdp","required":false,"description":"Maximum distance from a bin center."}
+      ],
+      "stdin":"su_traces",
+      "stdout":"su_traces",
+      "lib_calls":["initargs","requestdoc","countparval","getparfloat","getparint","ealloc1float","err","warn","checkpars","gettr","puttr","CWP_Exit"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Repeated float coordinate updates mix float and double sqrt and pow operations. The segment loop accesses xline[iseg+1] and yline[iseg+1] after incrementing iseg, potentially past the input arrays; bin arrays can also be overrun.",
+      "c_lines":193,
+      "difficulty":"medium",
+      "difficulty_reason":"Bin construction follows connected line segments and searches all generated bins for each trace.",
+      "test_cases":[
+        {"description":"Bin traces along a straight line.","command":"suplane nt=64 ntr=16 | sucdpbin xline=0,100 yline=0,0 dcdp=10 cdpmin=1 distmax=20 > out.su"},
+        {"description":"Exercise a bent line and diagnostics.","command":"suplane nt=64 ntr=16 | sucdpbin xline=0,50,100 yline=0,10,0 dcdp=10 verbose=1 > out.su"}
+      ],
+      "license_note":"",
+      "related_programs":[]
+    },
+    {
+      "name":"suchart",
+      "path":"su/main/headers/suchart.c",
+      "purpose":"Write pairs of selected trace-header values as binary floats for plotting.",
+      "selfdoc_first_line":" SUCHART - prepare data for x vs. y plot\t\t\t",
+      "params":[
+        {"name":"key1","type":"string","default":"sx","required":false,"description":"Abscissa header."},
+        {"name":"key2","type":"string","default":"gx","required":false,"description":"Ordinate header."},
+        {"name":"outpar","type":"string","default":"","required":false,"description":"Optional output parameter file; despite the selfdoc's null, the code creates no file when omitted."}
+      ],
+      "stdin":"su_traces",
+      "stdout":"binary_floats",
+      "lib_calls":["initargs","requestdoc","err","getparstring","hdtype","getindex","gettr","gethval","vtof","efwrite","efopen","checkpars","CWP_Exit"],
+      "calls_programs":[],
+      "uses_randomness":false,
+      "float_sensitive_notes":"Header values are converted to native float, which can lose precision for large integer or double values; binary output uses native float representation and byte order.",
+      "c_lines":113,
+      "difficulty":"easy",
+      "difficulty_reason":"The program reads two headers per trace and writes their float conversions.",
+      "test_cases":[
+        {"description":"Write default source and receiver coordinates.","command":"suplane nt=64 ntr=16 | suchart key1=sx key2=gx > chart.bin"},
+        {"description":"Write CDP and fold with a parameter file.","command":"suplane nt=64 ntr=16 | suchart key1=cdp key2=nhs outpar=chart.par > chart.bin"}
+      ],
+      "license_note":"",
+      "related_programs":[]
+    }
+  ]
+}

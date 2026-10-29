@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = ["crates/*", "programs/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "BSD-3-Clause"
+rust-version = "1.88"
+description = "A Rust port of CWP/SU"
+publish = false
+
+[workspace.dependencies]
+oxwave-core = { path = "crates/oxwave-core" }
+oxwave-cwp = { path = "crates/oxwave-cwp" }
+oxwave-cref = { path = "crates/oxwave-cref" }
+
+[profile.release]
+debug = false
+opt-level = 3
+# No fast-math exists in Rust; keep default strict IEEE semantics.
+# overflow-checks stay off in release (C wraps; ports must use wrapping_* where C relies on it).
+
+[profile.dev]
+opt-level = 1

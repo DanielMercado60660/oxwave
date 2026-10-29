@@ -1,0 +1,14 @@
+# Defaults, single trace/sample, normalized and unnormalized stacks.
+sunull nt=1 ntr=1 | surecip
+suplane nt=31 ntr=7 | sushw key=cdp,offset,sx,gx a=2,-10,30,-20 | surecip
+suplane nt=31 ntr=7 | sushw key=cdp,offset,sx,gx a=2,-10,30,-20 | surecip norm=0
+suplane nt=17 ntr=5 | sushw key=cdp,offset a=-1,0 | surecip norm=-1
+# Multiple adjacent groups in CDP and offset, including negative values.
+suplane nt=19 ntr=9 | sushw key=cdp,offset a=-2,-5 b=1,0 j=3,1 | surecip
+suplane nt=19 ntr=9 | sushw key=cdp,offset a=1,-5 b=0,1 j=1,3 | surecip norm=0
+[stderr] sunull nt=3 ntr=3 | surecip verbose=1 unknown=2
+sunull nt=3 ntr=3 | surecip norm=abc
+sunull nt=3 ntr=3 | surecip norm=2147483648
+surecip < /dev/null
+surecip norm=1 < /dev/null
+sunull nt=3 ntr=2 | surecip par=missing.par

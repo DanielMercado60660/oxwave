@@ -1,0 +1,13 @@
+# Defaults and fractional differentiation/integration, including odd lengths.
+suplane nt=127 ntr=3 dt=0.004 | sufrac
+suplane nt=99 ntr=1 dt=0.002 | sufrac power=1 sign=-1 phasefac=-0.25
+suplane nt=101 ntr=2 dt=0.004 | sufrac power=-0.5 sign=1 phasefac=0.5
+suplane nt=1 ntr=1 dt=0.004 | sufrac power=0 sign=0 phasefac=0
+[stderr] suplane nt=63 ntr=1 dt=0.004 | sufrac phasefac=0.25 verbose=1
+# Nonseismic input uses d1, and dt= is documented but ignored.
+[stderr] suplane nt=33 ntr=1 dt=0.004 | sushw key=trid,d1 a=30,0.002 | sufrac power=0.5 verbose=1 dt=0.1
+suplane nt=32 ntr=1 dt=0.004 | sushw key=dt a=0 | sufrac dt=0.004
+suplane nt=32 ntr=1 dt=0.004 | sushw key=trid,d1 a=30,0 | sufrac
+sufrac power=1
+suplane nt=32 ntr=1 dt=0.004 | sufrac power=1e999
+suplane nt=65535 ntr=1 dt=0.004 | sufrac

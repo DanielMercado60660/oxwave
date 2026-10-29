@@ -1,0 +1,53 @@
+# Compressed output is an opaque native binary stream: compare every byte.
+[exact] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=32 n2=4
+[exact] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=32 n2=4 blocksize1=16 blocksize2=16 error=0.01
+[exact] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05
+[exact] suplane nt=17 ntr=7 | sustrip outpar=/dev/null | dctcomp n1=17 n2=7 blocksize1=3 blocksize2=5
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1 blocksize1=1 blocksize2=1
+[exact] suplane nt=19 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=19 n2=1 blocksize1=4 blocksize2=1
+[exact] suplane nt=1 ntr=19 | sustrip outpar=/dev/null | dctcomp n1=1 n2=19 blocksize1=1 blocksize2=4
+[exact] sunull nt=8 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=8 n2=3
+[exact] sunull nt=13 ntr=7 | suaddnoise seed=123 | sustrip outpar=/dev/null | dctcomp n1=13 n2=7 blocksize1=7 blocksize2=3 error=0.001
+[exact] sunull nt=13 ntr=7 | suaddnoise seed=345 | sustrip outpar=/dev/null | dctcomp n1=13 n2=7 blocksize1=4 blocksize2=2 error=0.5
+[exact] suspike nt=8 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=8 n2=4 error=0
+[exact] suspike nt=8 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=8 n2=4 error=-0.01
+[exact] suspike nt=8 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=8 n2=4 error=1
+[exact] dctcomp n1=0 n2=0
+[exact] dctcomp n1=0 n2=3
+[exact] dctcomp n1=3 n2=0
+# fread is unchecked in C; the golden generator flags nondeterministic short reads.
+[exact] dctcomp n1=1 n2=1
+[exact] printf '\000\000' | dctcomp n1=3 n2=2
+[stderr] suspike nt=16 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=16 n2=4 verbose=1
+[stderr] suspike nt=16 ntr=4 | sustrip outpar=/dev/null | dctcomp n1=16 n2=4 unknown=7
+[stderr] dctcomp
+[stderr] dctcomp n2=1
+[stderr] dctcomp n1=1
+[stderr] dctcomp n1= n2=1
+[stderr] dctcomp n1=1 n2=
+[stderr] dctcomp n1=2147483648 n2=1
+[stderr] dctcomp n1=1 n2=-2147483649
+[stderr] dctcomp n1=1 n2=1 blocksize1=2147483648
+[stderr] dctcomp n1=1 n2=1 blocksize2=-2147483649
+[stderr] dctcomp n1=1 n2=1 error=1e-310
+# Last parameter wins and empty optional values select the C defaults.
+[exact] suspike nt=8 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=99 n1=8 n2=3 blocksize1= blocksize2= error=
+# Parameter files use the same parsing and command-line overrides.
+[exact] [stderr] printf 'n1=99 n2=3 blocksize1=4 blocksize2=2 error=0.1\n' > params; suspike nt=8 ntr=3 | sustrip outpar=/dev/null | dctcomp par=params n1=8
+# Exercise decoding as well as the exact compressed representation.
+[f32] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | dctuncomp
+# A negative n1 still rounds to a positive padded size. With no input rows,
+# this exercises that path without C's allocator-dependent f[0][-1] write.
+[exact] [stderr] dctcomp n1=-1 n2=0
+# dctcomp n1=-1 n2=1 is undefined in C: an earlier C run recorded exit 0,
+# but local fresh goldens record SIGSEGV. Rust reserves the negative prefix
+# and follows the successful compression path; do not assert a fixed C signal.
+# The remaining negative values fault in the C allocator or padding loops.
+[exact] dctcomp n1=1 n2=-1
+[exact] dctcomp n1=1 n2=1 blocksize1=-1
+[exact] dctcomp n1=1 n2=1 blocksize2=-1
+# Known library blockers, recorded for the core maintainer (not runnable as passing cases yet):
+# dctcomp n1=1 n2=1 blocksize1=0
+# dctcomp n1=1 n2=1 blocksize2=0
+# dctcomp n1=0 n2=0 blocksize1=1 blocksize2=1

@@ -1,0 +1,114 @@
+{
+  "scope": "su/main/interp_extrap part 1 of 1",
+  "programs": [
+    {
+      "name": "suinterp",
+      "path": "su/main/interp_extrap/suinterp.c",
+      "purpose": "Interpolate traces between input traces using automatically estimated event dips.",
+      "selfdoc_first_line": " SUINTERP - interpolate traces using automatic event picking\t\t",
+      "params": [
+        {"name": "ninterp", "type": "int", "default": "1", "required": false, "description": "Number of interpolated traces between input traces."},
+        {"name": "nxmax", "type": "int", "default": "500", "required": false, "description": "Maximum number of input traces; input reading stops at this limit."},
+        {"name": "freq1", "type": "float", "default": "4.", "required": false, "description": "Lower corner frequency for the picking model."},
+        {"name": "freq2", "type": "float", "default": "20.", "required": false, "description": "Upper corner frequency for the picking model."},
+        {"name": "deriv", "type": "int", "default": "0", "required": false, "description": "Take a time derivative of the picking section when nonzero."},
+        {"name": "linear", "type": "int", "default": "0", "required": false, "description": "Use linear interpolation instead of eight-point sinc when nonzero."},
+        {"name": "lent", "type": "int", "default": "5", "required": false, "description": "Time smoothing length in samples, rounded up to an odd number."},
+        {"name": "lenx", "type": "int", "default": "1", "required": false, "description": "Spatial smoothing length in traces, rounded up to an odd number."},
+        {"name": "lagc", "type": "int", "default": "400", "required": false, "description": "AGC length in milliseconds for dip estimation."},
+        {"name": "xopt", "type": "int", "default": "0", "required": false, "description": "Use differences for the spatial derivative when nonzero; fewer than 16 traces force differences."},
+        {"name": "iopt", "type": "int", "default": "0", "required": false, "description": "Output interpolated traces, the picking model, or dip picks for values 0, 1, or 2."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Report temporary-file information when nonzero."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise \"\"", "required": false, "description": "Directory for the temporary header file."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "getparstring", "checkpars", "VNDtempname", "V2Dop", "VNDfree", "etmpfile", "warn", "temporary_filename", "efopen", "V2Dw0", "efwrite", "efseeko", "efread", "V2Dr0", "puttr", "VNDcl", "VNDtotalmem", "efclose", "eremove", "CWP_Exit", "npfar", "VNDemalloc", "pfarc", "crmul", "cmul", "cmplx", "pfacr", "V2Dr1", "V2Dw1", "intlin", "ints8r"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT filtering and derivatives, running-sum smoothing, dip division, and sinc or linear interpolation depend on operation order and float rounding. The linear branch interpolates both sides from the preceding trace array, unlike the sinc branch. Interpolated headers copy the preceding input header.",
+      "c_lines": 560,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers traces on disk and combines FFT filtering, dip estimation, smoothing, and interpolation.",
+      "test_cases": [
+        {"description": "Sinc interpolation with FFT spatial derivatives.", "command": "suplane nt=128 ntr=24 | suinterp ninterp=2 nxmax=24 freq1=4 freq2=20 xopt=0"},
+        {"description": "Linear interpolation with difference derivatives and spatial smoothing.", "command": "suplane nt=128 ntr=8 | suinterp ninterp=1 linear=1 deriv=1 xopt=1 lent=3 lenx=3 lagc=100"},
+        {"description": "Output the low-pass picking model.", "command": "suplane nt=128 ntr=8 | suinterp iopt=1 freq1=0 freq2=15"},
+        {"description": "Output estimated dips.", "command": "suplane nt=128 ntr=8 | suinterp iopt=2 xopt=1"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suinterpfowler",
+      "path": "su/main/interp_extrap/suinterpfowler.c",
+      "purpose": "Interpolate an output image from velocity and eta panels using a specified model.",
+      "selfdoc_first_line": " SUINTERPFOWLER - interpolate output image from constant velocity panels",
+      "params": [
+        {"name": "vmin", "type": "float", "default": "1500.", "required": false, "description": "Minimum velocity in the input panels."},
+        {"name": "vmax", "type": "float", "default": "2500.", "required": false, "description": "Maximum velocity in the input panels."},
+        {"name": "nv", "type": "int", "default": "21", "required": false, "description": "Number of velocity panels."},
+        {"name": "etamin", "type": "float", "default": "0.10", "required": false, "description": "Minimum eta in the input panels."},
+        {"name": "etamax", "type": "float", "default": "0.25", "required": false, "description": "Maximum eta in the input panels."},
+        {"name": "neta", "type": "int", "default": "11", "required": false, "description": "Number of eta panels."},
+        {"name": "ncdps", "type": "int", "default": "1130", "required": false, "description": "Number of output CDP positions."},
+        {"name": "nvstack", "type": "int", "default": "0", "required": false, "description": "Number of CVS velocity stack panels; values greater than 5 select CVS mode."},
+        {"name": "vminstack", "type": "float", "default": "0.25", "required": false, "description": "Minimum CVS velocity used in the stack spacing formula; the selfdoc says 1450, but the code sets 0.25."},
+        {"name": "vscale", "type": "float", "default": "1.0", "required": false, "description": "Scale factor applied to model velocities."},
+        {"name": "cdp", "type": "float", "default": "", "required": false, "description": "Repeated CDP control-point positions. Despite the documented default, no value is initialized if omitted; at least one is needed for valid execution."},
+        {"name": "t", "type": "float array", "default": "", "required": false, "description": "Repeated time arrays, one per CDP; each must match its velocity array. The documented default is not applied by code."},
+        {"name": "v", "type": "float array", "default": "", "required": false, "description": "Repeated velocity arrays, one per CDP; the documented default is not applied by code."},
+        {"name": "eta", "type": "float array", "default": "", "required": false, "description": "Repeated eta arrays, one per CDP, required by count checks in non-CVS mode when CDPs are supplied; the documented default is not applied by code."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "checkpars", "gettr", "err", "ealloc1float", "countparname", "getnparfloat", "countnparval", "intlin", "puttr"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Time, CDP, velocity, and eta interpolation mix float arithmetic with double literals; CVS mode transforms velocity to inverse squared velocity. Float-to-int truncation determines panel indices. No CDP control points causes out-of-bounds access; zero velocity spacing can cause division by zero. The upper panel boundary is excluded.",
+      "c_lines": 263,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers multiple panels per CDP and interpolates a time-varying model across CDP, velocity, and eta.",
+      "test_cases": [
+        {"description": "Interpolate velocity and eta panels at two CDPs.", "command": "suplane nt=128 ntr=8 | suinterpfowler ncdps=2 nv=2 neta=2 vmin=1500 vmax=2500 etamin=0 etamax=0.2 cdp=0 t=0,0.4 v=1800,2000 eta=0.05,0.1 cdp=1 t=0,0.4 v=1900,2100 eta=0.1,0.15"},
+        {"description": "Interpolate CVS panels with scaled velocities.", "command": "suplane nt=128 ntr=12 | suinterpfowler ncdps=2 nvstack=6 vminstack=1500 vscale=1 cdp=0 t=0,0.4 v=1700,1800"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suocext",
+      "path": "su/main/interp_extrap/suocext.c",
+      "purpose": "Extrapolate common-offset seismic gathers to a smaller offset using offset continuation.",
+      "selfdoc_first_line": " SUOCEXT - smaller Offset EXTrapolation via Offset Continuation        ",
+      "params": [
+        {"name": "cdpmin", "type": "int", "default": "", "required": true, "description": "Minimum CDP bin number to process."},
+        {"name": "cdpmax", "type": "int", "default": "", "required": true, "description": "Maximum CDP bin number to process."},
+        {"name": "dxcdp", "type": "float", "default": "", "required": true, "description": "Distance between adjacent CDP bins."},
+        {"name": "noffmix", "type": "int", "default": "", "required": true, "description": "Number of offsets to mix."},
+        {"name": "offextr", "type": "float", "default": "", "required": true, "description": "Target offset."},
+        {"name": "tdmo", "type": "float array", "default": "0.0", "required": false, "description": "Increasing times for the RMS velocity function."},
+        {"name": "vdmo", "type": "float array", "default": "1500.0", "required": false, "description": "RMS velocities corresponding to tdmo; array lengths must match."},
+        {"name": "sdmo", "type": "float", "default": "1.0", "required": false, "description": "DMO stretch factor."},
+        {"name": "fmax", "type": "float", "default": "computed: 0.5/dt, where dt is the first trace header interval in seconds", "required": false, "description": "Maximum input frequency."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostics when nonzero."},
+        {"name": "tmpdir", "type": "string", "default": "computed: CWP_TMPDIR environment variable if set, otherwise \"\"", "required": false, "description": "Directory for the temporary header file."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "countparval", "ealloc1float", "getparstring", "checkpars", "npfar", "ealloc2float", "etmpfile", "warn", "temporary_filename", "efopen", "free2float", "erewind", "efread", "puttr", "efwrite", "efclose", "eremove", "CWP_Exit", "cmonot", "intcub", "free1float", "cmplx", "npfa", "ealloc1complex", "ealloc1", "pfa2rc", "ints8c", "pfacc", "pfa2cr", "free1complex", "free1", "yxtoxy"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT transforms, sinc and cubic interpolation, offset mixing, and stretch calculations are sensitive to accumulation order and float rounding; pow, sqrt, log, sin, and cos can vary by math library. Small or invalid time, velocity, stretch, or frequency values can cause divisions by zero or invalid math.",
+      "c_lines": 649,
+      "difficulty": "hard",
+      "difficulty_reason": "It implements frequency-wavenumber offset continuation with nonlinear time stretching, FFTs, interpolation, and multi-offset state.",
+      "test_cases": [
+        {"description": "Extrapolate one common-offset gather.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=8 dxcdp=25 noffmix=1 offextr=100"},
+        {"description": "Mix two offsets using a time-varying velocity function.", "command": "suplane nt=128 ntr=16 | sushw key=cdp,offset a=1,200 b=1,0 c=-8,100 j=8,8 | suocext cdpmin=1 cdpmax=8 dxcdp=25 noffmix=2 offextr=50 tdmo=0,0.4 vdmo=1500,1800 sdmo=0.6 fmax=60"}
+      ],
+      "license_note": "Credits Carlos E. Theodoro for modifying Hale's SUDMOFK and cites SEG course notes and other technical references.",
+      "related_programs": ["sudmofk"]
+    }
+  ]
+}

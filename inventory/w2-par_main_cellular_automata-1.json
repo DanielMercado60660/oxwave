@@ -1,0 +1,121 @@
+{
+  "scope": "par/main/cellular_automata (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "cellauto",
+      "path": "par/main/cellular_automata/cellauto.c",
+      "purpose": "Generate a two-dimensional cellular automaton image as binary floats.",
+      "selfdoc_first_line": " CELLAUTO - Two-dimensional CELLular AUTOmata\t\t\t  \t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "500",
+          "required": false,
+          "description": "Requested image dimension; the program writes up to n1 columns of n1 floats."
+        },
+        {
+          "name": "rule",
+          "type": "int",
+          "default": "30",
+          "required": false,
+          "description": "Cellular automaton rule; the implementation supports 30, 54, 60, 62, 90, 94, 102, 110, 122, 126, 150, 158, 182, 188, 190, 220, 222, 225, 226, 250 and 260."
+        },
+        {
+          "name": "ic",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Initial condition: 1 places a centered unit; 2 places nc random units."
+        },
+        {
+          "name": "nc",
+          "type": "int",
+          "default": "20",
+          "required": false,
+          "description": "Number of random initial units when ic=2."
+        },
+        {
+          "name": "tc",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "For ic=2, 2 places units at random time and position; other values place them at time zero."
+        },
+        {
+          "name": "fill",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, replace zero and nonzero cells with f0 and f1."
+        },
+        {
+          "name": "f0",
+          "type": "float",
+          "default": "330",
+          "required": false,
+          "description": "Value substituted for zero cells when fill is nonzero."
+        },
+        {
+          "name": "f1",
+          "type": "float",
+          "default": "3000",
+          "required": false,
+          "description": "Value substituted for nonzero cells when fill is nonzero."
+        },
+        {
+          "name": "seed",
+          "type": "unsigned int",
+          "default": "computed: current time from time(NULL)",
+          "required": false,
+          "description": "Seed for sranuni; random positions are used when ic=2."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Documented as defaulting to 0, but never read or used by the code; porosity is always reported."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getparuint",
+        "ealloc1float",
+        "ealloc2float",
+        "err",
+        "sranuni",
+        "franuni",
+        "warn",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "The ca array is allocated without initialization, but its elements are read and incremented before being initialized, so behavior and output are undefined and goldens can vary even with an explicit seed. Random placement depends on the CWP random generator and float-to-int truncation. The bottom-half porosity uses float accumulation and can divide by zero for small dimensions. For even n1, the internal time dimension is n1+1, but only n1 floats per column are written.",
+      "c_lines": 806,
+      "difficulty": "hard",
+      "difficulty_reason": "The program maintains a two-dimensional evolving automaton with random seeding, many rule tables and undefined behavior from uninitialized state.",
+      "test_cases": [
+        {
+          "description": "Centered initial condition and rule 30 with an odd image size.",
+          "command": "cellauto n1=31 rule=30 ic=1 fill=0 seed=123 > cellauto30.bin"
+        },
+        {
+          "description": "Random initial units at time zero with an even image size and filled values.",
+          "command": "cellauto n1=32 rule=110 ic=2 nc=8 tc=1 fill=1 f0=330 f1=3000 seed=123 > cellauto110.bin"
+        },
+        {
+          "description": "Random units at random times using the rule with a nonzero output for the zero-neighbor pattern.",
+          "command": "cellauto n1=33 rule=225 ic=2 nc=6 tc=2 fill=0 seed=456 > cellauto225.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

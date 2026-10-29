@@ -1,0 +1,190 @@
+{
+  "scope": "par/main/apertures (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "kaperture",
+      "path": "par/main/apertures/kaperture.c",
+      "purpose": "Generate binary wavenumber coordinate pairs for a point scatterer and a seismic source-receiver array.",
+      "selfdoc_first_line": " KAPERTURE - generate the k domain of a line scatterer for a seismic array",
+      "params": [
+        {
+          "name": "x0",
+          "type": "float",
+          "default": "1000.0",
+          "required": false,
+          "description": "Scatterer x coordinate."
+        },
+        {
+          "name": "z0",
+          "type": "float",
+          "default": "1000.0",
+          "required": false,
+          "description": "Scatterer z coordinate."
+        },
+        {
+          "name": "nshot",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of shots."
+        },
+        {
+          "name": "sxmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First shot x coordinate."
+        },
+        {
+          "name": "szmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First shot z coordinate."
+        },
+        {
+          "name": "dsx",
+          "type": "float",
+          "default": "100.0",
+          "required": false,
+          "description": "Shot x-coordinate increment."
+        },
+        {
+          "name": "dsz",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Shot z-coordinate increment."
+        },
+        {
+          "name": "ngeo",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of receivers."
+        },
+        {
+          "name": "gxmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First receiver x coordinate."
+        },
+        {
+          "name": "gzmin",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First receiver z coordinate."
+        },
+        {
+          "name": "dgx",
+          "type": "float",
+          "default": "100.0",
+          "required": false,
+          "description": "Receiver x-coordinate increment."
+        },
+        {
+          "name": "dgz",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Receiver z-coordinate increment."
+        },
+        {
+          "name": "fnyq",
+          "type": "float",
+          "default": "125.0",
+          "required": false,
+          "description": "Nyquist frequency in Hz, used for the plotting bounds and circle."
+        },
+        {
+          "name": "fmax",
+          "type": "float",
+          "default": "125.0",
+          "required": false,
+          "description": "Maximum frequency in Hz."
+        },
+        {
+          "name": "fmin",
+          "type": "float",
+          "default": "125.0",
+          "required": false,
+          "description": "Minimum frequency in Hz; the selfdoc says 5, but the code defaults to 125."
+        },
+        {
+          "name": "nfreq",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of frequencies; the selfdoc says 2, but the code defaults to 1. A single frequency uses fmin."
+        },
+        {
+          "name": "both",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "When nonzero, also output negated wavenumber pairs."
+        },
+        {
+          "name": "nstep",
+          "type": "int",
+          "default": "60",
+          "required": false,
+          "description": "Number of points in the Nyquist circle; zero suppresses the circle."
+        },
+        {
+          "name": "c",
+          "type": "float",
+          "default": "5000.0",
+          "required": false,
+          "description": "Propagation speed."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File for plotting bounds and the count of scatterer coordinate pairs."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "getparstring",
+        "checkpars",
+        "efopen",
+        "ealloc1float",
+        "efwrite",
+        "free1float",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses sqrt, cos and sin, with double-valued constants and math results mixed with float intermediates and assignments. Compiler contraction, intermediate precision and platform math libraries can affect results. Shot and receiver indices are derived using float arithmetic and conversion to int; invalid or extreme dimensions and zero speed are not checked.",
+      "c_lines": 257,
+      "difficulty": "easy",
+      "difficulty_reason": "It computes independent coordinate pairs from parameterized geometry and writes them as binary floats.",
+      "test_cases": [
+        {
+          "description": "Single frequency with default geometry and a small Nyquist circle.",
+          "command": "kaperture nfreq=1 fmin=30 nstep=8 outpar=/dev/stderr > aperture.bin"
+        },
+        {
+          "description": "Multiple shots, receivers and frequencies with negative pairs and no circle.",
+          "command": "kaperture nshot=3 ngeo=4 sxmin=-100 szmin=10 dsx=50 dsz=5 gxmin=20 gzmin=15 dgx=40 dgz=2 x0=300 z0=500 nfreq=3 fmin=10 fmax=80 both=1 nstep=0 c=2500 outpar=/dev/stderr > aperture.bin"
+        },
+        {
+          "description": "Scatterer coincident with source and receiver exercises the distance guard.",
+          "command": "kaperture x0=0 z0=0 sxmin=0 szmin=0 gxmin=0 gzmin=0 nshot=1 ngeo=1 fnyq=60 nfreq=2 fmin=5 fmax=50 nstep=4 outpar=/dev/stderr > aperture.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

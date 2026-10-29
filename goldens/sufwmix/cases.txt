@@ -1,0 +1,12 @@
+# Defaults and both frequency modes, with marked and unmarked traces.
+[stderr] suplane nt=32 ntr=8 | sufwmix key=tracl dx=1
+[stderr] suplane nt=31 ntr=7 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=2 vf=0
+[stderr] suplane nt=45 ntr=6 | sushw key=mark a=1 | sufwmix key=tracl,offset dx=2,10 vf=1 vmin=100 padd=50 fac=3
+[stderr] suplane nt=17 ntr=8 | sushw key=cdp a=1 b=1 | sufwmix keyg=cdp key=tracl dx=1 padd=0 fac=0 verbose=1
+[stderr] suspike nt=1 ntr=1 | sufwmix key=tracl dx=1 vf=0
+[stderr] suspike nt=13 ntr=3 | sufwmix key=tracl dx=0 vf=1 vmin=0 fac=-2
+[stderr] suplane nt=20 ntr=4 | sufwmix dx=1 vf=0
+[stderr] sufwmix key=tracl dx=1 < /dev/null
+[stderr] suplane nt=20 ntr=4 | sufwmix key=tracl
+[stderr] suplane nt=20 ntr=4 | sufwmix key=invalid dx=1
+[stderr] suplane nt=20 ntr=4 | sufwmix key=tracl dx=1 padd=1000000

@@ -1,0 +1,17 @@
+# Defaults, varied offsets and odd sizes.
+suspike nt=17 ntr=3 | sushw key=offset a=-100 b=100 | suweight
+suspike nt=1 ntr=1 | suweight
+# Linear weighting, including negative and zero factors and inverse mode.
+suspike nt=19 ntr=5 | sushw key=cdp a=-2 b=1 | suweight key=cdp a=0 b=-0.5
+suspike nt=13 ntr=3 | sushw key=offset a=-2 b=1 | suweight a=2 b=0.25 inv=-1
+# Header weights, default and explicit scale, and inverse mode.
+suspike nt=17 ntr=3 | sushw key=cdp a=10000 b=5000 | suweight key2=cdp
+suspike nt=17 ntr=3 | sushw key=cdp a=-3 b=1 | suweight key2=cdp scale=-0.5
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | suweight key2=cdp scale=0.25 inv=1
+# Scale is only parsed with key2, and verbose is handled by checkpars.
+[stderr] suspike nt=3 ntr=1 | suweight scale=2 verbose=1
+# Invalid headers, invalid numeric input, and empty input.
+suweight key=notakey
+suweight key2=notakey
+suweight inv=999999999999999999999
+suweight a=1

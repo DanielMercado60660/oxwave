@@ -1,0 +1,14 @@
+# Default, single sample, single trace, and varying input headers.
+suspike nt=1 ntr=1 ix1=1 it1=1 | sur2ai
+suspike nt=7 ntr=3 ix1=1 it1=3 nspk=1 | sugain scale=0.25 | sushw key=offset a=10 b=5 | sur2ai
+# Positive and negative reflectivity, and verbose parameter.
+suspike nt=9 ntr=1 ix1=1 it1=1 nspk=1 | sugain scale=-0.5 | sur2ai verbose=1
+suspike nt=9 ntr=1 ix1=1 it1=2 nspk=1 | sur2ai verbose=0
+suspike nt=9 ntr=1 ix1=1 it1=2 nspk=1 | sugain scale=-1 | sur2ai
+# The final sample is not inspected; illegal values earlier are errors.
+suspike nt=7 ntr=1 ix1=1 it1=7 nspk=1 | sugain scale=2 | sur2ai
+suspike nt=7 ntr=1 ix1=1 it1=2 nspk=1 | sugain scale=1.5 | sur2ai
+suspike nt=7 ntr=1 ix1=1 it1=2 nspk=1 | sugain scale=-1.5 | sur2ai
+# Empty input and numeric parameter overflow.
+sur2ai </dev/null
+suspike nt=3 ntr=1 | sur2ai verbose=999999999999999999999999

@@ -1,0 +1,16 @@
+# Generated sample and each interpolation mode, including all output grids.
+[exact] unif2ti2 tfile=model && cat model
+[f32] unif2ti2 tfile=model && unif2ti2 < model nx=7 nz=97 method=spline > /dev/null && cat c11_file c13_file c15_file c33_file c35_file c55_file vp_file vs_file epsilon_file delta_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=2 nx=7 nz=65 method=akima dx=73 dz=10 fx=12 fz=2 vp00=1600,2000,2500 vs00=800,1000,1200 eps00=.1,.2,.3 delta00=.05,.1,.15 rho00=1000,1200,1400 x0=1,2,3 z0=4,5,6 dvpdx=.1,.2,.3 dvpdz=.2,.3,.4 dvsdx=.1,.2,.3 dvsdz=.2,.3,.4 dedx=.0001,.0002,.0003 dedz=.0002,.0003,.0004 dddx=.0001,.0002,.0003 dddz=.0002,.0003,.0004 drdx=.1,.2,.3 drdz=.2,.3,.4 > /dev/null && cat c11_file c13_file c33_file vp_file vs_file epsilon_file delta_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=3 nz=51 method=linear ns=3 > /dev/null && cat vp_file c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=1 nz=3 method=bad npmax=10 > /dev/null && cat c11_file
+[f32] unif2ti2 tfile=model && vtlvz nt=15 dt=.004 v0=.2 a=0 > tilt && unif2ti2 < model ninf=1 nx=3 nz=5 method=mono nufile=tilt vp00=1800,2200 vs00=900,1100 eps00=.1,.2 delta00=.05,.1 c11_file=a c13_file=b c33_file=c c15_file=d c35_file=e c55_file=f vp_file=g vs_file=h epsilon_file=i delta_file=j rho_file=k > /dev/null && cat a b c d e f g h i j k
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=2 nz=2 method=bad
+[stderr] unif2ti2 tfile=model && unif2ti2 < model npmax=2
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=2 nz=2 nufile=missing
+[stderr] unif2ti2 tfile=model && touch tilt && unif2ti2 < model ninf=1 nx=2 nz=2 nufile=tilt
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=3 nz=5 verbose=1
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=5 nz=45 ns=2 method=linear vp00=1700,2400 rho00=1000,1200 > /dev/null && cat vp_file rho_file c11_file
+[stderr] unif2ti2 ninf=1 nx=2 nz=2 npmax=4 < /dev/null
+[stderr] printf '0 100\n10 100\n1 -99999\n0 0\n10 0\n1 -99999\n' | unif2ti2 ninf=1 nx=2 nz=2 method=linear
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=3 nz=1 dx=-2 dz=-1 fx=-1 fz=-1 method=linear > /dev/null && cat vp_file

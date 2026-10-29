@@ -1,0 +1,14 @@
+# Default window and nonzero offsets across traces
+suplane nt=31 ntr=7 | sushw key=offset a=200 b=50 | sugausstaper
+# Alternate integer and floating header fields, explicit center and width
+suplane nt=17 ntr=5 | sugausstaper key=tracl x0=3 xw=2
+suplane nt=19 ntr=3 | sushw key=d1 a=1 b=1 | sugausstaper key=d1 x0=2 xw=0.75
+# Single trace and sample, negative center and width
+suspike nt=1 ntr=1 | sugausstaper x0=-1 xw=-3
+# Zero width away from center
+suspike nt=7 ntr=1 | sugausstaper x0=1 xw=0
+# Diagnostics and errors
+[stderr] suplane nt=9 ntr=3 | sugausstaper verbose=1 unknown=1
+sugausstaper key=notakey
+sugausstaper x0=1
+sugausstaper xw=1e999

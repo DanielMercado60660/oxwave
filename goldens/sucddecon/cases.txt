@@ -1,0 +1,15 @@
+# Defaults, non-power-of-two sizes, and a single trace/sample.
+suplane nt=127 ntr=3 | sucddecon filter=1,0.5,-0.2
+suspike nt=1 ntr=1 | sucddecon filter=1
+suspike nt=31 ntr=1 | sucddecon filter=1,0.2 panel=1 sym=1 pnoise=0.1
+[stderr] suplane nt=64 ntr=2 | sucddecon filter=1,0.4 verbose=1
+# File filter, header delay, panel exhaustion, and explicit zero values.
+suspike nt=21 ntr=2 | sushw key=delrt a=12 > filt.su && suplane nt=51 ntr=3 | sushw key=delrt a=30 | sucddecon sufile=filt.su
+[stderr] suspike nt=21 ntr=1 > filt.su && suplane nt=51 ntr=3 | sucddecon sufile=filt.su panel=1 verbose=1
+suplane nt=64 ntr=2 | sucddecon filter=1 pnoise=0 sym=0 panel=0
+suplane nt=64 ntr=1 | sucddecon filter=1,-0.5 pnoise=-0.01 sym=-1
+# Error paths.
+sucddecon filter=1
+suplane nt=64 ntr=1 | sucddecon
+suplane nt=64 ntr=1 | sucddecon sufile=missing.su
+suplane nt=64 ntr=1 | sucddecon filter=1 panel=999999999999999999999

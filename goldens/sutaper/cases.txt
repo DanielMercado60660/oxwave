@@ -1,0 +1,17 @@
+# Defaults and header-supplied count
+suplane nt=31 ntr=7 | sushw key=ntr a=7 | sutaper
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2
+suplane nt=31 ntr=7 | sutaper n2=7 tr1=0 tr2=3 min=-0.2
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=3 tr2=1 taper=2 tbeg=8 tend=12
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 taper=3 tbeg=8 tend=8
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 tr2=3 taper=4 tbeg=8 tend=8
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 taper=5 tbeg=8 tend=8
+[stderr] suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 tr2=3 verbose=1
+suplane nt=1 ntr=1 | sutaper ntr=1
+suplane nt=31 ntr=1 | sutaper ntr=1 tr1=0 tr2=0 tbeg=-2 tend=0
+sutaper min=2
+sutaper
+suplane nt=31 ntr=7 | sutaper
+suplane nt=31 ntr=7 | sutaper ntr=7 tbeg=200
+suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 taper=9
+suplane nt=31 ntr=7 | sutaper ntr=7 tbeg=8 taper=9

@@ -1,0 +1,74 @@
+# Compare the receiver trace itself (inventory cases redirect it away).
+sunull nt=32 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=32 tmax=0.02 sz=16 dz=10 rz=10 freq=25
+# Actual defaults, including receiver depth zero, source zero, and nt=0.
+sunull nt=17 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.006 sz=1
+sunull nt=17 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.006 sz=1 nt=0 styp=0 dz=1 fz=0 rz=0 freq=15 abs=0,1 td=1 zd=1 press=1 verbose=0
+# Every source type and both recorded fields, nonzero first depth.
+sunull nt=31 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null | sufdmod1 nz=31 tmax=0.08 sz=150 dz=10 fz=100 rz=180 styp=1 press=1 abs=1,0 freq=30
+sunull nt=31 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null | sufdmod1 nz=31 tmax=0.08 sz=150 dz=10 fz=100 rz=180 styp=1 press=0 abs=0,0 freq=30
+sunull nt=31 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null | sufdmod1 nz=31 tmax=0.08 sz=150 dz=10 fz=100 rz=180 styp=2 press=1 abs=1,1 freq=30
+sunull nt=31 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null | sufdmod1 nz=31 tmax=0.08 sz=150 dz=10 fz=100 rz=180 styp=2 press=0 abs=1,1 freq=30
+# Snapshot file contents, odd and even depth decimation, both fields.
+sunull nt=17 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=17 tmax=0.025 sz=50 rz=70 dz=10 nt=23 td=2 zd=3 wfile=wave < vel > /dev/null && cat wave
+sunull nt=16 ntr=1 | sugain bias=2000 | sustrip outpar=/dev/null > vel; sufdmod1 nz=16 tmax=0.04 sz=30 dz=10 nt=17 styp=2 press=0 td=3 zd=2 wfile=wave < vel > /dev/null && cat wave
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.02 sz=30 dz=10 nt=1 wfile=wave < vel > /dev/null && cat wave
+# Named input/output files and nonconstant velocity/density models.
+sunull nt=19 ntr=1 | sugain bias=1700 | sustrip outpar=/dev/null > vel; sunull nt=19 ntr=1 | sugain bias=2700 | sustrip outpar=/dev/null > den; sufdmod1 nz=19 tmax=0.04 sz=50 dz=10 rz=80 velfile=vel dfile=den sfile=seis && cat seis
+sunull nt=23 ntr=1 | sugain bias=1800 | suaddnoise seed=42 sn=8 | sustrip outpar=/dev/null > vel; sunull nt=23 ntr=1 | sugain bias=2500 | suaddnoise seed=43 sn=10 | sustrip outpar=/dev/null > den; sufdmod1 nz=23 tmax=0.05 sz=40 rz=90 dz=10 styp=1 press=0 dfile=den < vel
+# Full diagnostics, with and without file parameters.
+[stderr] sunull nt=17 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.02 sz=40 rz=50 dz=10 verbose=1
+[stderr] sunull nt=17 ntr=1 | sugain bias=1600 | sustrip outpar=/dev/null > vel; sunull nt=17 ntr=1 | sugain bias=2300 | sustrip outpar=/dev/null > den; sufdmod1 nz=17 tmax=0.02 sz=40 rz=50 dz=10 nt=19 styp=1 press=0 abs=1,0 td=2 zd=3 verbose=1 velfile=vel dfile=den sfile=seis wfile=wave && cat seis
+# Tiny sizes, zero and negative values, unsupported source type is silent.
+sunull nt=1 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=1 tmax=0.001 sz=0 rz=0 nt=1 abs=1,1
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0 sz=3 nt=1
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=-0.001 sz=3 nt=5
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 nt=-1
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 freq=0 nt=13
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 freq=-15 nt=13
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 styp=3 nt=7
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 td=0 nt=5
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 td=-2 nt=5
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=7 tmax=0.001 sz=3 zd=0 nt=5 wfile=wave < vel > /dev/null && cat wave
+# Undocumented names from the selfdoc and unknown args are ignored (no checkpars).
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=3 vfile=ignored zt=9 arbitrary=10
+# Required parameters, invalid output selection, unreadable and short files.
+[stderr] sufdmod1
+[stderr] sufdmod1 nz=7
+[stderr] sufdmod1 nz=7 tmax=0.01
+[stderr] sufdmod1 nz=7 tmax=0.01 sz=3 press=2
+[stderr] sufdmod1 nz=7 tmax=0.01 sz=3 press=-1
+[stderr] sufdmod1 nz=7 tmax=0.01 sz=3
+[stderr] sufdmod1 nz=7 tmax=0.01 sz=3 velfile=missing
+[stderr] sunull nt=3 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.01 sz=3
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.01 sz=3 dfile=missing
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; : > den; sufdmod1 nz=7 tmax=0.01 sz=3 dfile=den < vel
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.01 sz=3 nt=65535
+[stderr] sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.01 sz=3 sfile=missing/out
+[stderr] sufdmod1 nz=2147483648
+# Float-to-short header conversions truncate through 32 bits, then wrap.
+sunull nt=7 ntr=1 | sugain bias=1 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=40 sz=10 rz=10 dz=10 freq=0 nt=1
+sunull nt=7 ntr=1 | sugain bias=1 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=-40 sz=10 rz=10 dz=10 freq=0 nt=1
+# Zero/negative spacing, including NaNs from the zero-spacing arithmetic.
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=0 dz=0 nt=1
+sunull nt=7 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=7 tmax=0.001 sz=-3 rz=-2 dz=-1 nt=3
+# Recording to stdout while also taking snapshots uses a distinct FILE pointer.
+sunull nt=17 ntr=1 | sugain bias=1600 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.02 sz=40 rz=50 dz=10 nt=19 styp=1 press=0 abs=1,0 td=2 zd=3 wfile=wave
+# Depth limit check occurs before reading the requested zd parameter.
+[stderr] sunull nt=65535 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=65535 tmax=0 sz=3 nt=1 zd=20 wfile=wave
+# Closed snapshot FILE identity is reused by the named receiver output.
+# The receiver header retains its own ns, but its payload has snapshot ns.
+sunull nt=13 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=13 tmax=0.02 sz=30 rz=40 dz=10 nt=31 styp=2 td=3 zd=4 wfile=wave sfile=seis < vel && cat seis
+sunull nt=13 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=13 tmax=0.02 sz=30 rz=40 dz=10 nt=1 styp=0 td=1 zd=2 wfile=wave sfile=seis < vel && cat seis
+# Both output files are compared. Opening /dev/stdout on a pipe fails on macOS.
+sunull nt=11 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null > vel; sufdmod1 nz=11 tmax=0.02 sz=30 rz=50 dz=10 nt=17 press=0 td=2 zd=3 wfile=wave sfile=seis < vel && cat wave seis
+[stderr] sunull nt=17 ntr=1 | sugain bias=1600 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.02 sz=40 rz=50 dz=10 nt=19 styp=1 press=0 td=2 zd=3 wfile=wave sfile=/dev/stdout
+sunull nt=17 ntr=1 | sugain bias=1600 | sustrip outpar=/dev/null > vel; sufdmod1 nz=17 tmax=0.02 sz=40 rz=50 dz=10 nt=19 styp=1 press=0 td=2 zd=3 wfile=wave sfile=/dev/stdout < vel > seis && cat seis
+# A FIFO exercises the reused stream without requiring seekable output.
+sunull nt=13 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; mkfifo seis; cat seis & reader=$!; sufdmod1 nz=13 tmax=0.02 sz=30 rz=40 dz=10 nt=31 styp=2 td=3 zd=4 wfile=wave sfile=seis < vel; status=$?; wait "$reader"; exit "$status"
+# Equal counts and no snapshots written need no stream-count adjustment.
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=4 zd=2 wfile=wave sfile=seis < vel && cat seis
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=-1 zd=2 wfile=wave sfile=seis < vel && cat seis
+# Reusing the same pathname truncates the snapshots before writing the receiver.
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=13 zd=2 wfile=both sfile=both < vel && cat both
+# Zero decimation follows the original arm64 division/remainder behavior.
+sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=7 td=0 zd=0 wfile=wave sfile=seis < vel && cat seis

@@ -1,0 +1,65 @@
+# Compare actual SU output: inventory cases redirect it to a file.
+suplane nt=128 ntr=16 | sushw key=cdp,offset a=1,200 b=1,0 | sudmofkcw cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1
+suplane nt=128 ntr=16 | sushw key=cdp,offset a=1,300 b=1,0 | sudmofkcw cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 gamma=0.7 ntable=200 flip=1 sdmo=0.6 fmax=80
+# Explicit defaults and verbose diagnostics.
+[stderr] suspike nt=65 ntr=7 nspk=1 it1=12 ix1=3 | sushw key=cdp,offset a=1,150 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500 gamma=0.5 ntable=1000 sdmo=1 flip=0 fmax=125 verbose=1
+suplane nt=97 ntr=9 | sushw key=cdp,offset a=1,200 b=1,0 | sudmofkcw cdpmin=1 cdpmax=9 dxcdp=30 noffmix=1 gamma=1
+[stderr] suspike nt=63 ntr=5 nspk=1 it1=18 ix1=2 | sushw key=cdp,offset a=1,120 b=1,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 gamma=1.5 flip=1 ntable=111 sdmo=0.8 verbose=1
+suplane nt=81 ntr=11 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofkcw cdpmin=3 cdpmax=9 dxcdp=25 noffmix=1 tdmo=-0.1 vdmo=1900 sdmo=0.6 fmax=60
+# One trace; zero offset; signed offset and negative bin spacing.
+suspike nt=33 ntr=1 nspk=1 it1=8 ix1=1 | sushw key=cdp,offset a=10,80 | sudmofkcw cdpmin=10 cdpmax=10 dxcdp=20 noffmix=1
+suplane nt=64 ntr=5 | sushw key=cdp a=1 b=1 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+suspike nt=73 ntr=7 nspk=1 it1=25 ix1=4 | sushw key=cdp,offset a=1,-100 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 flip=-1
+suplane nt=64 ntr=5 | sushw key=cdp,offset a=1,150 b=1,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=-25 noffmix=1 gamma=1
+# Header delay, early unmuted samples, non-default dt, deterministic noise.
+suspike nt=51 ntr=5 nspk=1 it1=1 ix1=2 dt=0.002 | sushw key=cdp,offset,delrt a=1,90,20 b=1,0,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=15 noffmix=1 gamma=0.8
+suplane nt=83 ntr=9 dt=0.002 | suaddnoise seed=177 sn=2 | sushw key=cdp,offset a=1,180 b=1,0 | sudmofkcw cdpmin=1 cdpmax=9 dxcdp=20 noffmix=1 gamma=0.65 fmax=120
+# Multiple gathers, a complete mix followed by a partial mix.
+[stderr] suspike nt=65 ntr=15 nspk=2 it1=12 ix1=2 it2=40 ix2=8 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=5,5 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=20 noffmix=2 verbose=1
+suplane nt=80 ntr=12 | sushw key=cdp,offset a=1,80 b=1,0 c=0,40 j=4,4 | sudmofkcw cdpmin=1 cdpmax=4 dxcdp=20 noffmix=1 flip=1 gamma=0.75
+suplane nt=65 ntr=6 | sushw key=cdp,offset a=-2,100 b=1,0 | sudmofkcw cdpmin=-2 cdpmax=3 dxcdp=25 noffmix=0
+suplane nt=65 ntr=6 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofkcw cdpmin=1 cdpmax=6 dxcdp=25 noffmix=-2
+# All-zero path, including nt=1, dt=0, and ranges with no output traces.
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp,offset a=1,100 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 verbose=1
+suspike nt=1 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset a=1,100 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=2 ntr=3 nspk=1 it1=1 ix1=2 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofkcw cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+sunull nt=19 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofkcw cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+[stderr] sunull nt=7 ntr=3 | sushw key=cdp,dt a=1,0 b=1,0 | sudmofkcw cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+[stderr] suplane nt=32 ntr=3 | sushw key=cdp a=1 b=1 | sudmofkcw cdpmin=10 cdpmax=12 dxcdp=25 noffmix=1 verbose=1
+# Zero/negative optional values on defined all-zero data paths.
+sunull nt=7 ntr=1 | sudmofkcw cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 fmax=0 sdmo=0 vdmo=0 ntable=1
+sunull nt=7 ntr=1 | sudmofkcw cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 fmax=-10 sdmo=-1 vdmo=-1500 gamma=1 ntable=0
+# Unknown arguments and duplicate argument handling.
+[stderr] sunull nt=7 ntr=1 | sudmofkcw cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 gamma=0.8 gamma=1 mystery=3 verbose=1
+# Errors: empty input, every required argument, invalid bins and velocity picks.
+[stderr] sudmofkcw
+[stderr] sunull nt=4 ntr=1 | sudmofkcw
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=2 cdpmax=1
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,1 vdmo=1500
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=1,0 vdmo=1500,2000
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,0 vdmo=1500,2000
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=2147483648 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 gamma=-0.5
+[stderr] sunull nt=4 ntr=1 | sudmofkcw cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 gamma=-3
+# Valid multiple-pick velocity regressions.
+suplane nt=97 ntr=7 | sushw key=cdp,offset a=1,150 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0,0.2,0.5 vdmo=1400,1600,1900
+# Two picks exercise linear interpolation and extrapolation before/after the picks.
+suspike nt=65 ntr=5 nspk=1 it1=20 ix1=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 gamma=1 tdmo=0.05,0.15 vdmo=1500,1600
+# Flat segments and slope changes exercise monotone cubic coefficient generation.
+suplane nt=97 ntr=7 | sushw key=cdp,offset a=1,150 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 flip=1 tdmo=0,0.1,0.2,0.4 vdmo=1500,1600,1600,1550
+# Constant and decreasing velocity curves with unequal pick spacing.
+suplane nt=73 ntr=5 | sushw key=cdp,offset a=1,120 b=1,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 gamma=1 tdmo=0,0.07,0.3 vdmo=1700,1700,1700
+suplane nt=101 ntr=7 | sushw key=cdp,offset a=1,180 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=20 noffmix=1 tdmo=-0.1,0.08,0.5 vdmo=2000,1900,1800
+# Unequal intervals and changing slope at both ends exercise endpoint limiting.
+suplane nt=95 ntr=7 | sushw key=cdp,offset a=1,160 b=1,0 | sudmofkcw cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0.02,0.12,0.14,0.3 vdmo=1500,1510,1480,1600
+# Multiple-pick interpolation during offset mixing, including a partial final mix.
+[stderr] suspike nt=81 ntr=15 nspk=2 it1=10 ix1=3 it2=35 ix2=9 | sushw key=cdp,offset a=1,100 b=1,0 c=0,60 j=5,5 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=20 noffmix=2 gamma=1.4 flip=1 ntable=151 sdmo=0.8 tdmo=0,0.09,0.3 vdmo=1500,1550,1750 verbose=1
+# Header delay and a non-default sampling interval with velocity interpolation.
+suspike nt=77 ntr=5 nspk=1 it1=13 ix1=3 dt=0.002 | sushw key=cdp,offset,delrt a=1,90,20 b=1,0,0 | sudmofkcw cdpmin=1 cdpmax=5 dxcdp=15 noffmix=1 gamma=0.8 tdmo=0,0.04,0.11,0.3 vdmo=1450,1500,1650,1800
+# One spatial trace with two picks and extrapolation at both time endpoints.
+suspike nt=47 ntr=1 nspk=1 it1=8 ix1=1 | sushw key=cdp,offset a=4,80 | sudmofkcw cdpmin=4 cdpmax=4 dxcdp=20 noffmix=1 tdmo=0.04,0.1 vdmo=1500,1550
+# A single nonzero time sample also accepts multiple velocity picks.
+suspike nt=1 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset a=1,100 | sudmofkcw cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,0.1,0.3 vdmo=1500,1550,1700

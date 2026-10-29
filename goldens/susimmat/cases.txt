@@ -1,0 +1,22 @@
+# Defaults and multiple input traces; panel is documented but never read by C.
+suplane nt=9 ntr=1 > ref.su && suplane nt=9 ntr=2 | susimmat sufile=ref.su
+suplane nt=9 ntr=2 > ref.su && suplane nt=9 ntr=2 | susimmat sufile=ref.su panel=1 mt=1
+# Correlation, normalized angle, linear regression, and vector angle.
+[stderr] suplane nt=9 ntr=1 > ref.su && suplane nt=9 ntr=1 | susimmat sufile=ref.su mt=4 method=1 taper=1 verbose=1
+suplane nt=9 ntr=1 > ref.su && suplane nt=9 ntr=1 | susimmat sufile=ref.su mt=5 method=2 eps=0.2
+suplane nt=9 ntr=1 > ref.su && suplane nt=9 ntr=1 | susimmat sufile=ref.su mt=5 method=3
+suplane nt=9 ntr=1 > ref.su && suplane nt=9 ntr=1 | susimmat sufile=ref.su mt=5 method=4 taper=1 eps=0
+sunull nt=1 ntr=1 > ref.su && sunull nt=1 ntr=1 | susimmat sufile=ref.su mt=1 method=3
+sunull nt=3 ntr=1 > ref.su && sunull nt=3 ntr=1 | susimmat sufile=ref.su mt=1 method=4 eps=-1 taper=2
+# Seeded nonzero samples exercise window arithmetic at both edges.
+sunull nt=17 ntr=1 | suaddnoise seed=42 > ref.su && sunull nt=17 ntr=2 | suaddnoise seed=7 | susimmat sufile=ref.su mt=5 method=1
+sunull nt=17 ntr=1 | suaddnoise seed=42 > ref.su && sunull nt=17 ntr=1 | suaddnoise seed=7 | susimmat sufile=ref.su mt=7 method=2
+sunull nt=17 ntr=1 | suaddnoise seed=42 > ref.su && sunull nt=17 ntr=1 | suaddnoise seed=7 | susimmat sufile=ref.su mt=7 method=3
+sunull nt=17 ntr=1 | suaddnoise seed=42 > ref.su && sunull nt=17 ntr=1 | suaddnoise seed=7 | susimmat sufile=ref.su mt=7 method=4 taper=1
+# Parameter and input errors.
+susimmat method=0
+susimmat method=5
+susimmat method=2 mt=1
+susimmat sufile=missing
+suplane nt=3 ntr=1 | susimmat mt=1
+suplane nt=3 ntr=1 | susimmat mt=1 sufile=missing

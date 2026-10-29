@@ -1,0 +1,12 @@
+# Defaults, varied coordinates, positive and negative coordinate scales, odd sizes.
+suspike nt=1 ntr=7 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,1 b=10,10,2,2,0 | sucdpbin xline=0,100 yline=0,20 dcdp=10
+suspike nt=7 ntr=5 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,-10 b=100,100,20,20,0 | sucdpbin xline=0,30,100 yline=0,20,0 dcdp=8 cdpmin=-3 distmax=2
+[stderr] suspike nt=1 ntr=1 | sucdpbin xline=0,20 yline=0,0 dcdp=5 verbose=1
+sucdpbin yline=0,1 dcdp=1
+sucdpbin xline=0,1 dcdp=1
+sucdpbin xline=0,1 yline=0 dcdp=1
+sucdpbin xline=0,1 yline=0,1
+sucdpbin xline=1,0 yline=0,1 dcdp=1
+sucdpbin xline=0,10 yline=0,0 dcdp=5
+suspike nt=3 ntr=1 | sushw key=sx,gx,scalco a=100,100,2 | sucdpbin xline=0,10 yline=0,0 dcdp=5 distmax=0 cdpmin=0
+[stderr] suspike nt=3 ntr=1 | sucdpbin xline=0,50,100 yline=0,10,0 dcdp=10 verbose=1

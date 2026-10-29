@@ -1,0 +1,23 @@
+# Strip variable PostScript metadata from every successful wrapper output.
+printf '%%!PS\n%%%%BoundingBox: 1 2 101 202\nshowpage\n' | psmanager | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%BoundingBox: -1.6 -2.4 100.6 201.5\n' | psmanager papersize=1 orient=1 tray=2 media=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%BoundingBox: (atend)\n%%%%Pages: 2\n%%%%Page: 1 1\none\n%%%%Page: 2 2\ntwo\n%%%%BoundingBox: 0 0 23 45\n' | psmanager papersize=2 orient=0 tray=1 media=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%Pages: 0\n' | psmanager papersize=3 manual=1 tray=99 media=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=6 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=8 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager media=9 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+psmanager tray=0
+psmanager orient=-1
+psmanager papersize=4
+psmanager media=10
+printf '%%%%BoundingBox: garbage\n' | psmanager
+printf '%%%%BoundingBox: 0 0 1 1\n%%%%Pages: 1\n' | psmanager manual=-1 orient=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t=Example | psmanager papersize=2 orient=1 manual=1 media=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=32 ntr=8 | sustrip | psmovie n1=32 n2=4 n3=2 verbose=0 | psmanager papersize=3 tray=2 media=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# Exercise partial integer scans, float fallback, and an unparseable page count.
+printf '%%%%BoundingBox: 1.25 2.5 13.75 25.5\n%%%%Pages: (atend)\n' | psmanager | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%BoundingBox: 1-2 13+25\n%%%%Pages: 2extra\n%%%%Page: 1 1\n' | psmanager | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '%%%%BoundingBox: 1 2 3\n' | psmanager

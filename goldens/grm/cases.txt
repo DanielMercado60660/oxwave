@@ -1,0 +1,58 @@
+# ASCII input: all three output sections, automatic XY, and all optional defaults.
+awk 'BEGIN {for(i=0;i<31;i++) printf "%g %g %g %g\n",i*10,100+i*.2,20+i*5,170-i*5}' | grm nt=31 dx=10 v0=500 abtime=0
+# Explicit defaults and supplied A-B time.
+awk 'BEGIN {for(i=0;i<31;i++) printf "%g %g %g %g\n",i*10,100+i*.2,20+i*5,170-i*5}' | grm nt=31 dx=10 v0=500 abtime=170 xy=99999.9 xymax=200 depthres=.5
+# Nonlinear arrivals exercise smoothness selection and varying arc radii.
+awk 'BEGIN {for(i=0;i<27;i++) printf "%g %g %g %g\n",i*7.5,50+sin(i*.2),18+i*3.7+sin(i*.7),117-i*3.7+cos(i*.7)}' | grm nt=27 dx=7.5 v0=400 abtime=117 xymax=61 depthres=.25
+# Explicit XY zero, fractional half-offset truncation, and sentinel boundary.
+awk 'BEGIN {for(i=0;i<9;i++) print i*10,100,20+i*5,60-i*5}' | grm nt=9 dx=10 v0=500 abtime=60 xy=0 xymax=40
+awk 'BEGIN {for(i=0;i<9;i++) print i*10,100,20+i*5,60-i*5}' | grm nt=9 dx=10 v0=500 abtime=60 xy=39.9 xymax=40 depthres=1.3
+awk 'BEGIN {for(i=0;i<9;i++) print i*10,100,20+i*5,60-i*5}' | grm nt=9 dx=10 v0=500 abtime=60 xy=40 xymax=40 depthres=2
+printf '0 0 10 20\n10 0 20 10\n' | grm nt=2 dx=10 v0=200 abtime=20 xy=99999.7 xymax=0
+# XYmax is converted to an integer number of half-offsets.
+awk 'BEGIN {for(i=0;i<7;i++) print i*10,100,20+i*5,50-i*5}' | grm nt=7 dx=10 v0=500 abtime=50 xymax=39.9 depthres=.7
+# Search interval with no interior points: equal minima retain largest j.
+printf '0 100 20 30\n10 100 25 25\n20 100 30 20\n' | grm nt=3 dx=10 v0=500 abtime=30 xymax=20
+# Odd/small sizes, no data, and empty stdin are accepted by the C program.
+printf '0 100 20 20\n' | grm nt=1 dx=10 v0=500 abtime=20 xymax=0
+printf '0 100 20 20\n' | grm nt=1 dx=10 v0=500 abtime=0
+grm nt=0 dx=10 v0=500 abtime=1 xymax=0
+grm nt=0 dx=10 v0=500 abtime=0
+# Empty stdin with positive nt: default search leaves no printable data rows.
+grm nt=1 dx=10 v0=500 abtime=20
+# Negative nt=-1 allocates zero-sized arrays; an explicit abtime avoids a read.
+grm nt=-1 dx=10 v0=500 abtime=20
+# Zero spacing with no data and xymax=0 exercises the NaN-to-int conversion.
+grm nt=0 dx=0 v0=500 abtime=20 xymax=0
+# Previously read scan values persist on EOF or a failed later conversion.
+printf '0 100 20 30\n10 101 25 25\n' | grm nt=5 dx=10 v0=500 abtime=30 xymax=0
+printf '0 100 20 30\n10 101 25 bad\n' | grm nt=3 dx=10 v0=500 abtime=30 xymax=0
+# Degenerate velocities, zero depths, negative depths/increments/spacings.
+printf '0 0 10 20\n10 1 20 10\n' | grm nt=2 dx=10 v0=0 abtime=20 xymax=0
+printf '0 0 10 20\n10 1 20 10\n' | grm nt=2 dx=10 v0=2000 abtime=20 xymax=0
+printf '0 0 10 20\n10 1 20 10\n' | grm nt=2 dx=10 v0=-200 abtime=20 xymax=0
+printf '0 0 10 20\n10 1 20 10\n' | grm nt=2 dx=10 v0=200 abtime=-20 xymax=0 depthres=-1
+printf '0 0 10 20\n10 1 20 10\n' | grm nt=2 dx=-10 v0=200 abtime=20 xymax=0 xy=-1
+# Zero increment with zero depths avoids an unbounded arc search.
+printf '0 0 10 20\n10 0 20 10\n' | grm nt=2 dx=10 v0=0 abtime=20 xymax=0 depthres=0
+# Negative fractional XY truncates to zero; the C source adds no validation.
+printf '0 0 10 20\n10 0 20 10\n' | grm nt=2 dx=10 v0=200 abtime=20 xy=-1 xymax=0
+# Full stderr comparison: checkpars verbose message and case-sensitive names.
+[stderr] printf '0 0 10 20\n10 0 20 10\n' | grm nt=2 dx=10 v0=200 abtime=20 xymax=0 verbose=1
+[stderr] printf '0 0 10 20\n10 0 20 10\n' | grm nt=2 dx=10 v0=200 abtime=20 xymax=0 XY=0 XYmax=0 unknown=1
+# Last duplicate wins; par file entries are overridden on the command line.
+printf '0 0 10 20\n10 0 20 10\n' | grm nt=99 nt=2 dx=5 dx=10 v0=200 abtime=20 xymax=0
+printf 'nt=99 dx=10 v0=200 abtime=20 xymax=0\n' > params; printf '0 0 10 20\n10 0 20 10\n' | grm par=params nt=2
+# Missing required parameters, empty parameters, and invalid numeric input.
+[stderr] grm
+[stderr] grm nt=2
+[stderr] grm nt=2 dx=10
+[stderr] grm nt=2 dx=10 v0=500
+[stderr] grm nt= dx=10 v0=500 abtime=20
+[stderr] grm nt=1 dx= v0=500 abtime=20
+[stderr] grm nt=1 dx=10 v0= abtime=20
+[stderr] grm nt=1 dx=10 v0=500 abtime=
+[stderr] grm nt=2147483648 dx=10 v0=500 abtime=20
+[stderr] grm nt=1 dx=1e-310 v0=500 abtime=20
+# Alphabetic nt parses as zero, with no input reads or data rows.
+grm nt=abc dx=10 v0=500 abtime=20 xymax=0

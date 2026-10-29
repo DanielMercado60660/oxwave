@@ -1,0 +1,24 @@
+# Point binning, defaults, custom keys, offset, odd sample sizes.
+suspike nt=1 ntr=1 | subincsv bintype=20 point_crz=1 point_cru=2 point_csz=3 point_csu=4
+suspike nt=7 ntr=3 | sushw key=tracl,tracr,sx,gx,scalco a=3,5,20,40,-2 | subincsv bintype=20 point_crz=-3 point_cru=2 point_csz=5 point_csu=-1 rpkey=tracl spkey=tracr offset=1 verbose=1
+# All grid modes and coordinate scaling.
+suspike nt=7 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=20,30,40,50,-2 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10
+suspike nt=5 ntr=2 | sushw key=cdp,scalco a=2,2 | subincsv bintype=-30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 offset=1
+suspike nt=5 ntr=2 | sushw key=cdp a=3 | subincsv bintype=-31 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10
+suspike nt=5 ntr=2 | sushw key=igi,igc a=2,3 | subincsv bintype=-32 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10
+[stderr] suspike nt=1 ntr=1 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=20 grid_yb=0 grid_xc=0 grid_yc=20 grid_wb=10 grid_wc=10 check=1
+# K-file output and input overrides.
+suspike nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=2 point_csu=3 wfile=grid.csv > /dev/null && cat grid.csv
+suspike nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=2 point_csu=3 wfile=grid.csv > /dev/null && suspike nt=1 ntr=1 | subincsv rfile=grid.csv point_cru=2
+# Errors and empty input.
+subincsv
+subincsv bintype=42
+subincsv bintype=20
+subincsv bintype=20 rpkey=bad
+subincsv bintype=20 spkey=bad
+subincsv bintype=30
+subincsv rfile=missing
+subincsv rfile=same wfile=same
+subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1
+subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=0 grid_wc=10
+suspike nt=1 ntr=1 | sushw key=cdp a=0 | subincsv bintype=-31 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10

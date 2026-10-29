@@ -1,0 +1,23 @@
+# Read all default output files, including the documented a1223 filename discrepancy.
+[f32] elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=2 nz=2 < model; s=$?; cat a1111.bin a3333.bin a1133.bin a1313.bin a1113.bin a3313.bin a1212.bin a2323.bin a1223.bin rho.bin; exit $s
+# Every custom file parameter, and repeated grid increments over an odd grid.
+[f32] elamodel fill=0.5,0.5,3,1.5,2 > model 2>/dev/null; elatriuni nx=3 nz=5 fx=0.2 fz=0.1 dx=0.2 dz=0.2 a1111file=f1 a3333file=f2 a1133file=f3 a1313file=f4 a1113file=f5 a3313file=f6 a1212file=f7 a2323file=f8 a1223file=f9 rhofile=f10 < model; s=$?; cat f1 f2 f3 f4 f5 f6 f7 f8 f9 f10; exit $s
+[f32] elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=1 nz=1 fx=0.5 fz=0.5 dx=0 dz=0 verbose=1 < model; s=$?; cat rho.bin; exit $s
+[f32] elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=3 nz=3 fx=1 fz=1 dx=-0.5 dz=-0.5 < model; s=$?; cat a1111.bin; exit $s
+elatriuni nz=1
+elatriuni nx=1
+elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=abc nz=1 < model
+elatriuni nx=1 nz=1 a1111file=/no/such/directory/file
+elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=2 nz=1 fx=0.5 dx=1 < model
+elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=1 nz=2 fz=0.5 dz=1 < model
+elatriuni nx=1 nz=1 < /dev/null
+[f32] elamodel fill=0.5,0.5,10,11,12,13,14,15,16,17,18,19 > model 2>/dev/null; elatriuni nx=5 nz=3 dx=0.25 dz=0.5 < model; s=$?; cat a1111.bin rho.bin; exit $s
+[stderr] elamodel fill=0.5,0.5,2,1,1 > model 2>/dev/null; elatriuni nx=1 nz=1 verbose=1 < model
+# Allocation errors for each negative dimension and for both together.
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m 2>/dev/null; elatriuni < m nx=-1 nz=5
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m 2>/dev/null; elatriuni < m nx=5 nz=-1
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m 2>/dev/null; elatriuni < m nx=-1 nz=-1
+# The converter returns 1 even after writing its files; cat supplies a successful result for comparison.
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nz=2 < m; cat a1111.bin rho.bin
+[f32] elamodel fill=0.5,0.5,3,1.5,2 > m 2>/dev/null; elatriuni nx=3 nz=5 fx=0.2 fz=0.1 dx=0.2 dz=0.2 a3333file=out < m; cat out
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=1 nz=1 fx=0.5 fz=0.5 verbose=1 < m; cat rho.bin

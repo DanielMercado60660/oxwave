@@ -1,0 +1,17 @@
+# Defaults from depth header and single trace
+suspike nt=31 ntr=1 | sushw key=d1 a=3 | suztot
+suspike nt=31 ntr=2 | suztot dz=3 dt=0.002 ft=0.002 fz=1 nt=21 z=0,30,90 v=1400,1700,2000 verbose=1
+[stderr] suspike nt=9 ntr=1 | suztot dz=3 dt=0.004 nt=5 verbose=1
+suspike nt=1 ntr=1 | suztot dz=3 dt=0.004 nt=1
+suspike nt=17 ntr=1 | suztot dz=2 dt=0.001 nt=19 ft=-0.002
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=17f",*([1500.0]*17)))' && suspike nt=17 ntr=1 | suztot dz=3 vfile=vel dt=0.004 nt=17
+suspike nt=17 ntr=1 | suztot dz=3 z=0,1 v=1500
+suspike nt=17 ntr=1 | suztot dz=3 z=1,0 v=1500,1600
+suspike nt=17 ntr=1 | suztot dz=3 vfile=missing
+touch vel && suspike nt=17 ntr=1 | suztot dz=3 vfile=vel
+suspike nt=17 ntr=1 | suztot dz=3 dt=0 nt=3 ft=0.01
+suspike nt=17 ntr=1 | suztot dz=3 nt=65536
+suztot
+# Regression: negative allocation size and microsecond interval beyond 16 bits.
+suspike nt=17 ntr=1 | suztot dz=3 nt=-1
+suspike nt=17 ntr=1 | suztot dz=3 dt=0.1 nt=3

@@ -1,0 +1,13 @@
+# Defaults, header-derived intervals, and verbose warnings.
+[stderr] suplane nt=32 ntr=4 | sukfrac
+[stderr] suplane nt=31 ntr=5 | sushw key=trid,d1,d2 a=130,0.5,2 | sukfrac verbose=1
+suplane nt=33 ntr=7 | sukfrac d1=0.5 d2=2 power=2 phasefac=-1
+suplane nt=31 ntr=5 | sukfrac d1=2 d2=3 power=-0.5 sign=-1 angle=-45 phasefac=0.3 verbose=0
+suplane nt=17 ntr=3 | sukfrac d1=1 d2=1 power=1 angle=90
+suplane nt=19 ntr=5 | sukfrac d1=1 d2=1 power=0 sign=0 phasefac=0.5 angle=0
+suplane nt=9 ntr=3 | sukfrac d1=0 d2=1 power=0
+suplane nt=1 ntr=1 | sukfrac d1=1 d2=1
+suplane nt=7 ntr=1 | sukfrac d1=-1 d2=1 power=0.5
+[stderr] sukfrac
+[stderr] suplane nt=8 ntr=2 | sukfrac d1=1 d2=1 power=1e999
+[stderr] sunull nt=65534 ntr=1 | sukfrac d1=1 d2=1

@@ -1,0 +1,21 @@
+# Defaults, one trace and non-power-of-two sample counts.
+suplane nt=101 ntr=1 | sutaupnmo
+suspike nt=1 ntr=1 | sutaupnmo lmute=0
+suspike nt=35 ntr=1 | sutaupnmo lmute=0
+# Nonzero ray parameters, mute options and velocity interpolation.
+suplane nt=127 ntr=5 | sushw key=f2,d2,tracr a=0.0001,0.00005,1 b=0,0,1 | sutaupnmo vnmo=1600 smute=2 lmute=7 sscale=0
+suplane nt=97 ntr=4 | sushw key=f2,d2,tracr,delrt a=0.0001,0.00005,1,100 b=0,0,1,0 | sutaupnmo tnmo=0,0.2,0.7 vnmo=1400,1800,2300 smute=1.2 lmute=0 sscale=1
+# Unsorted CDP functions, interpolation and extrapolation across traces.
+suplane nt=101 ntr=5 | sushw key=cdp,f2 a=50,0.0001 b=25,0 | sutaupnmo cdp=150,100 vnmo=2000,2400 vnmo=1400,1800 tnmo=0,1 tnmo=0,1 lmute=4
+[stderr] suplane nt=64 ntr=1 | sutaupnmo verbose=1 lmute=0
+# Parameter validation and empty input.
+sutaupnmo </dev/null
+suplane nt=32 ntr=1 | sutaupnmo cdp=1,2 vnmo=1500 tnmo=0
+suplane nt=32 ntr=1 | sutaupnmo cdp=1 vnmo=1500
+suplane nt=32 ntr=1 | sutaupnmo vnmo=1500 vnmo=1600
+suplane nt=32 ntr=1 | sutaupnmo tnmo=0 tnmo=1
+suplane nt=32 ntr=1 | sutaupnmo vnmo=1500,1600 tnmo=0
+suplane nt=32 ntr=1 | sutaupnmo vnmo=1500,1600 tnmo=1,0
+suplane nt=32 ntr=1 | sutaupnmo smute=0
+suplane nt=32 ntr=1 | sutaupnmo smute=-1
+suplane nt=64 ntr=1 | sutaupnmo lmute=-2 sscale=-1

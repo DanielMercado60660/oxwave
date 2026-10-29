@@ -1,0 +1,11 @@
+# Strip time and creator metadata so PostScript output is deterministic.
+pslabel t=Example | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t=Example f=Helvetica size=18 tcolor=blue bcolor=yellow | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t='(a) ' f=Times-Bold t=h f=Symbol t='=0.04' f=Helvetica nsub=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t='' f=Courier size=0 nsub=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t=x f=Times-Italic size=-7 nsub=-2 tcolor='#255' bcolor='#abc' | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pslabel t='a(b)\c' f=Unknown size=1.25 tcolor=unknown bcolor=unknown | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pslabel t=one t=two f=Courier verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] pslabel size=3
+[stderr] pslabel t=x size=1e999
+[stderr] pslabel t=x f=Helvetica nonsense=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

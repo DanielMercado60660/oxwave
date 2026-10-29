@@ -1,0 +1,21 @@
+# Defaults, explicit sampling, interpolation and bias
+suplane nt=75 ntr=7 dt=0.004 | sudipfilt dx=10
+suplane nt=65 ntr=9 dt=0.004 | sudipfilt d2=5 slopes=-0.003,0,0.003 amps=0,1,0 bias=-0.0004
+suspike nt=31 ntr=5 | sudipfilt dt=0.002 dx=2 slopes=-1,0,1 amps=0.2,1,0.5
+suplane nt=32 ntr=4 dt=0.004 | sudipfilt dx=10 amps=0
+[stderr] suplane nt=32 ntr=4 dt=0.004 | sudipfilt dx=10 verbose=1
+[stderr] suplane nt=32 ntr=4 dt=0.004 | sudipfilt dx=10 tmpdir=. verbose=1
+suplane nt=1 ntr=1 dt=0.004 | sudipfilt dx=1
+suspike nt=17 ntr=1 | sudipfilt dt=1 dx=-1 slopes=-1,1 amps=1,0 bias=0.2
+sudipfilt dx=1
+suspike nt=16 ntr=2 | sudipfilt dx=1 dt=0
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=0
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=1 slopes=0,1 amps=1
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=1 slopes=1,0 amps=1,1
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=1 tmpdir=/nonexistent/oxwave
+# Header spacing, parameter precedence, and environment-supplied temporary directory
+suplane nt=41 ntr=3 dt=0.004 | sushw key=d2 a=12 | sudipfilt
+suplane nt=45 ntr=6 dt=0.004 | sudipfilt dx=2 d2=3 slopes=-1,0,1 amps=1,0,1
+[stderr] suplane nt=25 ntr=3 dt=0.004 | CWP_TMPDIR=. sudipfilt dx=2 verbose=1 amps=1
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt
+suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=1 slopes=0,0 amps=1,1

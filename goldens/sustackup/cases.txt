@@ -1,0 +1,28 @@
+# Defaults and odd trace/sample counts, including a single sample and trace.
+suplane nt=1 ntr=1 | sustackup
+suplane nt=17 ntr=7 | sushw key=cdp,offset a=3,-30 b=-1,10 j=2,1 | sustackup
+sunull nt=7 ntr=3 | sustackup keyloc=cdp
+# Range limits, reversed intervals, subtracted keys, and both keep modes.
+suplane nt=17 ntr=7 | sushw key=cdp,offset a=1,-30 b=1,10 | sustackup keyabs=offset minabs=10 maxabs=30 keep=1
+suplane nt=17 ntr=7 | sushw key=cdp,offset a=1,-30 b=1,10 | sustackup keyabs=offset minabs=20 maxabs=10 keep=0
+suplane nt=17 ntr=7 | sushw key=cdp,offset a=1,-30 b=1,10 | sustackup keysign=offset keysign2=cdp minsign=-20 maxsign=20 keep=0
+suplane nt=17 ntr=7 | sushw key=cdp,offset a=1,-30 b=1,10 | sustackup keysign=offset minsign=20 maxsign=-20 keep=1
+suplane nt=17 ntr=7 | sustackup keyabs=offset keyabs2=cdp keysign=offset keysign2=cdp minabs=1 maxabs=2 minsign=-1 maxsign=1
+[stderr] suplane nt=5 ntr=3 | sustackup verbose=1
+# Parameter errors and empty input.
+sustackup keyloc=bad
+sustackup keyabs=bad
+sustackup keyabs=offset keyabs2=bad
+sustackup keysign=bad
+sustackup keysign=offset keysign2=bad
+sustackup keyabs2=offset
+sustackup minabs=0
+sustackup maxabs=0
+sustackup keysign2=offset
+sustackup minsign=0
+sustackup maxsign=0
+sustackup keep=-1
+sustackup keep=2
+sustackup maxstack=0
+sustackup
+suplane nt=5 ntr=3 | sushw key=cdp a=1 b=1 | sustackup maxstack=1

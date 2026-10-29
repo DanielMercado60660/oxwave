@@ -1,0 +1,35 @@
+# Default extrapolation, exact hits, endpoints, interpolation, and odd trace sizes.
+sunull nt=3 ntr=7 | sushw key=fldr a=-1 b=1 | suahw a=-10,10,30 b=0,2,4
+# Each mode, with c filtering and nondefault keys.
+sunull nt=3 ntr=7 | sushw key=tracf,fldr,ep a=-1,1,99 b=1,1,0 | suahw key1=ep key2=tracf key3=fldr a=10,30 b=0,4 c=2,4 mode=interpolate
+sunull nt=3 ntr=7 | sushw key=tracf,fldr,ep a=-1,1,99 b=1,1,0 | suahw key1=ep key2=tracf key3=fldr a=10,30 b=0,4 c=2,4 mode=extrapolate
+sunull nt=3 ntr=7 | sushw key=tracf,fldr,ep a=-1,1,99 b=1,1,0 | suahw key1=ep key2=tracf key3=fldr a=10,30 b=0,4 c=2,4 mode=zero
+sunull nt=3 ntr=7 | sushw key=tracf,fldr,ep a=-1,1,99 b=1,1,0 | suahw key1=ep key2=tracf key3=fldr a=10,30 b=0,4 c=2,4 mode=preserve
+sunull nt=3 ntr=7 | sushw key=tracf,fldr,ep a=-1,1,99 b=1,1,0 | suahw key1=ep key2=tracf key3=fldr a=10,30 b=0,4 c=2,4 mode=transfer
+[stderr] sunull nt=1 ntr=1 | suahw a=2 b=0 key1=trid verbose=1
+sunull nt=1 ntr=1 | suahw a=2.25 b=0 key1=d1
+suahw mode=bad
+suahw
+suahw a=1,2 b=1
+suahw a=1,2 b=1,1
+suahw a=1,2 b=2,1
+suahw a=1 b=1 key1=bad
+suahw a=1 b=1
+sunull nt=1 ntr=1 | suahw key1=trid a=65535 b=0
+sunull nt=1 ntr=1 | suahw key1=dt a=-1 b=0
+# One-entry tables must handle exact hits and both sides without interpolation.
+sunull nt=1 ntr=3 | sushw key=d1 a=-1 b=1 | suahw key2=d1 a=12 b=0
+sunull nt=1 ntr=3 | sushw key=d1 a=-1 b=1 | suahw key2=d1 a=12 b=0 mode=interpolate
+sunull nt=1 ntr=3 | sushw key=d1,ep a=-1,99 b=1,0 | suahw key2=d1 a=12 b=0 mode=zero
+sunull nt=1 ntr=3 | sushw key=d1,ep a=-1,99 b=1,0 | suahw key2=d1 a=12 b=0 mode=preserve
+sunull nt=1 ntr=3 | sushw key=d1,ep a=-1,99 b=1,0 | suahw key2=d1 a=12 b=0 mode=transfer
+# Infinities have defined endpoint behavior; NaN is defined in these other modes.
+sunull nt=1 ntr=1 | sushw key=d1 a=3.5e38 | suahw key2=d1 a=12 b=0
+sunull nt=1 ntr=1 | sushw key=d1 a=-3.5e38 | suahw key2=d1 a=12 b=0
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | suahw key2=d1 a=12 b=0 mode=interpolate
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | suahw key2=d1 a=12 b=0 mode=zero
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | suahw key2=d1 a=12 b=0 mode=preserve
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | suahw key1=d2 key2=d1 a=12 b=0 mode=transfer
+# NaN with two entries stays within the C allocation and produces a NaN result.
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | suahw key1=d2 key2=d1 a=12,24 b=0,1
+# NaN with a one-entry table in default mode is undefined in C: checked separately.

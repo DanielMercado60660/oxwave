@@ -1,0 +1,14 @@
+# Individual phase parameters, odd sizes, and multiple traces.
+suplane nt=127 ntr=3 dt=0.004 | suphase a=45
+suplane nt=101 ntr=1 dt=0.002 | suphase b=-90
+suplane nt=63 ntr=2 dt=0.004 | suphase c=-0.12
+suspike nt=1 ntr=1 | suphase a=180 b=0 c=0
+suspike nt=17 ntr=1 | suphase dt=0.001 a=-30 b=0 c=0.5
+# Zero sampling interval warning and explicit override.
+[stderr] sunull nt=33 ntr=1 | sushw key=dt a=0 | suphase
+[stderr] sunull nt=33 ntr=1 | suphase dt=0
+[stderr] suplane nt=32 ntr=1 | suphase verbose=1 unknown=2
+# Empty input, numeric parsing error, and FFT length limit.
+suphase
+suplane nt=16 ntr=1 | suphase a=1e999
+sunull nt=65535 ntr=1 | suphase

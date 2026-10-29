@@ -1,0 +1,123 @@
+{
+  "scope": "su/main/headers (re-scout batch 5)",
+  "programs": [
+    {
+      "name": "sutoolcsv",
+      "path": "su/main/headers/sutoolcsv.c",
+      "purpose": "Convert, repair, and check geometry records in CSV and fixed-width text files.",
+      "selfdoc_first_line": " SUTOOLCSV - Tools for Comma Separated Values and fixed text files.       ",
+      "params": [
+        {"name": "rfile", "type": "string", "default": "", "required": true, "description": "Input text file."},
+        {"name": "wfile", "type": "string", "default": "", "required": true, "description": "Output text file; must differ from rfile."},
+        {"name": "rtype", "type": "string", "default": "computed: csv if rfile ends in csv, otherwise fixed; csv for names shorter than three characters", "required": false, "description": "Input record format: csv or fixed."},
+        {"name": "wtype", "type": "string", "default": "computed: csv if wfile ends in csv, otherwise fixed; csv for names shorter than three characters", "required": false, "description": "Output format: csv, fixed, or csvchop."},
+        {"name": "match", "type": "string array", "default": "computed: from C_SU_MATCH record in rfile", "required": false, "description": "Matching keys; must be supplied on the command line or in rfile."},
+        {"name": "setid", "type": "string", "default": "computed: from C_SU_SETID record in rfile", "required": false, "description": "Accepted record identifier, ANY, or NONE; must be supplied on the command line or in rfile."},
+        {"name": "names", "type": "string array", "default": "computed: from C_SU_NAMES record in rfile", "required": false, "description": "Field names and optional fixed-column ranges; must be supplied on the command line or in rfile."},
+        {"name": "forms", "type": "string array", "default": "computed: from C_SU_FORMS record in rfile", "required": false, "description": "Output format specifiers; must be supplied on the command line or in rfile."},
+        {"name": "process", "type": "string array", "default": "", "required": false, "description": "Ordered fixed-column repair and arithmetic operations."},
+        {"name": "width", "type": "int", "default": "0", "required": false, "description": "Fixed output width; 0 becomes the greater of 80 and the largest named trailing column. Negative values suppress C_SU records."},
+        {"name": "rdelim", "type": "string", "default": ",", "required": false, "description": "Single input CSV delimiter; cannot be specified for fixed input."},
+        {"name": "nicerecord", "type": "int", "default": "1", "required": false, "description": "Controls skipping initial bad input records; must be at least 1."},
+        {"name": "maxrecords", "type": "int", "default": "0", "required": false, "description": "Record storage limit; 0 counts records first, -1 and -2 avoid storing all records, and -2 requires csvchop."},
+        {"name": "unrepeat", "type": "int", "default": "-2147483645", "required": false, "description": "Enables generation of an incrementing identifier for repeated records when above the sentinel."},
+        {"name": "scalco", "type": "int", "default": "10", "required": false, "description": "Coordinate scaling used for size checks."},
+        {"name": "scalel", "type": "int", "default": "10", "required": false, "description": "Elevation scaling used for size checks."},
+        {"name": "outid", "type": "string", "default": "computed: from setid", "required": false, "description": "Identifier for output data records."},
+        {"name": "tolr", "type": "float", "default": "0.01", "required": false, "description": "Undocumented matching tolerance; converted to double after float parsing."}
+      ],
+      "stdin": "none",
+      "stdout": "none",
+      "lib_calls": ["initargs", "requestdoc", "err", "warn", "getparint", "getparfloat", "getparstring", "getparstringarray", "countparval", "ealloc1", "hdtype"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Values are parsed and processed as doubles, while tolr is first rounded to float; matching quantizes doubles to long long integers and uses tolerance-sensitive comparisons. Formatting and qsort behavior can affect results. The local tdel pointer is uninitialized before getparstring, so an omitted rdelim can invoke undefined behavior; some string allocations also omit space for a terminating null byte.",
+      "c_lines": 3358,
+      "difficulty": "hard",
+      "difficulty_reason": "The program exceeds 3,000 lines and combines text parsing, format expansion, record sorting, repairs, and geometry checks.",
+      "test_cases": [
+        {
+          "description": "Convert generated header values from fixed text to CSV; run in a terminal because sutoolcsv requires both standard streams to be terminals.",
+          "command": "sunull nt=16 ntr=4 | sushw key=cdp a=1 b=1 | sugethw key=cdp output=geom > in.txt && sutoolcsv rfile=in.txt wfile=out.csv rtype=fixed wtype=csv setid=NONE match=cdp names=1_cdp_20 forms=%.0f"
+        },
+        {
+          "description": "Repair fixed fields and emit raw CSV fields without retaining all records; run in a terminal.",
+          "command": "sunull nt=16 ntr=4 | sushw key=cdp a=10 b=1 | sugethw key=cdp output=geom > in.txt && sutoolcsv rfile=in.txt wfile=out.csv rtype=fixed wtype=csvchop setid=NONE match=cdp names=1_cdp_20 forms=%.0f process=1_add_1_20 maxrecords=-2"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["sugeomcsv"]
+    },
+    {
+      "name": "suutm",
+      "path": "su/main/headers/suutm.c",
+      "purpose": "Project geographic coordinates in SU trace headers into UTM or transverse Mercator coordinates.",
+      "selfdoc_first_line": " SUUTM - UTM projection of longitude and latitude in SU trace headers  ",
+      "params": [
+        {"name": "counit", "type": "int", "default": "0", "required": false, "description": "Nonzero value overrides each trace's coordinate units; zero uses its header."},
+        {"name": "idx", "type": "int", "default": "23", "required": false, "description": "Reference ellipsoid index."},
+        {"name": "a", "type": "double", "default": "computed: semimajor axis of the ellipsoid selected by idx", "required": false, "description": "Override ellipsoid semimajor axis."},
+        {"name": "f", "type": "double", "default": "computed: flattening of the ellipsoid selected by idx", "required": false, "description": "Override ellipsoid flattening."},
+        {"name": "zkey", "type": "string", "default": "", "required": false, "description": "Header key for signed UTM zone; written only when lon0 is not specified."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print selected ellipsoid parameters."},
+        {"name": "lon0", "type": "double", "default": "computed: central meridian of receiver's UTM zone", "required": false, "description": "Override central meridian in degrees."},
+        {"name": "xoff", "type": "double", "default": "500000.0", "required": false, "description": "False easting."},
+        {"name": "ynoff", "type": "double", "default": "0.0", "required": false, "description": "Northern false northing."},
+        {"name": "ysoff", "type": "double", "default": "10000000.0", "required": false, "description": "Southern false northing."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparstring", "getpardouble", "err", "hdtype", "getindex", "checkpars", "warn", "gettr", "puthval", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The projection uses double-precision trigonometric functions and polynomial arithmetic before rounding coordinates to integer headers, so library math and rounding near integer boundaries can change results. The source northing offset is selected using the already-offset receiver northing. For unsupported counit values decodeCoordinates leaves y output uninitialized, although those coordinates are not projected.",
+      "c_lines": 602,
+      "difficulty": "medium",
+      "difficulty_reason": "The coordinate projection combines several encoding modes, ellipsoid options, zone rules, and double-precision geographic calculations.",
+      "test_cases": [
+        {
+          "description": "Project northern decimal-degree coordinates and store the zone.",
+          "command": "sunull nt=16 ntr=4 | sushw key=sx,sy,gx,gy,scalco,counit a=-105,40,-104,40,1,3 | suutm zkey=cdp verbose=1"
+        },
+        {
+          "description": "Project southern arc-second coordinates with a custom meridian and ellipsoid.",
+          "command": "sunull nt=16 ntr=4 | sushw key=sx,sy,gx,gy,scalco,counit a=108000,-108000,108000,-108000,1,2 | suutm lon0=33 a=6371000 f=0 xoff=0 ysoff=10000000 ynoff=0"
+        },
+        {
+          "description": "Pass length coordinates through without projection.",
+          "command": "sunull nt=16 ntr=4 | sushw key=sx,sy,gx,gy a=100,200,300,400 | suutm counit=1 idx=0"
+        }
+      ],
+      "license_note": "The projection function states that it was adapted from a Perl routine in Geo-Coordinates-UTM-0.06 by G. Crookham.",
+      "related_programs": []
+    },
+    {
+      "name": "suxedit",
+      "path": "su/main/headers/suxedit.c",
+      "purpose": "Interactively inspect SU trace files, plot traces, and edit headers in writable files.",
+      "selfdoc_first_line": " SUXEDIT - examine segy diskfiles and edit headers\t\t\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": ["initargs", "requestdoc", "err", "efopen", "warn", "fgettra", "ealloc1int", "printheader", "efflush", "eatoi", "CWP_Exit", "tabplot", "hdtype", "atoval", "puthdval", "efseeko", "efwrite", "temporary_filename", "fputtr", "efclose", "eremove"],
+      "calls_programs": ["suxwigb", "suspecfx"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Rank sorting compares samples by subtracting floats; equal values and NaNs compare as equal, and qsort ordering is platform-dependent. The header-edit parser performs pointer arithmetic on a null strchr result if '=' is missing, which is undefined behavior.",
+      "c_lines": 493,
+      "difficulty": "medium",
+      "difficulty_reason": "Interactive terminal control, random-access trace editing, sorting, and external plotting require substantial state and I/O handling.",
+      "test_cases": [
+        {
+          "description": "Inspect redirected traces interactively; enter r, %, p 1 16, then q at the terminal.",
+          "command": "sunull nt=32 ntr=4 > in.su && suxedit < in.su"
+        },
+        {
+          "description": "Open a writable file interactively; enter ! cdp=12, then q at the terminal.",
+          "command": "sunull nt=32 ntr=4 > in.su && suxedit in.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

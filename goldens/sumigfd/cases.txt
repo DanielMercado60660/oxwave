@@ -1,0 +1,64 @@
+# All seven dip approximations; nonzero input, odd trace/sample counts and varying velocity.
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=45
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=65
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=79
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=80
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=87
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=89
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=90
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=0
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=-7
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=66
+# Defaults, explicit defaults, header preservation, padding and raw float output.
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v dip=65 dt=0.004 dx=12.5 verbose=0 tmpdir=
+makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v | sugethw key=ns,dt,d1,d2,delrt,offset
+[f32] makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v | sustrip outpar=/dev/null
+makevel nx=5 nz=8 v000=2200 > v; suplane nt=32 ntr=5 | sumigfd nz=8 dz=10 dx=20 dt=0.002 vfile=v
+makevel nx=5 nz=7 v000=1700 > v; sunull nt=17 ntr=5 | suaddnoise seed=23 | sushw key=d2,delrt,dt a=8,12,3000 | sumigfd nz=7 dz=3 vfile=v dip=90
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=13 ntr=3 | sumigfd nz=4 dz=2 vfile=v verbose=1
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=13 ntr=3 | sushw key=dt a=0 | sumigfd nz=4 dz=2 vfile=v
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=13 ntr=3 | sushw key=dt a=0 | sumigfd nz=4 dz=2 dt=0.004 dx=1 vfile=v
+# Smallest dimensions and degenerate numerical parameters.
+makevel nx=3 nz=5 v000=1500 > v; suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sumigfd nz=5 dz=2 dx=10 vfile=v
+makevel nx=1 nz=4 v000=1500 > v; suspike nt=9 ntr=1 nspk=1 ix1=1 it1=2 | sumigfd nz=4 dz=5 dx=10 vfile=v
+makevel nx=2 nz=4 v000=1500 > v; suspike nt=9 ntr=2 nspk=1 ix1=1 it1=2 | sumigfd nz=4 dz=5 dx=10 vfile=v
+makevel nx=3 nz=1 v000=1500 > v; suspike nt=7 ntr=3 | sumigfd nz=1 dz=2 dx=10 vfile=v
+sunull nt=3 ntr=3 | sumigfd nz=0 dz=1 dx=10 vfile=/dev/null
+# Negative nz is undefined in C (SIGSEGV here); require failure with no output.
+# The Rust port reports err! rather than reproducing the memory fault.
+[exact] { sunull nt=3 ntr=3 | sumigfd nz=-1 dz=1 dx=10 vfile=/dev/null > migrated; rc=$?; test "$rc" -ne 0 && test ! -s migrated; } 2>/dev/null
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=0 dx=10 dt=0.004 vfile=v
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=-2 dx=10 dt=0.004 vfile=v
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=-10 dt=0.004 vfile=v
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=0 dt=0.004 vfile=v
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=10 dt=0 vfile=v
+makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=10 dt=-0.004 vfile=v
+# Temporary paths and environment fallback; verify named files are removed.
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=10 vfile=v tmpdir=. verbose=1
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | CWP_TMPDIR=. sumigfd nz=4 dz=2 dx=10 vfile=v verbose=1
+[stderr] makevel nx=3 nz=4 v000=1500 > v; suspike nt=9 ntr=3 | CWP_TMPDIR=/missing sumigfd nz=4 dz=2 dx=10 vfile=v tmpdir= verbose=1
+[exact] mkdir scratch; makevel nx=3 nz=4 v000=1500 > v; sunull nt=9 ntr=3 | sumigfd nz=4 dz=2 dx=10 vfile=v tmpdir=scratch > migrated; ls -A scratch
+# Errors and argument reporting.
+[stderr] sumigfd
+[stderr] sunull nt=3 ntr=3 | sumigfd
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2 dz=1
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2 dz=1 vfile=missing
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2 dz=1 vfile=
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2 dz=1 vfile=/dev/null tmpdir=/does-not-exist
+[stderr] sunull nt=3 ntr=3 | CWP_TMPDIR=/does-not-exist sumigfd nz=2 dz=1 vfile=/dev/null
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2147483648 dz=1 vfile=/dev/null
+[stderr] sunull nt=3 ntr=3 | sumigfd nz=2 dz=1e-310 vfile=/dev/null
+[stderr] sunull nt=3 ntr=3 | sumigfd nz= dz=1 vfile=/dev/null
+[stderr] makevel nx=7 nz=11 v000=1500 dvdx=13 dvdz=7 | transp n1=11 n2=7 > v; suspike nt=35 ntr=7 | sushw key=d2 a=12.5 | sumigfd nz=11 dz=4 vfile=v unrecognized=1
+# Partial velocity input is zero filled after the short read.
+sunull nt=5 ntr=3 | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null
+# Largest representable output trace, including its last sample.
+makevel nx=3 nz=65535 v000=1500 > v; sunull nt=1 ntr=3 | sumigfd nz=65535 dz=1 dx=10 vfile=v
+# Signal cleanup while reading a pipe: wait for handlers/files to be ready,
+# signal, then let the finite producer close the pipe so deferred cleanup runs.
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -INT "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -QUIT "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -HUP "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -TERM "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log

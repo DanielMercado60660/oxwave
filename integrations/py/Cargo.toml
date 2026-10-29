@@ -1,0 +1,16 @@
+# The `oxwave._native` extension module (pyo3, abi3), built only with maturin.
+[package]
+name = "oxwave-py"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Python bindings for OxWave, a Rust port of CWP/SU"
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+oxwave-core.workspace = true
+pyo3.workspace = true

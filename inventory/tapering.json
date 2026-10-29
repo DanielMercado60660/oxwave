@@ -1,0 +1,389 @@
+{
+  "scope": "su/main/tapering part 1 of 1",
+  "programs": [
+    {
+      "name": "sugausstaper",
+      "path": "su/main/tapering/sugausstaper.c",
+      "purpose": "Multiply each trace by a Gaussian weight based on a header value.",
+      "selfdoc_first_line": " SUGAUSSTAPER - Multiply traces with gaussian taper\t\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string",
+          "default": "offset",
+          "required": false,
+          "description": "Header field used to calculate the trace weight."
+        },
+        {
+          "name": "x0",
+          "type": "float",
+          "default": "300.0",
+          "required": false,
+          "description": "Center of the Gaussian window in key units."
+        },
+        {
+          "name": "xw",
+          "type": "float",
+          "default": "50.0",
+          "required": false,
+          "description": "Width of the Gaussian window in key units."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "getparfloat",
+        "checkpars",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "err",
+        "gethval",
+        "vtof",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The Gaussian uses double-precision pow and exp with float inputs and stores each product as float; math-library results and rounding can vary. The first trace's ns is used for every trace, and xw=0 can cause division by zero.",
+      "c_lines": 96,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies one header-derived scalar weight to each sample.",
+      "test_cases": [
+        {
+          "description": "Apply the default Gaussian to a small panel.",
+          "command": "suplane nt=128 ntr=16 | sugausstaper"
+        },
+        {
+          "description": "Weight traces using trace sequence numbers and a narrower window.",
+          "command": "suplane nt=128 ntr=16 | sugausstaper key=tracl x0=8 xw=4"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suramp",
+      "path": "su/main/tapering/suramp.c",
+      "purpose": "Apply linear ramps at the beginnings and ends of traces.",
+      "selfdoc_first_line": " SURAMP - Linearly taper the start and/or end of traces to zero.\t",
+      "params": [
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt divided by 1000000.0",
+          "required": false,
+          "description": "Sampling interval in seconds; required when the first trace header dt is zero."
+        },
+        {
+          "name": "tmin",
+          "type": "float",
+          "default": "computed: first trace header delrt divided by 1000.0",
+          "required": false,
+          "description": "End time of the starting ramp in seconds."
+        },
+        {
+          "name": "tmax",
+          "type": "float",
+          "default": "computed: (first trace ns - 1) * dt",
+          "required": false,
+          "description": "Start time of the ending ramp in seconds."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparfloat",
+        "checkpars",
+        "ealloc1float",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Ramp lengths use NINT after mixed float and double arithmetic; weights and sample products are float. Ramp lengths are not capped at ns, so out-of-range parameters can cause out-of-bounds access. All traces use the first trace's geometry.",
+      "c_lines": 107,
+      "difficulty": "easy",
+      "difficulty_reason": "It precomputes linear weights and applies them sample by sample.",
+      "test_cases": [
+        {
+          "description": "Apply both starting and ending ramps.",
+          "command": "suplane nt=128 ntr=16 | suramp dt=0.004 tmin=0.08 tmax=0.40"
+        },
+        {
+          "description": "Apply only a starting ramp.",
+          "command": "suplane nt=128 ntr=16 | suramp dt=0.004 tmin=0.04"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sutaper",
+      "path": "su/main/tapering/sutaper.c",
+      "purpose": "Taper the edge traces and the beginnings and ends of traces in a panel.",
+      "selfdoc_first_line": " SUTAPER - Taper the edge traces of a data panel to zero.\t",
+      "params": [
+        {
+          "name": "verbose",
+          "type": "short",
+          "default": "0",
+          "required": false,
+          "description": "Print taper weights and trace factors to standard error."
+        },
+        {
+          "name": "min",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Minimum trace taper factor for the linear taper; values greater than one cause an error."
+        },
+        {
+          "name": "tbeg",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Starting time taper length in milliseconds."
+        },
+        {
+          "name": "tend",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Ending time taper length in milliseconds."
+        },
+        {
+          "name": "taper",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Taper shape: 1 linear, 2 sine, 3 cosine, 4 Gaussian with 3.8090232 scale, or 5 Gaussian with 2.0 scale."
+        },
+        {
+          "name": "tr1",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Number of traces tapered at the beginning."
+        },
+        {
+          "name": "tr2",
+          "type": "int",
+          "default": "computed: tr1",
+          "required": false,
+          "description": "Number of traces tapered at the end."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "computed: first trace header ntr",
+          "required": false,
+          "description": "Number of traces; takes precedence over ntr when supplied. One of n2 or ntr is required if the first trace header ntr is zero."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "computed: first trace header ntr",
+          "required": false,
+          "description": "Number of traces; read only if n2 is absent. One of n2 or ntr is required if the first trace header ntr is zero."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparshort",
+        "getparfloat",
+        "err",
+        "getparint",
+        "ealloc1float",
+        "gettr",
+        "checkpars",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sine, cosine, and exponential tapers mix float intermediates with double math-library operations. The ending time taper indexes trace[nt-i], starting one sample beyond the computed trace length; this can modify an unintended sample. Taper pointer arithmetic can leave the allocated array for some parameter combinations, and trace counts and geometry are taken from parameters or the first header without validating the stream.",
+      "c_lines": 298,
+      "difficulty": "easy",
+      "difficulty_reason": "It computes taper weights and applies them to individual traces and samples.",
+      "test_cases": [
+        {
+          "description": "Apply asymmetric linear trace tapers.",
+          "command": "suplane nt=128 ntr=16 | sutaper ntr=16 tr1=3 tr2=5 min=0.2"
+        },
+        {
+          "description": "Apply Gaussian trace and time tapers.",
+          "command": "suplane nt=128 ntr=16 | sutaper ntr=16 tr1=3 tr2=3 tbeg=40 tend=40 taper=4"
+        },
+        {
+          "description": "Apply a cosine starting time taper with the n2 alias.",
+          "command": "suplane nt=128 ntr=16 | sutaper n2=16 tbeg=40 taper=3"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "sutxtaper"
+      ]
+    },
+    {
+      "name": "sutxtaper",
+      "path": "su/main/tapering/sutxtaper.c",
+      "purpose": "Taper a panel in time and by trace position or header value.",
+      "selfdoc_first_line": " SUTXTAPER - TAPER in (X,T) the edges of a data panel to zero.\t",
+      "params": [
+        {
+          "name": "verbose",
+          "type": "short",
+          "default": "0",
+          "required": false,
+          "description": "Print trace taper information; values above one also print weights."
+        },
+        {
+          "name": "low",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Minimum trace taper factor for the linear taper; values greater than one cause an error."
+        },
+        {
+          "name": "tbeg",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Starting time taper length in milliseconds."
+        },
+        {
+          "name": "tend",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Ending time taper length in milliseconds."
+        },
+        {
+          "name": "taper",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Taper shape: 1 linear, 2 sine, 3 cosine, 4 Gaussian with 3.8090232 scale, or 5 Gaussian with 2.0 scale."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "default": "tr",
+          "required": false,
+          "description": "Header field used for spatial tapering; tr uses the internal trace count."
+        },
+        {
+          "name": "min",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Lower key value at which the spatial taper reaches full amplitude."
+        },
+        {
+          "name": "max",
+          "type": "float",
+          "default": "0.",
+          "required": false,
+          "description": "Upper key value at which the spatial taper begins."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "1.",
+          "required": false,
+          "description": "Spatial taper length in key units."
+        },
+        {
+          "name": "tr1",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Number of traces tapered at the beginning when using trace count."
+        },
+        {
+          "name": "tr2",
+          "type": "int",
+          "default": "computed: tr1",
+          "required": false,
+          "description": "Number of traces tapered at the end when using trace count."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "computed: first trace header ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Number of traces; takes precedence over ntr when supplied."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "computed: first trace header ntr if nonzero, otherwise count input traces",
+          "required": false,
+          "description": "Number of traces; read only if n2 is absent."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparshort",
+        "getparfloat",
+        "err",
+        "getparint",
+        "getparstring",
+        "gettr",
+        "warn",
+        "hdtype",
+        "getindex",
+        "checkpars",
+        "etmpfile",
+        "ealloc1float",
+        "gethval",
+        "vtod",
+        "vtof",
+        "efwrite",
+        "erewind",
+        "efread",
+        "puttr",
+        "efclose",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sine, cosine, and exponential tapers mix float intermediates with double math-library operations. The ending time taper starts at trace[nt], beyond the computed trace length. A zero trace factor makes unscale=1/fac divide by zero. Supplied or header ntr is trusted when reading temporary files; mismatches with the actual trace count can fail or omit traces. Header index zero is treated as trace-count mode, and coordinate/depth scaling branches are unreachable because their flags remain false.",
+      "c_lines": 511,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers the panel in temporary files and computes trace weights from either trace counts or header values.",
+      "test_cases": [
+        {
+          "description": "Apply asymmetric linear tapers by trace count.",
+          "command": "suplane nt=128 ntr=16 | sutxtaper ntr=16 tr1=3 tr2=5 low=0.2"
+        },
+        {
+          "description": "Apply a header-value Gaussian taper and a starting time taper.",
+          "command": "suplane nt=128 ntr=16 | sutxtaper ntr=16 key=tracl min=4 max=12 dx=3 tbeg=40 taper=5"
+        },
+        {
+          "description": "Apply sine tapers at both ends of traces and the panel.",
+          "command": "suplane nt=128 ntr=16 | sutxtaper n2=16 tr1=2 tr2=2 tbeg=40 tend=40 taper=2"
+        }
+      ],
+      "license_note": "The credits say the program is based on sutaper.",
+      "related_programs": [
+        "sutaper"
+      ]
+    }
+  ]
+}

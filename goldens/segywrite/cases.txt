@@ -1,0 +1,25 @@
+# Compare the actual SEG-Y output, including headers and samples.
+[exact] suspike nt=1 ntr=1 | segyhdrs | segywrite tape=out && cat out
+[exact] suplane nt=17 ntr=5 | segyhdrs hfile=hdr bfile=bin | segywrite tape=out hfile=hdr bfile=bin trmin=2 trmax=3 && cat out
+[exact] suspike nt=7 ntr=3 | segyhdrs format=5 | segywrite tape=out conv=0 ebcdic=0 buff=0 format=5 && cat out
+[exact] suspike nt=7 ntr=2 | segyhdrs | segywrite tape=out endian=1 errmax=2 && cat out
+[stderr] suspike nt=3 ntr=3 | segyhdrs | segywrite tape=out verbose=1 vblock=1 && cat out
+segywrite
+segywrite tape=out trmin=0
+segywrite tape=out trmin=3 trmax=2
+segywrite tape=out
+suspike nt=1 ntr=1 | segywrite tape=out hfile=missing
+[exact] suspike nt=5 ntr=1 | segyhdrs | segywrite tape=out ebcdic=2 conv=0 endian=1 format=3 && cat out
+[stderr] suspike nt=5 ntr=2 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=3 && suspike nt=5 ntr=2 | segywrite tape=out conv=0 verbose=1 vblock=2 && cat out
+suspike nt=1 ntr=1 | segyhdrs bfile=other | segywrite tape=out bfile=missing
+suspike nt=1 ntr=1 | segywrite tape=/missing/out
+suspike nt=1 ntr=1 | segyhdrs | segywrite tape=/dev/full verbose=1
+suspike nt=1 ntr=1 | segyhdrs | segywrite tape=/dev/full buff=0 verbose=1
+suspike nt=1 ntr=1 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=0 && suspike nt=1 ntr=1 | segywrite tape=out
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+[exact] suplane nt=17 ntr=3 | suaddnoise seed=5 sn=2 | sugain scale=1000 | segyhdrs | segywrite tape=out && cat out
+[exact] suplane nt=17 ntr=3 | suaddnoise seed=5 sn=2 | sugain scale=1e-30 | segyhdrs | segywrite tape=out endian=1 && cat out
+[exact] suplane nt=17 ntr=5 | suaddnoise seed=6 sn=2 | segyhdrs format=5 | segywrite tape=out conv=0 buff=0 trmax=4 format=5 && cat out
+suplane nt=33 ntr=4 | suaddnoise seed=7 sn=1 | sugain scale=12345.678 | sushw key=offset,sx,gx a=-50,100,200 b=25,10,-10 | segyhdrs | segywrite tape=out trmin=2 && segyread tape=out verbose=0 | sushw key=tracr a=0
+[exact] suplane nt=17 ntr=2 | suaddnoise seed=5 | sugain scale=1e-20 | sugain scale=1e-20 | segyhdrs | segywrite tape=out && cat out

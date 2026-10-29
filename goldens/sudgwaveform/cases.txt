@@ -1,0 +1,20 @@
+# Defaults and individual parameters, including calculated nt.
+[stderr] sudgwaveform
+[stderr] sudgwaveform n=1
+sudgwaveform fpeak=50
+sudgwaveform nfpeak=7
+sudgwaveform shift=0.02
+sudgwaveform sign=-1
+sudgwaveform sign=0
+sudgwaveform nt=1
+[stderr] sudgwaveform nt=0
+sudgwaveform nt=37 n=3 fpeak=27.5 nfpeak=5 shift=-0.001 sign=-1
+[stderr] sudgwaveform n=3 nt=21 verbose=1
+# Error paths and parameter parsing.
+[stderr] sudgwaveform n=0 nt=10
+[stderr] sudgwaveform n=-1 nt=10
+[stderr] sudgwaveform nt=-1
+[stderr] sudgwaveform fpeak=1000000 nt=10
+[stderr] sudgwaveform nfpeak=-1 nt=10
+[stderr] sudgwaveform n=999999999999999999999
+[stderr] sudgwaveform nt=15 unknown=1

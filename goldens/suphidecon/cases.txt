@@ -1,0 +1,48 @@
+# Defaults and single trace.
+suspike nt=512 ntr=1 dt=0.004 | suphidecon
+# Odd trace length and multiple traces, with independently chosen window and stabilizer.
+suplane nt=255 ntr=3 | suphidecon tm=-0.02 tp=0.06 pad=0.5
+suspike nt=256 ntr=2 dt=0.004 | suphidecon tm=0 tp=0.04 pad=0
+suspike nt=256 ntr=2 dt=0.004 | suphidecon tm=-0.04 tp=0 pad=-0.1
+suspike nt=1 ntr=1 dt=0.004 | suphidecon tm=0 tp=0
+# Exercise the length-3 FFT packing with nonzero input, not just null traces.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | suphidecon tm=0 tp=0
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | suphidecon tm=0 tp=0 pad=0.5
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 dt=0.004 | suphidecon tm=0 tp=0 pad=0
+sunull nt=2 ntr=3 dt=0.004 | suaddnoise seed=17 | suphidecon tm=0 tp=0
+# Odd FFT lengths now use the library's C-compatible packing directly.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | suphidecon tm=0 tp=0
+sunull nt=3 ntr=3 dt=0.004 | suaddnoise seed=23 | suphidecon tm=-0.004 tp=0.008 pad=0.5
+# Windows may occupy the entire FFT (3 and 105 samples respectively).
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | suphidecon tm=-0.004 tp=0.004
+suspike nt=64 ntr=1 nspk=1 ix1=1 it1=32 dt=0.004 | suphidecon tm=0 tp=0.418
+# Representable wrap offsets beyond nfft are valid: wrapArray uses modulo.
+suspike nt=64 ntr=1 nspk=1 ix1=1 it1=32 dt=0.004 | suphidecon tm=-4 tp=-3.984
+suspike nt=64 ntr=1 nspk=1 ix1=1 it1=32 dt=0.004 | suphidecon tm=3.984 tp=4
+# Explicit defaults; zero signal; seeded signal checks pad mutation across traces.
+[stderr] suplane nt=512 ntr=3 | suphidecon tm=-0.1 tp=0.4 pad=0.1 pnoise=0.001 verbose=0
+sunull nt=127 ntr=3 dt=0.004 | suphidecon tm=-0.012 tp=0.032
+suplane nt=257 ntr=5 | suaddnoise seed=123 | suphidecon tm=-0.032 tp=0.072 pad=0.3
+# Empty extraction windows and zero sampling interval retain C arithmetic.
+suspike nt=256 ntr=1 dt=0.004 | suphidecon tm=0.004 tp=0
+suspike nt=256 ntr=1 dt=0.004 | suphidecon tm=0 tp=-0.004
+sunull nt=256 ntr=1 | sushw key=dt a=0 | suphidecon tm=0 tp=0
+# pnoise and verbose are not read by the original program.
+[stderr] suspike nt=512 ntr=1 dt=0.004 | suphidecon pnoise=0.2 verbose=1
+# Unknown arguments are ignored, since the original never calls checkpars.
+[stderr] suspike nt=512 ntr=1 dt=0.004 | suphidecon unknown=1
+# Empty numeric arguments fall back to defaults; nonnumeric pad parses as zero.
+suspike nt=512 ntr=1 dt=0.004 | suphidecon tm= tp= pad=
+suspike nt=256 ntr=1 dt=0.004 | suphidecon pad=abc
+# Empty input, FFT size limit, and parameter conversion error exits.
+suphidecon </dev/null
+sunull nt=50000 ntr=1 dt=0.004 | suphidecon tm=-0.01 tp=0.01
+[stderr] suphidecon tm=1e999 </dev/null
+[stderr] suphidecon tp=1e-310 </dev/null
+[stderr] suphidecon pad=1e999 </dev/null
+# Negative lengths retain the original allocation-failure diagnostic.
+[stderr] suspike nt=64 ntr=1 dt=0.004 | suphidecon tm=0.04 tp=0
+[stderr] suspike nt=64 ntr=1 dt=0.004 | suphidecon tm=0 tp=-0.04
+# Safety probes run separately against Rust: the C reference has undefined
+# behavior for nt=64 with the default 126-sample window (nfft=105), and for
+# overflowing window lengths or wrap offsets.

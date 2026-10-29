@@ -1,0 +1,82 @@
+# elamodel and elaray both return 1 on success; use semicolons so tracing runs.
+# RayEnd has native f32 fields interspersed with i32 fields (also checked exactly
+# by the exact-output homogeneous cases below). All tolerances are the default.
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray mode=0 xs=0.5 zs=0 nangle=101 fangle=-45 langle=45 f0=1 fdip=0 fazi=0 reftrans=0 nxz=101 nt=2147483647 tw=3.402823466e38 krecord=2147483647 prim=2147483647 outparfile=outpar < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray mode=1 nangle=9 xs=0.5 zs=0.01 fangle=-30 langle=30 < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray mode=2 nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=40 f0=2 fdip=30 fazi=60 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 fangle=0 langle=80 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 fangle=150 langle=210 xs=0.33 zs=0.25 f0=-2 fdip=-15 fazi=-40 < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=0 < m
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 f0=0 verbose=1 unknown=1 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=5 rayfile=r nxz=7 < m > /dev/null; cat r
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 rayfile=r nxz=1 < m > /dev/null; cat r
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 rayfile=r nxz=0 < m > /dev/null; cat r outpar
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 rayfile=r nxz=-1 outparfile=count < m > /dev/null; cat r count
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=5 rayfile=r krecord=0 prim=0 outparfile=count < m > /dev/null; cat count
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=5 rayfile=r krecord=99 outparfile=count < m > /dev/null; cat r count
+[f32] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=5 wavefile=w nt=7 < m > /dev/null; cat w
+[f32] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w nt=1 < m > /dev/null; cat w
+[exact] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w nt=0 < m > /dev/null; cat w
+[f32] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=7 wavefile=w tw=0.15 < m > /dev/null; cat w
+[f32] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 wavefile=w tw=5 < m > /dev/null; cat w
+[f32] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w tw=-0.1 < m > /dev/null; cat w
+[exact] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w < m > /dev/null; cat w
+[exact] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w nt=3 tw=0 < m > /dev/null; cat w
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 xs=0.3 zs=0.1 infofile=info rayfile=r nxz=3 outparfile=count < m > /dev/null; cat info count
+# Anisotropic P, SV, and SH initializations and propagation.
+[f32] elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2 > m; elaray nangle=7 xs=0.3 zs=0.1 mode=0 < m
+[f32] elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2 > m; elaray nangle=7 xs=0.3 zs=0.1 mode=1 < m
+[f32] elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2 > m; elaray nangle=7 xs=0.3 zs=0.1 mode=2 fdip=45 fazi=30 < m
+# Interface stopping, reflection, conversion, free surface, repeated sequences.
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 refseq=7,-1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 refseq=7,1 prim=1 rayfile=r nxz=11 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 refseq=7,2 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 refseq=7,3 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray xs=0.3 zs=0.1 nangle=3 refseq=0,4,-1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 refseq=7,1,0 refseq=0,1,-1 < m
+[stderr] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=1 refseq=7,99 < m > /dev/null
+[f32] [stderr] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 reftrans=1 < m
+# The shell appends its PID when reporting the reference SIGSEGV; compare exit status.
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=5 reftrans=1 refseq=7,1 < m
+# Invalid parameters and stream/file errors.
+[stderr] elaray mode=3
+[stderr] elaray mode=-1
+elaray
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray prim=1 < m
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray mode=3 < m
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=99999999999999999999 < m
+elamodel fill=0.5,0.5,2,1,2 > m; elaray rayfile=/nonexistent/paths < m
+elamodel fill=0.5,0.5,2,1,2 > m; elaray infofile=/nonexistent/info < m
+elamodel fill=0.5,0.5,2,1,2 > m; elaray wavefile=/nonexistent/waves < m
+elamodel fill=0.5,0.5,2,1,2 > m; elaray outparfile=/nonexistent/count < m
+# Negative/empty values, degenerate sampling, source perturbations, model errors.
+[stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=-1 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 fangle=90 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 fangle=10 langle=-10 xs=-1 zs=-1 < m
+[f32] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 xs=0 zs=0 < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 mode= xs= zs= fangle= langle= fdip= fazi= f0= reftrans= < m
+[stderr] elamodel fill=0.5,0.5,4,-1,2,1,0,0,1,1,0,2 > m; elaray nangle=1 < m
+[stderr] elamodel fill=0.5,0.5,4,4,2,-1,0,0,1,1,0,2 > m; elaray nangle=1 < m
+[stderr] elamodel fill=0.5,0.5,4,4,2,1,0,0,-1,1,0,2 > m; elaray nangle=1 < m
+[stderr] elamodel fill=0.5,0.5,4,4,2,1,0,0,1,-1,0,2 > m; elaray nangle=1 < m
+[exact] [stderr] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=1 wavefile=w nt=-1 < m > /dev/null; cat w
+# Exercise boundary conditions and coefficients for all anisotropic modes.
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=0 reftrans=1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=1 reftrans=1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=2 fdip=40 fazi=30 reftrans=1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=0 refseq=7,3 reftrans=1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=1 refseq=7,2 reftrans=1 < m
+[f32] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,0.15,0.05,0.1,20,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 mode=2 refseq=7,1 fdip=40 fazi=30 reftrans=1 < m
+[f32] elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2 > m; elaray nangle=5 xs=0.3 zs=0.1 mode=2 fdip=30 fazi=20 refseq=0,4,-1 reftrans=1 < m
+# Compare integer fields separately: float comparison cannot validate integer modes.
+[exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray nangle=5 xs=0.3 zs=0.1 refseq=7,3 < m | python3 -c 'import sys,struct; b=sys.stdin.buffer.read(); print([tuple(struct.unpack_from("i",b,i+j)[0] for j in (40,44,60,76,92,96)) for i in range(0,len(b),108)])'
+# Diagnostics include interfaces and root-finder paths, as well as reflection amplitudes.
+[exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=3 fangle=-20 langle=20 refseq=7,1 infofile=info < m > /dev/null; cat info
+[exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=3 fangle=-20 langle=20 refseq=7,1 reftrans=1 infofile=info < m > /dev/null; cat info
+[exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.1 nangle=3 fangle=-20 langle=20 reftrans=1 infofile=info < m > /dev/null; cat info
+[f32] elamodel xedge=0,1 zedge=0.3,0.7 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5 > m; elaray nangle=7 xs=0.3 zs=0.1 fangle=-20 langle=20 refseq=7,1 < m
+# A source next to the reflector exercises the stale diagnostic slot across rays.
+[exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.4 nangle=3 fangle=-20 langle=20 refseq=7,1 infofile=info < m > /dev/null; cat info
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 refseq=0 < m
+[exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 refseq= < m

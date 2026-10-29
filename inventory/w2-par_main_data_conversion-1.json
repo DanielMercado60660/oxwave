@@ -1,0 +1,309 @@
+{
+  "scope": "par/main/data_conversion (wave 2, batch 1)",
+  "programs": [
+    {
+      "name": "a2b",
+      "path": "par/main/data_conversion/a2b.c",
+      "purpose": "Convert ASCII floating-point values to native binary floats.",
+      "selfdoc_first_line": " A2B - convert ascii floats to binary \t\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Number of floats per vector; input whitespace need not follow line boundaries."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/null",
+          "required": false,
+          "description": "Output parameter file receiving n2, the number of complete vectors."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "binary_floats",
+      "lib_calls": ["initargs", "requestdoc", "filestat", "warn", "pagedoc", "getparstring", "efopen", "getparint", "ealloc1float", "checkpars", "err"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Conversion uses the platform's fscanf float parsing and native float representation. An incomplete final vector causes an error.",
+      "c_lines": 108,
+      "difficulty": "easy",
+      "difficulty_reason": "It parses and writes fixed-size vectors of floats.",
+      "test_cases": [
+        {
+          "description": "Round-trip two-float vectors.",
+          "command": "suplane nt=16 ntr=2 | sustrip | b2a n1=2 format=0 outpar=/dev/null | a2b n1=2 outpar=/dev/null > out.bin"
+        },
+        {
+          "description": "Parse four-float vectors in decimal notation.",
+          "command": "suspike nt=16 ntr=2 | sustrip | b2a n1=4 format=1 outpar=/dev/null | a2b n1=4 outpar=/dev/null > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["a2i", "b2a"]
+    },
+    {
+      "name": "a2i",
+      "path": "par/main/data_conversion/a2i.c",
+      "purpose": "Convert lines of ASCII numeric values to native binary integers.",
+      "selfdoc_first_line": " A2I - convert Ascii to binary Integers\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Number of values read from each input line."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter file receiving n, the number of input lines."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "filestat", "warn", "pagedoc", "getparstring", "efopen", "getparint", "ealloc1int", "checkpars", "err", "efwrite", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Each value is parsed as float and rounded with NINT before conversion to int; out-of-range conversions can have undefined behavior. Input is processed in fixed-size line buffers.",
+      "c_lines": 102,
+      "difficulty": "easy",
+      "difficulty_reason": "It parses each input line and rounds its values to integers.",
+      "test_cases": [
+        {
+          "description": "Convert two values per line to integers.",
+          "command": "suplane nt=16 ntr=2 | sustrip | b2a n1=2 format=0 outpar=/dev/null | a2i n1=2 outpar=/dev/null > out.int"
+        },
+        {
+          "description": "Convert scaled values with four values per line.",
+          "command": "suspike nt=16 ntr=2 | sustrip | farith op=scale scale=2.5 | b2a n1=4 format=1 outpar=/dev/null | a2i n1=4 outpar=/dev/null > out.int"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["a2b"]
+    },
+    {
+      "name": "b2a",
+      "path": "par/main/data_conversion/b2a.c",
+      "purpose": "Convert native binary floats to formatted ASCII lines.",
+      "selfdoc_first_line": " B2A - convert binary floats to ascii\t\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Number of floats per output line."
+        },
+        {
+          "name": "format",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Zero prints scientific notation; any nonzero value prints fixed-point notation with 20 digits after the decimal."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter file receiving n, the number of output lines."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "ascii",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "efopen", "getparint", "ealloc1float", "checkpars", "efread", "err", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Formatting uses the platform's printf and locale. The code's nonzero format is %20.20f, although the selfdoc describes %15.15f.",
+      "c_lines": 87,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads fixed-size groups of floats and formats them as text.",
+      "test_cases": [
+        {
+          "description": "Print scientific notation in pairs.",
+          "command": "suplane nt=16 ntr=2 | sustrip | b2a n1=2 format=0 outpar=/dev/null > out.txt"
+        },
+        {
+          "description": "Print fixed-point notation in groups of four.",
+          "command": "suspike nt=16 ntr=2 | sustrip | b2a n1=4 format=1 outpar=/dev/null > out.txt"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["a2b", "ftnunstrip"]
+    },
+    {
+      "name": "farith",
+      "path": "par/main/data_conversion/farith.c",
+      "purpose": "Apply arithmetic operations to native binary float files or streams.",
+      "selfdoc_first_line": " FARITH - File ARITHmetic -- perform simple arithmetic with binary files",
+      "params": [
+        {
+          "name": "in",
+          "type": "string",
+          "default": "stdin",
+          "required": false,
+          "description": "First input filename; omitted means standard input."
+        },
+        {
+          "name": "out",
+          "type": "string",
+          "default": "stdout",
+          "required": false,
+          "description": "Output filename; omitted means standard output."
+        },
+        {
+          "name": "in2",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Second input filename or scalar; required for add, sub, mul, div, cartprod, slowp and slothp. The latter three branches nevertheless read a file pointer even when a scalar was parsed."
+        },
+        {
+          "name": "n",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "Number of first-input floats for cartprod; required when op=cartprod."
+        },
+        {
+          "name": "isig",
+          "type": "int",
+          "default": "",
+          "required": false,
+          "description": "First zero-based index whose sign is flipped; required when op=signum."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "default": "1.0",
+          "required": false,
+          "description": "Multiplier for op=scale."
+        },
+        {
+          "name": "bias",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Addend for op=bias."
+        },
+        {
+          "name": "op",
+          "type": "string",
+          "default": "noop",
+          "required": false,
+          "description": "Operation: noop, neg, abs, scale, bias, exp, sin, cos, log, sqrt, sqr, degrad, raddeg, pinv, pinvsqr, pinvsqrt, add, sub, mul, div, cartprod, signum, sloth, slowp, or slothp."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "binary_floats",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "err", "getparfloat", "efread", "efwrite", "getparint", "warn", "alloc1float", "checkpars", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Math-library transcendental functions operate in double and are assigned to float; other expressions mix float and double constants. sloth computes (1.0/x)*x and slothp computes (1/x)*x - (1/x2)*x2, rather than the documented reciprocal squares. Scalar in2 with cartprod, slowp or slothp leaves in2fp null and leads to invalid file access.",
+      "c_lines": 362,
+      "difficulty": "medium",
+      "difficulty_reason": "It has many unary and binary operations and buffers the first input for Cartesian products.",
+      "test_cases": [
+        {
+          "description": "Apply a non-default scale.",
+          "command": "suplane nt=16 ntr=2 | sustrip | farith op=scale scale=2.5 > out.bin"
+        },
+        {
+          "description": "Add a scalar to each sample.",
+          "command": "suspike nt=16 ntr=2 | sustrip | farith op=add in2=1.25 > out.bin"
+        },
+        {
+          "description": "Multiply two binary files sample by sample.",
+          "command": "suspike nt=16 ntr=2 | sustrip > in2.bin && suplane nt=16 ntr=2 | sustrip | farith op=mul in2=in2.bin > out.bin"
+        },
+        {
+          "description": "Form a Cartesian product of two small input vectors.",
+          "command": "suspike nt=4 ntr=1 | sustrip > in2.bin && suplane nt=4 ntr=1 | sustrip | farith op=cartprod n=4 in2=in2.bin > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["suop", "suop2"]
+    },
+    {
+      "name": "float2ibm",
+      "path": "par/main/data_conversion/float2ibm.c",
+      "purpose": "Convert native binary floats to IBM-format floating-point words.",
+      "selfdoc_first_line": " FLOAT2IBM - convert native binary FLOATS to IBM tape FLOATS\t",
+      "params": [
+        {
+          "name": "endian",
+          "type": "int",
+          "default": "computed: detected host byte order, 1 for big endian and 0 for little endian",
+          "required": false,
+          "description": "Selects byte swapping in the usual conversion implementation."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "Output parameter file receiving n, the number of converted values."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "filestat", "warn", "pagedoc", "getparint", "getparstring", "efopen", "checkpars", "ealloc1float", "efread", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The conversion assumes 32-bit IEEE floats and 32-bit int, loses up to three mantissa bits, and does not specially handle IEEE subnormals, infinities, NaNs or negative zero. It aliases float storage through int pointers and uses signed shifts that can be undefined or implementation-dependent. The HPUX branch ignores endian.",
+      "c_lines": 268,
+      "difficulty": "easy",
+      "difficulty_reason": "It converts each float independently with integer masks and shifts.",
+      "test_cases": [
+        {
+          "description": "Convert samples using detected byte order.",
+          "command": "suplane nt=16 ntr=2 | sustrip | float2ibm outpar=/dev/null > out.ibm"
+        },
+        {
+          "description": "Convert samples with explicit little-endian selection.",
+          "command": "suspike nt=16 ntr=2 | sustrip | float2ibm endian=0 outpar=/dev/null > out.ibm"
+        },
+        {
+          "description": "Exercise the explicit big-endian selection.",
+          "command": "suplane nt=16 ntr=2 | sustrip | float2ibm endian=1 outpar=/dev/null > out.ibm"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["ibm2float"]
+    },
+    {
+      "name": "ftnstrip",
+      "path": "par/main/data_conversion/ftnstrip.c",
+      "purpose": "Remove Fortran record-length delimiters from binary records.",
+      "selfdoc_first_line": " FTNSTRIP - convert a file of binary data plus record delimiters created",
+      "params": [],
+      "stdin": "other",
+      "stdout": "other",
+      "lib_calls": ["initargs", "requestdoc", "efread", "ealloc1", "efwrite", "free1", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Record markers are interpreted as native int byte counts; the trailer is read but not checked against the header. Malformed or truncated records are not reliably validated.",
+      "c_lines": 49,
+      "difficulty": "easy",
+      "difficulty_reason": "It copies each record payload after reading its length and discards the trailer.",
+      "test_cases": [
+        {
+          "description": "Strip single-float Fortran records.",
+          "command": "suspike nt=16 ntr=2 | sustrip | ftnunstrip n1=1 outpar=/dev/null | ftnstrip > out.bin"
+        },
+        {
+          "description": "Strip multi-float Fortran records.",
+          "command": "suplane nt=16 ntr=2 | sustrip | ftnunstrip n1=8 outpar=/dev/null | ftnstrip > out.bin"
+        }
+      ],
+      "license_note": "",
+      "related_programs": ["ftnunstrip"]
+    }
+  ]
+}

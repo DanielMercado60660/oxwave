@@ -1,0 +1,20 @@
+[package]
+name = "suradon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suradon"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-taup = { path = "../../crates/oxwave-f-taup" }
+oxwave-f-vnd = { path = "../../crates/oxwave-f-vnd" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-sinc-interp = { path = "../../crates/oxwave-sinc-interp" }

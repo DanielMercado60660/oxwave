@@ -1,0 +1,24 @@
+[build-system]
+requires = ["maturin>=1.5,<2"]
+build-backend = "maturin"
+
+[project]
+name = "oxwave"
+version = "0.1.0"
+description = "Python bindings and MCP server for OxWave, a Rust port of CWP/SU (Seismic Un*x)"
+license = { text = "BSD-3-Clause" }
+requires-python = ">=3.10"
+dependencies = ["numpy"]
+
+[project.optional-dependencies]
+plot = ["matplotlib"]
+mcp = ["mcp>=2.3,<3", "matplotlib"]
+
+[project.scripts]
+oxwave-mcp = "oxwave.mcp_server.server:main"
+
+[tool.maturin]
+python-source = "python"
+module-name = "oxwave._native"
+features = ["pyo3/extension-module"]
+include = [{ path = "python/oxwave/_programs.json", format = ["sdist", "wheel"] }]

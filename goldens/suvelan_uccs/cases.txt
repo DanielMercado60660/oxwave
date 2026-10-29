@@ -1,0 +1,12 @@
+# Defaults with the gather size in cdpt.
+# Multiple CDPs overflow the original's gather buffers and cannot be a golden case.
+suplane nt=51 ntr=3 | sushw key=cdpt a=3 | suvelan_uccs
+# Explicit sampling, mute, power and diagnostic output.
+[stderr] suplane nt=73 ntr=3 | sushw key=offset a=10 b=30 | suvelan_uccs nx=3 nv=3 dv=65 fv=1200 smute=2 dtratio=3 nsmooth=5 pwr=2 verbose=1
+suplane nt=1 ntr=1 | suvelan_uccs nx=1 nv=1
+suplane nt=31 ntr=1 | suvelan_uccs nx=1 nv=2 dtratio=1 nsmooth=1
+suplane nt=31 ntr=2 | suvelan_uccs nx=2 nv=0
+suvelan_uccs nx=1
+suplane nt=20 ntr=1 | suvelan_uccs nx=1 smute=1
+suplane nt=20 ntr=1 | suvelan_uccs nx=1 pwr=-1
+suplane nt=20 ntr=1 | suvelan_uccs nx=1 pwr=0

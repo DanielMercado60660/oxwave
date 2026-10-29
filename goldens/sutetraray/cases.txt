@@ -1,0 +1,86 @@
+# All numeric tolerances are the harness default (1e-5).
+# Direct SU output: defaults, odd/even sizes, singleton tables, apertures.
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1  < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray wffile=wf.txt  < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray   < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=4 nygd=6 nxt=2 nyt=4 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxt=0 nyt=0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntakeoff=1 nazimuth=3 takeoff=0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 takeoff=75 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 takeoff=-20 ntwf=1 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=-1 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 wffile=wf.txt ifwf2dump=2 tmax=0.1 dtwf=0.02 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=7 nygd=7 nxt=3 nyt=3 wffile=wf.txt ifwf2dump=2 ntwf=30 ntakeoff=2 nazimuth=6 nsx=2 nsy=2 nsz=2 fsx=0.5 fsy=0.5 fsz=0.25 dsx=0.5 dsy=0.5 dsz=0.25 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fxgd=0.2 fygd=0.2 dxgd=0.4 dygd=0.4 fsx=1.0 fsy=1.0 dsx=0 dsy=-1 fsz=0.25 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 shootupward=-1 takeoff=20 irefseq=-2,0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nsx=0 nsy=0 nsz=0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 shootupward=0 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 edgemax=0.05 maxntris=80 maxnrays=70 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 edgemax=0.2 maxntris=2 maxnrays=30 maxnsegs=70 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 unknown=7 verbose=1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 verbose=1 irefseq=0,1,2 < model.txt > tt.su
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 verbose=1 jpfile=job.txt < model.txt > tt.su && cat job.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 verbose=1 jpfile=missing/job.txt < model.txt > tt.su
+# Auxiliary outputs are explicitly copied to stdout.
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 rayfile=ray.txt < model.txt > tt.su && cat ray.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 shootupward=-1 rayfile=ray.txt irefseq=-2,0 < model.txt > tt.su && cat ray.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ifwf2dump=1 nwf2dump=3 < model.txt > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 sttfile=surface.txt < model.txt > tt.su && cat surface.txt
+[f32] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 crfile=cr.bin < model.txt > tt.su && cat cr.bin
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 rayfile=ray.txt nsx=0 < model.txt > tt.su && cat ray.txt
+# Nonconstant slowness and curved, layered horizons exercise the local solvers.
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=0.3 takeoff=65 < model.txt
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=0.9 takeoff=70 < model.txt
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=0.3 shootupward=-1 irefseq=1,0 < model.txt
+# Parameter errors; stderr is compared in full where it is deterministic.
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=0 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nygd=1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fxgd=-1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fygd=-1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 dxgd=1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 dygd=1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsx=0 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsy=0 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsx=1.8 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsy=1.8 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nsx=4 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nsy=4 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=2001 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxt=-4 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nyt=-4 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=-1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=3 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 rayfile=missing/r < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 wffile=missing/w < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 crfile=missing/c < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 sttfile=missing/s < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 maxnsegs=1 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntakeoff=3 nazimuth=3 maxnrays=9 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=2147483648 < model.txt
+# Empty/truncated model headers and getpar corner cases.
+# Crash cases compare exit status; shell signal messages contain process IDs.
+[stderr] sutetraray nxgd=0
+[stderr] sutetraray nygd=0 nxgd=3
+printf '0=xmin\n2=xmax\n0=ymin\n2=ymax\n0=zmin\n1=zmax\n' | sutetraray ntwf=2001 wffile=wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=3,5 nxgd=5 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 takeoff=abc < model.txt
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 nsx=2 nsy=2 fsx=0.5 fsy=0.5 dsx=0.5 dsy=0.5 fsz=0.3 < model.txt
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 fsz=1.0 shootupward=1 irefseq=1,0 rayfile=ray.txt sttfile=s.txt < model.txt > tt.su && cat ray.txt s.txt
+tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 nsz=2 fsz=0.3 dsz=0.6 rayfile=ray.txt < model.txt > tt.su && cat ray.txt
+[f32] tetramod nxhz=4 nyhz=3 nhz=2 hzfile=hz.bin v00=1,2 v01=1.1,2.1 v10=1.2,2.2 v11=1.3,2.3 dvdz00=0.1,0.2 dvdz01=0.1,0.2 dvdz10=0.1,0.2 dvdz11=0.1,0.2 z00=0,0.5 z01=0,0.6 z10=0,0.7 z11=0,0.8 > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 nxgd=7 nygd=4 fxgd=0.1 fygd=0.2 dxgd=0.25 dygd=0.4 tmax=0.8 dtwf=0.04 takeoff=50 fsz=0.3 crfile=cr.bin < model.txt > tt.su && cat cr.bin
+
+# Segment overflow row, reachable limit error, and allocation failures.
+# No verbose dump counters without wffile: the intended Rust zeros are retained.
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=2 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=15 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=16 < model.txt
+[stderr] tetramod nxhz=3 nyhz=7 nhz=1 z00=0.0 v00=1.203 z01=0.013 v01=1.109 dvdz01=0.02 z10=0.0 v10=1.333 dvdz10=0.395 z11=0.0 v11=1.323 dvdz11=0.245 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=3 takeoff=45 nazimuth=24 maxnsegs=20 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=0 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=-1 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnrays=-1 < model.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=-2147483648 < model.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 maxnsegs=16 < model.txt

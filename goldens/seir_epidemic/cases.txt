@@ -1,0 +1,78 @@
+# No input is needed, including when all defaults are used.
+[f32] seir_epidemic
+[f32] seir_epidemic stepmax=40 verbose=0 normalize=1 N=1000 s0=1000 e0=1 i0=1 r0=0 scale=0 h=1 tol=1e-8 mode=SEIR b=.5 k=.333 mu=0 nu=0 xi=0
+# Each output mode, with odd sizes and raw float output.
+[f32] seir_epidemic mode=S stepmax=7
+[f32] seir_epidemic mode=E stepmax=9
+[f32] seir_epidemic mode=I stepmax=11
+[f32] seir_epidemic mode=R stepmax=13
+[f32] seir_epidemic mode=SEIR stepmax=17 h=.25
+[f32] seir_epidemic stepmax=1
+[f32] seir_epidemic stepmax=1 mode=S
+[f32] seir_epidemic stepmax=1 mode=E
+[f32] seir_epidemic stepmax=1 mode=I
+[f32] seir_epidemic stepmax=1 mode=R
+[exact] seir_epidemic stepmax=0
+[exact] seir_epidemic stepmax=0 mode=R
+# All normalization and scaling branches, including unsupported nonzero scale.
+[f32] seir_epidemic stepmax=7 normalize=0 N=20 s0=12 e0=8 i0=.2 r0=.5 h=.01
+[f32] seir_epidemic stepmax=7 normalize=-1 N=20 s0=12 i0=2 r0=3
+[f32] seir_epidemic stepmax=7 scale=1 N=200 s0=150 i0=2 r0=4
+[f32] seir_epidemic stepmax=7 scale=2 N=200 s0=150 i0=2 r0=4
+[f32] seir_epidemic stepmax=7 scale=1 mode=S
+[f32] seir_epidemic stepmax=7 scale=2 mode=E
+[f32] seir_epidemic stepmax=7 scale=1 mode=I
+[f32] seir_epidemic stepmax=7 scale=2 mode=R r0=4
+[f32] seir_epidemic stepmax=3 scale=3
+[f32] seir_epidemic stepmax=3 scale=-1 mode=S
+# Preserve the original's unused e0, i0 assignment, and supplied-eti behavior.
+[f32] seir_epidemic stepmax=7 e0=500
+[f32] seir_epidemic stepmax=7 e0=-5 i0=0
+[f32] seir_epidemic stepmax=7 i0=10 r0=5 s0=500 N=800
+[f32] seir_epidemic stepmax=7 eti=.333
+[f32] seir_epidemic stepmax=7 eti=.2 k=.1 b=.4
+[f32] seir_epidemic stepmax=7 eti=0 mode=I
+[f32] seir_epidemic stepmax=7 eti=-.5 mode=R r0=3
+# Vital dynamics and reinfection, separately and together.
+[f32] seir_epidemic stepmax=7 b=0
+[f32] seir_epidemic stepmax=7 k=0
+[f32] seir_epidemic stepmax=7 mu=.01
+[f32] seir_epidemic stepmax=7 nu=.02
+[f32] seir_epidemic stepmax=7 xi=.03 r0=50
+[f32] seir_epidemic stepmax=17 h=.3 mu=.001 nu=.002 xi=.01 N=200 s0=150 i0=2 r0=10 scale=1
+[f32] seir_epidemic stepmax=5 h=.01 b=-.2 k=-.1 mu=-.001 nu=-.002 xi=-.003 i0=-1 r0=-3
+# Time direction, zero step, tolerance controls, and adaptive step diagnostics.
+[f32] seir_epidemic stepmax=7 h=0
+[f32] seir_epidemic stepmax=7 h=-.1
+[f32] seir_epidemic stepmax=7 h=1e-8
+[f32] seir_epidemic stepmax=7 tol=0
+[f32] seir_epidemic stepmax=7 tol=1e-12
+[f32] seir_epidemic stepmax=3 tol=-1
+[stderr] [f32] seir_epidemic stepmax=5 verbose=1
+[stderr] [f32] seir_epidemic stepmax=7 h=5 b=2 i0=10 tol=1e-12 verbose=1
+[stderr] [f32] seir_epidemic stepmax=3 h=-.25 verbose=-1
+# Degenerate initial conditions and getpar's empty/default handling.
+[f32] seir_epidemic stepmax=3 h=0 N=0
+[f32] seir_epidemic stepmax=3 N=-100 s0=-50 i0=0 r0=-4
+[f32] seir_epidemic stepmax=3 s0=0 i0=0 r0=0
+[f32] seir_epidemic stepmax= stepmax=3 h= N= normalize= scale= e0= i0= r0= tol= b= k= eti= mu= nu= xi=
+[f32] seir_epidemic stepmax=2 stepmax=5 h=.1 h=.2 i0=1 i0=3
+[stderr] [f32] seir_epidemic stepmax=2 unknown=1
+[f32] printf 'N=200 s0=180 i0=3 r0=1 stepmax=5 h=.1 scale=1\n' > params; seir_epidemic par=params i0=4
+# Capture redirected output as well as the inventory's write-only pipelines.
+[f32] seir_epidemic stepmax=32 h=.25 N=200 i0=2 scale=1 mu=.001 nu=.002 xi=.01 mode=SEIR > output; cat output
+[f32] seir_epidemic stepmax=32 h=.1 eti=.2 b=.4 k=.3 mode=E scale=2 > output; cat output
+# Errors: mode validation, allocation failure, and parameter parsing.
+[stderr] seir_epidemic mode=SIR
+[stderr] seir_epidemic mode=seir
+[stderr] seir_epidemic mode=
+[stderr] seir_epidemic stepmax=-1
+[stderr] seir_epidemic stepmax=2147483648
+[stderr] seir_epidemic N=1e999
+[stderr] seir_epidemic h=1e-310
+[stderr] seir_epidemic stepmax=2 b=1e999
+[stderr] seir_epidemic stepmax=2 eti=1e999
+[stderr] seir_epidemic par=missing_file
+# Callback parameters are not read when the solver is never entered.
+[exact] seir_epidemic stepmax=0 b=1e999
+[f32] seir_epidemic stepmax=3 h=0 eti=1e999

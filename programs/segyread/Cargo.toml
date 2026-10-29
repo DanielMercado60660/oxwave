@@ -1,0 +1,16 @@
+[package]
+name = "segyread"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "segyread"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-syscalls = { path = "../../crates/oxwave-f-syscalls" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

@@ -1,0 +1,10 @@
+# Raw native floats; metadata is supplied by wptcomp.
+[f32] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wptcomp n1=128 n2=16 | wptuncomp
+[f32] suspike nt=100 ntr=9 | sustrip outpar=/dev/null | wptcomp n1=100 n2=9 nstage1=2 nstage2=2 error=0.03 | wptuncomp
+[f32] suplane nt=33 ntr=5 | sustrip outpar=/dev/null | wptcomp n1=33 n2=5 nfilter1=4 nfilter2=6 | wptuncomp verbose=1
+[f32] suspike nt=17 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=17 n2=1 | wptuncomp
+[f32] suspike nt=1 ntr=7 | sustrip outpar=/dev/null | wptcomp n1=1 n2=7 | wptuncomp
+[f32] suplane nt=32 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=32 n2=8 nstage1=0 nstage2=0 | wptuncomp ignored=0
+[stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=7i2f",1,4,4,11,11,1,1,0.,1.)+b"\0")' | wptuncomp
+# A small noisy section overflows the compressor's bounded output buffer (nsize=-1).
+[stderr] sunull nt=128 ntr=1 | suaddnoise seed=129 | sugain scale=1000 | sustrip outpar=/dev/null | wptcomp n1=128 n2=1 error=0.001 > compressed 2>/dev/null; exec wptuncomp < compressed

@@ -1,0 +1,8 @@
+# Cases excluded because their golden bytes come from undefined behaviour in the original SU.
+# Rule: excluded only if the output changes when the UB is removed by a minimal C fix (SU's own build flags).
+# Evidence: audits/claude-ub-exclusions.md (2026-10-29).
+# Case 1: the vendor wpccompress upstream emits freed memory (wpc.c realloc stale pointer); the golden is not
+# even reproducible today (it depends on PATH length). Case 2: codeDecoder (wpccoding.c ~373-383) never stores an
+# all-zero tile's flag/average, quantDe reads them uninitialised and writes NaN; with the fix the tile decodes to 0.
+suplane nt=128 ntr=128 | sustrip outpar=/dev/null | wpccompress n1=128 n2=128 error=0.05 | wpcuncompress
+suplane nt=257 ntr=259 | sustrip outpar=/dev/null | wpccompress n1=257 n2=259 | wpcuncompress

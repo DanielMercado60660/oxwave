@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-butterworth"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-f-butterworth = { path = "../oxwave-f-butterworth" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+
+[dev-dependencies]
+oxwave-cref.workspace = true

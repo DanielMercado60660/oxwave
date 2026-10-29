@@ -1,0 +1,96 @@
+# Defaults, explicit defaults, odd sample counts, and header preservation.
+suplane nt=129 ntr=3 | supef
+suplane nt=129 ntr=3 | supef minlag=0.004 maxlag=0.024 pnoise=0.001 mincorr=0 maxcorr=0.516 wienerout=0 mix=1 outpar=/dev/null method=linear
+suplane nt=97 ntr=1 | supef
+sunull nt=1 ntr=1 | supef
+sunull nt=7 ntr=3 | supef
+suspike nt=9 ntr=1 | supef
+suplane nt=257 ntr=5 | sushw key=cdp,offset,delrt a=10,-123,8 b=3,4,1 | supef
+# Correlation origin intentionally follows the original (data is not offset).
+suplane nt=257 ntr=5 | supef minlag=0.012 maxlag=0.060 mincorr=0.100 maxcorr=0.732 pnoise=0.02
+sunull nt=97 ntr=5 | suaddnoise seed=41 | supef minlag=0.004 maxlag=0.052
+sunull nt=97 ntr=5 | suaddnoise seed=41 | supef pnoise=0
+sunull nt=97 ntr=5 | suaddnoise seed=41 | supef pnoise=-0.01
+# Stateful mixing, nonnormalised weights, zero weights, and dead traces.
+sunull nt=97 ntr=7 | suaddnoise seed=43 | supef mix=1,0.5,2 maxlag=0.048
+sunull nt=97 ntr=7 | suaddnoise seed=43 | supef mix=1,0,-0.2,0.3 maxlag=0.048
+sunull nt=97 ntr=3 | suaddnoise seed=43 | supef mix=0
+sunull nt=97 ntr=3 | supef mix=1,0.5
+# Output modes, exact warnings, and the additional output file.
+[stderr] sunull nt=97 ntr=3 | suaddnoise seed=47 | supef maxlag=0.020 wienerout=1
+[stderr] sunull nt=97 ntr=3 | supef wienerout=1
+[stderr] suplane nt=97 ntr=3 | supef maxlag=0.020 wienerout=-1
+[ws] sunull nt=97 ntr=3 | suaddnoise seed=47 | supef maxlag=0.020 wienerout=1 outpar=filters.txt > /dev/null; cat filters.txt
+sunull nt=97 ntr=1 | supef outpar=empty.txt > /dev/null; cat empty.txt
+[stderr] suplane nt=97 ntr=3 | supef verbose=1
+[stderr] suplane nt=97 ntr=1 | supef unknown=7
+# dt is read only when the first header contains zero.
+suplane nt=97 ntr=3 | sushw key=dt a=0 | supef dt=0.002 minlag=0.002 maxlag=0.014
+[stderr] suplane nt=97 ntr=1 | supef dt=0.002
+[stderr] suplane nt=97 ntr=1 | sushw key=dt a=0 | supef
+# Each interpolation selector with unchanged CDP (no interpolation needed).
+suplane nt=97 ntr=3 | supef cdp=1 minlag=0.004 maxlag=0.024 method=linear
+suplane nt=97 ntr=3 | supef cdp=1 minlag=0.004 maxlag=0.024 method=mono
+suplane nt=97 ntr=3 | supef cdp=1 minlag=0.004 maxlag=0.024 method=akima
+suplane nt=97 ntr=3 | supef cdp=1 minlag=0.004 maxlag=0.024 method=spline
+suplane nt=97 ntr=3 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.024,0.032
+# Changed CDP: the source's reversed interpolation table is preserved.
+sunull nt=2049 ntr=2 | suaddnoise seed=53 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.004,0.008 method=linear
+[stderr] sunull nt=97 ntr=2 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.024,0.032 method=unknown
+# Error exits and complete diagnostic messages.
+[stderr] supef
+[stderr] suplane nt=97 ntr=1 | supef cdp=1,2
+[stderr] suplane nt=97 ntr=1 | supef cdp=1,2 minlag=0.004
+[stderr] suplane nt=97 ntr=1 | supef cdp=1,2 minlag=0.004,0.008
+[stderr] suplane nt=97 ntr=1 | supef cdp=1,2 minlag=0.004,0.008 maxlag=0.024
+[stderr] suplane nt=97 ntr=1 | supef cdp=2,1 minlag=0.004,0.008 maxlag=0.024,0.032
+[stderr] suplane nt=97 ntr=1 | supef cdp=1 minlag=0 maxlag=0.024
+[stderr] suplane nt=97 ntr=1 | supef cdp=1 minlag=-0.004 maxlag=0.024
+[stderr] suplane nt=97 ntr=1 | supef cdp=1 minlag=0.004 maxlag=0.388
+[stderr] suplane nt=97 ntr=1 | supef mincorr=-0.004
+[stderr] suplane nt=97 ntr=1 | supef maxcorr=0.392
+[stderr] suplane nt=97 ntr=1 | supef mincorr=0.08 maxcorr=0.04
+[stderr] suplane nt=97 ntr=1 | supef mincorr=0 maxcorr=0
+[stderr] suplane nt=97 ntr=1 | supef mincorr=0 maxcorr=-0.004
+[stderr] suplane nt=97 ntr=1 | supef minlag=0.04 maxlag=0.004
+[stderr] suplane nt=97 ntr=1 | supef maxlag=-0.008
+[stderr] suplane nt=97 ntr=1 | supef outpar=/nonexistent/supef/file
+[stderr] suplane nt=97 ntr=1 | supef wienerout=999999999999999999999
+# The no-CDP branch does not reject zero lags.
+sunull nt=97 ntr=3 | suaddnoise seed=59 | supef minlag=0 maxlag=0.024
+sunull nt=97 ntr=3 | suaddnoise seed=59 | supef maxlag=0
+sunull nt=97 ntr=1 | suaddnoise seed=59 | supef minlag=0.004 maxlag=0.004
+# Empty numeric fields and last occurrence wins.
+suplane nt=97 ntr=3 | supef minlag= maxlag= pnoise= mix= method=
+sunull nt=97 ntr=3 | suaddnoise seed=61 | supef pnoise=0.1 pnoise=0.002 mix=1,,2
+# Known out-of-bounds C paths: filter output reads the adjacent spiker array.
+[stderr] sunull nt=97 ntr=3 | suaddnoise seed=67 | supef minlag=0.012 maxlag=0.024 wienerout=1
+[ws] sunull nt=97 ntr=1 | suaddnoise seed=67 | supef minlag=0.012 maxlag=0.024 wienerout=1 outpar=filters.txt > /dev/null; cat filters.txt
+sunull nt=97 ntr=3 | suaddnoise seed=71 | supef minlag=-0.004 maxlag=0.024
+sunull nt=97 ntr=1 | suaddnoise seed=73 | supef cdp=1 minlag=0.004 maxlag=0.024 wienerout=1
+# Empty interpolation method remains unused on constant CDP.
+sunull nt=97 ntr=1 | suaddnoise seed=73 | supef method=
+sunull nt=97 ntr=1 | suaddnoise seed=73 | sushw key=dt a=0 | supef dt=0
+# A dead trace must not advance the autocorrelation mixing history.
+{ sunull nt=97 ntr=1; sunull nt=97 ntr=3 | suaddnoise seed=79; sunull nt=97 ntr=1; sunull nt=97 ntr=2 | suaddnoise seed=83; } | supef mix=1,0.4,0.1 wienerout=1
+# Changed CDP enters every cubic branch, including the two-point fallback.
+sunull nt=2049 ntr=2 | suaddnoise seed=53 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.004,0.008 method=mono
+sunull nt=2049 ntr=2 | suaddnoise seed=53 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.004,0.008 method=akima
+sunull nt=2049 ntr=2 | suaddnoise seed=53 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.004,0.008 method=spline
+# Nonlinear three-point tables exercise actual cubic coefficients. Descending
+# lag coordinates preserve the reversed C arguments and give usable filters.
+sunull nt=2049 ntr=2 | suaddnoise seed=89 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=mono
+sunull nt=2049 ntr=2 | suaddnoise seed=89 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=akima
+sunull nt=2049 ntr=2 | suaddnoise seed=89 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=spline
+# Four points exercise interior derivatives and the spline system.
+sunull nt=2049 ntr=2 | suaddnoise seed=97 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5,6 minlag=3.5,2.4,1.2,0.8 maxlag=4,3,2,1 method=mono
+sunull nt=2049 ntr=2 | suaddnoise seed=97 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5,6 minlag=3.5,2.4,1.2,0.8 maxlag=4,3,2,1 method=akima
+sunull nt=2049 ntr=2 | suaddnoise seed=97 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5,6 minlag=3.5,2.4,1.2,0.8 maxlag=4,3,2,1 method=spline
+# Mixing continues on subsequent traces at the new CDP after interpolation.
+{ sunull nt=2049 ntr=1 | suaddnoise seed=101 | sushw key=cdp a=1; sunull nt=2049 ntr=3 | suaddnoise seed=103 | sushw key=cdp a=2; } | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 mix=1,0.5,0.25 method=mono
+{ sunull nt=2049 ntr=1 | suaddnoise seed=101 | sushw key=cdp a=1; sunull nt=2049 ntr=3 | suaddnoise seed=103 | sushw key=cdp a=2; } | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 mix=1,0.5,0.25 method=akima
+{ sunull nt=2049 ntr=1 | suaddnoise seed=101 | sushw key=cdp a=1; sunull nt=2049 ntr=3 | suaddnoise seed=103 | sushw key=cdp a=2; } | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 mix=1,0.5,0.25 method=spline
+# Prediction-error output and diagnostics after entering every cubic branch.
+[stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=mono wienerout=1 verbose=1
+[stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=akima wienerout=1 verbose=1
+[stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=spline wienerout=1 verbose=1

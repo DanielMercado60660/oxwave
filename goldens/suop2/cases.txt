@@ -1,0 +1,31 @@
+# Panel operations, weights and zero divisors.
+suplane nt=17 ntr=3 > a && suspike nt=17 ntr=3 > b && suop2 a b
+suplane nt=17 ntr=3 > a && suspike nt=17 ntr=3 > b && suop2 a b op=prod w1=-2 w2=0.5
+suplane nt=17 ntr=3 > a && suspike nt=17 ntr=3 > b && suop2 a b op=quo w1=3
+suplane nt=1 ntr=1 > a && suplane nt=1 ntr=1 > b && suop2 a b op=sum
+suplane nt=9 ntr=3 > a && suspike nt=9 ntr=1 > b && suop2 a b op=ptdiff w1=-2 w2=3
+suplane nt=9 ntr=3 > a && suspike nt=9 ntr=1 > b && suop2 a b op=ptprod
+suplane nt=9 ntr=3 > a && suspike nt=9 ntr=1 > b && suop2 a b op=ptquo w1=2 w2=3
+suplane nt=9 ntr=2 > a && suspike nt=9 ntr=2 > b && suop2 a b op=zipper trid=1
+suplane nt=9 ntr=2 > a && suspike nt=9 ntr=2 > b && suop2 a b op=zipper
+suplane nt=9 ntr=2 > a && suspike nt=9 ntr=2 > b && suop2 a b op=zippol trid=1
+# Complex paths and uneven lengths.
+[stderr] suplane nt=9 ntr=2 | sushw key=trid a=111 > a && suspike nt=9 ntr=2 | sushw key=trid a=111 > b && suop2 a b op=prod
+[stderr] suplane nt=9 ntr=2 | sushw key=trid a=111 > a && suspike nt=9 ntr=2 | sushw key=trid a=111 > b && suop2 a b op=quo
+suplane nt=9 ntr=2 | sushw key=trid a=111 > a && suspike nt=9 ntr=1 | sushw key=trid a=111 > b && suop2 a b op=ptprod
+suplane nt=9 ntr=2 | sushw key=trid a=111 > a && suspike nt=9 ntr=1 | sushw key=trid a=111 > b && suop2 a b op=ptquo
+[stderr] suplane nt=9 ntr=1 > a && suplane nt=9 ntr=2 > b && suop2 a b verbose=1
+[stderr] suplane nt=9 ntr=2 > a && suplane nt=9 ntr=1 > b && suop2 a b
+# Errors.
+suop2 missing other
+suplane nt=9 ntr=1 > a && suplane nt=8 ntr=1 > b && suop2 a b
+suplane nt=9 ntr=1 > a && suplane nt=9 ntr=1 > b && suop2 a b op=bad
+suplane nt=9 ntr=1 > a && suplane nt=9 ntr=1 > b && suop2 a b op=ptsum
+touch a b && suop2 a b
+
+# Largest valid interleaved output (65534 samples), for both expansion loops.
+suplane nt=32767 ntr=1 > a && suplane nt=32767 ntr=1 > b && suop2 a b op=zipper
+suplane nt=32767 ntr=1 > a && suplane nt=32767 ntr=1 > b && suop2 a b op=zippol
+# Explicit zero weights and trace id, and the single-sample polar path.
+suplane nt=1 ntr=1 > a && suplane nt=1 ntr=1 > b && suop2 a b op=zippol trid=0 w1=0 w2=0
+

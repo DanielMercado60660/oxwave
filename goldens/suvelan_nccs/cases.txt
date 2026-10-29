@@ -1,0 +1,12 @@
+# Default parameters with cdpt set to gather size.
+suplane nt=63 ntr=4 | sushw key=cdpt a=4 | suvelan_nccs
+# Explicit velocity, smoothing, power, and verbose diagnostics.
+[stderr] suplane nt=79 ntr=5 | sushw key=offset a=-40 b=20 | suvelan_nccs nx=5 nv=3 fv=1200 dv=75 smute=2 dtratio=3 nsmooth=9 pwr=2 verbose=1
+suplane nt=31 ntr=3 | suvelan_nccs nx=3 nv=1 dtratio=1 nsmooth=0
+suplane nt=1 ntr=1 | suvelan_nccs nx=1 nv=1
+suplane nt=17 ntr=2 | suvelan_nccs nx=2 nv=0
+suplane nt=17 ntr=2 | suvelan_nccs nx=2 nv=1 dv=-50 fv=1500 nsmooth=3
+suplane nt=17 ntr=2 | suvelan_nccs nx=2 smute=1
+suplane nt=17 ntr=2 | suvelan_nccs nx=2 pwr=0
+suplane nt=17 ntr=2 | suvelan_nccs nx=2 pwr=-1
+suvelan_nccs nx=2 </dev/null

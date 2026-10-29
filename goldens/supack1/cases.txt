@@ -1,0 +1,14 @@
+# Packed traces require byte-for-byte comparison, including both data writes.
+[exact] suplane nt=64 ntr=3 | supack1
+[exact] suplane nt=63 ntr=3 | supack1 gpow=0.5
+[exact] suplane nt=65 ntr=3 | supack1 gpow=1
+[exact] suplane nt=63 ntr=3 | supack1 gpow=0.7
+[exact] suplane nt=31 ntr=2 | suaddnoise seed=123 | supack1 gpow=2
+[exact] sunull nt=1 ntr=1 | supack1
+[exact] suspike nt=1 ntr=1 | supack1 gpow=1
+[exact] sunull nt=17 ntr=1 | supack1 gpow=0.7
+[stderr] suplane nt=8 ntr=1 | supack1 verbose=1
+supack1 gpow=0
+supack1 gpow=-1
+supack1 gpow=abc
+supack1

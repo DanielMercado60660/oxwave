@@ -1,0 +1,18 @@
+# Defaults, explicit multiply, and each arithmetic operation on odd trace sizes.
+suspike nt=17 ntr=3 | sumath
+suspike nt=17 ntr=3 | sumath op=mult a=-2
+suspike nt=17 ntr=3 | sumath op=add a=-0.5
+suspike nt=17 ntr=3 | sumath op=sub a=2
+suspike nt=17 ntr=3 | sumath op=div a=-2
+suspike nt=17 ntr=3 | sumath op=pow a=2.5
+suspike nt=17 ntr=3 | sumath op=mult a=-2 | sumath op=spow a=1.5
+# Single sample and trace, duplicates, and no output for nonpositive copy.
+suspike nt=1 ntr=1 | sumath op=add a=3 copy=3
+suspike nt=17 ntr=3 | sumath copy=0
+suspike nt=17 ntr=3 | sumath copy=-1
+# Zero operand and argument parsing behavior.
+suspike nt=17 ntr=3 | sumath op=mult a=0
+suspike nt=17 ntr=3 | sumath op=add a=1 a=2
+[stderr] suspike nt=17 ntr=1 | sumath verbose=1
+[stderr] suspike nt=17 ntr=1 | sumath op=bad
+[stderr] sumath op=add < /dev/null

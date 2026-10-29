@@ -1,0 +1,416 @@
+{
+  "scope": "su/main/convolution_correlation part 1 of 1",
+  "programs": [
+    {
+      "name": "suacor",
+      "path": "su/main/convolution_correlation/suacor.c",
+      "purpose": "Compute the autocorrelation of each input trace.",
+      "selfdoc_first_line": " SUACOR - auto-correlation\t\t\t\t\t\t",
+      "params": [
+        {
+          "name": "ntout",
+          "type": "int",
+          "default": "101",
+          "required": false,
+          "description": "Number of output samples; the selfdoc says it should be odd."
+        },
+        {
+          "name": "norm",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "If nonzero, divide the output by the zero-lag value, unless that value is zero."
+        },
+        {
+          "name": "sym",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "If nonzero, start the output at lag -(ntout-1)/2 using integer arithmetic; otherwise start at zero lag."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "checkpars",
+        "ealloc1float",
+        "xcor",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Correlation uses floating-point accumulation; normalization divides by the computed zero-lag value. f1 is set to -dt*ntout/2 even when sym=0.",
+      "c_lines": 88,
+      "difficulty": "easy",
+      "difficulty_reason": "It correlates each trace and optionally normalizes the result.",
+      "test_cases": [
+        {
+          "description": "Default symmetric normalized autocorrelation.",
+          "command": "suplane nt=128 ntr=4 | suacor ntout=31 norm=1 sym=1"
+        },
+        {
+          "description": "One-sided unnormalized autocorrelation.",
+          "command": "suplane nt=128 ntr=4 | suacor ntout=24 norm=0 sym=0"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "suxcor"
+      ]
+    },
+    {
+      "name": "suacorfrac",
+      "path": "su/main/convolution_correlation/suacorfrac.c",
+      "purpose": "Apply a fractional autocorrelation or autoconvolution operation in the frequency domain.",
+      "selfdoc_first_line": " SUACORFRAC -- general FRACtional Auto-CORrelation/convolution\t\t",
+      "params": [
+        {
+          "name": "a",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Exponent applied to the complex amplitude."
+        },
+        {
+          "name": "b",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "Multiplier applied to the complex phase."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: from first trace header dt for seismic data or d1 otherwise",
+          "required": false,
+          "description": "Listed in the selfdoc, but the program does not read a dt parameter; it requires the selected header value to be nonzero."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, report whether the first trace is seismic."
+        },
+        {
+          "name": "ntout",
+          "type": "int",
+          "default": "computed: from first trace header ns",
+          "required": false,
+          "description": "Read but never used to change the output length."
+        },
+        {
+          "name": "sym",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If nonzero, negate odd frequency bins before the inverse transform."
+        },
+        {
+          "name": "power",
+          "type": "float",
+          "default": "",
+          "required": false,
+          "description": "Appears in the selfdoc usage line, but the program does not read or use it; its type is not specified in the source."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "gettr",
+        "warn",
+        "err",
+        "checkpars",
+        "npfaro",
+        "ealloc1float",
+        "ealloc1complex",
+        "pfarc",
+        "cmul",
+        "pfacr",
+        "puttr",
+        "CWP_Exit",
+        "cmplx"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The PFA FFT and inverse FFT are unnormalized, so even a=b=0 scales samples by nfft. Complex powers use float intermediates with exp, log, atan2, cos and sin, whose results can vary by platform. When a=0, dopow returns 1 regardless of b. The program copies only the original nt samples back and ignores ntout.",
+      "c_lines": 190,
+      "difficulty": "medium",
+      "difficulty_reason": "It applies complex frequency-domain powers using forward and inverse FFTs.",
+      "test_cases": [
+        {
+          "description": "Default power operation with advisory output.",
+          "command": "suplane nt=128 ntr=4 | suacorfrac a=0 b=0 verbose=1"
+        },
+        {
+          "description": "Fractional operation with symmetric frequency shift.",
+          "command": "suplane nt=128 ntr=4 | suacorfrac a=0.5 b=0.5 sym=1 ntout=63"
+        },
+        {
+          "description": "Autoconvolution power.",
+          "command": "suplane nt=128 ntr=4 | suacorfrac a=1 b=-1 sym=0"
+        }
+      ],
+      "license_note": "Credits UHouston's Chris Liner; based on Hale's crpow.",
+      "related_programs": []
+    },
+    {
+      "name": "suconv",
+      "path": "su/main/convolution_correlation/suconv.c",
+      "purpose": "Convolve each input trace with a supplied numeric filter or SU trace.",
+      "selfdoc_first_line": " SUCONV - convolution with user-supplied filter\t\t\t",
+      "params": [
+        {
+          "name": "sufile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "SU filter file; either sufile or filter is required, and sufile takes precedence."
+        },
+        {
+          "name": "filter",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Filter coefficients; required if sufile is absent."
+        },
+        {
+          "name": "panel",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "With sufile, 0 uses its first trace for every input trace; 1 reads one filter trace per input trace."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "gettr",
+        "err",
+        "getparstring",
+        "countparval",
+        "ealloc1float",
+        "getparfloat",
+        "efopen",
+        "fgettr",
+        "checkpars",
+        "convolve_cwp",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Convolution uses floating-point accumulation. In panel=1 the return value of fgettr is ignored, so a short filter file can reuse stale trace data; the allocated filter is also replaced without being freed.",
+      "c_lines": 151,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads a filter and performs direct per-trace convolution.",
+      "test_cases": [
+        {
+          "description": "Convolve with explicit coefficients.",
+          "command": "suplane nt=128 ntr=4 | suconv filter=1,2,1 panel=0"
+        },
+        {
+          "description": "Use one SU filter trace for all input traces.",
+          "command": "suplane nt=32 ntr=1 > in.su && suplane nt=128 ntr=4 | suconv sufile=in.su panel=0"
+        },
+        {
+          "description": "Use corresponding SU filter traces.",
+          "command": "suplane nt=32 ntr=4 > in.su && suplane nt=128 ntr=4 | suconv sufile=in.su panel=1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": [
+        "surefcon",
+        "suxcor"
+      ]
+    },
+    {
+      "name": "surefcon",
+      "path": "su/main/convolution_correlation/surefcon.c",
+      "purpose": "Convolve forward and reverse shot traces with a specified trace offset.",
+      "selfdoc_first_line": " SUREFCON -  Convolution of user-supplied Forward and Reverse\t\t",
+      "params": [
+        {
+          "name": "sufile",
+          "type": "string",
+          "default": "",
+          "required": true,
+          "description": "SU file containing the offset forward-shot traces."
+        },
+        {
+          "name": "xy",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Number of initial file traces to skip; must be nonnegative. The selfdoc labels it required, but the code defaults it to zero."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparstring",
+        "checkpars",
+        "efopen",
+        "fgettr",
+        "ealloc1float",
+        "warn",
+        "convolve_cwp",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Convolution uses floating-point accumulation. Input and filter lengths are taken from their first selected traces and reused for subsequent traces; output dt is integer-divided by two.",
+      "c_lines": 145,
+      "difficulty": "easy",
+      "difficulty_reason": "It pairs two streams at a trace offset and directly convolves each pair.",
+      "test_cases": [
+        {
+          "description": "Pair traces without an offset.",
+          "command": "suplane nt=64 ntr=4 > in.su && suplane nt=64 ntr=4 | surefcon sufile=in.su xy=0"
+        },
+        {
+          "description": "Skip one forward-shot trace.",
+          "command": "suplane nt=64 ntr=5 > in.su && suplane nt=64 ntr=4 | surefcon sufile=in.su xy=1"
+        }
+      ],
+      "license_note": "Credits UNSW's D. Palmer and K.T. Lee and says the program is based on suconv; cites Palmer's refraction convolution work.",
+      "related_programs": [
+        "suconv"
+      ]
+    },
+    {
+      "name": "suxcor",
+      "path": "su/main/convolution_correlation/suxcor.c",
+      "purpose": "Cross-correlate input traces with a numeric filter or corresponding SU traces.",
+      "selfdoc_first_line": " SUXCOR - correlation with user-supplied filter\t\t\t",
+      "params": [
+        {
+          "name": "sufile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "SU filter file; either sufile or filter is required, and sufile takes precedence. Required for a valid panel=1 run."
+        },
+        {
+          "name": "filter",
+          "type": "float array",
+          "default": "",
+          "required": false,
+          "description": "Filter coefficients; required if sufile is absent."
+        },
+        {
+          "name": "vibroseis",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If positive, use this output length, start at zero lag, and set output delrt to zero."
+        },
+        {
+          "name": "first",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "If nonzero, use the supplied filter as the first correlation input; otherwise use it as the second."
+        },
+        {
+          "name": "panel",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "If 1, use corresponding traces from sufile and apply the specified window."
+        },
+        {
+          "name": "ftwin",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Starting window offset used with panel=1."
+        },
+        {
+          "name": "ltwin",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Ending window offset used to calculate the integer window step with panel=1."
+        },
+        {
+          "name": "ntwin",
+          "type": "int",
+          "default": "computed: from first input trace header ns",
+          "required": false,
+          "description": "Window length for panel=1; otherwise reset to the input trace length."
+        },
+        {
+          "name": "ntrc",
+          "type": "int",
+          "default": "48",
+          "required": false,
+          "description": "Number of traces per gather for resetting the panel window position."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparint",
+        "getparstring",
+        "countparval",
+        "ealloc1float",
+        "getparfloat",
+        "efopen",
+        "fgettr",
+        "checkpars",
+        "xcor",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Correlation uses floating-point accumulation. Panel window slope uses integer division and starts at ftwin plus one step on the first trace. Panel=1 with filter= and no sufile passes a null file pointer to fgettr; window bounds and ntrc are not validated.",
+      "c_lines": 269,
+      "difficulty": "medium",
+      "difficulty_reason": "It supports per-trace filter files, alternate correlation orders, vibroseis output, and a moving panel window.",
+      "test_cases": [
+        {
+          "description": "Correlate with an explicit filter in the default order.",
+          "command": "suplane nt=128 ntr=4 | suxcor filter=1,2,1 first=1 panel=0"
+        },
+        {
+          "description": "Use an SU filter with reversed correlation order and vibroseis output.",
+          "command": "suplane nt=32 ntr=1 > in.su && suplane nt=128 ntr=4 | suxcor sufile=in.su first=0 vibroseis=64"
+        },
+        {
+          "description": "Correlate corresponding traces with a sloping window.",
+          "command": "suplane nt=128 ntr=4 > in.su && suplane nt=128 ntr=4 | suxcor sufile=in.su panel=1 ftwin=2 ltwin=10 ntwin=64 ntrc=4 first=1"
+        }
+      ],
+      "license_note": "Credits UTK's Rick Williams for the vibroseis correlation option.",
+      "related_programs": [
+        "suconv",
+        "suacor"
+      ]
+    }
+  ]
+}

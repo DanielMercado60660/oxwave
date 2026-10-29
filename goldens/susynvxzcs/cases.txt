@@ -1,0 +1,78 @@
+# Early validation: required parameters, numeric conversion, sample limit, geometry.
+[stderr] susynvxzcs
+[stderr] susynvxzcs nx=21
+[stderr] susynvxzcs nz=21
+[stderr] susynvxzcs nx= nz=21
+[stderr] susynvxzcs nx=2147483648 nz=21
+[stderr] susynvxzcs nx=21 nz=21 nt=65536
+[stderr] susynvxzcs nx=21 nz=21 fxs=-1 nxg=1
+[stderr] susynvxzcs nx=21 nz=21 fxs=1001 nxg=1
+[stderr] susynvxzcs nx=21 nz=21 fxs=950 nxs=3 dxs=50 nxg=1
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 fxg=-1
+[stderr] susynvxzcs nx=21 nz=21 nxg=2 fxg=990 dxg=15
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 fxg=990 nxs=2 dxs=50 cable=1
+[stderr] susynvxzcs nx=0 nz=21
+[stderr] susynvxzcs nx=-3 nz=21
+# There is one output format (SU). Uniform native float velocity grids.
+# Default optional parameters including nt=501, nxg=101, nxd=5 and default ref.
+sunull nt=21 ntr=33 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=33 nz=21 < vel.bin
+# Nonzero trace samples; direct receivers and explicit common defaults.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=501 dt=0.004 ft=0 fpeak=50 dx=50 fx=0 dz=50 nxc=0 nzc=0 ls=0 pert=0 tmin=0.04 ndpfz=5 smooth=0 cable=1 verbose=0 < vel.bin
+# nt=1 and odd, non-power-of-two sample counts.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=1 nxg=1 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 dt=0.003 ft=0.05 fpeak=35 tmin=0.02 ndpfz=3 < vel.bin
+# Interpolation, final partial interval, multiple shots, rolling and static cables.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 nxg=7 dxg=25 nxd=4 nxs=2 dxs=25 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 nxg=6 dxg=25 nxd=2 nxs=2 dxs=50 cable=0 ls=1 < vel.bin
+# Smooth curved reflector, repeated reflector strings, implicit amplitude, signed amplitude.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 smooth=1 'ref=0.75:150,200;400,350;750,225' 'ref=200,450;700,450' < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 'ref=-0.5:200,225;700,425' < vel.bin
+# Corner velocity modification, including nxc/nzc upper clamping (nx1 <= nx).
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 nxc=2 nzc=3 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 nxc=99 nzc=99 < vel.bin
+# Non-square grid, negative origin, noninteger positions, negative receiver spacing.
+sunull nt=19 ntr=23 | sugain bias=1800 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=23 nz=19 nt=203 dx=40 dz=30 fx=-100 fxs=210.5 fxg=330.25 dxg=-25 nxg=3 nxb=5 nxd=1 'ref=1:150,250;600,250' < vel.bin
+# Verbose diagnostics and ignored unknown parameters: C never calls checkpars().
+[stderr] sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 verbose=1 ignored=1 < vel.bin
+# Perturbation: zero and nonzero slowness inputs.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=21 ntr=21 | sustrip outpar=/dev/null > pert.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 pert=1 vpfile=pert.bin < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sunull nt=21 ntr=21 | sugain bias=0.00001 | sustrip outpar=/dev/null > pert.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 pert=1 vpfile=pert.bin nxd=2 cable=0 ls=1 < vel.bin
+# Missing perturbation filename and short perturbation input.
+[stderr] sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' pert=1 < vel.bin
+[stderr] sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' pert=1 vpfile=/dev/null < vel.bin
+# Invalid reflectors and empty velocity input (C incorrectly formats FILE* with %s).
+[stderr] sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' 'ref=broken' < vel.bin
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 fxs=300 fxg=300 nxb=6
+# Empty shot/receiver loops; zero and negative values without undefined grid accesses.
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nxs=0 cable=0 nt=0 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nxs=-1 cable=0 nt=-1 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nxg=0 < vel.bin
+sunull nt=21 ntr=21 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && susynvxzcs nx=21 nz=21 nxg=3 fxg=300 dxg=50 fxs=300 nxb=6 nxd=1 'ref=1:100,300;800,300' nt=173 tmin=-1 nxc=-1 nzc=-1 < vel.bin
+# Reflector errors must precede the empty velocity read; odd coordinate
+# count, too few points, misplaced amplitude separator, and an empty string.
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 'ref=100,200;300'
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 'ref=1:100,200'
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 'ref=100,200:300,400'
+[stderr] susynvxzcs nx=21 nz=21 nxg=1 ref=
+# A short native float velocity grid must report the full requested item count.
+[stderr] sunull nt=3 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=21 nxg=1
+# Smoothly varying velocity in both dimensions. Header values provide a
+# reproducible native float ramp from 1700 to 2098 (21 columns by 19 depths).
+sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=binary > vel.bin && susynvxzcs nx=21 nz=19 nt=193 nxg=5 fxg=300 dxg=25 fxs=325 nxb=5 nxd=3 nxs=2 dxs=25 'ref=0.8:150,275;700,375' < vel.bin
+# The same varying medium with smoothing, line-source amplitudes and zero
+# perturbation, ensuring pert=1 retains the base travel-time calculation.
+sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=binary > vel.bin && sunull nt=19 ntr=21 | sustrip outpar=/dev/null > pert.bin && susynvxzcs nx=21 nz=19 nt=193 nxg=1 fxg=350 fxs=325 nxb=5 nxd=1 cable=0 ls=1 smooth=1 pert=1 vpfile=pert.bin 'ref=0.8:150,275;400,350;700,375' < vel.bin
+# Fractional source/receiver positions in a varying medium exercise
+# f32 surface-velocity interpolation in both receiver calculation branches.
+sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=binary > vel.bin && susynvxzcs nx=21 nz=19 nt=193 nxg=4 fxg=347.75 dxg=27.5 fxs=327.25 nxb=5 nxd=2 nxs=2 dxs=23.25 'ref=0.8:150,275;700,375' < vel.bin
+# Nonuniform, nonzero slowness perturbation in a varying medium.
+# This exercises spatial differences in the program-local delta_t routine;
+# the earlier perturbation grids were constant or zero.
+sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=binary > vel.bin && sunull nt=1 ntr=399 | sushw key=d1 a=0.000001 b=0.00000001 | sugethw key=d1 output=binary > pert.bin && susynvxzcs nx=21 nz=19 nt=193 nxg=4 fxg=347.75 dxg=27.5 fxs=327.25 nxb=5 nxd=2 pert=1 vpfile=pert.bin smooth=1 'ref=0.8:150,275;400,350;700,375' < vel.bin
+# Corner extrapolation must change a varying velocity grid, not just
+# rewrite identical values in the constant models tested above.
+sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=binary > vel.bin && susynvxzcs nx=21 nz=19 nt=193 nxg=4 fxg=347.75 dxg=27.5 fxs=327.25 nxb=5 nxd=2 nxc=3 nzc=4 'ref=0.8:150,275;700,375' < vel.bin
+# Excessive curvature exits from the supplied eikpex library; compare its
+# entire multiline diagnostic as well as the exit status and empty stdout.
+[stderr] sunull nt=1 ntr=399 | sushw key=tracl a=1500 b=1000 | sugethw key=tracl output=binary | susynvxzcs nx=21 nz=19 nt=193 nxg=1 fxg=300 fxs=300 nxb=5 nxd=1

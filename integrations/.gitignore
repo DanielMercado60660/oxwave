@@ -1,0 +1,9 @@
+target/
+dist/
+.venv/
+__pycache__/
+*.so
+*.pyc
+.prompts/
+.status.lock
+.test.lock

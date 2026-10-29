@@ -1,0 +1,21 @@
+# Single trace and default verbose; zero and negative integer values.
+sunull nt=1 ntr=1 | sukeycount key=cdp
+sunull nt=7 ntr=5 | sushw key=cdp a=-2 b=1 | sukeycount key=cdp
+# Constant and changing floating-point headers.
+sunull nt=3 ntr=5 | sushw key=d1 a=-0.5 b=0.25 | sukeycount key=d1
+sunull nt=3 ntr=3 | sukeycount key=d1 verbose=1
+# Positional key and legacy output argument.
+sunull nt=3 ntr=2 | sukeycount cdp
+[stderr] sunull nt=3 ntr=2 | sukeycount cdp verbose=1
+sunull nt=3 ntr=2 | sukeycount output=ascii
+# Invalid or missing key, multiple keys, and empty input.
+sukeycount
+sukeycount key=cdp </dev/null
+sunull nt=1 ntr=1 | sukeycount key=cdp,tracl
+sunull nt=1 ntr=1 | sukeycount cdp tracl
+sunull nt=1 ntr=1 | sukeycount key=notakey
+# A value that reappears is counted in a separate consecutive group.
+sunull nt=3 ntr=6 | sushw key=cdp a=1 b=1 j=2 | sukeycount key=cdp
+# Verbose diagnostics with an explicit key, and legacy output after the key.
+[stderr] sunull nt=1 ntr=1 | sukeycount key=cdp verbose=1
+sunull nt=1 ntr=1 | sukeycount cdp output=ascii

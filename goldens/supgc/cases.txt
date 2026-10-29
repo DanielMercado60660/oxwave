@@ -1,0 +1,13 @@
+# Default gain and single trace, odd sample count.
+[stderr] suspike nt=65 ntr=1 k1=20 mag=2 > in.su && supgc file=in.su
+# Partial and complete scans, zero and negative limits.
+[stderr] suplane nt=127 ntr=5 > in.su && supgc file=in.su ntrscan=1 lwindow=0.024 verbose=1
+[stderr] suplane nt=31 ntr=3 > in.su && supgc file=in.su ntrscan=0 lwindow=0.012
+[stderr] suplane nt=31 ntr=3 > in.su && supgc file=in.su ntrscan=-2 lwindow=-0.02
+[stderr] suspike nt=1 ntr=1 k1=1 > in.su && supgc file=in.su lwindow=0
+[stderr] sunull nt=17 ntr=3 > in.su && supgc file=in.su lwindow=0.04
+# Missing, nonexistent and empty input files and malformed parameter.
+supgc
+supgc file=missing
+touch empty.su && supgc file=empty.su
+supgc file=missing ntrscan=99999999999999999999999

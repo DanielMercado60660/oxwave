@@ -1,0 +1,17 @@
+# Native float input, multiple odd rows, and the output parameter file.
+suspike nt=3 ntr=3 | sustrip outpar=/dev/null | z2xyz n1=3 outpar=rows; cat rows
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=1 outpar=rows; cat rows
+# Empty input, zero and negative row sizes.
+z2xyz n1=3 outpar=rows </dev/null; cat rows
+z2xyz n1=0 outpar=rows </dev/null; cat rows
+z2xyz n1=-1 outpar=/dev/null
+# Missing parameter and failed default /dev/tty open.
+z2xyz outpar=/dev/null
+z2xyz n1=1
+# Partial final row.
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=3 outpar=/dev/null
+# Diagnostics and argument parsing.
+[stderr] z2xyz n1=1 outpar=/dev/null verbose=1 </dev/null
+[stderr] z2xyz n1=1 outpar=/dev/null unused=1 </dev/null
+z2xyz n1=abc outpar=rows </dev/null; cat rows
+z2xyz n1=1 outpar=/nonexistent/path

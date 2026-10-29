@@ -1,0 +1,49 @@
+# Defaults, explicit defaults, both correction modes, and diagnostics.
+[stderr] suplane nt=64 ntr=6 | sudipdivcor dxcdp=25
+[stderr] suplane nt=64 ntr=6 | sudipdivcor dxcdp=25 np=50 tmig=0 vmig=1500 conv=0 trans=0 norm=1 verbose=0
+[stderr] suplane nt=64 ntr=6 | sudipdivcor dxcdp=25 conv=1
+[stderr] suplane nt=65 ntr=7 | sudipdivcor dxcdp=25 np=9 verbose=1
+[stderr] suplane nt=65 ntr=7 | sudipdivcor dxcdp=12.5 np=9 conv=1 verbose=1
+# Nonconstant velocities exercise cubic interpolation, transmission and norm.
+[stderr] sunull nt=73 ntr=9 dt=0.004 | suaddnoise seed=13579 | sudipdivcor dxcdp=50 np=13 tmig=0,0.1,0.3 vmig=1400,1900,2300
+[stderr] sunull nt=73 ntr=9 dt=0.004 | suaddnoise seed=13579 | sudipdivcor dxcdp=50 np=13 tmig=0,0.1,0.3 vmig=1400,1900,2300 trans=1 norm=0
+[stderr] sunull nt=73 ntr=9 dt=0.004 | suaddnoise seed=13579 | sudipdivcor dxcdp=50 np=13 tmig=0,0.1,0.3 vmig=1400,1900,2300 conv=1 trans=1 norm=1
+[stderr] sunull nt=73 ntr=9 dt=0.004 | suaddnoise seed=13579 | sudipdivcor dxcdp=50 np=13 tmig=0,0.1,0.3 vmig=1400,1900,2300 conv=1 trans=0 norm=0
+# Decreasing velocities, turning rays, and negative times.
+[stderr] sunull nt=71 ntr=5 | suaddnoise seed=2468 | sudipdivcor dxcdp=100 np=7 tmig=0,0.1,0.3 vmig=3000,2200,1600 trans=1
+[stderr] sunull nt=71 ntr=5 | suaddnoise seed=2468 | sudipdivcor dxcdp=100 np=7 tmig=0,0.05,0.1 vmig=1000,3000,4000 trans=1 norm=0
+[stderr] sunull nt=31 ntr=3 | suaddnoise seed=2468 | sudipdivcor dxcdp=25 np=5 tmig=-0.1,0,0.1 vmig=1200,1500,1900 conv=1
+# Exactly nt velocity picks retains the C linear interpolation branch.
+[stderr] sunull nt=3 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=4 tmig=0,0.004,0.008 vmig=1500,1800,1600 conv=1
+# One trace, one sample, short and non-power-of-two FFT sizes.
+[stderr] sunull nt=67 ntr=1 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=8
+[stderr] sunull nt=1 ntr=1 | sudipdivcor dxcdp=25
+[stderr] sunull nt=1 ntr=3 | sudipdivcor dxcdp=25 conv=1 norm=0
+[stderr] sunull nt=2 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=2
+[stderr] sunull nt=7 ntr=5 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=3
+[stderr] sunull nt=17 ntr=11 | suaddnoise seed=42 | sudipdivcor dxcdp=200 np=6
+# delrt is retained in headers but not used to build the time array.
+[stderr] suplane nt=64 ntr=5 | sushw key=delrt a=120 | sudipdivcor dxcdp=25 np=6 conv=1
+# Zero and negative parameters; flags are tested for exact equality to 1.
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=0 np=4
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=-25 np=4
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=1 conv=1
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=1
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=4 trans=-1 norm=-1 conv=-1
+[stderr] sunull nt=17 ntr=3 | sudipdivcor dxcdp=25 np=4 vmig=0 conv=1 norm=0
+[stderr] sunull nt=17 ntr=3 | sudipdivcor dxcdp=25 np=4 vmig=-1500 conv=1 norm=0
+# Binary velocity input and ignored pick parameters.
+[stderr] printf '1500\n1600\n1700\n1800\n1900\n' | a2b n1=1 > vel; sunull nt=5 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=6 vfile=vel
+[stderr] printf '1500\n1600\n1700\n1800\n1900\n' | a2b n1=1 > vel; sunull nt=5 ntr=3 | suaddnoise seed=42 | sudipdivcor dxcdp=25 np=6 vfile=vel conv=1 trans=1 norm=0 verbose=1 tmig=1,0 vmig=1
+# Parameter and input errors: compare entire stderr for diagnostic fidelity.
+[stderr] sudipdivcor dxcdp=25
+[stderr] sunull nt=8 ntr=1 | sudipdivcor
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=25 tmig=0,1 vmig=1500
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=25 tmig=0,0 vmig=1500,1800
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=25 tmig=1,0 vmig=1500,1800
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=25 np=2147483648
+[stderr] sunull nt=8 ntr=1 | sudipdivcor dxcdp=1e-310
+[stderr] printf '1500\n1600\n' | a2b n1=1 > vel; sunull nt=5 ntr=1 | sudipdivcor dxcdp=25 vfile=vel
+[stderr] sunull nt=9 ntr=3 | sudipdivcor dxcdp=25 np=4 unknown=7
+[stderr] sunull nt=9 ntr=3 | sudipdivcor dxcdp=50 dxcdp=25 np=4

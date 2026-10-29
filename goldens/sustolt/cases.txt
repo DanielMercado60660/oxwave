@@ -1,0 +1,111 @@
+# SUSTOLT has one SU trace output mode. @selfdoc is added by the harness.
+# Compare full diagnostics for validation failures.
+[stderr] sustolt
+[stderr] sustolt cdpmin=1 cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=3 cdpmax=1 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sushw key=delrt a=4 | sustolt cdpmin=1 cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sushw key=delrt a=-4 | sustolt cdpmin=1 cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 vmig=1500
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0,0 vmig=1500,1600
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0.02,0.01 vmig=1500,1600
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0,1 vmig=1500,1600
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmpdir=/oxwave-no-such-directory/sustolt
+[stderr] sunull nt=9 ntr=1 | CWP_TMPDIR=/oxwave-no-such-directory/sustolt sustolt cdpmin=1 cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=2147483648 cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1e-310
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 noffmix=2147483648
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 lstaper=2147483648
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 lbtaper=2147483648
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin= cdpmax=3 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax= dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=
+# Default parameters, explicit defaults, odd sample/trace counts, and nonzero data.
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 noffmix=1 smig=1 vscale=1 fmax=125 lstaper=0 lbtaper=0 verbose=0 tmpdir=
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 smig=0.6
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 smig=1.4
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 fmax=40
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 fmax=1000
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 fmax=0
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 fmax=-1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=0.75
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=0
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=-1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 lstaper=2
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 lbtaper=7
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 lstaper=2 lbtaper=5
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 lstaper=-1 lbtaper=-1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 lstaper=9 lbtaper=50
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 noffmix=0
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 noffmix=-1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 verbose=1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 unknown=1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 tmpdir=.
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 tmpdir=
+# Stolt stretching with rising and falling velocity profiles.
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0,0.06 vmig=1400,2300
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0,0.04,0.1 vmig=1400,1800,2100 smig=0.6 fmax=60
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0,0.06 vmig=2300,1600
+# Single-sample, single-trace, even samples, zero data and selection windows.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+suspike nt=16 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500
+suspike nt=31 ntr=7 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=7 dxcdp=25 tmig=0 vmig=1500
+sunull nt=13 ntr=3 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=2 cdpmax=4 dxcdp=25 tmig=0 vmig=1500
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=10 cdpmax=12 dxcdp=25 tmig=0 vmig=1500
+suspike nt=9 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp a=-2 b=1 | sustolt cdpmin=-2 cdpmax=0 dxcdp=25 tmig=0 vmig=1500
+suspike nt=9 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=-25 tmig=0 vmig=1500
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=0 tmig=0 vmig=0
+# Multiple offsets, mixes and a partial final mix.
+[stderr] { suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 offset=100; suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 offset=200; suspike nt=17 ntr=3 nspk=1 ix1=3 it1=13 offset=300; } | sushw key=cdp a=1 b=1 j=3 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 noffmix=1 verbose=1
+[stderr] { suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 offset=100; suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 offset=200; suspike nt=17 ntr=3 nspk=1 ix1=3 it1=13 offset=300; } | sushw key=cdp a=1 b=1 j=3 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 noffmix=2 verbose=1
+[stderr] { suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 offset=100; suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 offset=200; suspike nt=17 ntr=3 nspk=1 ix1=3 it1=13 offset=300; } | sushw key=cdp a=1 b=1 j=3 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 noffmix=3 verbose=1
+# CWP_TMPDIR and the explicit empty tmpdir override.
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | CWP_TMPDIR=. sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 verbose=1
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | CWP_TMPDIR=/oxwave-no-such-directory sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 tmpdir=
+# Parse ordering and velocity/stretch scalar conversion errors.
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=2147483648 dxcdp=25
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1e-310
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 smig=1e-310
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 fmax=1e-310
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 vscale=1e-310
+# Non-default dt, deterministic broadband input, and repeated CDP assignment.
+suspike nt=65 ntr=5 dt=0.002 nspk=1 ix1=3 it1=25 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=12.5 tmig=0,0.06 vmig=1500,2200 fmax=80 smig=0.6
+sunull nt=41 ntr=5 | suaddnoise seed=17 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1800
+suspike nt=19 ntr=3 nspk=1 ix1=2 it1=7 | sushw key=cdp a=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+# Repeated parameters, empty array fields, and parameter files.
+[stderr] sunull nt=9 ntr=1 | sustolt cdpmin=1 cdpmin=4 cdpmax=3 dxcdp=25
+[stderr] sunull nt=33 ntr=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0,,0.06 vmig=1500,1600,1700
+[stderr] printf 'cdpmin=1 cdpmax=3 dxcdp=25 tmpdir=/oxwave-no-such-directory/sustolt\n' > migration.par; sunull nt=9 ntr=1 | sustolt par=migration.par
+[stderr] printf 'cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 noffmix=1 verbose=1\n' > migration.par; suspike nt=21 ntr=3 nspk=1 ix1=2 it1=7 | sushw key=cdp a=1 b=1 | sustolt par=migration.par vmig=1800
+# Descending offsets, a partial mix, and CDPs on both sides of the selection.
+[stderr] { suspike nt=23 ntr=5 nspk=1 ix1=3 it1=7 offset=100; suspike nt=23 ntr=5 nspk=1 ix1=2 it1=11 offset=0; suspike nt=23 ntr=5 nspk=1 ix1=4 it1=15 offset=-100; } | sushw key=cdp a=0 b=1 j=5 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 noffmix=2 lstaper=1 lbtaper=3 verbose=1
+# Negative padding makes the reference px pointer table alias q.
+# Exercise both transformed rows and aliased rows, with nxfft=2 and nxfft=4.
+suspike nt=33 ntr=5 nspk=1 ix1=1 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=-1
+suspike nt=33 ntr=5 nspk=1 ix1=5 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=-1
+suspike nt=17 ntr=5 nspk=1 ix1=5 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 vscale=-1
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=-25 tmig=0 vmig=1500
+# Stretch grids shorter than nt leave tail samples in the gather between offsets.
+[stderr] { suspike nt=65 ntr=5 nspk=1 ix1=1 it1=55 offset=0; suspike nt=65 ntr=5 nspk=1 ix1=5 it1=37 offset=100; } | sushw key=cdp a=1 b=1 j=5 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0,0.1 vmig=1400,2100 fmax=10 smig=0.6 noffmix=2 lstaper=2 lbtaper=12 verbose=1
+[stderr] { suspike nt=65 ntr=5 nspk=1 ix1=1 it1=55 offset=0; suspike nt=65 ntr=5 nspk=1 ix1=5 it1=37 offset=100; } | sushw key=cdp a=1 b=1 j=5 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0,0.1 vmig=1400,2100 smig=0.6 noffmix=1 verbose=1
+# Nonzero samples in the left, right and bottom taper regions.
+suspike nt=35 ntr=7 nspk=2 ix1=1 it1=33 ix2=7 it2=35 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=7 dxcdp=20 tmig=0 vmig=1800 lstaper=2 lbtaper=7
+# Larger odd dimensions, broadband data and a velocity curve with reversals.
+sunull nt=257 ntr=17 dt=0.002 | suaddnoise seed=29 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=17 dxcdp=12.5 tmig=0,0.08,0.2,0.4 vmig=1500,1900,1600,2400 smig=0.6 fmax=100 vscale=1.2 lstaper=3 lbtaper=15
+# Empty optional scalars take the C defaults; explicit zero/negative stretch.
+[stderr] suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 noffmix= smig= fmax= vscale= lstaper= lbtaper= verbose=
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 smig=0
+suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=5 dxcdp=25 tmig=0 vmig=1500 smig=-0.5
+# Named temporary files must be removed after successful output.
+[stderr] mkdir scratch; suspike nt=21 ntr=3 nspk=1 ix1=2 it1=7 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 tmpdir=scratch verbose=1 > migrated.su; test -z "$(ls -A scratch)" && cat migrated.su
+# Header validation and the appended end-time knot with dt=0.
+[stderr] sunull nt=9 ntr=1 | sushw key=dt a=0 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+[stderr] { sunull nt=9 ntr=1; sunull nt=11 ntr=1; } | sustolt cdpmin=0 cdpmax=0 dxcdp=25 tmig=0 vmig=1500

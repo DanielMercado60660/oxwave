@@ -1,0 +1,9 @@
+# Cases excluded because t prints the current date and time, so a recorded golden only matches
+# within the same minute. The selfdoc case still runs. Checked by hand on 2026-10-29: with TZ=UTC,
+# the original and OxWave print the same line when run in the same minute.
+TZ=UTC t
+TZ=America/Chicago t
+TZ=Pacific/Kiritimati t
+TZ=Pacific/Honolulu t
+TZ=UTC t verbose=1 unknown=3
+printf 'ignored input\n' | TZ=UTC t

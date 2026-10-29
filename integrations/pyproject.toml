@@ -1,0 +1,22 @@
+# uv environment for the OxWave integrations (bindings, MCP server, judges).
+# The `oxwave` Python package itself is built by maturin from py/pyproject.toml.
+[project]
+name = "oxwave-integrations-env"
+version = "0.1.0"
+description = "Environment for OxWave phase 2: Python bindings, MCP server, judges (a Rust port of CWP/SU)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "mcp",
+    "anyio",
+    "pytest",
+    "maturin",
+    "ruff",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider --basetemp=target/pytest-tmp"

@@ -1,0 +1,11 @@
+# Parameters, marked trace, frequency options and padding
+[stderr] suplane nt=31 ntr=7 | sushw key=mark a=0 b=1 | sufwatrim key=tracl,offset dx=2,10 keyg=ep vf=0 vmin=1500 padd=40 fac=2 verbose=1
+suspike nt=17 ntr=5 | sufwatrim key=tracl dx=1 padd=0
+suspike nt=1 ntr=1 | sufwatrim key=tracl dx=1
+suspike nt=13 ntr=3 | sufwatrim dx=1
+suspike nt=16 ntr=4 | sufwatrim key=tracl dx=0 fac=-1 vf=1 vmin=0
+suspike nt=20 ntr=8 | sushw key=ep a=1 b=1 j=4 | sufwatrim key=tracl dx=1 keyg=ep
+sufwatrim key=tracl dx=1
+sufwatrim key=tracl
+suspike nt=16 ntr=3 | sufwatrim key=badkey dx=1
+suspike nt=100 ntr=3 | sufwatrim key=tracl dx=1 padd=100000

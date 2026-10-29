@@ -1,0 +1,67 @@
+# Read generated attribute files so numerical results and headers are compared.
+suplane nt=65 ntr=6 | supolar; cat polar.rl polar.dir
+suplane nt=65 ntr=6 | supolar dt=0.004 wl=0.1 win=boxcar file=explicit rl=1 dir=1 all=0 theta=0 phi=0 tau=0 ellip=0 pln=0 f1=0 l1=0 amp=0 rlq=1 verbose=0; cat explicit.rl explicit.dir
+# All three rectilinearity/angle definitions, all windows, and all angle units.
+sunull nt=65 ntr=6 | suaddnoise seed=17 | supolar wl=0.028 all=1 amp=0; cat polar.rl polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.dir
+sunull nt=65 ntr=6 | suaddnoise seed=17 | supolar wl=0.032 win=bartlett all=2 amp=0 angle=deg rlq=1.5 file=second; cat second.rl second.theta second.phi second.tau second.e21 second.e31 second.e32 second.pln second.f1 second.l1 second.dir
+sunull nt=65 ntr=6 | suaddnoise seed=17 | supolar wl=0.028 win=hanning all=3 amp=0 angle=gon rlq=2; cat polar.rl polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.dir
+sunull nt=33 ntr=9 | suaddnoise seed=53 | supolar wl=0.024 win=welsh all=1 amp=0 angle=rad; cat polar.rl polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.dir
+# Even two-sample window tests every amplitude sample without the original
+# quadratic-resultant overread (which occurs with larger windows).
+sunull nt=35 ntr=6 | suaddnoise seed=71 | supolar wl=0.008 all=1; cat polar.er polar.ir polar.qr polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# C ampparams reads beyond its entire data allocation when a computed qr
+# sample has it + iwl > nt. Its tail then depends on unrelated heap objects
+# (earlier failures); compare the defined prefix for windows > 2.
+# sumute zeros only the unchecked tail while preserving ns, so the harness
+# still compares SU headers and uses the normal 1e-5 float tolerance.
+# All er/ir samples, and all other attributes, are still compared in full.
+sunull nt=31 ntr=6 | suaddnoise seed=71 | supolar all=1; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=0.028
+sunull nt=128 ntr=6 | suaddnoise seed=71 | supolar all=3; cat polar.er polar.ir polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1; sumute < polar.qr mode=1 xmute=0 tmute=0.416
+sunull nt=128 ntr=6 | suaddnoise seed=71 | supolar wl=0.48 all=3 win=hanning file=out; cat out.er out.ir; sumute < out.qr mode=1 xmute=0 tmute=0.036
+sunull nt=1024 ntr=6 | suaddnoise seed=71 | supolar wl=3.072 all=1; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=1.028
+sunull nt=1024 ntr=6 | suaddnoise seed=71 | supolar wl=3.072 rl=0 dir=0 amp=1; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=1.028
+sunull nt=1 ntr=3 | supolar dt=0.004 wl=0.004 all=3; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+sunull nt=7 ntr=3 | suaddnoise seed=9 | supolar wl=0.004 all=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+sunull nt=7 ntr=3 | suaddnoise seed=9 | supolar wl=0.004 all=1 win=hanning; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+sunull nt=15 ntr=3 | supolar wl=0.06 all=2 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=16 ntr=3 | supolar wl=0.064 all=1 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# Individual flags and explicit overrides; unknown definition values use defaults.
+sunull nt=31 ntr=3 | suaddnoise seed=91 | supolar wl=0.02 rl=0 dir=0 theta=1 phi=1; cat polar.theta polar.phi
+sunull nt=31 ntr=3 | suaddnoise seed=91 | supolar wl=0.02 rl=2 dir=0 tau=1 ellip=1 pln=1 f1=1 l1=1; cat polar.rl polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=31 ntr=3 | suaddnoise seed=91 | supolar wl=0.02 all=3 rl=0 dir=0 theta=0 phi=0 tau=0 ellip=0 pln=0 f1=0 l1=0 amp=0
+sunull nt=31 ntr=3 | suaddnoise seed=91 | supolar wl=0.02 rl=-1 theta=4 phi=-2 rlq=-0.5; cat polar.rl polar.theta polar.phi polar.dir
+sunull nt=31 ntr=3 | suaddnoise seed=91 | supolar wl=0.02 rlq=0; cat polar.rl
+sunull nt=31 ntr=3 | supolar dt=-0.004 wl=-0.02; cat polar.rl polar.dir
+[stderr] sunull nt=31 ntr=7 | supolar wl=0.02 all=2 amp=0 angle=deg verbose=1; cat polar.rl polar.dir polar.theta polar.phi
+[stderr] sunull nt=31 ntr=1 | supolar wl=0.02 verbose=1; cat polar.rl polar.dir
+[stderr] sunull nt=31 ntr=2 | supolar wl=0.02 verbose=1; cat polar.rl polar.dir
+[stderr] sunull nt=31 ntr=3 | sushw key=dt a=0 | supolar; cat polar.rl polar.dir
+[stderr] sunull nt=31 ntr=3 | supolar dt=0; cat polar.rl polar.dir
+[stderr] sunull nt=31 ntr=3 | supolar wl=0.02 bogus=1; cat polar.rl polar.dir
+# Error exits, including validation order and empty input.
+[stderr] supolar
+[stderr] supolar all=1
+[stderr] sunull nt=31 ntr=3 | supolar win=invalid
+[stderr] sunull nt=31 ntr=3 | supolar win=
+[stderr] sunull nt=31 ntr=3 | supolar angle=invalid
+[stderr] sunull nt=31 ntr=3 | supolar angle=
+[stderr] sunull nt=31 ntr=3 | supolar wl=0
+[stderr] sunull nt=31 ntr=3 | supolar wl=-0.1
+[stderr] sunull nt=31 ntr=3 | supolar wl=0.001
+[stderr] sunull nt=31 ntr=3 | supolar dt=-0.004
+[stderr] sunull nt=31 ntr=3 | supolar wl=1
+[stderr] sunull nt=31 ntr=3 | supolar file=
+[stderr] sunull nt=31 ntr=3 | supolar file=/nonexistent/supolar
+[stderr] sunull nt=1 ntr=1 | supolar
+[stderr] sunull nt=31 ntr=3 | supolar all=2147483648
+# Last occurrence wins, empty numeric values restore defaults, and par files.
+sunull nt=31 ntr=3 | suaddnoise seed=37 | supolar wl=0 wl=0.02 rlq= dir=0 theta=2 phi=3; cat polar.rl polar.theta polar.phi
+printf 'wl=0.024 win=welsh all=2 amp=0 angle=deg\n' > params; sunull nt=31 ntr=3 | suaddnoise seed=55 | supolar par=params; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+
+# Nonzero qr with long windows: retain every sample whose C reads are defined.
+sunull nt=257 ntr=9 | suaddnoise seed=123 | supolar wl=0.48 win=hanning all=3; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=0.552
+sunull nt=1024 ntr=6 | suaddnoise seed=71 | supolar wl=1.028 win=bartlett amp=1; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=3.072
+sunull nt=513 ntr=6 | suaddnoise seed=89 | supolar wl=0.1 win=welsh rl=0 dir=0 amp=1; cat polar.er polar.ir; sumute < polar.qr mode=1 xmute=0 tmute=1.956
+# Full qr is defined for one- and two-sample windows, including nt=1,2.
+sunull nt=2 ntr=6 | suaddnoise seed=101 | supolar wl=0.008 all=3; cat polar.er polar.ir polar.qr polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=9 ntr=7 | suaddnoise seed=19 | supolar wl=0.008 amp=1 verbose=1; cat polar.er polar.ir polar.qr polar.rl polar.dir

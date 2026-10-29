@@ -1,0 +1,24 @@
+# Ordered merge, ties, sparse input numbers, and default trace renumbering.
+suplane nt=7 ntr=5 > a && suplane nt=7 ntr=3 > b && subraid in99=b in0=a key=tracl
+# Explicit ascending and descending keys, with original counters retained.
+sunull nt=5 ntr=4 | sushw key=cdp,offset a=1,9 b=1,-1 > a && sunull nt=5 ntr=3 | sushw key=cdp,offset a=1,8 b=1,-1 > b && subraid in2=a in10=b key=+cdp,-offset trac=0
+# Descending order and singleton traces.
+sunull nt=1 ntr=1 | sushw key=cdp a=-2 > a && sunull nt=1 ntr=1 | sushw key=cdp a=0 > b && subraid in1=a in2=b key=-cdp trac=1
+# Verbose and unknown argument diagnostics.
+[stderr] sunull nt=3 ntr=2 > a && sunull nt=3 ntr=1 > b && subraid in1=a in2=b key=tracl verbose=1 extra=1
+# Errors for missing and invalid parameters, missing files, and empty files.
+subraid
+subraid key=bad
+subraid key=null
+subraid key=cdp trac=-1
+subraid key=cdp trac=2
+subraid key=cdp
+subraid key=cdp in1=missing
+touch a && subraid key=cdp in1=a in2=a
+sunull nt=3 ntr=1 > a && subraid key=cdp in1=a
+# A decreasing input causes an error after the correctly ordered prefix.
+sunull nt=3 ntr=3 | sushw key=cdp a=3 b=-1 > a && sunull nt=3 ntr=1 | sushw key=cdp a=9 > b && subraid key=cdp in7=a in20=b
+# Three inputs with equal keys exercise tie ordering after an input is exhausted.
+sunull nt=3 ntr=1 | sushw key=cdp,tracf a=1,10 > a && sunull nt=3 ntr=2 | sushw key=cdp,tracf a=1,20 b=0,1 > b && sunull nt=3 ntr=2 | sushw key=cdp,tracf a=1,30 b=0,1 > c && subraid in0=a in33=b in99=c key=cdp trac=0
+# Signed unknown key name.
+subraid key=-bad

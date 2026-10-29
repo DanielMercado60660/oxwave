@@ -1,0 +1,222 @@
+{
+  "scope": "su/main/synthetics_waveforms_testpatterns part 2 of 2 — incomplete: only surandspike and suspike have been fully inventoried; the other 11 programs still require source and library-call review.",
+  "programs": [
+    {
+      "name": "surandspike",
+      "path": "su/main/synthetics_waveforms_testpatterns/surandspike.c",
+      "purpose": "Generate SU traces containing randomly placed spikes.",
+      "selfdoc_first_line": " SURANDSPIKE - make a small data set of RANDom SPIKEs \t\t",
+      "params": [
+        {
+          "name": "mode",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Use different spikes on each trace when 1, or repeat the first trace when 2."
+        },
+        {
+          "name": "seed",
+          "type": "unsigned int",
+          "default": "computed: current time from time()",
+          "required": false,
+          "description": "Random generator seed."
+        },
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "500",
+          "required": false,
+          "description": "Number of samples per trace."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": ".002",
+          "required": false,
+          "description": "Sample interval in seconds."
+        },
+        {
+          "name": "n2",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Number of traces; the selfdoc incorrectly states 200."
+        },
+        {
+          "name": "nspk",
+          "type": "int",
+          "default": "20",
+          "required": false,
+          "description": "Number of spike placements per generated trace."
+        },
+        {
+          "name": "amax",
+          "type": "float",
+          "default": "0.2",
+          "required": false,
+          "description": "Absolute amplitude limit; negative values are negated."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparuint",
+        "getparfloat",
+        "err",
+        "sranuni",
+        "checkpars",
+        "franuni",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": true,
+      "float_sensitive_notes": "The random generator and float rounding determine spike indices and amplitudes. A placement can address sample n1, beyond the samples written in the trace. Repeated placements overwrite earlier amplitudes.",
+      "c_lines": 112,
+      "difficulty": "easy",
+      "difficulty_reason": "The program generates random indices and amplitudes and writes traces.",
+      "test_cases": [
+        {
+          "description": "Generate independently randomized traces with a fixed seed.",
+          "command": "surandspike n1=128 n2=8 dt=0.004 nspk=5 amax=0.5 mode=1 seed=123"
+        },
+        {
+          "description": "Repeat the same random spike pattern on each trace.",
+          "command": "surandspike n1=64 n2=4 dt=0.002 nspk=8 amax=0.3 mode=2 seed=7"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suspike",
+      "path": "su/main/synthetics_waveforms_testpatterns/suspike.c",
+      "purpose": "Generate a common-offset SU dataset with up to four unit spikes.",
+      "selfdoc_first_line": " SUSPIKE - make a small spike data set \t\t\t",
+      "params": [
+        {
+          "name": "nt",
+          "type": "int",
+          "default": "64",
+          "required": false,
+          "description": "Number of time samples."
+        },
+        {
+          "name": "ntr",
+          "type": "int",
+          "default": "32",
+          "required": false,
+          "description": "Number of traces."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "0.004",
+          "required": false,
+          "description": "Sample interval in seconds."
+        },
+        {
+          "name": "offset",
+          "type": "float",
+          "default": "400",
+          "required": false,
+          "description": "Offset stored in each trace header."
+        },
+        {
+          "name": "nspk",
+          "type": "int",
+          "default": "4",
+          "required": false,
+          "description": "Number of enabled spikes; the first spike is always enabled."
+        },
+        {
+          "name": "ix1",
+          "type": "int",
+          "default": "computed: ntr/4",
+          "required": false,
+          "description": "One-based trace index of spike 1."
+        },
+        {
+          "name": "it1",
+          "type": "int",
+          "default": "computed: nt/4",
+          "required": false,
+          "description": "One-based sample index of spike 1."
+        },
+        {
+          "name": "ix2",
+          "type": "int",
+          "default": "computed: ntr/4",
+          "required": false,
+          "description": "One-based trace index of spike 2."
+        },
+        {
+          "name": "it2",
+          "type": "int",
+          "default": "computed: 3*nt/4",
+          "required": false,
+          "description": "One-based sample index of spike 2."
+        },
+        {
+          "name": "ix3",
+          "type": "int",
+          "default": "computed: 3*ntr/4",
+          "required": false,
+          "description": "One-based trace index of spike 3."
+        },
+        {
+          "name": "it3",
+          "type": "int",
+          "default": "computed: nt/4",
+          "required": false,
+          "description": "One-based sample index of spike 3."
+        },
+        {
+          "name": "ix4",
+          "type": "int",
+          "default": "computed: 3*ntr/4",
+          "required": false,
+          "description": "One-based trace index of spike 4."
+        },
+        {
+          "name": "it4",
+          "type": "int",
+          "default": "computed: 3*nt/4",
+          "required": false,
+          "description": "One-based sample index of spike 4."
+        }
+      ],
+      "stdin": "none",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "getparfloat",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Spike sample indices are not validated; invalid values can write outside the intended trace data. Header conversion truncates floating-point values.",
+      "c_lines": 97,
+      "difficulty": "easy",
+      "difficulty_reason": "The program fills trace headers and sets individual samples.",
+      "test_cases": [
+        {
+          "description": "Generate two explicitly positioned spikes.",
+          "command": "suspike nt=128 ntr=16 dt=0.002 offset=100 nspk=2 ix1=3 it1=20 ix2=12 it2=80"
+        },
+        {
+          "description": "Generate all four spikes with custom positions.",
+          "command": "suspike nt=64 ntr=8 nspk=4 ix1=1 it1=5 ix2=2 it2=15 ix3=5 it3=30 ix4=8 it4=60"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

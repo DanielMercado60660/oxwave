@@ -1,0 +1,17 @@
+[package]
+name = "succfilt"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "succfilt"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-gather-io = { path = "../../crates/oxwave-gather-io" }
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }

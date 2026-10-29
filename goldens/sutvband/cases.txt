@@ -1,0 +1,24 @@
+# Single filter, explicit dt, odd trace size and one trace
+suplane nt=101 ntr=1 dt=0.004 | sutvband dt=0.004 tf=0.2 f=0,5,30,40
+# Filter at each endpoint, zero-width tapers, Nyquist clipping
+suplane nt=101 ntr=2 dt=0.004 | sutvband tf=0,0.4 f=0,0,30,30 f=5,10,120,200
+# Nonzero delay and non-seismic trace warning, verbose argument is unused by C
+[stderr] suplane nt=101 ntr=1 dt=0.004 | sushw key=delrt,trid a=100,30 | sutvband tf=0.2 f=5,10,30,40 verbose=1
+# One sample
+suplane nt=1 ntr=1 dt=0.004 | sutvband tf=0 f=0,0,30,40
+# Missing input and required parameters
+sutvband tf=0 f=0,5,30,40 < /dev/null
+suplane nt=64 ntr=1 | sutvband f=0,5,30,40
+suplane nt=64 ntr=1 | sutvband tf=0
+suplane nt=64 ntr=1 | sutvband tf=0,0.1 f=0,5,30,40
+suplane nt=64 ntr=1 | sutvband tf=0 f=0,5,30
+suplane nt=64 ntr=1 | sutvband tf=0 f=-1,5,30,40
+suplane nt=64 ntr=1 | sutvband tf=0 f=5,4,30,40
+suplane nt=64 ntr=1 | sutvband tf=0 f=0,5,5,40
+suplane nt=64 ntr=1 | sutvband tf=0 f=0,5,40,30
+suplane nt=64 ntr=1 | sushw key=dt a=0 | sutvband tf=0 f=0,5,30,40
+suplane nt=64 ntr=1 | sutvband dt=0 tf=0 f=0,5,30,40
+# Last valid frequency bin as a lower corner; filter times at trace endpoints
+suplane nt=101 ntr=1 dt=0.004 | sutvband tf=0,0.4 f=120,125,130,140 f=120,125,130,140
+# Nonzero delay with both filter centers at the sampled endpoints
+suplane nt=101 ntr=1 dt=0.004 | sushw key=delrt a=100 | sutvband tf=0.1,0.5 f=0,5,30,40 f=5,10,20,30

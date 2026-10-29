@@ -1,0 +1,19 @@
+# Defaults and record sizes; output count in a file.
+[exact] suplane nt=5 ntr=1 | sustrip | ftnunstrip outpar=count; cat count
+[exact] suspike nt=5 ntr=3 | sustrip | ftnunstrip n1=5 outpar=count; cat count
+[exact] suspike nt=1 ntr=1 | sustrip | ftnunstrip n1=1 outpar=count; cat count
+[exact] suplane nt=7 ntr=2 | sustrip | ftnunstrip n1=2 outpar=count; cat count
+# Partial record, empty input, and zero length.
+[stderr] suspike nt=5 ntr=1 | sustrip | ftnunstrip n1=3 outpar=count
+[exact] ftnunstrip n1=2 outpar=count </dev/null; cat count
+[exact] ftnunstrip n1=0 outpar=count </dev/null; cat count
+[stderr] ftnunstrip n1=-1 outpar=count </dev/null
+[stderr] ftnunstrip n1=1 </dev/null
+[stderr] ftnunstrip outpar=/nonexistent/ftnunstrip/count </dev/null
+[stderr] ftnunstrip outpar=count verbose=1 unknown=1 </dev/null
+[stderr] ftnunstrip outpar=/dev/stderr </dev/null
+# Native float input exercises record markers and data independently of SU generators.
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=5f",1,-2,3.5,0,9))' | ftnunstrip outpar=count; cat count
+[exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6f",1,-2,3.5,0,9,4))' | ftnunstrip n1=3 outpar=count; cat count
+[stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=5f",1,-2,3.5,0,9))' | ftnunstrip n1=3 outpar=count
+[exact] printf '\001\002\003' | ftnunstrip n1=1 outpar=count; cat count

@@ -1,0 +1,13 @@
+# Default and both signs, varied FFT sizes and trace counts.
+suplane nt=63 ntr=1 | sufft | suifft
+suplane nt=101 ntr=3 | sufft sign=-1 | suifft sign=1
+suplane nt=1 ntr=1 | sufft | suifft sign=-1
+suspike nt=30 ntr=2 | sufft | suifft verbose=1
+# Sampling interval falls back to dt, or zero, when frequency d1 is zero.
+suplane nt=64 ntr=2 | sufft | sushw key=d1 a=0 | suifft
+suplane nt=64 ntr=1 | sufft | sushw key=d1,dt a=0,0 | suifft
+# Bad input, invalid signs and empty input.
+suplane nt=16 ntr=1 | suifft
+suplane nt=16 ntr=1 | sufft | suifft sign=0
+suplane nt=16 ntr=1 | sufft | suifft sign=2
+suifft sign=-1

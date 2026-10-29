@@ -1,0 +1,36 @@
+# Default, single trace and odd sample counts
+sunull nt=1 ntr=1 dt=0.004 | suwind
+sunull nt=9 ntr=7 dt=0.004 | suwind
+# Selection, unconditional accept/reject, modulo and counts
+sunull nt=9 ntr=7 dt=0.004 | suwind min=2 max=6 j=2 s=1 reject=3 accept=7 count=3
+sunull nt=9 ntr=7 dt=0.004 | sushw key=offset a=-3 b=1 | suwind key=offset abs=1 min=1 max=2
+sunull nt=9 ntr=7 dt=0.004 | suwind min=2 max=4 ordered=1
+sunull nt=9 ntr=7 dt=0.004 | sushw key=tracl a=7 b=-1 | suwind min=3 max=6 ordered=-1
+sunull nt=9 ntr=3 dt=0.004 | suwind count=0 j=0
+# Time windows, explicit sampling and padding
+suspike nt=9 ntr=3 dt=0.004 | suwind itmin=2 itmax=6
+suspike nt=9 ntr=3 dt=0.004 | suwind tmin=0.008 tmax=0.024
+suspike nt=9 ntr=3 dt=0.004 | suwind dt=0.002 f1=0.01 tmin=0.012 nt=12
+suspike nt=9 ntr=3 dt=0.004 | suwind nt=12
+# Window reaches beyond the input samples but stays inside the trace buffer
+sunull nt=9 ntr=1 dt=0.004 | suwind itmin=8 nt=3
+# Nonseismic header branch and fallback
+sunull nt=9 ntr=2 dt=0.004 | sushw key=trid,d1,f1 a=130,2,10 | suwind itmin=2 nt=4
+[stderr] sunull nt=9 ntr=2 dt=0.004 | sushw key=trid a=130 | suwind verbose=1
+[stderr] sunull nt=9 ntr=5 dt=0.004 | suwind verbose=1 min=2 max=3 reject=2 accept=4
+# Disk-only skip and failure on pipe
+sunull nt=9 ntr=5 dt=0.004 > in.su; suwind skip=2 < in.su
+sunull nt=9 ntr=5 dt=0.004 > in.su; suwind skip=5 < in.su
+sunull nt=9 ntr=5 dt=0.004 | suwind skip=1
+# Error paths
+suwind < /dev/null
+sunull nt=9 ntr=1 dt=0.004 | sushw key=dt a=0 | suwind
+sunull nt=9 ntr=1 dt=0.004 | suwind itmin=-1
+sunull nt=9 ntr=1 dt=0.004 | suwind nt=65536
+sunull nt=9 ntr=1 dt=0.004 | suwind itmin=5 itmax=2
+sunull nt=9 ntr=1 dt=0.004 | suwind key=bogus
+# Parameter precedence and empty selection statistics
+[stderr] sunull nt=9 ntr=3 dt=0.004 | suwind verbose=1 min=99
+sunull nt=9 ntr=2 dt=0.004 | suwind itmin=2 tmin=0.024 itmax=5 tmax=0.032 nt=1
+sunull nt=9 ntr=2 dt=0.004 | sushw key=trid,dt,d1 a=130,0,0 | suwind
+sunull nt=9 ntr=2 dt=0.004 | suwind nt=0

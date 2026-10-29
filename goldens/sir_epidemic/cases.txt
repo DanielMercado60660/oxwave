@@ -1,0 +1,69 @@
+# Default execution consumes no input and emits three contiguous float series.
+[f32] sir_epidemic
+[f32] sir_epidemic stepmax=40 verbose=0 normalize=1 N=1000 s0=1000 i0=1 r0=0 scale=0 h=1 tol=1e-8 mode=SIR b=0.5 k=0.333 xi=0 mu=0 gamma=0 nu=0
+# Each supported output mode, odd sizes, and both documented scaling modes.
+[f32] sir_epidemic stepmax=1
+[f32] sir_epidemic stepmax=1 mode=S s0=375 i0=12 r0=20 scale=1
+[f32] sir_epidemic stepmax=1 mode=R s0=375 i0=12 r0=20 scale=2
+[f32] sir_epidemic stepmax=7 mode=S
+[f32] sir_epidemic stepmax=7 mode=R
+[f32] sir_epidemic stepmax=17 h=0.125 N=762 s0=700 i0=10 r0=52 b=2 k=0.5 scale=1
+[f32] sir_epidemic stepmax=31 h=0.3 N=200 s0=175 i0=20 r0=5 scale=2
+[f32] sir_epidemic stepmax=11 h=0.1 normalize=0 N=10 s0=9 i0=1 r0=0.25 b=0.02 k=0.3 mode=R
+[f32] sir_epidemic stepmax=13 normalize=2 N=75 s0=60 i0=3 r0=12 scale=2 mode=S
+# Full diagnostics also verify adaptive accepted/rejected step counts.
+[f32] [stderr] sir_epidemic verbose=1 stepmax=7
+[f32] [stderr] sir_epidemic verbose=2 stepmax=9 h=2 b=4 k=0.2 tol=1e-10
+[f32] [stderr] sir_epidemic verbose=1 stepmax=5 h=-0.2 tol=1e-6
+[f32] [stderr] sir_epidemic verbose=1 stepmax=4 h=0
+# Reinfection, births, and social distancing separately and together.
+[f32] sir_epidemic stepmax=19 xi=0.1 r0=50
+[f32] sir_epidemic stepmax=19 mu=0.03
+[f32] sir_epidemic stepmax=19 gamma=20
+[f32] sir_epidemic stepmax=27 h=0.5 N=200 i0=5 r0=10 b=0.8 k=0.15 xi=0.04 mu=0.02 gamma=7 scale=1
+# nu is never parsed; mode=I is rejected due to the repeated S test in C.
+[f32] [stderr] sir_epidemic stepmax=7 nu=0.9 unknown=ignored
+[f32] [stderr] sir_epidemic stepmax=3 nu=1e999
+[stderr] sir_epidemic mode=I
+[stderr] sir_epidemic mode=invalid
+[stderr] sir_epidemic mode=
+[stderr] sir_epidemic mode=s
+# Zero/negative values and unsupported nonzero scales (scalar stays zero).
+[f32] sir_epidemic stepmax=0
+[f32] [stderr] sir_epidemic stepmax=0 verbose=1
+[stderr] sir_epidemic stepmax=-1
+[f32] sir_epidemic stepmax=5 scale=3
+[f32] sir_epidemic stepmax=5 scale=-1
+[f32] sir_epidemic stepmax=5 h=-0.5 b=-0.1 k=0.2
+[f32] sir_epidemic stepmax=5 N=-100 s0=-80 i0=-2 r0=-18
+[f32] sir_epidemic stepmax=5 N=0 normalize=0 s0=0 i0=0 r0=0
+[f32] sir_epidemic stepmax=3 N=0
+[f32] sir_epidemic stepmax=9 b=0 k=0 xi=0 mu=0 gamma=0
+[f32] sir_epidemic stepmax=9 s0=0 i0=0 r0=0
+[f32] [stderr] sir_epidemic stepmax=3 tol=0 h=0.1 b=0 k=0
+[f32] [stderr] sir_epidemic stepmax=3 tol=-1 h=0.1 b=0 k=0 verbose=1
+# Parameter conversion errors preserve callback timing and parameter order.
+[stderr] sir_epidemic stepmax=2147483648
+[stderr] sir_epidemic normalize=2147483648
+[stderr] sir_epidemic N=1e999
+[stderr] sir_epidemic s0=1e999
+[stderr] sir_epidemic i0=1e999
+[stderr] sir_epidemic r0=1e999
+[stderr] sir_epidemic h=1e999
+[stderr] sir_epidemic tol=1e999
+[stderr] sir_epidemic scale=2147483648
+[stderr] sir_epidemic verbose=2147483648
+[stderr] sir_epidemic stepmax=1 b=1e999
+[stderr] sir_epidemic stepmax=1 k=1e999
+[stderr] sir_epidemic stepmax=1 xi=1e999
+[stderr] sir_epidemic stepmax=1 mu=1e999
+[stderr] sir_epidemic stepmax=1 gamma=1e999
+[f32] sir_epidemic stepmax=1 h=0 b=1e999 k=1e999 xi=1e999 mu=1e999 gamma=1e999
+# Empty numeric values, repeated values, and parameter files use core getpar.
+[f32] sir_epidemic stepmax=3 h= N= b= k= i0= r0=
+[f32] sir_epidemic stepmax=3 b=abc k=abc
+[f32] sir_epidemic stepmax=2 stepmax=5 mode=R mode=S scale=1
+[f32] printf 'stepmax=7 h=0.25 N=150 i0=3 r0=4 scale=2 mode=R\n' > model.par; sir_epidemic par=model.par k=0.2
+# Redirected outputs must be read back for comparison.
+[f32] sir_epidemic stepmax=32 h=0.25 N=200 i0=2 b=0.6 k=0.2 gamma=5 xi=0.01 scale=1 mode=SIR > sir_all.bin; cat sir_all.bin
+[f32] sir_epidemic stepmax=32 h=0.1 normalize=0 N=10 s0=9 i0=1 b=0.02 k=0.3 mode=R > sir_r.bin; cat sir_r.bin

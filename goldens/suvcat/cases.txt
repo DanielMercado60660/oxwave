@@ -1,0 +1,36 @@
+# Defaults, differing trace lengths and non-power-of-two sizes.
+suspike nt=7 ntr=3 k1=3 > a && suspike nt=5 ntr=3 k1=2 > b && suvcat a b
+# Every taper type with distinct positive and negative values.
+suspike nt=9 ntr=2 k1=7 mag=2 > a && suspike nt=7 ntr=2 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=0
+suspike nt=9 ntr=2 k1=7 mag=2 > a && suspike nt=7 ntr=2 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=1
+suspike nt=9 ntr=2 k1=7 mag=2 > a && suspike nt=7 ntr=2 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=2
+suspike nt=9 ntr=2 k1=7 mag=2 > a && suspike nt=7 ntr=2 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=3
+suspike nt=1 ntr=1 > a && suspike nt=1 ntr=1 > b && suvcat a b taplen=1 taptype=2
+[stderr] suspike nt=5 ntr=1 > a && suspike nt=5 ntr=1 > b && suvcat a b taplen=5 taptype=1 verbose=1
+suspike nt=5 ntr=1 > a && suspike nt=5 ntr=1 > b && suvcat a b taplen=0 taptype=-1
+# Both unequal trace-count directions and warning messages.
+[stderr] suspike nt=5 ntr=3 > a && suspike nt=5 ntr=1 > b && suvcat a b
+[stderr] suspike nt=5 ntr=1 > a && suspike nt=5 ntr=3 > b && suvcat a b
+# Error exits and parameter diagnostics.
+suvcat missing1 missing2
+suvcat missing1 missing2 taptype=4
+: > a && suspike nt=5 ntr=1 > b && suvcat a b
+suspike nt=5 ntr=1 > a && : > b && suvcat a b
+[stderr] suspike nt=5 ntr=1 > a && suspike nt=5 ntr=1 > b && suvcat a b taplen=abc taptype=0 extra=1
+# Combined trace exceeds the SU sample limit.
+sunull nt=40000 ntr=1 > a && sunull nt=40000 ntr=1 > b && suvcat a b
+# Overlap exactly equals either input length, for every combination method.
+suspike nt=3 ntr=1 k1=2 mag=2 > a && suspike nt=5 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=0
+suspike nt=3 ntr=1 k1=2 mag=2 > a && suspike nt=5 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=1
+suspike nt=3 ntr=1 k1=2 mag=2 > a && suspike nt=5 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=2
+suspike nt=3 ntr=1 k1=2 mag=2 > a && suspike nt=5 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=3
+suspike nt=5 ntr=1 k1=4 mag=2 > a && suspike nt=3 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=0
+suspike nt=5 ntr=1 k1=4 mag=2 > a && suspike nt=3 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=1
+suspike nt=5 ntr=1 k1=4 mag=2 > a && suspike nt=3 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=2
+suspike nt=5 ntr=1 k1=4 mag=2 > a && suspike nt=3 ntr=1 k1=2 mag=-3 > b && suvcat a b taplen=3 taptype=3
+# Explicit defaults on the smallest traces.
+suspike nt=1 ntr=1 > a && suspike nt=1 ntr=1 > b && suvcat a b taplen=0 taptype=0
+# Negative overlap with a defined sample-limit error before any indexing.
+sunull nt=5 ntr=1 > a && sunull nt=5 ntr=1 > b && suvcat a b taplen=-65535
+# Negative/oversized overlaps that reach indexing are undefined in C;
+# exercise the Rust error exits separately.

@@ -1,0 +1,181 @@
+{
+  "scope": "su/main/stacking part 1 of 1",
+  "programs": [
+    {
+      "name": "sucvs4fowler",
+      "path": "su/main/stacking/sucvs4fowler.c",
+      "purpose": "Compute constant-velocity stacks for Fowler processing.",
+      "selfdoc_first_line": " SUCVS4FOWLER --compute constant velocity stacks for input to Fowler codes",
+      "params": [
+        {"name": "ncdps", "type": "int", "default": "", "required": true, "description": "Number of input CDP gathers to process."},
+        {"name": "vminstack", "type": "float", "default": "1500.", "required": false, "description": "Minimum stacking velocity in meters per second."},
+        {"name": "nvstack", "type": "int", "default": "180", "required": false, "description": "Number of velocity panels."},
+        {"name": "lmute", "type": "int", "default": "24", "required": false, "description": "Mute taper length in milliseconds; converted to output samples."},
+        {"name": "nonhyp", "type": "int", "default": "1", "required": false, "description": "Enable the nonhyperbolic moveout mute."},
+        {"name": "vhyp", "type": "float", "default": "2500.", "required": false, "description": "Velocity used by the nonhyperbolic mute."},
+        {"name": "lbtaper", "type": "int", "default": "0", "required": false, "description": "Bottom taper length in milliseconds."},
+        {"name": "lstaper", "type": "int", "default": "0", "required": false, "description": "Side taper length in CDP gathers."},
+        {"name": "dtout", "type": "float", "default": "computed: 1.5 times input header dt in seconds", "required": false, "description": "Output sample interval in seconds."},
+        {"name": "mxfold", "type": "int", "default": "120", "required": false, "description": "Maximum input traces per CDP gather."},
+        {"name": "salias", "type": "float", "default": "0.8", "required": false, "description": "Antialias frequency fraction; values above 1 are capped at 1."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "fgettr", "err", "getparfloat", "getparint", "checkpars", "VNDemalloc", "ints8r", "puttr", "fputtr", "VNDfree", "VNDtotalmem"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float accumulation, square roots, cosine tapers and eight-point sinc interpolation. The output trace header is uninitialized except for ns, dt, cdp and tracf. The fold limit is checked after writing to the arrays, so an oversized gather can write out of bounds; mute indices can also be out of range.",
+      "c_lines": 275,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers gathers and performs moveout interpolation and stacking for multiple velocities.",
+      "test_cases": [
+        {"description": "Small constant-velocity stack.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=8 mxfold=16"},
+        {"description": "Custom sampling, taper and mute settings.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=8 mxfold=16 vminstack=1800 dtout=0.004 nonhyp=0 lmute=8 lbtaper=16 lstaper=1 salias=0.6"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sudivstack",
+      "path": "su/main/stacking/sudivstack.c",
+      "purpose": "Stack adjacent traces using inverse average or peak power weights.",
+      "selfdoc_first_line": " SUDIVSTACK -  Diversity Stacking using either average power or peak   ",
+      "params": [
+        {"name": "key", "type": "string", "default": "tracf", "required": false, "description": "Header word identifying adjacent traces to stack."},
+        {"name": "winlen", "type": "float", "default": "computed: (ns - 1) times header dt in seconds", "required": false, "description": "Power window length in seconds; the resulting sample count is capped at ns."},
+        {"name": "peak", "type": "int", "default": "0", "required": false, "description": "Use peak power when nonzero; otherwise use average power."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "fgettr", "err", "getparstring", "getparfloat", "getparint", "checkpars", "hdtype", "getindex", "ealloc1float", "gethval", "vtoi", "intlin", "puttr", "fputtr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Power, inverse weights and stack sums accumulate in float, with linear interpolation between windows. The default interval calculation mixes double and float; zero-power samples are skipped.",
+      "c_lines": 301,
+      "difficulty": "medium",
+      "difficulty_reason": "It computes and interpolates windowed weights while stacking adjacent trace groups.",
+      "test_cases": [
+        {"description": "Whole-trace average-power stack.", "command": "suplane nt=128 ntr=8 | sushw key=tracf a=1 | sudivstack key=tracf"},
+        {"description": "Windowed peak-power stack.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 | sudivstack key=cdp winlen=0.032 peak=1"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "supws",
+      "path": "su/main/stacking/supws.c",
+      "purpose": "Compute phase stacks or phase-weighted stacks of adjacent traces.",
+      "selfdoc_first_line": " SUPWS - Phase stack or phase-weighted stack (PWS) of adjacent traces\t",
+      "params": [
+        {"name": "key", "type": "string", "default": "cdp", "required": false, "description": "Header word identifying adjacent traces to stack."},
+        {"name": "pwr", "type": "float", "default": "1.0", "required": false, "description": "Power applied to phase coherence."},
+        {"name": "dt", "type": "float", "default": "computed: header dt in microseconds divided by 1000000; 0.004 if the result is zero", "required": false, "description": "Sampling interval in seconds, used for smoothing."},
+        {"name": "sl", "type": "float", "default": "0.0", "required": false, "description": "Phase-weight smoothing length in seconds."},
+        {"name": "ps", "type": "int", "default": "0", "required": false, "description": "Output the phase stack instead of the phase-weighted stack when nonzero."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print diagnostics when nonzero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "fgettr", "err", "getparstring", "getparfloat", "getparint", "checkpars", "warn", "hdtype", "getindex", "gethval", "vtof", "ealloc1float", "ealloc1complex", "etmpfile", "efwrite", "hilbert", "cmplx", "rcabs", "crmul", "cadd", "erewind", "efread", "puttr", "fputtr", "free1float", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Hilbert transformation, complex magnitude, pow and float accumulation are sensitive to arithmetic and library implementation. Smoothing sums 2*(isl/2) samples but divides by isl, including for odd lengths. Header keys are converted to float before comparison.",
+      "c_lines": 333,
+      "difficulty": "medium",
+      "difficulty_reason": "It computes Hilbert transforms and complex phase coherence across trace groups.",
+      "test_cases": [
+        {"description": "Phase-weighted stack with custom power and smoothing.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 | supws key=cdp pwr=2 sl=0.016 dt=0.004"},
+        {"description": "Phase stack with diagnostic output.", "command": "suplane nt=128 ntr=8 | sushw key=tracf a=1 | supws key=tracf ps=1 pwr=0.5 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "surecip",
+      "path": "su/main/stacking/surecip.c",
+      "purpose": "Stack adjacent traces with matching CDP and offset in prepared reciprocal data.",
+      "selfdoc_first_line": " SURECIP - sum opposing offsets in prepared data (see below)\t",
+      "params": [
+        {"name": "norm", "type": "int", "default": "1", "required": false, "description": "Divide each stack by its fold when nonzero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "checkpars", "getindex", "gettr", "fgettr", "gethval", "valcmp", "puttr", "fputtr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Samples are accumulated in input order as floats and optionally divided by fold. The first trace is accessed even when input is empty.",
+      "c_lines": 166,
+      "difficulty": "easy",
+      "difficulty_reason": "It groups adjacent traces by two headers and sums their samples.",
+      "test_cases": [
+        {"description": "Normalized reciprocal stacks from prepared data.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,100 b=0,0 | surecip norm=1"},
+        {"description": "Unnormalized stacks with multiple offsets.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,100 b=0,10 | surecip norm=0"}
+      ],
+      "license_note": "Credits include SEP: Shuki Ronen.",
+      "related_programs": ["sustack"]
+    },
+    {
+      "name": "sustack",
+      "path": "su/main/stacking/sustack.c",
+      "purpose": "Stack adjacent traces with the same header value.",
+      "selfdoc_first_line": " SUSTACK - stack adjacent traces having the same key header word",
+      "params": [
+        {"name": "key", "type": "string", "default": "cdp", "required": false, "description": "Header word identifying adjacent traces to stack."},
+        {"name": "normpow", "type": "float", "default": "1.0", "required": false, "description": "Exponent of the nonzero sample count used for normalization."},
+        {"name": "repeat", "type": "int", "default": "0", "required": false, "description": "Repeat each output stack when nonzero."},
+        {"name": "nrepeat", "type": "int", "default": "10", "required": false, "description": "Number of copies when repeat is enabled."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print key values and fold when nonzero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "getparfloat", "getparstring", "checkpars", "hdtype", "getindex", "gettr", "fgettr", "ealloc1int", "gethval", "valcmp", "fprintfval", "puttr", "fputtr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Samples accumulate in input order as floats; normalization uses double-precision pow and converts back to float. Initial fold uses the first trace's nhs when nonzero, while sample normalization counts input traces with nonzero samples. Empty input is accessed without a check.",
+      "c_lines": 188,
+      "difficulty": "easy",
+      "difficulty_reason": "It groups adjacent traces and performs per-sample summation and normalization.",
+      "test_cases": [
+        {"description": "Normalized CDP stack.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 | sustack key=cdp normpow=1"},
+        {"description": "Repeated unnormalized offset stack.", "command": "suplane nt=128 ntr=8 | sushw key=offset a=100 | sustack key=offset normpow=0 repeat=1 nrepeat=3 verbose=1"}
+      ],
+      "license_note": "Credits include SEP: Einar Kjartansson and CENPET: Werner M. Heigl.",
+      "related_programs": ["surecip", "sustackup"]
+    },
+    {
+      "name": "sustackup",
+      "path": "su/main/stacking/sustackup.c",
+      "purpose": "Stack traces in any input order by combinations of header values, with optional range filters.",
+      "selfdoc_first_line": " SUSTACKUP - Input Any Trace Order and Stack To Any Key Combination.   ",
+      "params": [
+        {"name": "keyloc", "type": "string array", "default": "cdp", "required": false, "description": "Header words defining each output location."},
+        {"name": "keyabs", "type": "string", "default": "", "required": false, "description": "Header word used for the absolute-value range filter."},
+        {"name": "keyabs2", "type": "string", "default": "", "required": false, "description": "Header word subtracted from keyabs before taking the absolute value; requires keyabs."},
+        {"name": "minabs", "type": "double", "default": "-1.e31", "required": false, "description": "Lower absolute range limit; requires keyabs."},
+        {"name": "maxabs", "type": "double", "default": "1.e31", "required": false, "description": "Upper absolute range limit; requires keyabs."},
+        {"name": "keysign", "type": "string", "default": "", "required": false, "description": "Header word used for the signed range filter."},
+        {"name": "keysign2", "type": "string", "default": "", "required": false, "description": "Header word subtracted from keysign; requires keysign."},
+        {"name": "minsign", "type": "double", "default": "-1.e31", "required": false, "description": "Lower signed range limit; requires keysign."},
+        {"name": "maxsign", "type": "double", "default": "1.e31", "required": false, "description": "Upper signed range limit; requires keysign."},
+        {"name": "keep", "type": "int", "default": "1", "required": false, "description": "Keep output locations with no traces passing the filters."},
+        {"name": "maxstack", "type": "int", "default": "100000", "required": false, "description": "Maximum number of distinct output locations."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "countparval", "ealloc1", "getparstringarray", "ealloc1int", "GetCase", "err", "getparstring", "getpardouble", "getparint", "ealloc1double", "checkpars", "gettr", "fgettr", "fromhead", "puttr", "fputtr", "warn", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Amplitudes are accumulated in double and divided by sample fold stored as float, then converted to float. Header keys are compared as doubles. abs on the most negative integer offset has undefined behavior. Inserting a new location shifts one pointer beyond the used range, which writes beyond the allocation when the location count reaches maxstack.",
+      "c_lines": 432,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers and sorts arbitrary combinations of trace headers while filtering and stacking samples.",
+      "test_cases": [
+        {"description": "Stack arbitrary input locations.", "command": "suplane nt=128 ntr=8 | sushw key=cdp a=1 b=1 j=2 | sustackup keyloc=cdp maxstack=16"},
+        {"description": "Combined location keys and absolute and signed range filters.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,-30 b=0,10 | sustackup keyloc=cdp,offset keyabs=offset minabs=10 maxabs=40 keysign=offset minsign=-20 maxsign=30 keep=0 maxstack=16"},
+        {"description": "Difference-based filtering and retained empty locations.", "command": "suplane nt=128 ntr=8 | sushw key=cdp,offset a=1,10 b=1,10 | sustackup keyloc=cdp keyabs=offset keyabs2=cdp minabs=100 maxabs=200 keep=1 maxstack=16"}
+      ],
+      "license_note": "",
+      "related_programs": ["sustack"]
+    }
+  ]
+}

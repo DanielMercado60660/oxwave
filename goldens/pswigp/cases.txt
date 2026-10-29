@@ -1,0 +1,18 @@
+# Strip run-specific PostScript metadata for all plots.
+suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=3 d1=-0.5 f1=4 d2=2 f2=-1 bias=0.2 perc=75 xcur=-0.7 fill=0 linewidth=0 tracecolor=red backcolor=yellow verbose=0 style=normal frame=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 x2=-2,0,3 clip=1 fill=-2 xbox=1 ybox=2 wbox=4 hbox=5 x1beg=1 x1end=7 x2beg=3 x2end=-2 d1num=2 f1num=1 n1tic=2 grid1=dot d2num=1 f2num=0 n2tic=2 grid2=dash label1=Time label2=Distance labelfont=Courier labelsize=12 title=Test titlefont=Courier-Bold titlesize=16 titlecolor=blue axescolor=red gridcolor=green axeswidth=2 ticwidth=0.5 gridwidth=0.7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=3 fill=2 grid1=solid grid2=solid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=1 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=1 fill=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=3 nt=1 | sustrip outpar=/dev/null | pswigp n1=1 n2=3 frame=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+printf '0 0\n4 1\n8 2\n' > curve.txt; suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=3 curve=curve.txt npair=3 curvecolor=blue curvewidth=2 curvedash=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=3 nt=9 | sustrip outpar=/dev/null > data; pswigp n1=9 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+pswigp n2=3
+pswigp n1=9 n2=3
+printf x | pswigp n1=9
+
+# Added from the 2026-10-29 coverage audit (audits/claude-coverage.md).
+printf '0 0\n4 1\n8 2\n' > c1; printf '1 2\n3 1.5\n5 0.5\n7 0\n' > c2; suplane ntr=3 nt=9 | sustrip outpar=/dev/null | pswigp n1=9 n2=3 curve=c1,c2 npair=3,4 curvecolor=red curvewidth=1.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=6 nt=33 | suaddnoise seed=11 sn=2 | sustrip outpar=/dev/null | pswigp n1=33 n2=6 perc=90 bias=0.1 fill=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=8 nt=21 | suaddnoise seed=4 sn=3 | sustrip outpar=/dev/null | pswigp n1=21 n2=8 d2=10 f2=100 x2beg=160 x2end=120 d1=-0.01 f1=0.2 x1beg=0.137 x1end=-5 xcur=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane ntr=4 nt=17 | suaddnoise seed=21 sn=1 | sustrip outpar=/dev/null | pswigp n1=17 x2=3,0.5,7,2 style=normal perc=50 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

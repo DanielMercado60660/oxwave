@@ -1,0 +1,17 @@
+# Defaults, alternate key, filter parameters, triangular and partial mixing.
+suplane nt=256 ntr=7 dt=0.004 | sulfaf
+suplane nt=257 ntr=9 dt=0.004 | sushw key=cdp a=2 | sulfaf key=cdp f1=4 f2=35 fr=7 vel=1500 dx=12 maxmix=5 tri=1 adb=0.4
+[stderr] suplane nt=128 ntr=5 dt=0.004 | sulfaf verbose=1 f1=4 f2=20 fr=3
+suplane nt=128 ntr=6 dt=0.004 | sulfaf maxmix=3 adb=0 fr=0
+suplane nt=128 ntr=6 dt=0.004 | sulfaf maxmix=0 vel=0 dx=0
+suplane nt=1 ntr=1 dt=0.004 | sulfaf
+suplane nt=127 ntr=1 dt=0.004 | sulfaf
+suplane nt=129 ntr=8 dt=0.004 | sushw key=ep a=1 b=1 j=4 | sulfaf f1=0 f2=15 fr=0
+suplane nt=128 ntr=5 dt=0.004 | sulfaf vel=-1 maxmix=3
+sulfaf key=ep < /dev/null
+suplane nt=128 ntr=4 | sulfaf key=notakey
+suplane nt=128 ntr=4 | sulfaf maxmix=999999999999999999999
+# Frequency range ends exactly at the final FFT bin.
+suplane nt=128 ntr=4 dt=0.004 | sulfaf f1=0 f2=125 fr=2
+# Later gathers with shorter headers retain the first gather's FFT size.
+( suplane nt=128 ntr=3 dt=0.004 | sushw key=ep a=1; suplane nt=100 ntr=3 dt=0.004 | sushw key=ep a=2 ) | sulfaf

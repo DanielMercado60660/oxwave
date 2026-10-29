@@ -1,0 +1,60 @@
+# Raw native float tables; use outpar=/dev/null so sustrip runs without a tty.
+[f32] sunull nt=101 ntr=101 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=151 dt=0.004
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=1 fxs=400 ek=0 nt=81 na=21 fa=-50 da=5
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=2 fxs=200 dxs=100 nt=31
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=1
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=0 nt=1
+# Explicit geometry, output interpolation, aperture, emergence angles and all report options.
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2dtopo vfile=v tfile=t jpfile=report nx=9 nz=9 fx=-100 fz=-50 dx=75 dz=50 nxo=7 nzo=5 fxo=-25 fzo=0 dxo=60 dzo=65 nxs=3 fxs=50 dxs=90 nt=121 dt=0.003 fa=-70 na=41 da=3.5 amin=5 amax=120 fac=0.025 aperx=150 ek=0 ms=1 restart=n verbose=1 'surf=-100,0;200,30;500,0'; cat t
+# Named output, perturbation outputs, and default velocity-analysis file names are read back.
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; sunull nt=9 ntr=9 | suop op=exp | sustrip outpar=/dev/null > p; rayt2dtopo vfile=v nx=9 nz=9 nt=101 dt=0.004 nxs=3 fxs=200 dxs=100 npv=1 pvfile=p tvfile=tv csfile=cs tfile=t 'surf=0,0;400,30;800,0'; cat t tv cs
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; sunull nt=9 ntr=9 | sustrip outpar=/dev/null > pvfile; rayt2dtopo vfile=v nx=9 nz=9 nt=61 nxs=3 fxs=200 dxs=100 npv=1 tfile=t; cat t tvfile csfile
+# Restart uses whole existing source tables and preserves the prefix.
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2dtopo vfile=v nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=81 tfile=t; rayt2dtopo vfile=v nx=9 nz=9 nxs=5 fxs=200 dxs=100 nt=81 tfile=t restart=y; cat t
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null > v; rayt2dtopo vfile=v nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=51 tfile=t restart=y; rayt2dtopo vfile=v nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=51 tfile=t restart=yes; cat t
+# First surface is used; every repeat is parsed and splined.
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=81 'surf=0,10;400,60;800,20' 'surf=0,0;800,0'
+# Gradient velocity and nonuniform spline data exercise dynamic ray equations.
+[f32] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=221f",*[1700+13*z+3*x+0.6*x*z for x in range(13) for z in range(17)]))' | rayt2dtopo nx=13 nz=17 dx=50 dz=25 nxs=5 fxs=100 dxs=50 nt=201 dt=0.002 nxo=11 nzo=15 dxo=50 dzo=25 fxo=50 fzo=25 na=61 fa=-75 da=2.5 fac=0.05 aperx=200 'surf=0,5;150,20;350,5;600,25'
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=61 dt=0 ek=0 fac=0
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=61 dt=-0.008 ek=0
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=61 na=1 fa=0 da=0 ek=0
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=61 ms=0
+# Deterministic progress reports, including ignored verbose and unknown arguments (no checkpars in C).
+[stderr] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=1 verbose=1 mystery=7 > t
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=1 jpfile=report > t; cat report
+# Error paths before velocity input.
+rayt2dtopo nx=2
+rayt2dtopo nz=0
+rayt2dtopo nx=-1
+rayt2dtopo nx=3 nz=3 nxo=1
+rayt2dtopo nx=3 nz=3 nzo=-1
+rayt2dtopo amin=-1
+rayt2dtopo amax=181
+rayt2dtopo fxs=-1
+rayt2dtopo fz=1
+rayt2dtopo nxs=99
+rayt2dtopo fxo=-1
+rayt2dtopo fzo=-1
+rayt2dtopo nxo=102
+# Empty/short raw input and invalid surface tokens.
+rayt2dtopo nx=3 nz=3
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | rayt2dtopo nx=3 nz=3
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 'surf=0,0'
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 'surf=0,0;800'
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 'surf=0,0;800,0' 'surf=1,2'
+rayt2dtopo vfile=missing nx=3 nz=3
+rayt2dtopo nx=9999999999999999999
+# Replace the 999999 shadow sentinel with zero so float tolerance is scaled by physical times.
+[f32] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=323f",*[1600+7*z+4*x+0.5*x*x+0.3*z*z for x in range(17) for z in range(19)]))' > v; python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=323f",*[0.01+0.001*z+0.0005*x for x in range(17) for z in range(19)]))' > p; rayt2dtopo vfile=v nx=17 nz=19 dx=50 dz=30 nxs=5 fxs=200 dxs=50 nt=251 dt=0.002 na=81 fa=-80 da=2 fac=0.03 aperx=250 npv=1 pvfile=p tvfile=tv csfile=cs tfile=t 'surf=0,10;250,25;500,15;800,40'; cat t tv cs | python3 -c 'import struct,sys; b=sys.stdin.buffer.read(); a=struct.unpack("=%df"%(len(b)//4),b); sys.stdout.buffer.write(struct.pack("=%df"%len(a),*[x if x<999 else 0 for x in a]))'
+[stderr] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=51 ms=-1 fa=-38.12345 da=3.112233 amin=1.2345 amax=89.1234 > t
+# Use three sources to isolate bad time counts from the original surface endpoint out-of-bounds bug.
+# Degenerate time counts and a negative allocation count preserve original exits.
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=0
+sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nt=-1
+[stderr] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=-1
+# strtok leaves skipped repeated separators in the buffer walked by strlen.
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nxs=3 fxs=200 dxs=100 nt=81 'surf=0,,30;800,0'
+[f32] sunull nt=9 ntr=9 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2dtopo nx=9 nz=9 nt=31 dzo=0

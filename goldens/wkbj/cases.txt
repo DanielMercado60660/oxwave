@@ -1,0 +1,68 @@
+# Default sampling, origins, and filenames; compare every output, in C write order.
+[f32] sunull nt=5 ntr=7 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=7 nz=5 xs=0 zs=0 > times && cat times sfile afile bfile
+# Explicit defaults and an interior source on an odd, nonsquare grid.
+[f32] sunull nt=7 ntr=5 | suop op=exp | sugain scale=2000 | sustrip outpar=strip.par | wkbj nx=5 nz=7 xs=2 zs=3 dx=1 fx=0 dz=1 fz=0 sfile=sigma bfile=beta afile=angle > times && cat times sigma angle beta
+# Shifted origins, unequal intervals, and a source between grid nodes.
+[f32] sunull nt=9 ntr=7 | suop op=exp | sugain scale=1750 | sustrip outpar=strip.par | wkbj nx=7 nz=9 xs=-5.5 zs=24.5 fx=-20 fz=10 dx=3 dz=5 sfile=sigma bfile=beta afile=angle > times && cat times sigma angle beta
+# Each boundary corner and the other half-plane branch of the polar solver.
+[f32] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=5 nz=5 xs=4 zs=0 > times && cat times sfile afile bfile
+[f32] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=5 nz=5 xs=0 zs=4 > times && cat times sfile afile bfile
+[f32] sunull nt=5 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=5 nz=5 xs=4 zs=4 > times && cat times sfile afile bfile
+# Minimum supported solver dimensions.
+[f32] sunull nt=2 ntr=2 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=2 nz=2 xs=0 zs=0 > times && cat times sfile afile bfile
+# Smooth nonconstant velocities exercise transport as well as traveltimes.
+[f32] suplane nt=9 ntr=7 | sugain scale=0.001 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=7 nz=9 xs=2.5 zs=0.5 dx=1.5 dz=0.75 > times && cat times sfile afile bfile
+# Check individual auxiliary grids without sigma dominating the float tolerance.
+[f32] suplane nt=9 ntr=7 | sugain scale=0.001 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=7 nz=9 xs=2.5 zs=0.5 dx=1.5 dz=0.75 > times && cat sfile
+[f32] suplane nt=9 ntr=7 | sugain scale=0.001 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=7 nz=9 xs=2.5 zs=0.5 dx=1.5 dz=0.75 > times && cat afile
+[f32] suplane nt=9 ntr=7 | sugain scale=0.001 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=7 nz=9 xs=2.5 zs=0.5 dx=1.5 dz=0.75 > times && cat bfile
+# All outputs redirected to the same filename, preserving fopen/write/close order.
+[f32] sunull nt=5 ntr=5 | suop op=exp | sustrip outpar=strip.par | wkbj nx=5 nz=5 xs=0 zs=0 sfile=aux bfile=aux afile=aux > times && cat times aux
+# Unknown arguments and verbose diagnostics come from checkpars.
+[stderr] [f32] sunull nt=5 ntr=5 | suop op=exp | sustrip outpar=strip.par | wkbj nx=5 nz=5 xs=1 zs=1 verbose=1 mystery=9
+# Last occurrence wins; empty optional numeric values select defaults.
+[f32] sunull nt=5 ntr=5 | suop op=exp | sustrip outpar=strip.par | wkbj nx=2 nx=5 nz=5 xs=1 zs=1 dx= dz= fx= fz=
+# Parameter file followed by command-line overrides.
+[f32] printf 'nx=5 nz=5 xs=0 zs=0 dx=2 dz=3\n' > pars; sunull nt=5 ntr=5 | suop op=exp | sustrip outpar=strip.par | wkbj par=pars xs=2 zs=3
+# Empty input is unchecked in C; this small grid produces IEEE NaNs.
+[f32] wkbj nx=3 nz=3 xs=0 zs=0
+# Zero velocity also exercises singular arithmetic.
+[f32] sunull nt=3 ntr=3 | sustrip outpar=strip.par | wkbj nx=3 nz=3 xs=0 zs=0
+# Missing required parameters, including empty numeric values.
+[stderr] wkbj
+[stderr] wkbj nx=3
+[stderr] wkbj nx=3 nz=3
+[stderr] wkbj nx=3 nz=3 xs=0
+[stderr] wkbj nx= nz=3 xs=0 zs=0
+[stderr] wkbj nx=3 nz=3 xs= zs=0
+# Conversion errors occur before file creation.
+[stderr] wkbj nx=2147483648 nz=3 xs=0 zs=0
+[stderr] wkbj nx=3 nz=3 xs=1e-310 zs=0
+# Failed output opens: preserve order and literal diagnostics.
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 sfile=missing/sigma
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 bfile=missing/beta
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 afile=missing/angle
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 sfile=
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 bfile=
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 afile=
+# Source bounds, including zero/negative dimensions or intervals.
+[stderr] wkbj nx=3 nz=3 xs=-0.1 zs=0
+[stderr] wkbj nx=3 nz=3 xs=2.1 zs=0
+[stderr] wkbj nx=3 nz=3 xs=0 zs=-0.1
+[stderr] wkbj nx=3 nz=3 xs=0 zs=2.1
+[stderr] wkbj nx=0 nz=3 xs=0 zs=0
+[stderr] wkbj nx=3 nz=0 xs=0 zs=0
+[stderr] wkbj nx=-1 nz=3 xs=0 zs=0
+[stderr] wkbj nx=3 nz=-1 xs=0 zs=0
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 dx=-1
+[stderr] wkbj nx=3 nz=3 xs=0 zs=0 dz=-1
+[stderr] wkbj nx=3 nz=3 xs=1 zs=0 dx=0
+[stderr] wkbj nx=3 nz=3 xs=0 zs=1 dz=0
+# Singleton dimensions rejected by the source-bounds check before the solver.
+# In-bounds singleton grids require broader eiktam library support.
+[stderr] wkbj nx=1 nz=5 xs=1 zs=0
+[stderr] wkbj nx=5 nz=1 xs=0 zs=1
+
+# Inventory scenarios with sustrip outpar set for the harness without a tty.
+[f32] sunull nt=16 ntr=16 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=16 nz=16 xs=700 zs=0 dx=100 dz=100 sfile=sigma.bin bfile=beta.bin afile=angle.bin > times && cat times sigma.bin angle.bin beta.bin
+[f32] sunull nt=16 ntr=16 | suop op=exp | sugain scale=2000 | sustrip outpar=strip.par | wkbj nx=16 nz=16 fx=100 fz=50 dx=50 dz=50 xs=350 zs=150 sfile=sigma.bin bfile=beta.bin afile=angle.bin > times && cat times sigma.bin angle.bin beta.bin

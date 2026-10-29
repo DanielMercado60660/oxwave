@@ -1,0 +1,70 @@
+{
+  "scope": "Trielas/lib part 1",
+  "functions": [
+    {
+      "name": "findPiso",
+      "file": "Trielas/lib/findPiso.c",
+      "signature": "int findPiso (float a3333, float pl, float gx, float gz, float *px, float *pz, float *vgx, float *vgz, float *g11, float *g13, float *g33, int r)",
+      "purpose": "Finds the reflected or transmitted isotropic P-wave slowness, group velocity, and polarization components.",
+      "calls": ["err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float arithmetic and the double-precision sqrt function for transmission; rounding near zero in the discriminant determines whether the root is rejected.",
+      "c_lines": 40,
+      "difficulty": "easy",
+      "group": "isotropic-interface",
+      "license_note": ""
+    },
+    {
+      "name": "findSiso",
+      "file": "Trielas/lib/findSiso.c",
+      "signature": "int findSiso (float a1313, float pl, float gx, float gz, float *px, float *pz, float *vgx, float *vgz, float *g11, float *g13, float *g33, int r)",
+      "purpose": "Finds the reflected or transmitted isotropic S-wave slowness, group velocity, and polarization components.",
+      "calls": ["err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float arithmetic and the double-precision sqrt function for transmission; rounding near zero in the discriminant determines whether the root is rejected.",
+      "c_lines": 39,
+      "difficulty": "easy",
+      "group": "isotropic-interface",
+      "license_note": ""
+    },
+    {
+      "name": "findqSH",
+      "file": "Trielas/lib/findqSH.c",
+      "signature": "int findqSH(float si, float co, float pl, float a1212, float a1223, float a2323, float *pxnew, float *pznew, float *vgx, float *vgz, int r)",
+      "purpose": "Solves for reflected or transmitted quasi-SH slowness and group velocity across an interface.",
+      "calls": ["err"],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Solves a quadratic using float intermediates and double-precision sqrt; the 0.5 literal promotes the root expression to double. Discriminant, FLT_EPSILON, and group-velocity sign tests are sensitive near their boundaries, and the quadratic formula can suffer cancellation.",
+      "c_lines": 46,
+      "difficulty": "medium",
+      "group": "sh-interface",
+      "license_note": ""
+    },
+    {
+      "name": "rottensh",
+      "file": "Trielas/lib/rottensh.c",
+      "signature": "void rottensh (float *a1212, float *a2323, float *a1223, float si, float co )",
+      "purpose": "Rotates the three independent components of a two-dimensional SH stiffness tensor in place.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses float products and sums whose evaluation order affects rounding, particularly when terms cancel; input components are saved before outputs are written.",
+      "c_lines": 13,
+      "difficulty": "easy",
+      "group": "tensor-rotation",
+      "license_note": ""
+    },
+    {
+      "name": "rottensor",
+      "file": "Trielas/lib/rottensor.c",
+      "signature": "void rottensor (float *a1111, float *a3333, float *a1133, float *a1313, float *a1113, float *a3313, float si, float co )",
+      "purpose": "Rotates the six independent components of a two-dimensional elastic stiffness tensor in place.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Uses long expressions of float products and sums; preserve expression order to limit rounding differences, especially for cancellation. Input components are saved before outputs are written.",
+      "c_lines": 23,
+      "difficulty": "medium",
+      "group": "tensor-rotation",
+      "license_note": ""
+    }
+  ]
+}

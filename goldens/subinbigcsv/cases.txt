@@ -1,0 +1,33 @@
+# 2D ranges, lists, extents, reset and odd trace sizes
+suplane nt=1 ntr=1 | sushw key=cdp a=-1000000000 | subinbigcsv igiout=-1000000000,1000000000,2000000000
+suplane nt=7 ntr=9 | subinbigcsv igiout=1,9,3 igiext=1,0
+suplane nt=1 ntr=1 | subinbigcsv igilist=1 recdp=0 verbose=1
+suplane nt=5 ntr=9 | subinbigcsv igilist=1,4,8 igiext=1
+[exact] suplane nt=1 ntr=1 | subinbigcsv igiout=1,5,2 qout=q.csv > /dev/null; cat q.csv
+# Full grid, input modes and reset controls
+suplane nt=7 ntr=4 | sushw key=cdp a=1 b=1 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 igiout=1,10,3 igcout=1,10,3 igiext=1 igcext=1 intype=2
+suplane nt=3 ntr=1 | sushw key=igi,igc a=1,1 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 igilist=1,4 igclist=1,4 intype=1 reigi=0 reigc=0 recdp=0 check=1
+[exact] suplane nt=3 ntr=1 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 igiout=1,4,3 igcout=1,4,3 qout=q.csv > /dev/null; cat q.csv
+# Parameter and input errors
+subinbigcsv
+subinbigcsv igiout=1,2
+subinbigcsv igiout=1,3,0
+subinbigcsv igiout=3,1,1
+subinbigcsv igiout=1,3,2 igiext=-1
+subinbigcsv igiout=1,3,2 igiext=1
+subinbigcsv igilist=1,2 igiext=1
+subinbigcsv igiout=1,2,1 igilist=1
+subinbigcsv igiout=1,2,1 igcout=1,2,1
+subinbigcsv igiout=1,2,1 recdp=2
+subinbigcsv igiout=1,2,1 intype=7
+subinbigcsv igiout=1,2,1 intype=1
+subinbigcsv grid_xa=1 igiout=1,2,1
+subinbigcsv rfile=missing igiout=1,2,1
+subinbigcsv igiout=1,2,1
+[stderr] suplane nt=3 ntr=2 | subinbigcsv igiout=1,3,2 verbose=1 > /dev/null
+[stderr] subinbigcsv igiout=1,2,0
+subinbigcsv igiout=1,2,1 igiext=1,2,3
+subinbigcsv igiout=1,2,1 reigi=0
+subinbigcsv igiout=1,2,1 igcext=0
+subinbigcsv igiout=1,2,1 igclist=1
+printf 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g\nC_SU_NAMES\nC_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,30,0,0,100,0,0,80,10,10\n' > in.csv; suplane nt=3 ntr=2 | subinbigcsv rfile=in.csv igiout=1,4,3 igcout=1,4,3 intype=2

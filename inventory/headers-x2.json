@@ -1,0 +1,495 @@
+{
+  "scope": "su/main/headers (re-scout batch 2)",
+  "programs": [
+    {
+      "name": "suchw",
+      "path": "su/main/headers/suchw.c",
+      "purpose": "Change one or more trace header words using arithmetic on two input header words.",
+      "selfdoc_first_line": " SUCHW - Change Header Word using one or two header word fields\t",
+      "params": [
+        {
+          "name": "key1",
+          "type": "string array",
+          "default": "cdp",
+          "required": false,
+          "description": "Output header keys; sets the number of operations."
+        },
+        {
+          "name": "key2",
+          "type": "string array",
+          "default": "cdp",
+          "required": false,
+          "description": "First input keys; must have the same count as key1. The default is available only for one key."
+        },
+        {
+          "name": "key3",
+          "type": "string array",
+          "default": "cdp",
+          "required": false,
+          "description": "Second input keys; must have the same count as key1. The default is available only for one key."
+        },
+        {
+          "name": "a",
+          "type": "double array",
+          "default": "0",
+          "required": false,
+          "description": "Additive constants, one per output key."
+        },
+        {
+          "name": "b",
+          "type": "double array",
+          "default": "1",
+          "required": false,
+          "description": "Multipliers for the first input keys."
+        },
+        {
+          "name": "c",
+          "type": "double array",
+          "default": "0",
+          "required": false,
+          "description": "Multipliers for the second input keys."
+        },
+        {
+          "name": "d",
+          "type": "double array",
+          "default": "1",
+          "required": false,
+          "description": "Overall divisors."
+        },
+        {
+          "name": "e",
+          "type": "double array",
+          "default": "1",
+          "required": false,
+          "description": "Exponents for the first input keys."
+        },
+        {
+          "name": "f",
+          "type": "double array",
+          "default": "1",
+          "required": false,
+          "description": "Exponents for the second input keys."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "getparstringarray",
+        "err",
+        "ealloc1double",
+        "getpardouble",
+        "checkpars",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "gethval",
+        "vtod",
+        "puthval",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The calculation uses double-precision pow and arithmetic, then casts to the destination header type. Math-library results and out-of-range floating-to-integer casts can be platform dependent; operations on multiple keys occur sequentially.",
+      "c_lines": 292,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies a small arithmetic expression to header values on each trace.",
+      "test_cases": [
+        {
+          "description": "Shift the default cdp header.",
+          "command": "suplane nt=64 ntr=8 | suchw a=-1"
+        },
+        {
+          "description": "Compute two headers sequentially with multiple inputs.",
+          "command": "suplane nt=64 ntr=8 | suchw key1=gx,cdp key2=offset,gx key3=sx,sx b=1,1 c=1,1 d=1,2"
+        },
+        {
+          "description": "Exercise non-default exponents and scaling.",
+          "command": "suplane nt=64 ntr=8 | suchw key1=offset key2=tracl key3=tracr a=3 b=2 c=1 d=2 e=2 f=2"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sucliphead",
+      "path": "su/main/headers/sucliphead.c",
+      "purpose": "Clip selected trace header values to specified lower and upper limits.",
+      "selfdoc_first_line": " SUCLIPHEAD - Clip header values\t\t\t\t\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "cdp",
+          "required": false,
+          "description": "Header keys to clip. The code leaves nkeys at zero when key is omitted, so the documented default performs no clipping."
+        },
+        {
+          "name": "min",
+          "type": "float array",
+          "default": "0",
+          "required": false,
+          "description": "Lower bounds, one per supplied key."
+        },
+        {
+          "name": "max",
+          "type": "float array",
+          "default": "ULONG_MAX",
+          "required": false,
+          "description": "Upper bounds, one per supplied key; ULONG_MAX is converted to float."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "getparstringarray",
+        "hdtype",
+        "getindex",
+        "err",
+        "ealloc1float",
+        "getparfloat",
+        "checkpars",
+        "gettr",
+        "gethval",
+        "vtof",
+        "puthval",
+        "puttr",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values and bounds pass through float, including the platform-sized ULONG_MAX default. Large integers can lose precision, and out-of-range float-to-integer casts can be undefined.",
+      "c_lines": 150,
+      "difficulty": "easy",
+      "difficulty_reason": "It compares and conditionally replaces individual header values.",
+      "test_cases": [
+        {
+          "description": "Exercise the omitted-key behavior.",
+          "command": "suplane nt=64 ntr=8 | sucliphead"
+        },
+        {
+          "description": "Clip one integer header at both limits.",
+          "command": "suplane nt=64 ntr=8 | sucliphead key=tracl min=3 max=6"
+        },
+        {
+          "description": "Clip multiple headers with independent bounds.",
+          "command": "suplane nt=64 ntr=8 | sucliphead key=tracl,offset min=2,-10 max=5,10"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sucountkey",
+      "path": "su/main/headers/sucountkey.c",
+      "purpose": "Count distinct values of selected trace header words.",
+      "selfdoc_first_line": " SUCOUNTKEY - COUNT the number of unique values for a given KEYword.\t",
+      "params": [
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "cdp",
+          "required": false,
+          "description": "Header keys to count. Although the selfdoc calls this required, the code does not error when omitted; nkeys remains zero and no counts are printed."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "If 1, report counts through warnings on stderr; otherwise print key and count pairs on stdout."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "countparval",
+        "getparstringarray",
+        "getparint",
+        "checkpars",
+        "hdtype",
+        "getindex",
+        "gettr",
+        "err",
+        "gethval",
+        "valcmp",
+        "warn",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Each key has a fixed allocation for 100000 distinct values without a bounds check; exceeding it writes beyond the allocation. Floating headers are compared using valcmp.",
+      "c_lines": 123,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers distinct values for each requested header and searches them for every trace.",
+      "test_cases": [
+        {
+          "description": "Count multiple keys in compact stdout format.",
+          "command": "suplane nt=64 ntr=8 | sucountkey key=tracl,tracr,offset verbose=0"
+        },
+        {
+          "description": "Report a single count through warnings.",
+          "command": "suplane nt=64 ntr=8 | sucountkey key=cdp verbose=1"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "sudumptrace",
+      "path": "su/main/headers/sudumptrace.c",
+      "purpose": "Print selected trace headers and sample values in columns.",
+      "selfdoc_first_line": " SUDUMPTRACE - print selected header values and data.              ",
+      "params": [
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string",
+          "required": false,
+          "description": "Directory for named temporary files; an empty string uses anonymous temporary files."
+        },
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: first trace header dt in microseconds divided by 1000000",
+          "required": false,
+          "description": "Sample interval in seconds; read and required only when the first trace header dt is zero."
+        },
+        {
+          "name": "num",
+          "type": "int",
+          "default": "4",
+          "required": false,
+          "description": "Maximum number of traces to print."
+        },
+        {
+          "name": "key",
+          "type": "string array",
+          "default": "",
+          "required": false,
+          "description": "Header keys to print above the trace data."
+        },
+        {
+          "name": "hpf",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Header format: 0 uses fixed-point; any other value uses exponential notation."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "err",
+        "gettr",
+        "getparfloat",
+        "MUSTGETPARFLOAT",
+        "getparint",
+        "countparval",
+        "getparstringarray",
+        "ealloc1float",
+        "checkpars",
+        "etmpfile",
+        "efwrite",
+        "gethdval",
+        "hdtype",
+        "vtof",
+        "temporary_filename",
+        "efopen",
+        "erewind",
+        "efread",
+        "efclose",
+        "eremove",
+        "free1",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Header values are converted to float before printing; time uses float dt and delrt after double division. The code calls rewind on tracefp after efclose(tracefp), which is undefined behavior. Nonpositive num can also lead to an undersized header allocation.",
+      "c_lines": 259,
+      "difficulty": "medium",
+      "difficulty_reason": "It buffers multiple traces and headers in temporary files before formatting columns.",
+      "test_cases": [
+        {
+          "description": "Dump two traces and selected headers in exponential format.",
+          "command": "suplane nt=32 ntr=4 | sudumptrace num=2 key=tracl,offset hpf=1"
+        },
+        {
+          "description": "Use a named temporary directory and fixed-point headers.",
+          "command": "suplane nt=32 ntr=4 | sudumptrace num=3 key=cdp hpf=0 tmpdir=/tmp"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suedit",
+      "path": "su/main/headers/suedit.c",
+      "purpose": "Interactively inspect traces and edit headers in a seekable SU disk file.",
+      "selfdoc_first_line": " SUEDIT - examine segy diskfiles and edit headers\t\t\t",
+      "params": [],
+      "stdin": "su_traces",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "err",
+        "efopen",
+        "warn",
+        "fgettra",
+        "ealloc1int",
+        "printheader",
+        "efflush",
+        "eatoi",
+        "tabplot",
+        "hdtype",
+        "atoval",
+        "puthdval",
+        "temporary_filename",
+        "fputtr",
+        "efclose",
+        "CWP_Exit"
+      ],
+      "calls_programs": [
+        "suximage",
+        "suxwigb",
+        "suspecfx"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The sort comparator subtracts float samples, so NaNs compare as equal and ties can have platform-dependent order. Malformed edit commands can invoke undefined pointer arithmetic; very small trace counts and sample counts can produce invalid indices. Interactive commands come from /dev/tty, and user pipelines can run arbitrary shell programs.",
+      "c_lines": 477,
+      "difficulty": "medium",
+      "difficulty_reason": "It combines interactive navigation, random-access trace files, sorting, editing, and external plotting pipelines.",
+      "test_cases": [
+        {
+          "description": "Inspect a seekable file and quit through a pseudo-terminal; script syntax is platform dependent.",
+          "command": "suplane nt=64 ntr=8 > in.su && printf 'q\\n' | script -q /dev/null suedit in.su"
+        },
+        {
+          "description": "Inspect ranks and percentiles before quitting through a pseudo-terminal; script syntax is platform dependent.",
+          "command": "suplane nt=64 ntr=8 > in.su && printf 'r\\n%%\\nq\\n' | script -q /dev/null suedit in.su"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "suflex2d",
+      "path": "su/main/headers/suflex2d.c",
+      "purpose": "Fill offset bins in CDP gathers by selecting and duplicating traces from neighboring gathers.",
+      "selfdoc_first_line": " SUFLEX2D - Duplicate Some Traces Into CDPs From Neighbouring CDPs.         ",
+      "params": [
+        {
+          "name": "maxflex",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Maximum relative CDP in the flex range; must be nonnegative."
+        },
+        {
+          "name": "minflex",
+          "type": "int",
+          "default": "computed: -maxflex",
+          "required": false,
+          "description": "Minimum relative CDP in the flex range; must be nonpositive."
+        },
+        {
+          "name": "maxfold",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Maximum input traces per CDP gather."
+        },
+        {
+          "name": "binfold",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Desired number of output traces per offset bin."
+        },
+        {
+          "name": "binbest",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Priority selector: 0 uses igi, 1 absolute igc, 2 igc, -2 negated igc, and 3 distance from offset-bin center."
+        },
+        {
+          "name": "binsize",
+          "type": "double",
+          "default": "25",
+          "required": false,
+          "description": "Positive offset-bin width."
+        },
+        {
+          "name": "binalign",
+          "type": "double",
+          "default": "computed: binsize / 2",
+          "required": false,
+          "description": "Nonnegative bin-center alignment, reduced modulo binsize."
+        },
+        {
+          "name": "keepmore",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Set to 1 to retain excess traces already in the target CDP."
+        },
+        {
+          "name": "igiadd",
+          "type": "int",
+          "default": "100",
+          "required": false,
+          "description": "Multiplier applied to the source-minus-target CDP difference when updating duplicated traces' igi."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparint",
+        "err",
+        "getpardouble",
+        "ealloc1",
+        "checkpars",
+        "gettr",
+        "puttr",
+        "warn"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Offset bins use double arithmetic, fmod, a 0.5000001 adjustment, and truncation to int, so values near boundaries are sensitive to rounding. Integer overflow, abs(INT_MIN), and out-of-range conversions can invoke undefined behavior; updating the short igi field can be implementation dependent when out of range.",
+      "c_lines": 576,
+      "difficulty": "medium",
+      "difficulty_reason": "It maintains rolling CDP gather buffers and selects traces across offset bins and neighboring gathers.",
+      "test_cases": [
+        {
+          "description": "Fill offset bins across neighboring CDPs.",
+          "command": "suplane nt=64 ntr=8 | suchw key1=cdp key2=tracl a=0 b=1 | suflex2d maxflex=1 minflex=-1 binfold=2 maxfold=8"
+        },
+        {
+          "description": "Keep excess target traces and choose by offset-bin center.",
+          "command": "suplane nt=64 ntr=8 | suchw key1=cdp key2=tracl a=0 b=1 | suflex2d maxflex=1 minflex=0 binfold=1 binsize=20 binalign=10 binbest=3 keepmore=1 igiadd=25 maxfold=8"
+        },
+        {
+          "description": "Select by signed crossline priority without neighboring CDPs.",
+          "command": "suplane nt=64 ntr=8 | suchw key1=cdp key2=tracl a=0 b=1 | suflex2d maxflex=0 minflex=0 binfold=1 binbest=-2 maxfold=8"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

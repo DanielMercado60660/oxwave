@@ -1,0 +1,21 @@
+# Default geometry, odd sample count and incomplete station.
+suplane nt=17 ntr=7 | sushw key=sx,sy,gx,gy a=10,20,40,-30 | suhrot
+suplane nt=17 ntr=6 | sushw key=gx,gy a=0,30 | suhrot angle=gon verbose=1
+suplane nt=1 ntr=1 | suhrot
+suplane nt=9 ntr=6 | suhrot a=0.7
+suplane nt=9 ntr=9 | sushw key=cdp a=0 b=1 | suhrot key=cdp x=0,3,6 a=-90,0,90 angle=deg inv=1 verbose=1
+suplane nt=9 ntr=9 | sushw key=cdp a=0 b=1 | suhrot key=cdp x=6,3,0 a=100,0,-100 angle=gon
+python3 -c 'import struct;open("a.bin","wb").write(struct.pack("=2f",0,90));open("x.bin","wb").write(struct.pack("=2f",0,4))' && suplane nt=9 ntr=6 | suhrot afile=a.bin xfile=x.bin n=2 angle=deg
+suplane nt=4 ntr=3 | suhrot angle=bad
+suplane nt=4 ntr=3 | suhrot a=1,2 x=1
+suplane nt=4 ntr=3 | suhrot afile=missing
+suplane nt=4 ntr=3 | suhrot afile=missing xfile=missing n=2
+python3 -c 'open("a.bin","wb").write(b"x")' && suplane nt=4 ntr=3 | suhrot afile=a.bin xfile=missing n=2
+python3 -c 'import struct;open("a.bin","wb").write(struct.pack("=f",1))' && suplane nt=4 ntr=3 | suhrot afile=a.bin xfile=missing n=1
+suhrot </dev/null
+[stderr] suspike nt=19 ntr=9 | suaddnoise sn=2 seed=23 | sushw key=gx,gy a=-20,10 | suhrot verbose=1 inv=1
+[stderr] suspike nt=19 ntr=9 | suaddnoise sn=2 seed=23 | suhrot angle=deg a=-30 verbose=1
+suspike nt=19 ntr=6 | suaddnoise sn=2 seed=5 | suhrot a=0.8 inv=1
+suplane nt=4 ntr=3 | suhrot afile=missing xfile=missing
+suplane nt=4 ntr=3 | suhrot afile=/dev/null xfile=/dev/null n=-1
+python3 -c 'import struct;open("a.bin","wb").write(struct.pack("=f",1));open("x.bin","wb").write(b"x")' && suplane nt=4 ntr=3 | suhrot afile=a.bin xfile=x.bin n=1

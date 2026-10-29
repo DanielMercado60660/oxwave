@@ -1,0 +1,18 @@
+# Default advisory messages and sign; multiple traces.
+[stderr] suspike nt=127 ntr=3 | sufft
+# Both FFT signs, odd and minimal input lengths.
+suspike nt=1 ntr=1 | sufft verbose=0
+suspike nt=15 ntr=1 | sufft sign=1 verbose=0
+suplane nt=101 ntr=3 | sufft sign=-1 verbose=0
+# Seismic zero dt and nonseismic d1, including zero and negative intervals.
+[stderr] suspike nt=31 ntr=1 | sushw key=dt a=0 | sufft verbose=1
+[stderr] suspike nt=33 ntr=1 | sushw key=trid,d1 a=30,0.002 | sufft verbose=1
+[stderr] suspike nt=33 ntr=1 | sushw key=trid,d1 a=30,0 | sufft verbose=1
+suspike nt=33 ntr=1 | sushw key=trid,d1 a=30,-0.002 | sufft verbose=0
+# The documented dt argument is not consumed by the original.
+[stderr] suspike nt=32 ntr=1 | sufft dt=0.002 verbose=1
+# Invalid signs, empty input, and padding beyond SU_NFLTS.
+suspike nt=32 ntr=1 | sufft sign=0 verbose=0
+suspike nt=32 ntr=1 | sufft sign=2 verbose=0
+sufft verbose=0 </dev/null
+sunull nt=65535 ntr=1 | sufft verbose=0

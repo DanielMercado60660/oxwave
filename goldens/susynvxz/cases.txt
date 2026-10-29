@@ -1,0 +1,63 @@
+# The inventory pipelines omit sustrip outpar= and fail upstream without a tty.
+# Repeat them with outpar=/dev/null so synthesis is actually exercised.
+sunull nt=21 ntr=21 | suop op=exp | sugain scale=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=21 nz=21 dx=100 dz=100 nt=128 dt=0.02 nxm=4 dxm=100 fxm=500 nxo=1 'ref=1:100,500;1900,500' < velocity.bin
+sunull nt=21 ntr=21 | suop op=exp | sugain scale=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=21 nz=21 dx=100 dz=100 nt=128 dt=0.02 nxm=5 dxm=100 fxm=500 nxo=2 fxo=100 dxo=100 nxd=2 ls=1 'ref=1:100,500;1900,500' < velocity.bin
+# SU output only; ls selects point-source or line-source amplitudes.
+# Default optional parameters, including the default reflector and 101 midpoints.
+[stderr] sunull nt=5 ntr=51 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=51 nz=5 < velocity.bin
+# Explicit defaults and one output trace.
+[stderr] sunull nt=5 ntr=51 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=51 nz=5 nxb=51 nxd=1 dx=100 fx=0 dz=100 nt=101 dt=0.04 ft=0 nxo=1 dxo=50 fxo=0 nxm=1 dxm=50 fxm=0 fpeak=5 ls=0 tmin=0.4 ndpfz=5 smooth=0 verbose=0 'ref=1:1,2;4,2' < velocity.bin
+# Odd nt; fractional x origin and non-grid-aligned midpoints exercise velocity interpolation.
+[stderr] sunull nt=13 ntr=17 | sugain bias=1800 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=17 nz=13 nxb=5 dx=80 fx=-200 dz=60 nt=127 dt=0.008 ft=0.016 nxm=3 fxm=125 dxm=85 'ref=0.7:-100,240;950,380' fpeak=20 tmin=0.2 ndpfz=3 verbose=1 < velocity.bin
+# Line source, signed offsets, and repeated reflectors with implicit amplitude.
+[stderr] sunull nt=13 ntr=17 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=17 nz=13 dx=75 dz=50 nt=129 dt=0.008 nxm=3 fxm=400 dxm=100 nxo=3 fxo=-100 dxo=100 ls=1 'ref=50,200;1100,250' 'ref=-0.5:100,400;1000,400' < velocity.bin
+# Cubic spline versus broken reflector segments; smooth accepts any nonzero value.
+sunull nt=17 ntr=19 | sugain bias=2200 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=19 nz=17 dx=50 dz=50 nxm=3 fxm=300 dxm=50 nt=135 dt=0.006 smooth=1 'ref=1:50,250;350,330;600,200;850,300' < velocity.bin
+sunull nt=17 ntr=19 | sugain bias=2200 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=19 nz=17 dx=50 dz=50 nxm=3 fxm=300 dxm=50 nt=135 dt=0.006 smooth=0 'ref=1:50,250;350,330;600,200;850,300' < velocity.bin
+# Skip interval 3 and a shortened final interval, including d2/f2 headers.
+[stderr] sunull nt=15 ntr=21 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=21 nz=15 dx=50 dz=50 nt=131 dt=0.008 nxm=6 fxm=250 dxm=50 nxd=3 nxb=6 nxo=2 fxo=-50 dxo=100 'ref=1:50,250;950,300' < velocity.bin
+# Skip exceeds midpoint count; final interval is adjusted at ixm=0.
+sunull nt=9 ntr=13 | sugain bias=1900 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=13 nz=9 dx=100 dz=100 nxm=3 fxm=300 dxm=100 nxd=7 nt=67 dt=0.02 'ref=1:100,250;1100,250' < velocity.bin
+# Boundary source locations and reflectors partly or entirely outside the grid.
+sunull nt=9 ntr=11 | sugain bias=1800 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=11 nz=9 nxm=2 fxm=0 dxm=1000 nt=65 'ref=1:-100,300;1100,300' < velocity.bin
+sunull nt=9 ntr=11 | sugain bias=1800 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=65 'ref=1:0,900;1000,900' < velocity.bin
+# Minimum time length, zero/negative counts, and no traces requested.
+sunull nt=5 ntr=5 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=1 fxm=200 nt=1 < velocity.bin
+[stderr] sunull nt=5 ntr=5 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=0 < velocity.bin
+[stderr] sunull nt=5 ntr=5 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=-1 < velocity.bin
+[stderr] sunull nt=5 ntr=5 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=1 nxo=0 < velocity.bin
+# Nonpositive tmin is replaced by MAX(tmin, MAX(ft,dt)).
+sunull nt=9 ntr=11 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=73 dt=0.01 tmin=-1 ls=-1 smooth=2 'ref=1:100,200;900,200' < velocity.bin
+# Empty/short velocity input: the C passes FILE * to %s in this diagnostic (UB).
+# Partial-read diagnostic bytes may be unstable and skipped by the harness.
+[stderr] susynvxz nx=5 nz=5 nxm=1
+[stderr] sunull nt=3 ntr=2 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=1 < velocity.bin
+# Required parameter and getpar errors happen before reflector decoding.
+[stderr] susynvxz
+[stderr] susynvxz nz=5
+[stderr] susynvxz nx=5
+[stderr] susynvxz nx= nz=5
+[stderr] susynvxz nx=2147483648 nz=5
+[stderr] susynvxz nx=5 nz=5 nt=65536
+[stderr] susynvxz nx=5 nz=5 nt=abc
+[stderr] susynvxz nx=5 nz=5 dx=1e-310
+# Geometry errors with defaults, negative/zero x range, and nonzero offset.
+[stderr] susynvxz nx=3 nz=3
+[stderr] susynvxz nx=5 nz=5 nxm=1 fxm=-1
+[stderr] susynvxz nx=5 nz=5 nxm=1 fxm=450
+[stderr] susynvxz nx=5 nz=5 nxm=1 fxm=0 fxo=100
+[stderr] susynvxz nx=5 nz=5 nxm=1 fx=100
+[stderr] susynvxz nx=5 nz=5 nxm=1 dx=-100
+[stderr] susynvxz nx=5 nz=5 nxm=2 dx=0
+[stderr] susynvxz nx=0 nz=5 nxm=1
+[stderr] susynvxz nx=-1 nz=5 nxm=1
+# Band validation happens after reflector construction and velocity input.
+[stderr] sunull nt=7 ntr=11 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=11 nz=7 nxm=1 fxm=500 fxo=300 nxb=1 < velocity.bin
+# Malformed first/second reflector, and unknown-argument/checkpars diagnostics.
+[stderr] susynvxz nx=5 nz=5 nxm=1 ref=bad
+[stderr] susynvxz nx=5 nz=5 nxm=1 'ref=1:0,100;400,100' ref=1,2,3
+[stderr] sunull nt=5 ntr=5 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin && susynvxz nx=5 nz=5 nxm=1 fxm=200 bogus=1 verbose=1 < velocity.bin
+# Spatially varying velocities exercise the finite-difference solution and
+# fractional velocity resampling, with direct and interpolated midpoints.
+makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 > velocity.bin && susynvxz nx=21 nz=17 dx=50 dz=50 nxm=3 fxm=325 dxm=50 nxb=6 nt=137 dt=0.008 'ref=1:100,250;900,350' < velocity.bin
+makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 > velocity.bin && susynvxz nx=21 nz=17 dx=50 dz=50 nxm=5 fxm=300 dxm=50 nxd=2 nxb=6 nxo=2 fxo=-50 dxo=100 nt=137 dt=0.008 'ref=1:100,250;900,350' < velocity.bin

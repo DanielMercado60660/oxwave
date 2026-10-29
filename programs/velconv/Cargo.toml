@@ -1,0 +1,17 @@
+[package]
+name = "velconv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "velconv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-inverse-interp = { path = "../../crates/oxwave-inverse-interp" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }

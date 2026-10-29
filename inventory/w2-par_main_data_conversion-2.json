@@ -1,0 +1,351 @@
+{
+  "scope": "par/main/data_conversion (wave 2, batch 2)",
+  "programs": [
+    {
+      "name": "ftnunstrip",
+      "path": "par/main/data_conversion/ftnunstrip.c",
+      "purpose": "Wrap groups of binary floats in Fortran-style record markers.",
+      "selfdoc_first_line": " FTNUNSTRIP - convert C binary floats to Fortran style floats\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "1",
+          "required": false,
+          "description": "Number of floats per record; an incomplete final record is an error."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the record count as n=."
+        }
+      ],
+      "stdin": "binary_floats",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "efopen",
+        "getparint",
+        "ealloc1float",
+        "checkpars",
+        "efread",
+        "err",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Record markers are native integers containing FSIZE*n1, and their byte order and integer representation are platform-dependent. Very large n1 can overflow the marker calculation.",
+      "c_lines": 94,
+      "difficulty": "easy",
+      "difficulty_reason": "It buffers one fixed-size record and writes native record markers around its floats.",
+      "test_cases": [
+        {
+          "description": "Wrap individual float samples.",
+          "command": "suplane nt=16 ntr=2 | sustrip | ftnunstrip n1=1 outpar=/dev/stderr"
+        },
+        {
+          "description": "Wrap one trace's samples per record.",
+          "command": "suspike nt=16 ntr=2 | sustrip | ftnunstrip n1=16 outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "Credits say it is based on ftnstrip by Jack K. Cohen.",
+      "related_programs": [
+        "ftnstrip"
+      ]
+    },
+    {
+      "name": "h2b",
+      "path": "par/main/data_conversion/h2b.c",
+      "purpose": "Convert pairs of hexadecimal digits to binary floats with each value subtracted from 255.",
+      "selfdoc_first_line": " H2B - convert 8 bit hexidecimal floats to binary\t\t",
+      "params": [
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the total number of converted values."
+        }
+      ],
+      "stdin": "ascii",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "filestat",
+        "warn",
+        "pagedoc",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The parser advances exactly two characters after each sscanf call, including when whitespace or a short final field is present; malformed or oddly formatted lines can therefore be misread or access beyond the line terminator.",
+      "c_lines": 95,
+      "difficulty": "easy",
+      "difficulty_reason": "It parses hexadecimal fields line by line and performs a simple per-value conversion.",
+      "test_cases": [
+        {
+          "description": "Convert hexadecimal bytes derived from a small trace.",
+          "command": "suspike nt=8 ntr=1 | sustrip | od -An -v -tx1 | tr -d ' \\n' | h2b outpar=/dev/stderr"
+        },
+        {
+          "description": "Convert multiple short hexadecimal input lines.",
+          "command": "suplane nt=8 ntr=2 | sustrip | od -An -v -tx1 -w4 | tr -d ' ' | h2b outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "i2a",
+      "path": "par/main/data_conversion/i2a.c",
+      "purpose": "Format native binary integers as rows of ASCII decimal integers.",
+      "selfdoc_first_line": " I2A - convert binary integers to ascii\t\t\t\t",
+      "params": [
+        {
+          "name": "n1",
+          "type": "int",
+          "default": "2",
+          "required": false,
+          "description": "Number of integers per output line; an incomplete final line is an error."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the output line count as n=."
+        }
+      ],
+      "stdin": "other",
+      "stdout": "ascii",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "efopen",
+        "getparint",
+        "ealloc1int",
+        "checkpars",
+        "efread",
+        "err",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Input integers use the native C int size, representation, and byte order.",
+      "c_lines": 74,
+      "difficulty": "easy",
+      "difficulty_reason": "It reads fixed-size groups of integers and prints each group.",
+      "test_cases": [
+        {
+          "description": "Print pairs of integers converted from generated float samples.",
+          "command": "suspike nt=16 ntr=2 | sustrip | recast in=float out=int outpar=/dev/stderr | i2a n1=2 outpar=/dev/stderr"
+        },
+        {
+          "description": "Print eight integers per line.",
+          "command": "suplane nt=16 ntr=2 | sustrip | recast in=float out=int outpar=/dev/stderr | i2a n1=8 outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "Credits identify Balazs Nemeth of Potash Corporation and say the program is based on b2a.c by Jack K. Cohen.",
+      "related_programs": [
+        "b2a",
+        "a2i"
+      ]
+    },
+    {
+      "name": "ibm2float",
+      "path": "par/main/data_conversion/ibm2float.c",
+      "purpose": "Convert headerless IBM-format floating-point words to native binary floats.",
+      "selfdoc_first_line": " IBM2FLOAT - convert IBM tape FLOATS to native binary FLOATS\t",
+      "params": [
+        {
+          "name": "endian",
+          "type": "int",
+          "default": "computed: 1 on a big-endian host, 0 on a little-endian host",
+          "required": false,
+          "description": "Selects whether input words are byte-swapped before conversion; the HPUX implementation ignores it."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the number of converted values as n=."
+        }
+      ],
+      "stdin": "other",
+      "stdout": "binary_floats",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "filestat",
+        "warn",
+        "pagedoc",
+        "getparint",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "ealloc1float",
+        "efread",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Assumes 32-bit int and float and type-puns float storage through int pointers. Signed shifts in byte swapping can be undefined or implementation-dependent. In the regular implementation, a nonzero IBM word with zero mantissa warns but then loops forever; the HPUX implementation instead returns zero. Overflow saturates and underflow becomes zero.",
+      "c_lines": 190,
+      "difficulty": "easy",
+      "difficulty_reason": "It converts one word at a time using bit masks and shifts.",
+      "test_cases": [
+        {
+          "description": "Round-trip generated floats through IBM format with detected host byte order.",
+          "command": "suspike nt=16 ntr=2 | sustrip | float2ibm outpar=/dev/stderr | ibm2float outpar=/dev/stderr"
+        },
+        {
+          "description": "Exercise explicitly selected little-endian handling on a little-endian host.",
+          "command": "suplane nt=16 ntr=2 | sustrip | float2ibm endian=0 outpar=/dev/stderr | ibm2float endian=0 outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "Credits say the program is based on code by Jack K. Cohen; the conversion routine credits Brian Sumner and notes modifications by Toralf Foerster and M. J. Rutty.",
+      "related_programs": [
+        "float2ibm"
+      ]
+    },
+    {
+      "name": "recast",
+      "path": "par/main/data_conversion/recast.c",
+      "purpose": "Convert a stream of native binary numbers from one C data type to another.",
+      "selfdoc_first_line": " RECAST - RECAST data type (convert from one data type to another)\t",
+      "params": [
+        {
+          "name": "in",
+          "type": "string",
+          "default": "float",
+          "required": false,
+          "description": "Input type: float, double, int, char, uchar, short, long, or ulong."
+        },
+        {
+          "name": "out",
+          "type": "string",
+          "default": "double",
+          "required": false,
+          "description": "Output type; supported pairs are enumerated in the source, and equal or unsupported pairs error."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the number of converted values as n=; the selfdoc calls this n1."
+        }
+      ],
+      "stdin": "other",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "err",
+        "efread",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Native type widths and byte order affect the stream. Float-to-integer paths convert through double and round halves away from zero; out-of-range floating-to-integer conversions have undefined behavior, and narrowing signed integer conversions can be implementation-defined. The int-to-long and int-to-ulong branches actually read long-sized input; char-to-ulong and uchar-to-ulong write signed long. The initial type check uses OR across input and output types, so some invalid types reach the unsupported-pair error.",
+      "c_lines": 340,
+      "difficulty": "easy",
+      "difficulty_reason": "It selects a type pair and converts each input value independently.",
+      "test_cases": [
+        {
+          "description": "Convert floats to doubles.",
+          "command": "suplane nt=16 ntr=2 | sustrip | recast in=float out=double outpar=/dev/stderr"
+        },
+        {
+          "description": "Round floats to native integers.",
+          "command": "suspike nt=16 ntr=2 | sustrip | recast in=float out=int outpar=/dev/stderr"
+        },
+        {
+          "description": "Convert native integers to shorts.",
+          "command": "suspike nt=16 ntr=2 | sustrip | recast in=float out=int outpar=/dev/stderr | recast in=int out=short outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    },
+    {
+      "name": "swapbytes",
+      "path": "par/main/data_conversion/swapbytes.c",
+      "purpose": "Swap the byte order of each value in a binary stream.",
+      "selfdoc_first_line": " SWAPBYTES - SWAP the BYTES of various  data types\t\t\t",
+      "params": [
+        {
+          "name": "in",
+          "type": "string",
+          "default": "float",
+          "required": false,
+          "description": "Input type: float, double, short, ushort, long, ulong, or int."
+        },
+        {
+          "name": "outpar",
+          "type": "string",
+          "default": "/dev/tty",
+          "required": false,
+          "description": "File receiving the number of converted values as n=; the selfdoc calls this n1."
+        }
+      ],
+      "stdin": "other",
+      "stdout": "other",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "getparstring",
+        "efopen",
+        "checkpars",
+        "err",
+        "efread",
+        "swap_float_4",
+        "swap_double_8",
+        "swap_short_2",
+        "swap_u_short_2",
+        "swap_long_4",
+        "swap_u_long_4",
+        "swap_int_4",
+        "efwrite",
+        "CWP_Exit"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The code assumes fixed widths for the swap functions, but reads and writes long and unsigned long using sizeof(long); on platforms with 8-byte longs, the 4-byte swap routines do not swap the complete value.",
+      "c_lines": 167,
+      "difficulty": "easy",
+      "difficulty_reason": "It applies a byte-swap routine independently to each input value.",
+      "test_cases": [
+        {
+          "description": "Swap generated float samples.",
+          "command": "suplane nt=16 ntr=2 | sustrip | swapbytes in=float outpar=/dev/stderr"
+        },
+        {
+          "description": "Swap short integer samples.",
+          "command": "suspike nt=16 ntr=2 | sustrip | recast in=float out=short outpar=/dev/stderr | swapbytes in=short outpar=/dev/stderr"
+        },
+        {
+          "description": "Swap double samples.",
+          "command": "suspike nt=16 ntr=2 | sustrip | recast in=float out=double outpar=/dev/stderr | swapbytes in=double outpar=/dev/stderr"
+        }
+      ],
+      "license_note": "Credits say Jens Hartmann of Institut fur Geophysik, Hamburg supplied the byte-swapping subroutines.",
+      "related_programs": []
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Cases excluded because their golden bytes come from undefined behaviour in the original SU.
+# Rule: excluded only if the output changes when the UB is removed by a minimal C fix (SU's own build flags).
+# Evidence: audits/claude-ub-exclusions.md (2026-10-29).
+# The vendor wpc1comp2 upstream emits freed memory (wpc1.c:230 realloc keeps a stale pointer);
+# with the one-line compressor fix these decoder outputs change.
+suplane nt=128 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=128 | wpc1uncomp2
+suspike nt=100 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=100 error=0.05 | wpc1uncomp2 verbose=1
+suplane nt=1024 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=1024 | wpc1uncomp2
+# Added 2026-10-29: the same input through the original wpc1comp2 gives different compressed bytes
+# depending only on the environment variables (stale-pointer UB above), so this golden is not reproducible.
+suplane nt=1 ntr=2 | suaddnoise seed=123 | sustrip outpar=/dev/null | wpc1comp2 n1=1 | wpc1uncomp2

@@ -1,0 +1,104 @@
+# Early failures: compare all stderr, including first-trace/parameter ordering.
+[stderr] sutifowler
+[stderr] sutifowler ncdps=1
+[stderr] sunull nt=9 ntr=1 | sutifowler
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=2147483648
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=2147483648
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 dtout=1e-310
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 vmin=1e-310
+# fopen failure is not observed until the first fprintf, after these getpar calls.
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 printfile=missing/listing salias=1e-310
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 printfile=missing/listing dtout=1e-310
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 printfile=missing/listing getcvstacks=2147483648
+# Default migration, all documented output modes, and choose=5 (raw stacks).
+suspike nt=17 ntr=1 | sutifowler ncdps=1
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=3 nvstack=6
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=3 nvstack=6 choose=2
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=3 choose=3
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=3 choose=4
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=3 choose=5
+# Every default explicitly, including the undocumented ntpad and vsvp spelling.
+[stderr] sunull nt=15 ntr=1 | sutifowler ncdps=1 choose=1 getcvstacks=0 vminstack=1500 etamin=0 etamax=0.5 neta=1 d=0 vsvp=0.5 dx=25 vmin=1500 vmax=8000 nv=75 nvstack=180 nxpad=0 ntpad=1 lmute=24 nonhyp=1 lbtaper=0 lstaper=0 dtout=0.006 mxfold=120 salias=0.8 file=sutifowler ngroup=20
+# Odd and minimal sizes, dead traces, and verbose/checkpars behavior.
+sunull nt=1 ntr=1 | sutifowler ncdps=1 nv=1 choose=4
+sunull nt=7 ntr=1 | sutifowler ncdps=1 nv=1 choose=3
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 verbose=1
+# Nondefault geometry, velocity, padding, group headers, mute and taper lengths.
+suspike nt=33 ntr=6 | sushw key=cdp,offset a=10,0 b=0,25 j=2,2 c=1,0 | sutifowler ncdps=3 nv=3 nvstack=8 vmin=1200 vmax=3200 vminstack=1000 dx=12.5 nxpad=3 ntpad=5 ngroup=2 lmute=4 nonhyp=0 lbtaper=8 lstaper=1 dtout=0.004 mxfold=3 salias=0.6
+suspike nt=17 ntr=1 | sutifowler ncdps=1 nv=2 choose=4 lmute=0 nonhyp=0 lbtaper=0 lstaper=0 salias=2
+suspike nt=17 ntr=1 | sutifowler ncdps=1 nv=2 choose=4 lmute=-1 lstaper=-1 lbtaper=-1 salias=-0.5 nonhyp=0
+# TI tables and eta header values; neta <= 0 and equal eta limits collapse to 1.
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=2 nvstack=6 neta=2 etamin=0.1 etamax=0.3 d=0.05 vsvp=0.45
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=2 nvstack=6 choose=2 neta=2
+suspike nt=17 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=2 choose=3 d=0.1 neta=2 etamin=-0.1 etamax=0.2
+sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 neta=0
+sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 neta=-2
+sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 neta=3 etamin=0.1 etamax=0.1
+# Precomputed stacks: dtout is ignored, and all four processing choices.
+suspike nt=17 ntr=6 | sutifowler ncdps=1 nv=2 nvstack=6 getcvstacks=1 dtout=0.009
+suspike nt=17 ntr=6 | sutifowler ncdps=1 nv=2 nvstack=6 getcvstacks=1 choose=2
+suspike nt=17 ntr=2 | sutifowler ncdps=1 nv=2 getcvstacks=1 choose=3
+suspike nt=17 ntr=2 | sutifowler ncdps=1 nv=2 getcvstacks=1 choose=4
+# Temporary file roots and multiple directory parameters.
+mkdir disk1 disk2; sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 p=disk1 p=disk2 file=work
+# Print listing is a side effect: expose it on stdout for comparison.
+[exact] sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 printfile=listing > /dev/null; rc=$?; cat listing; exit $rc
+# Downstream input/parameter errors and too many input cdps.
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 nvstack=5
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 getcvstacks=1 nvstack=6
+[stderr] sunull nt=9 ntr=3 | sutifowler ncdps=1 nv=1 choose=4 mxfold=1
+sunull nt=9 ntr=1 | sutifowler ncdps=0 nv=1 choose=4
+sunull nt=9 ntr=1 | sutifowler ncdps=-1 nv=1 choose=4
+sunull nt=9 ntr=3 | sushw key=cdp a=1 b=1 | sutifowler ncdps=1 nv=1 choose=4
+[stderr] sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 vpvs=0.5 unknown=7
+# Precomputed stacks without spatial transforms, with complete output headers.
+suspike nt=19 ntr=6 | sushw key=cdp,trid,delrt a=120,2,8 | sutifowler ncdps=2 nv=3 choose=5 getcvstacks=1 vmin=1000 vmax=2500 dx=17.5 ngroup=1
+# Parameter-file defaults and command-line overrides; repeated scalar last wins.
+printf 'ncdps=2 nv=3 choose=4 dtout=0.004\n' > params; suspike nt=19 ntr=2 | sushw key=cdp a=11 b=1 | sutifowler par=params nv=1 nv=2
+# Nonzero input mute words and signed offsets, odd sample count, output cdps reset.
+suspike nt=31 ntr=4 | sushw key=cdp,offset,muts,mute a=10,-12,3,7 b=0,24,0,0 j=2,2,2,2 c=10,0,0,0 | sutifowler ncdps=2 nv=2 choose=5 nonhyp=0 lmute=8 dtout=0.004
+# Live impulses in every mode: explicit spike positions avoid ix=0 at small ntr;
+# zero offsets avoid the default nonhyperbolic mute removing all short traces.
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=3 nvstack=8 nonhyp=0 lmute=0
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=3 nvstack=8 choose=2 nonhyp=0 lmute=0
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=3 choose=3 nonhyp=0 lmute=0
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=3 choose=4 nonhyp=0 lmute=0
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=3 choose=5 nonhyp=0 lmute=0
+# General TI with live data and multiple eta panels.
+suspike nt=33 ntr=5 offset=0 nspk=1 ix1=3 it1=9 | sushw key=cdp a=10 b=1 | sutifowler ncdps=5 nv=2 nvstack=8 neta=2 d=0.05 etamin=0.1 etamax=0.3 vsvp=0.45 nonhyp=0 lmute=0
+# A live one-sample gather and integer division by ngroup=0.
+suspike nt=1 ntr=1 offset=0 nspk=1 ix1=1 it1=1 | sutifowler ncdps=1 nv=1 choose=5 nonhyp=0 lmute=0 ngroup=0
+# .VND directory selection and cleanup, with its listing exposed to comparison.
+[exact] mkdir disk; printf '1\ndisk\n' > .VND; sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=1 choose=4 printfile=listing > /dev/null; rc=$?; cat listing; find disk -type f; exit $rc
+# An unchecked failed fopen dies by SIGSEGV at the first fprintf. Capture the
+# child's wait status (-11), stdout and stderr directly: a shell pipeline would
+# conflate exit(139) with SIGSEGV and insert variable PIDs in its diagnostics.
+[stderr] sunull nt=9 ntr=1 | python3 -c 'import resource,subprocess,sys; resource.setrlimit(resource.RLIMIT_CORE,(0,0)); p=subprocess.run(sys.argv[1:],input=sys.stdin.buffer.read(),capture_output=True); sys.stdout.buffer.write(("returncode=%d\n" % p.returncode).encode()+p.stdout); sys.stderr.buffer.write(p.stderr)' sutifowler ncdps=1 printfile=missing/listing
+# ncdps parsing follows the first fprintf, so this crash precedes its overflow.
+[stderr] sunull nt=9 ntr=1 | python3 -c 'import resource,subprocess,sys; resource.setrlimit(resource.RLIMIT_CORE,(0,0)); p=subprocess.run(sys.argv[1:],input=sys.stdin.buffer.read(),capture_output=True); sys.stdout.buffer.write(("returncode=%d\n" % p.returncode).encode()+p.stdout); sys.stderr.buffer.write(p.stderr)' sutifowler ncdps=2147483648 printfile=missing/listing
+
+# Seeded live multi-offset gathers exercise NMO, fold normalization, mute,
+# both tapers, padded FFTs and every processing choice on nonzero data.
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=1
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=2
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=3
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=4
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=5
+# TI with live data for DMO, migration, and their combination.
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=1 neta=3 etamin=-0.05 etamax=0.25 d=0.07 vsvp=0.43
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=2 neta=3 etamin=-0.05 etamax=0.25 d=0.07 vsvp=0.43
+[stderr] sunull nt=129 ntr=21 | suaddnoise seed=41 | sushw key=cdp,offset a=100,-60 b=0,60 j=3,3 c=1,0 | sutifowler ncdps=7 nv=4 nvstack=16 vmin=1300 vmax=4100 vminstack=1100 dx=18.75 nxpad=5 ntpad=13 dtout=0.005 lmute=8 nonhyp=0 lbtaper=20 lstaper=2 mxfold=3 ngroup=3 salias=0.6 choose=3 neta=3 etamin=-0.05 etamax=0.25 d=0.07 vsvp=0.43
+# Precomputed, nonzero cvstacks in all modes; input header words persist.
+[stderr] sunull nt=65 ntr=32 | suaddnoise seed=73 | sushw key=trid,delrt a=2,12 | sutifowler ncdps=4 nv=3 nvstack=8 getcvstacks=1 choose=1 vmin=1100 vmax=2900 vminstack=900 dtout=0.02 nxpad=3 ntpad=5 ngroup=2
+[stderr] sunull nt=65 ntr=32 | suaddnoise seed=73 | sushw key=trid,delrt a=2,12 | sutifowler ncdps=4 nv=3 nvstack=8 getcvstacks=1 choose=2 vmin=1100 vmax=2900 vminstack=900 dtout=0.02 nxpad=3 ntpad=5 ngroup=2
+[stderr] sunull nt=65 ntr=12 | suaddnoise seed=73 | sushw key=trid,delrt a=2,12 | sutifowler ncdps=4 nv=3 nvstack=8 getcvstacks=1 choose=3 vmin=1100 vmax=2900 vminstack=900 dtout=0.02 nxpad=3 ntpad=5 ngroup=2
+[stderr] sunull nt=65 ntr=12 | suaddnoise seed=73 | sushw key=trid,delrt a=2,12 | sutifowler ncdps=4 nv=3 nvstack=8 getcvstacks=1 choose=4 vmin=1100 vmax=2900 vminstack=900 dtout=0.02 nxpad=3 ntpad=5 ngroup=2
+[stderr] sunull nt=65 ntr=12 | suaddnoise seed=73 | sushw key=trid,delrt a=2,12 | sutifowler ncdps=4 nv=3 nvstack=8 getcvstacks=1 choose=5 vmin=1100 vmax=2900 vminstack=900 dtout=0.02 nxpad=3 ntpad=5 ngroup=2
+# Larger blocked storage, nonhyperbolic and sloth mutes, and a live default run.
+[stderr] sunull nt=257 ntr=45 | suaddnoise seed=19 | sushw key=cdp,offset a=12,0 b=0,250 j=3,3 c=1,0 | sutifowler ncdps=15 nv=5 nvstack=20 nxpad=7 nonhyp=1 lmute=20
+suspike nt=65 ntr=1 offset=0 nspk=1 ix1=1 it1=19 | sutifowler ncdps=1
+# Exact stderr includes the original outstanding p= allocation accounting.
+[stderr] mkdir disk1 disk2; sunull nt=65 ntr=3 | suaddnoise seed=11 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=2 nvstack=8 p=disk1 p=disk2 file=panels
+# Longer-than-declared gather with an even mxfold reaches the same error.
+[stderr] sunull nt=17 ntr=4 | sutifowler ncdps=1 nv=2 choose=5 mxfold=2

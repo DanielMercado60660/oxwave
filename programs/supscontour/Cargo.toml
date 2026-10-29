@@ -1,0 +1,16 @@
+[package]
+name = "supscontour"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "supscontour"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-tempfile = { path = "../../crates/oxwave-tempfile" }

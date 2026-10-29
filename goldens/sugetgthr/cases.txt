@@ -1,0 +1,18 @@
+# Required parameters and directory errors
+sugetgthr
+sugetgthr dir=missing
+sugetgthr dir=missing vt=1
+# Empty directory and empty file, verbose output
+mkdir gathers && sugetgthr dir=gathers
+[stderr] mkdir gathers && touch gathers/empty && sugetgthr dir=gathers verbose=1
+# Normal output and odd trace sizes
+mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers
+mkdir gathers && suplane nt=17 ntr=3 > gathers/a && sugetgthr dir=gathers vt=0 verbose=0
+[stderr] mkdir gathers && suplane nt=7 ntr=1 > gathers/a && sugetgthr dir=gathers verbose=1
+# Native raw variable trace mode with padding, truncation and zero samples
+[exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=3
+[exact] mkdir gathers && suplane nt=3 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=1
+[exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=0
+# Negative values can produce a partial header or an empty write in the original.
+[exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=-1
+[exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=-60

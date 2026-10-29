@@ -1,0 +1,11 @@
+# suxedit has no named parameters. Without a controlling terminal it errors before reading input.
+[stderr] suxedit </dev/null
+[stderr] suxedit one two
+[stderr] sunull nt=1 ntr=1 > in.su && suxedit < in.su
+[stderr] sunull nt=17 ntr=3 > in.su && suxedit < in.su
+[stderr] suxedit verbose=1 </dev/null
+# Drive the controlling terminal while trace input comes from a disk file.
+: suxedit; sunull nt=17 ntr=3 > in.su && python3 -c 'import os,pty; p,fd=pty.fork(); exec("if p == 0:\n os.dup2(os.open(\"in.su\",os.O_RDONLY),0); os.execlp(\"suxedit\",\"suxedit\")\nos.write(fd,b\"r\\n%\\np 1 5\\n+\\n-\\nd2\\n0\\n! cdp=5\\n?\\nq\\n\")\nwhile True:\n try:\n  b=os.read(fd,65536)\n  if not b: break\n  os.write(1,b)\n except OSError: break\nos.waitpid(p,0)")'
+: suxedit; sunull nt=1 ntr=1 > in.su && python3 -c 'import os,pty; p,fd=pty.fork(); exec("if p == 0:\n os.dup2(os.open(\"in.su\",os.O_RDONLY),0); os.execlp(\"suxedit\",\"suxedit\")\nos.write(fd,b\"r\\n%\\np\\n+\\nq\\n\")\nwhile True:\n try:\n  b=os.read(fd,65536)\n  if not b: break\n  os.write(1,b)\n except OSError: break\nos.waitpid(p,0)")'
+# Writable trace header edit, including the resulting file bytes.
+: suxedit; sunull nt=3 ntr=2 > in.su && python3 -c 'import os,pty; p,fd=pty.fork(); exec("if p == 0:\n os.execlp(\"suxedit\",\"suxedit\",\"in.su\")\nos.write(fd,b\"! cdp=12\\nq\\n\")\nwhile True:\n try:\n  b=os.read(fd,65536)\n  if not b: break\n  os.write(1,b)\n except OSError: break\nos.waitpid(p,0)\nos.write(1,open(\"in.su\",\"rb\").read().hex().encode())")'

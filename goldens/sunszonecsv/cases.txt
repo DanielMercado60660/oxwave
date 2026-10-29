@@ -1,0 +1,128 @@
+# A header-only Q-file has undefined behavior in C, so its clean
+# Rust error is checked separately rather than compared with a C golden.
+# The three one-record cases below cover the smallest supported model.
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sunszonecsv qin=m.q qzb=unknown locs=-1 tapp=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sunszonecsv qin=m.q qzb=unknown locs=0 tapp=0 tbulk=0.375
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sunszonecsv qin=m.q qzb=unknown locs=1 tapp=1 tbulk=0.375
+# Pre-reader validation, including its ordering before qin is opened.
+[stderr] sunszonecsv
+[stderr] sunszonecsv qin=missing.csv
+[stderr] sunszonecsv qin=
+[stderr] sunszonecsv locs=-2
+[stderr] sunszonecsv locs=2
+[stderr] sunszonecsv apply=0
+[stderr] sunszonecsv apply=2
+[stderr] sunszonecsv sdist=0
+[stderr] sunszonecsv smult=-1
+[stderr] sunszonecsv locs=2 apply=0 sdist=0 smult=-1
+[stderr] sunszonecsv apply=2147483648
+# tpath/tapp validation occurs after opening qin, before reading its contents.
+[stderr] touch m.q; sunszonecsv qin=m.q tpath=-1
+[stderr] touch m.q; sunszonecsv qin=m.q tpath=5
+[stderr] touch m.q; sunszonecsv qin=m.q qzb=unknown tpath=3
+[stderr] touch m.q; sunszonecsv qin=m.q qzc=unknown tpath=4
+[stderr] touch m.q; sunszonecsv qin=m.q tapp=-2
+[stderr] touch m.q; sunszonecsv qin=m.q tapp=2
+# Q-file diagnostics and empty trace input.
+[stderr] touch m.q; sunszonecsv qin=m.q
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; sunszonecsv qin=m.q qzb=unknown tapp=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; sunull nt=3 ntr=1 | sunszonecsv qin=m.q
+[stderr] printf 'C_SU_NAMES\nC_SU_NAMES\nC_SU_ID,sx,sy\nQ,0,0\n' > m.q; sunszonecsv qin=m.q
+[stderr] printf 'C_SU_NDIMS,vary\nC_SU_NDIMS,vary\nC_SU_NAMES\nC_SU_ID,sx,sy\nQ,0,0\n' > m.q; sunszonecsv qin=m.q
+[stderr] printf 'C_SU_NAMES\nQ,0,0\n' > m.q; sunszonecsv qin=m.q
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,no,5,1200\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+# All defaults, four velocities, three full layers
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q
+# Set headers only
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tapp=-1
+# Shift only; preserve original statics and sec
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tapp=0
+# Explicit defaults, including verbose
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q locs=0 apply=-1 sdist=100 smult=2 tpath=0 tapp=1 tbulk=200 verbose=1
+# Shot model at both ends
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q locs=1 tapp=-1
+# Receiver model at both ends
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q locs=-1 tapp=-1
+# Inverse shift
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q apply=1 tbulk=0
+# Noninteger bulk shift
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tbulk=-2.375
+# Small adaptive search radius
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q sdist=0.01 smult=3 tapp=-1
+# Fixed initial search radius
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q sdist=-0.01 smult=2 tapp=-1
+# Zero multiplier, all points within initial radius
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q sdist=-10000 smult=0 tapp=-1
+# Unit multiplier with sufficient initial radius
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q sdist=10000 smult=1 tapp=-1
+# One full layer; deeper parameters ignored
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q qzb=unknown qvc=unused qzc=unused qvd=unused tapp=-1
+# Two full layers
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q qzc=unknown qvd=unused tapp=-1
+# Unknown argument checked after Q-file read
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tapp=-1 unused=1
+# Scalar one-sample trace
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=1 ntr=1 dt=0.004 | sunszonecsv qin=m.q
+# Odd length and count
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=17 ntr=5 | sunszonecsv qin=m.q tbulk=0
+# Zero sample interval without interpolation
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=3 ntr=1 | sushw key=dt a=0 | sunszonecsv qin=m.q tapp=-1
+# Negative thickness
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,-5,1200\n' > m.q; sunull nt=7 ntr=1 | sushw key=gx a=100 | sunszonecsv qin=m.q qzb=unknown tapp=-1
+# Negative shot hole depth
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=7 ntr=1 | sushw key=sdepth,gx a=-2,100 | sunszonecsv qin=m.q tapp=-1
+# Shot hole below the full model
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=7 ntr=1 | sushw key=sdepth,gx a=100,300 | sunszonecsv qin=m.q tapp=-1
+# Positive coordinate and elevation scales
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=9 ntr=1 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,scalco,scalel a=1,2,20,10,3,2,1,10,2 | sunszonecsv qin=m.q tapp=-1
+# Negative coordinate and elevation scales
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=9 ntr=1 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,scalco,scalel a=100,200,2000,1000,300,200,100,-10,-100 | sunszonecsv qin=m.q tapp=-1
+# Nearest model tie chooses highest record number
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; sunull nt=5 ntr=1 | sushw key=sy,gx,gy a=100,200,100 | sunszonecsv qin=m.q tapp=-1
+# Explicit travel path 1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tpath=1 tbulk=0
+# Explicit travel path 2
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tpath=2 tbulk=0
+# Explicit travel path 3
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tpath=3 tbulk=0
+# Explicit travel path 4
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suplane nt=129 ntr=3 dt=0.001 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth a=0,0,80,0,20,5,2 b=45,5,35,20,0,0,0 | sunszonecsv qin=m.q tpath=4 tbulk=0
+# All nine Q column-name parameters
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,x,y,w,h,b,j,c,k,d\nQ,0,0,500,5,1200,12,2000,20,3000\n' > m.q; sunull nt=11 ntr=1 | sushw key=gx a=100 | sunszonecsv qin=m.q qx=x qy=y qvw=w qzw=h qvb=b qzb=j qvc=c qzc=k qvd=d tapp=-1
+# Varying tuple model rejected
+[stderr] printf 'C_SU_NDIMS,vary\nC_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,t,v,t,v\nQ,0,0,500,5,1200,0,1,2,3\nQ,0,1,500,5,1200,0,1\n' > m.q; sunszonecsv qin=m.q qzb=unknown qvw=v
+
+# Nonzero samples verify fractional sinc shifts and edge extrapolation.
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=7 ntr=1 nspk=1 ix1=1 it1=3 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=7 ntr=1 nspk=1 ix1=1 it1=3 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=8 ntr=1 nspk=1 ix1=1 it1=4 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=8 ntr=1 nspk=1 ix1=1 it1=4 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=9 ntr=1 nspk=1 ix1=1 it1=4 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=9 ntr=1 nspk=1 ix1=1 it1=4 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=33 ntr=1 nspk=1 ix1=1 it1=16 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=33 ntr=1 nspk=1 ix1=1 it1=16 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=1 nspk=1 ix1=1 it1=128 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=1 nspk=1 ix1=1 it1=128 dt=0.001 | sunszonecsv qin=m.q tpath=1 tbulk=0.375 apply=1
+# Seeded noise, all paths, mixed end models, changing coordinates and elevations.
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=129 dt=0.001 | suaddnoise seed=314159 sn=2 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,sstat,gstat,tstat,sec a=-50,10,40,3,12,-2,7,81,82,83,7 b=55,20,33,17,1,2,1,0,0,0,0 | sunszonecsv qin=m.q tpath=0 tapp=0 tbulk=1.234 locs=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=129 dt=0.001 | suaddnoise seed=314159 sn=2 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,sstat,gstat,tstat,sec a=-50,10,40,3,12,-2,7,81,82,83,7 b=55,20,33,17,1,2,1,0,0,0,0 | sunszonecsv qin=m.q tpath=1 tapp=0 tbulk=1.234 locs=0
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=129 dt=0.001 | suaddnoise seed=314159 sn=2 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,sstat,gstat,tstat,sec a=-50,10,40,3,12,-2,7,81,82,83,7 b=55,20,33,17,1,2,1,0,0,0,0 | sunszonecsv qin=m.q tpath=2 tapp=0 tbulk=1.234 locs=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=129 dt=0.001 | suaddnoise seed=314159 sn=2 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,sstat,gstat,tstat,sec a=-50,10,40,3,12,-2,7,81,82,83,7 b=55,20,33,17,1,2,1,0,0,0,0 | sunszonecsv qin=m.q tpath=3 tapp=0 tbulk=1.234 locs=-1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,zb_true,vc,zc_true,vd\nQ,0,0,500,5,1200,12,2000,20,3000\nQ,200,100,600,6,1300,15,2100,25,3200\nQ,0,200,700,7,1400,18,2200,30,3400\n' > m.q; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=129 dt=0.001 | suaddnoise seed=314159 sn=2 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,sstat,gstat,tstat,sec a=-50,10,40,3,12,-2,7,81,82,83,7 b=55,20,33,17,1,2,1,0,0,0,0 | sunszonecsv qin=m.q tpath=4 tapp=0 tbulk=1.234 locs=0
+# Reordered names, ignored nonnumeric columns, prefixed names, case and whitespace.
+[stderr] printf 'c_su_names\nC_SU_ID,5_vb_1,other,sy,zw_true,sx,vw\nq,1200,ignored,0,5,0,500\n' > m.q; suspike nt=33 ntr=1 nspk=1 ix1=1 it1=12 | sunszonecsv qin=m.q qzb=unknown tbulk=0
+# Larger ordered model exercises dispersed kd-tree construction.
+[stderr] { printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\n'; for i in $(seq 0 40); do printf 'Q,%s,%s,%s,7,1800\n' "$((i*20))" "$((i%5*11))" "$((500+i*7))"; done; } > m.q; sunull nt=3 ntr=31 | sushw key=sx,sy,gx,gy a=-300,13,1000,20 b=51,1,-37,2 | sunszonecsv qin=m.q qzb=unknown sdist=-0.01 smult=3 tapp=-1
+# Q-file malformed records and tuple validation.
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\nQ,0,0,500,bad,1200\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,5 00,5,1200\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb\nQ,0,0,500,5,1200\n' > m.q; sunszonecsv qin=m.q qzb=unknown qx=missing verbose=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,vw\nQ,0,0,500,5,1200,600\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+[stderr] printf 'C_SU_NDIMS,vary,,,,,,,,\nC_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,t,v,t,v\nQ,0,0,500,5,1200,0,1,2,3\n' > m.q; sunszonecsv qin=m.q qzb=unknown qvw=v
+[stderr] printf 'C_SU_NDIMS,,,,,,abc,abc,2,2\nC_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,vw,zw_true,vw,zw_true\nQ,0,0,500,5,1200,600,6,700,7\n' > m.q; sunszonecsv qin=m.q qzb=unknown
+[stderr] printf 'C_SU_NDIMS,,,,,,1,2,3,3\nC_SU_NAMES\nC_SU_ID,sx,sy,vw,zw_true,vb,vw,zw_true,vw,zw_true\nQ,0,0,500,5,1200,600,6,700,7\n' > m.q; sunszonecsv qin=m.q qzb=unknown

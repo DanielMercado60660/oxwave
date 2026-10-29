@@ -1,0 +1,51 @@
+# Required parameter errors and input-file errors.
+[stderr] suaddstatics
+[stderr] suaddstatics sources=1
+[stderr] suaddstatics sources=1 receivers=1
+[stderr] suaddstatics sources=1 receivers=1 cmps=1
+[stderr] suaddstatics sources=1 receivers=1 cmps=1 maxfold=1
+[stderr] suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing
+[stderr] suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift=2 seed=1
+[stderr] touch empty; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=empty shift=2 seed=1
+# One sample and one trace, explicit and default dt, and zero shift.
+sunull nt=1 ntr=1 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0 seed=1
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0 seed=1 dt=2 verbose=1
+# Seeded nonzero and negative shifts, multiple CMPs and repeated locations.
+sunull nt=7 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 b=1,1,1,0 > input.su; suaddstatics sources=5 receivers=5 cmps=5 maxfold=1 datafile=input.su shift=20 seed=42
+sunull nt=7 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 b=0,1,1,0 > input.su; suaddstatics sources=5 receivers=5 cmps=1 maxfold=5 datafile=input.su shift=-10 seed=-3 dt=1
+sunull nt=7 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 b=0,1,1,0 > input.su; suaddstatics sources=2 receivers=5 cmps=1 maxfold=5 datafile=input.su shift=0 seed=42
+# Preserve nonzero samples and all other headers, and replace an existing tstat.
+suspike nt=9 ntr=3 | sushw key=cdp,sx,gx,tstat a=1,100,200,-99 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=3 datafile=input.su shift=0
+# Three CMPs with revisited sources and receivers, and a nonzero-shift twin.
+[stderr] suspike nt=9 ntr=9 | sushw key=cdp,sx,gx,dt a=1,100,200,2500 b=0,1,1,0 c=1,0,0,0 j=3,2,3,1 > input.su; suaddstatics sources=2 receivers=3 cmps=3 maxfold=3 datafile=input.su shift=0 seed=0 dt=0 verbose=1
+[stderr] suspike nt=9 ntr=9 | sushw key=cdp,sx,gx,dt a=1,100,200,2500 b=0,1,1,0 c=1,0,0,0 j=3,2,3,1 > input.su; suaddstatics sources=2 receivers=3 cmps=3 maxfold=3 datafile=input.su shift=12.75 seed=0 dt=0 verbose=1
+# More than 17 draws, fractional negative dt, and short-header wrapping.
+sunull nt=3 ntr=25 | sushw key=cdp,sx,gx a=1,-20,-30 b=0,1,1 > input.su; suaddstatics sources=25 receivers=25 cmps=1 maxfold=25 datafile=input.su shift=40000.25 seed=2147483647 dt=-0.75
+# Receiver-count exhaustion must stop before saving the extra trace/header.
+[stderr] suspike nt=5 ntr=5 | sushw key=cdp,sx,gx a=1,10,20 b=0,0,1 > input.su; suaddstatics sources=1 receivers=2 cmps=1 maxfold=5 datafile=input.su shift=0 seed=-42 verbose=2
+# Explicit negative dt and signed zero shift.
+sunull nt=1 ntr=1 | sushw key=cdp,sx,gx a=1,-10,-20 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=-0 seed=-2147483648 dt=-2.5
+# Zero header dt reaches IEEE zero divisions in the original statics calculation.
+sunull nt=3 ntr=1 | sushw key=cdp,sx,gx,dt a=1,10,20,0 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0 seed=7 dt=0
+# Parameter parsing errors, empty values, and unknown-argument diagnostics.
+[stderr] suaddstatics sources=2147483648
+[stderr] suaddstatics sources=
+[stderr] suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile= shift=0 seed=1
+[stderr] suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift=1e-310 seed=1
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp a=1 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0 seed=1 mystery=7
+# Nonzero shift with zero dt also produces NaN statics, converted to tstat=0.
+[stderr] suspike nt=5 ntr=3 | sushw key=cdp,sx,gx,dt,tstat a=1,10,20,0,-23 b=0,1,1,0,0 > input.su; suaddstatics sources=3 receivers=3 cmps=1 maxfold=3 datafile=input.su shift=12.75 seed=42 verbose=1
+# NaN and infinite limits, and overflow/underflow in the f32 limit divisions.
+sunull nt=1 ntr=1 | sushw key=cdp,tstat a=1,17 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=nan seed=7
+sunull nt=1 ntr=1 | sushw key=cdp,tstat a=1,17 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=12 seed=7 dt=inf
+sunull nt=1 ntr=1 | sushw key=cdp,tstat a=1,17 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=3e38 seed=7 dt=1e-30
+sunull nt=1 ntr=1 | sushw key=cdp,tstat a=1,17 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=1e-30 seed=7 dt=3e38
+# INT_MIN must exercise seeding with nonzero shifts, including multiple state wraps.
+[stderr] sunull nt=3 ntr=37 | sushw key=cdp,sx,gx,dt a=1,-100,200,1250 b=0,1,1,0 > input.su; suaddstatics sources=37 receivers=37 cmps=1 maxfold=37 datafile=input.su shift=213.75 seed=-2147483648 verbose=1
+# All declared sources consume draws before the receiver vector, including unused sources.
+sunull nt=1 ntr=1 | sushw key=cdp,sx,gx,dt a=-7,300,-400,4000 > input.su; suaddstatics sources=257 receivers=257 cmps=1 maxfold=1 datafile=input.su shift=32768.25 seed=1
+# Seeded statics must still use the declared vector lengths after early exhaustion.
+[stderr] suspike nt=7 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,4000 b=0,1,1,0 > input.su; suaddstatics sources=2 receivers=5 cmps=1 maxfold=5 datafile=input.su shift=23.125 seed=-42 dt=0.333 verbose=1
+[stderr] suspike nt=5 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,2500 b=0,0,1,0 > input.su; suaddstatics sources=3 receivers=2 cmps=1 maxfold=5 datafile=input.su shift=19.75 seed=42 verbose=-1
+# Observe every draw across many generator-state wraps with fractional header dt.
+[exact] suspike nt=11 ntr=257 | sushw key=cdp,sx,gx,dt,tstat a=1,-300,500,3333,-99 b=0,1,1,0,0 > input.su; suaddstatics sources=257 receivers=257 cmps=1 maxfold=257 datafile=input.su shift=32768.25 seed=123456789 verbose=0

@@ -1,0 +1,17 @@
+[package]
+name = "suclogfft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suclogfft"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-pfa-fft = { path = "../../crates/oxwave-pfa-fft" }
+oxwave-phase-unwrap = { path = "../../crates/oxwave-phase-unwrap" }

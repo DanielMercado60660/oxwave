@@ -1,0 +1,20 @@
+# Different filter shapes, taper transitions, and rounded bins.
+suspike nt=127 ntr=2 dt=0.004 | sufilter f=0,10,20,80 amps=1,1,0,0
+suspike nt=101 ntr=1 dt=0.002 | sufilter f=5,10,40,100 amps=0,0,1,1
+suspike nt=65 ntr=1 dt=0.004 | sufilter f=10,12.5,35,50,60 amps=1,.5,0,.5,1
+suspike nt=31 ntr=1 dt=0.004 | sufilter f=10,10,20,500 amps=0,1,1,0
+[stderr] suspike nt=33 ntr=1 dt=0.004 | sufilter f=0,20 amps=1,1 verbose=1
+# Header interval precedence, fallback, and non-seismic data.
+[stderr] suspike nt=33 ntr=1 dt=0.004 | sushw key=dt a=0 | sufilter verbose=1
+[stderr] suspike nt=33 ntr=1 dt=0.004 | sushw key=dt a=0 | sufilter dt=0.002 verbose=1
+[stderr] suspike nt=33 ntr=1 dt=0.004 | sushw key=trid,d1 a=30,0.002 | sufilter dt=0.003 verbose=1
+suspike nt=1 ntr=1 dt=0.004 | sufilter
+suspike nt=15 ntr=1 dt=0.004 | sufilter f=20 amps=1
+# Error paths.
+sufilter
+suspike nt=32 ntr=1 | sufilter f=-1,20
+suspike nt=32 ntr=1 | sufilter f=20,10
+suspike nt=32 ntr=1 | sufilter f=10,20 amps=1
+suspike nt=32 ntr=1 | sufilter f=10,20 amps=-1,1
+suspike nt=32 ntr=1 | sufilter f=10,20 amps=0,0
+suspike nt=32 ntr=1 | sufilter f=10

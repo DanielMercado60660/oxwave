@@ -1,0 +1,56 @@
+# Native float histograms, including odd sizes and both scale choices.
+[f32] [stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | entropy n=1
+[f32] [stderr] suplane nt=31 ntr=3 | sustrip outpar=/dev/null | entropy n=93
+[f32] [stderr] suplane nt=31 ntr=3 | sustrip outpar=/dev/null | entropy n=93 dev=2 verbose=1
+[f32] [stderr] suspike nt=7 ntr=1 mag=-2 | sustrip outpar=/dev/null | entropy n=7 dev=-1
+[f32] [stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | entropy n=3 dev=1
+[f32] [stderr] sunull nt=101 ntr=3 | suaddnoise seed=17 sn=1 | sustrip outpar=/dev/null | entropy n=303
+[f32] [stderr] suspike nt=9 ntr=1 | sustrip outpar=/dev/null | entropy n=9 dev=0.5 unused=1
+[stderr] entropy
+[stderr] entropy n=
+[stderr] entropy n=2147483648
+[f32] [stderr] entropy n=0
+
+# Zero RMS and an explicit zero scale are safe when every sample is zero.
+[f32] [stderr] sunull nt=5 ntr=1 | sustrip outpar=/dev/null | entropy n=5
+[f32] [stderr] sunull nt=5 ntr=1 | sustrip outpar=/dev/null | entropy n=5 dev=0
+# An empty dev value selects the computed RMS, and later occurrences win.
+[f32] [stderr] suspike nt=7 ntr=1 | sustrip outpar=/dev/null | entropy n=7 dev= verbose=0
+[f32] [stderr] suspike nt=7 ntr=1 | sustrip outpar=/dev/null | entropy n=1 n=7 dev=2 dev=1
+# Read precisely n samples, leaving extra input unused.
+[f32] [stderr] suplane nt=7 ntr=1 | sustrip outpar=/dev/null | entropy n=3 dev=1
+# Signed loop bounds skip all samples for negative n, even with no input.
+[f32] [stderr] entropy n=-1
+[f32] [stderr] entropy n=-3 dev=-1 verbose=1
+# Nonnumeric integers parse as zero in getpar.
+[f32] [stderr] entropy n=abc
+[f32] [stderr] entropy n=0 dev=1
+# NaN scale quantizes all finite samples into the central bin on arm64.
+[f32] [stderr] suspike nt=7 ntr=1 | sustrip outpar=/dev/null | entropy n=7 dev=nan
+# Required parameter and numeric conversion errors, including float underflow.
+[stderr] entropy dev=1
+[stderr] entropy n=-2147483649
+[stderr] entropy n=0 dev=inf
+[stderr] entropy n=0 dev=1e-310
+# Test parameter-file parsing and command-line precedence.
+[f32] [stderr] printf 'n=0 dev=2\n' > params; entropy par=params dev=1
+
+# This dev rounds step and rstep to exactly 1. Test half-step rounding away
+# from zero, its neighboring floats, and both ends of the valid histogram.
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=13f", -512.49, -512, -511.5, -1.5, -0.5, -0.49999997, 0, 0.49999997, 0.5, 1.5, 510.5, 511, 511.49))' | entropy n=13 dev=28.8683605
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=7f", -2.5, -1.5, -0.5, 0, 0.5, 1.5, 2.5))' | entropy n=7 dev=-28.8683605
+# A constant negative signal has zero entropy and nonzero RMS.
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=5f", *([-3.0]*5)))' | entropy n=5
+# Nonnumeric dev becomes zero; zero input keeps the bin index defined.
+[f32] [stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | entropy n=3 dev=abc
+# Decimal parsing accepts a numeric prefix and ignores trailing text.
+[exact] [stderr] suspike nt=7 ntr=1 | sustrip outpar=/dev/null | entropy n=7tail dev=1tail
+# Further parser errors occur before any histogram output.
+[stderr] entropy n=0 dev=1e309
+[stderr] entropy n=0 dev=-inf
+[stderr] entropy par=missing.par
+
+# Occupy every histogram bin exactly once with step=1 (entropy is 10 bits).
+[exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=1024f", *range(-512,512)))' | entropy n=1024 dev=28.8683605
+# Preserve signed-zero scale behavior for an odd-length all-zero signal.
+[exact] [stderr] sunull nt=5 ntr=1 | sustrip outpar=/dev/null | entropy n=5 dev=-0

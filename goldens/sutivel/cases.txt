@@ -1,0 +1,23 @@
+# All output modes, parameters, and odd sizes.
+sutivel option=1 nangle=9 np=11 a=2300 b=1000 e=.12 d=.07 maxangle=70
+sutivel option=2 nangle=7 maxangle=60 normalize=1
+sutivel option=3 nangle=7 maxangle=60
+sutivel option=4 nangle=9 np=11 maxangle=60
+sutivel option=5 nangle=7
+sutivel option=6 nangle=7 maxangle=60
+sutivel option=7 nangle=7
+sutivel option=8 nangle=7 maxangle=60
+sutivel option=9 nangle=7 maxangle=60
+sutivel option=10 nangle=7
+sutivel option=11 nangle=7 maxangle=60
+sutivel option=12 nangle=7 maxangle=60
+sutivel option=13 nangle=7 maxangle=60 e=.1 d=.1
+sutivel option=14 np=9
+[stderr] sutivel option=5 nangle=3 verbose=1 normalize=1
+sutivel option=5 nangle=1 maxangle=0
+sutivel option=14 np=1
+sutivel option=99 nangle=3
+sutivel option=1 np=0 nangle=3
+sutivel nangle=999999999999999999999
+sutivel option=5 nangle=3 maxangle=-30
+sutivel

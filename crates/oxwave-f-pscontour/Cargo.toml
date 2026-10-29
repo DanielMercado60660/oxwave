@@ -1,0 +1,15 @@
+[package]
+name = "oxwave-f-pscontour"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-f-basic = { path = "../oxwave-f-basic" }
+
+[dev-dependencies]
+oxwave-cref.workspace = true

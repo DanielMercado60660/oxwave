@@ -1,0 +1,15 @@
+# Matching, duplicate rows, negative rounding, and mixed header types.
+printf '1 10 -2.6 65535\n1 20 -1.6 2\n2 30 0 3\n' > col; suplane nt=7 ntr=3 | sushw key=cdp a=1 b=1 | sulhead cf=col key=cdp,sx,offset,dt
+# Match on second column with a floating header and a single trace/sample.
+printf '5.9 0\n' > col; sunull nt=1 ntr=1 | sulhead cf=col key=d1,cdp mc=2
+# No terminal newline is not counted as a row; verbose unmatched diagnostics.
+[stderr] printf '1 4\n2 9' > col; suplane nt=5 ntr=3 | sushw key=cdp a=1 b=1 | sulhead cf=col key=cdp,ep verbose=1
+# Empty table and zero match key.
+touch col; sunull nt=1 ntr=1 | sulhead cf=col key=cdp verbose=1
+# Missing required file, nonexistent file, unknown header, and empty input.
+sulhead key=cdp
+sulhead cf=missing key=cdp
+sulhead cf=missing key=not_a_header
+printf '1\n' > col; sulhead cf=col key=cdp
+# Unknown argument reporting.
+[stderr] printf '0 5\n' > col; sunull nt=3 ntr=1 | sulhead cf=col key=cdp,ep other=1

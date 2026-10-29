@@ -1,0 +1,90 @@
+# All component modes and zero-frequency treatment.
+suspike nt=63 ntr=1 | sufft | suamp
+suspike nt=63 ntr=2 | sufft | suamp mode=real
+suspike nt=63 ntr=2 | sufft | suamp mode=imag
+suspike nt=63 ntr=2 | sufft | suamp mode=phase
+suspike nt=63 ntr=2 | sufft | suamp mode=logamp jack=1
+sunull nt=31 ntr=1 | sufft | suamp mode=logamp
+suspike nt=31 ntr=1 | sufft | suamp mode=suphase trend=0 unwrap=0
+suspike nt=31 ntr=1 | sufft | suamp mode=suphase trend=1 zeromean=1 unwrap=-1
+suspike nt=31 ntr=1 | sufft | suamp mode=ouphase trend=0 zeromean=1
+suspike nt=31 ntr=1 | sufft | suamp mode=ouphase unwrap=0
+suspike nt=31 ntr=1 | sufft | suamp mode=ouphase smooth=1 r=2
+suspike nt=1 ntr=1 | sufft | suamp mode=real
+[stderr] suspike nt=31 ntr=1 | sufft | sushw key=d1,dt a=0,0 | suamp verbose=1
+[stderr] suamp mode=amp
+[stderr] suspike nt=8 ntr=1 | suamp
+[stderr] suspike nt=8 ntr=1 | sufft | suamp mode=bogus
+suspike nt=8 ntr=1 | sufft | suamp mode=phase trend=0
+
+# Explicit defaults and nonzero flags outside the unwrapped modes.
+[stderr] suspike nt=29 ntr=1 | sufft verbose=0 | suamp mode=amp jack=0 smooth=0 r=10 verbose=0
+suspike nt=29 ntr=1 | sufft verbose=0 | suamp mode=amp jack=-1
+suspike nt=29 ntr=1 | sufft verbose=0 | suamp mode=phase smooth=-1 r=-2
+
+# Nontrivial spectra exercise wrapping, detrending, and zero-mean removal.
+sunull nt=97 ntr=2 | suaddnoise seed=147 | sufft verbose=0 | suamp mode=suphase unwrap=1 trend=1 zeromean=0 smooth=0 r=10
+sunull nt=97 ntr=2 | suaddnoise seed=147 | sufft verbose=0 | suamp mode=suphase unwrap=0.8 trend=1 zeromean=1
+sunull nt=97 ntr=2 | suaddnoise seed=147 | sufft verbose=0 | suamp mode=ouphase unwrap=1 trend=1 zeromean=0 smooth=0 r=10
+sunull nt=97 ntr=2 | suaddnoise seed=147 | sufft verbose=0 | suamp mode=ouphase trend=1 zeromean=1
+
+# Smoothing with the default, zero, and negative damping coefficients.
+sunull nt=47 ntr=2 | suaddnoise seed=953 | sufft verbose=0 | suamp mode=suphase smooth=1
+sunull nt=47 ntr=1 | suaddnoise seed=953 | sufft verbose=0 | suamp mode=suphase smooth=1 r=0
+sunull nt=47 ntr=1 | suaddnoise seed=953 | sufft verbose=0 | suamp mode=ouphase smooth=1 r=-2
+
+# Header-derived frequency spacing: use dt when d1 is absent.
+[stderr] sunull nt=47 ntr=1 | suaddnoise seed=841 | sufft verbose=0 | sushw key=d1 a=0 | suamp mode=ouphase trend=0 verbose=1
+
+# One complex sample and an odd number of interleaved input samples.
+sunull nt=2 ntr=1 | sushw key=trid a=111 | suamp mode=suphase trend=0
+sunull nt=2 ntr=1 | sushw key=trid a=111 | suamp mode=suphase trend=1
+sunull nt=2 ntr=1 | sushw key=trid a=111 | suamp mode=ouphase trend=0
+sunull nt=2 ntr=1 | sushw key=trid a=111 | suamp mode=ouphase trend=1
+suspike nt=7 ntr=1 | sushw key=trid a=111 | suamp mode=real
+suspike nt=7 ntr=1 | sushw key=trid a=111 | suamp mode=imag
+suspike nt=7 ntr=1 | sushw key=trid a=111 | suamp mode=amp
+
+# Empty mode is invalid; unused parameters and numeric overflow diagnostics.
+[stderr] suspike nt=8 ntr=1 | sufft verbose=0 | suamp mode=
+[stderr] suspike nt=8 ntr=1 | sufft verbose=0 | suamp mode=real unwrap=0 trend=0 zeromean=1
+[stderr] suspike nt=8 ntr=1 | sufft verbose=0 | suamp jack=2147483648
+[stderr] suspike nt=8 ntr=1 | sufft verbose=0 | suamp r=1e-310
+
+# Nonunit DC values distinguish logamp's first-sample amplitude from log(amp).
+sunull nt=13 ntr=2 | suaddnoise seed=311 | sushw key=trid a=111 | suamp mode=logamp jack=0
+sunull nt=13 ntr=2 | suaddnoise seed=311 | sushw key=trid a=111 | suamp mode=logamp jack=1
+
+# Wrapped phase ignores smoothing and does not request unwrapping parameters.
+[stderr] suspike nt=31 ntr=1 | sufft verbose=0 | suamp mode=phase smooth=1 r=2 unwrap=0 trend=1 zeromean=0
+
+# Oppenheim treats any nonzero unwrap value as enabled.
+sunull nt=31 ntr=1 | suaddnoise seed=311 | sufft verbose=0 | suamp mode=ouphase unwrap=-1 trend=0 zeromean=-1
+
+# Smoothing still runs when phase unwrapping is disabled in either mode.
+sunull nt=31 ntr=1 | suaddnoise seed=311 | sufft verbose=0 | suamp mode=suphase unwrap=0 smooth=-1 r=2
+sunull nt=31 ntr=1 | suaddnoise seed=311 | sufft verbose=0 | suamp mode=ouphase unwrap=0 smooth=1 r=2
+
+# Exercise the supplied smoother with short and odd-sized spectra.
+suspike nt=1 ntr=1 | sufft verbose=0 | suamp mode=suphase smooth=1
+suspike nt=1 ntr=1 | sufft verbose=0 | suamp mode=ouphase smooth=1
+sunull nt=2 ntr=2 | suaddnoise seed=591 | sushw key=trid a=111 | suamp mode=suphase unwrap=0 smooth=1
+sunull nt=2 ntr=1 | sushw key=trid a=111 | suamp mode=ouphase trend=1 smooth=1
+sunull nt=4 ntr=2 | suaddnoise seed=591 | sushw key=trid a=111 | suamp mode=suphase trend=0 smooth=1 r=10
+sunull nt=4 ntr=2 | suaddnoise seed=591 | sushw key=trid a=111 | suamp mode=ouphase trend=0 smooth=1 r=10
+sunull nt=7 ntr=2 | suaddnoise seed=591 | sushw key=trid a=111 | suamp mode=suphase smooth=1 r=2
+sunull nt=7 ntr=2 | suaddnoise seed=591 | sushw key=trid a=111 | suamp mode=ouphase smooth=1 r=2
+
+# Nonzero flags, larger damping, default Oppenheim damping, and zero spectra.
+sunull nt=127 ntr=3 | suaddnoise seed=722 | sufft verbose=0 | suamp mode=suphase trend=0 zeromean=1 unwrap=0.5 smooth=2 r=100
+sunull nt=127 ntr=3 | suaddnoise seed=722 | sufft verbose=0 | suamp mode=ouphase trend=0 zeromean=1 smooth=-1
+sunull nt=47 ntr=2 | suaddnoise seed=953 | sufft verbose=0 | suamp mode=ouphase smooth=1 r=0
+sunull nt=47 ntr=2 | sufft verbose=0 | suamp mode=suphase smooth=1
+sunull nt=47 ntr=2 | sufft verbose=0 | suamp mode=ouphase smooth=1
+
+# Both spacing fallbacks participate in smoothed Oppenheim mode.
+[stderr] sunull nt=17 ntr=2 | suaddnoise seed=722 | sufft verbose=0 | sushw key=d1,dt a=0,0 | suamp mode=ouphase trend=0 smooth=1 verbose=1
+
+# Empty numeric values retain defaults; no-argument nonterminal input is empty.
+sunull nt=17 ntr=1 | suaddnoise seed=722 | sufft verbose=0 | suamp mode=suphase unwrap= trend= zeromean= smooth=1 r= jack= verbose=
+[stderr] suamp

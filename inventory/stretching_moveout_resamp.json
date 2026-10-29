@@ -1,0 +1,395 @@
+{
+  "scope": "su/main/stretching_moveout_resamp part 1 of 1",
+  "programs": [
+    {
+      "name": "sudlmo",
+      "path": "su/main/stretching_moveout_resamp/sudlmo.c",
+      "purpose": "Apply frequency-dependent dynamic linear moveout correction to surface-wave traces.",
+      "selfdoc_first_line": " SUDLMO -- Dynamic Linear Move Out Correction for Surface Waves  \t",
+      "params": [
+        {"name": "dt", "type": "float", "default": "computed: first trace header dt divided by 1000000", "required": false, "description": "Sample interval in seconds; an error occurs if the resulting value is zero."},
+        {"name": "invert", "type": "int", "default": "0", "required": false, "description": "Use the inverse phase shift when nonzero."},
+        {"name": "cm", "type": "int", "default": "0", "required": false, "description": "Divide the absolute offset by 100 when equal to 1."},
+        {"name": "cdp", "type": "float array", "default": "computed: first trace header cdp", "required": false, "description": "CDPs for velocity functions."},
+        {"name": "vnmo", "type": "float array", "default": "400.0", "required": false, "description": "Velocity values; repeat once per CDP when cdp is specified."},
+        {"name": "fnmo", "type": "float array", "default": "0.0", "required": false, "description": "Frequencies corresponding to vnmo; repeat once per CDP when cdp is specified."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "npfaro", "countparval", "countparname", "ealloc1float", "ealloc2float", "countnparval", "getnparfloat", "intlin", "free1float", "ealloc1complex", "pfarc", "cmplx", "crmul", "cwp_cexp", "cmul", "pfacr", "puttr", "xindex"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT and complex exponential depend on floating-point arithmetic. The FFT of a trace is computed only when its offset differs from the first trace's offset or its CDP changes; oldoffset and oldcdp are never updated, so traces matching the first offset can reuse stale transformed data. On a CDP change, interpolation uses nt rather than nf and can access outside the allocated arrays.",
+      "c_lines": 306,
+      "difficulty": "medium",
+      "difficulty_reason": "It combines FFT phase shifts with frequency and CDP interpolation.",
+      "test_cases": [
+        {"description": "Constant velocity correction.", "command": "suplane nt=128 ntr=8 | sudlmo vnmo=400 dt=0.004"},
+        {"description": "Inverse correction with a dispersive velocity function and centimeter offsets.", "command": "suplane nt=128 ntr=8 | sudlmo vnmo=300,500 fnmo=0,40 invert=1 cm=1 dt=0.004"}
+      ],
+      "license_note": "Credits BRGM's Adnand Bitri and says the program is based on sufrac.",
+      "related_programs": []
+    },
+    {
+      "name": "suilog",
+      "path": "su/main/stretching_moveout_resamp/suilog.c",
+      "purpose": "Reverse a logarithmic time-axis stretch using reconstruction parameters.",
+      "selfdoc_first_line": " SUILOG -- time axis inverse log-stretch of seismic traces\t",
+      "params": [
+        {"name": "nt", "type": "int", "default": "", "required": true, "description": "Number of reconstructed samples."},
+        {"name": "ntmin", "type": "int", "default": "", "required": true, "description": "Original minimum sample index used for the log stretch."},
+        {"name": "dt", "type": "float", "default": "", "required": true, "description": "Original header sample interval in microseconds, as written by sulog."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "checkpars", "ealloc1float", "ealloc1int", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The coordinate calculation uses log and float arithmetic; interpolation accumulates two products. dt is assigned directly to the integer trace header.",
+      "c_lines": 174,
+      "difficulty": "medium",
+      "difficulty_reason": "It precomputes a nonlinear coordinate mapping and linear interpolation weights.",
+      "test_cases": [
+        {"description": "Round-trip through logarithmic time.", "command": "suplane nt=128 ntr=8 | sulog ntmin=12 m=2 outpar=logpar > in.su && suilog par=logpar < in.su"},
+        {"description": "Round-trip with explicit stretched length.", "command": "suspike nt=128 ntr=4 | sulog ntmin=16 ntau=256 outpar=logpar > in.su && suilog par=logpar < in.su"}
+      ],
+      "license_note": "",
+      "related_programs": ["sulog"]
+    },
+    {
+      "name": "sulog",
+      "path": "su/main/stretching_moveout_resamp/sulog.c",
+      "purpose": "Stretch the time axis of seismic traces logarithmically and write inverse parameters.",
+      "selfdoc_first_line": " SULOG -- time axis log-stretch of seismic traces\t\t",
+      "params": [
+        {"name": "ntmin", "type": "int", "default": "computed: 0.1 times first trace ns, converted to int", "required": false, "description": "Minimum input sample index."},
+        {"name": "outpar", "type": "string", "default": "/dev/tty", "required": false, "description": "Output parameter file."},
+        {"name": "m", "type": "int", "default": "3", "required": false, "description": "Multiplier used to calculate the unpadded stretched length and sample interval."},
+        {"name": "ntau", "type": "int", "default": "computed: smallest power of 2 at least m times first trace ns", "required": false, "description": "Output sample count."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparstring", "efopen", "checkpars", "ealloc1float", "ealloc1int", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "log and exp determine interpolation coordinates; the stretched interval is converted to an integer microsecond header value. Small nt can make the default ntmin zero.",
+      "c_lines": 210,
+      "difficulty": "medium",
+      "difficulty_reason": "It precomputes a nonlinear coordinate mapping and linear interpolation weights.",
+      "test_cases": [
+        {"description": "Use a specified minimum sample and output parameter file.", "command": "suplane nt=128 ntr=8 | sulog ntmin=12 outpar=logpar"},
+        {"description": "Override multiplier and output length.", "command": "suspike nt=128 ntr=4 | sulog ntmin=16 m=2 ntau=256 outpar=logpar"}
+      ],
+      "license_note": "",
+      "related_programs": ["suilog"]
+    },
+    {
+      "name": "sunmo",
+      "path": "su/main/stretching_moveout_resamp/sunmo.c",
+      "purpose": "Apply or approximately invert normal moveout using velocity functions of time and CDP.",
+      "selfdoc_first_line": " SUNMO - NMO for an arbitrary velocity function of time and CDP\t     ",
+      "params": [
+        {"name": "tnmo", "type": "float array", "default": "0.0", "required": false, "description": "Velocity-function times; repeat for each specified CDP."},
+        {"name": "vnmo", "type": "float array", "default": "1500.0", "required": false, "description": "NMO velocities; repeat for each specified CDP."},
+        {"name": "cdp", "type": "float array", "default": "computed: first trace header cdp", "required": false, "description": "CDP positions of velocity functions."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "Stretch mute threshold."},
+        {"name": "lmute", "type": "int", "default": "25", "required": false, "description": "Mute ramp length in samples."},
+        {"name": "sscale", "type": "int", "default": "1", "required": false, "description": "Apply stretch amplitude scaling when nonzero."},
+        {"name": "invert", "type": "int", "default": "0", "required": false, "description": "Perform approximate inverse NMO when nonzero."},
+        {"name": "upward", "type": "int", "default": "0", "required": false, "description": "Select the upward mute scan when nonzero."},
+        {"name": "voutfile", "type": "string", "default": "", "required": false, "description": "Optional binary interpolated velocity output file."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparstring", "countparval", "countparname", "ealloc1float", "ealloc2float", "getparfloat", "countnparval", "getnparfloat", "intlin", "free1float", "getparint", "checkpars", "ints8r", "yxtoxy", "puttr", "efwrite", "efclose", "xindex", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Velocity interpolation, square roots, stretch derivatives, sinc interpolation and inverse mapping depend on floating-point rounding and operation order.",
+      "c_lines": 422,
+      "difficulty": "medium",
+      "difficulty_reason": "It interpolates velocity functions across time and CDP and supports forward and inverse resampling.",
+      "test_cases": [
+        {"description": "Forward correction with time-varying velocity.", "command": "suplane nt=128 ntr=8 | sunmo tnmo=0,0.4 vnmo=1500,2000 smute=2 lmute=8"},
+        {"description": "Inverse correction without amplitude scaling.", "command": "suplane nt=128 ntr=8 | sunmo vnmo=1800 invert=1 sscale=0 upward=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sunmo_a", "sunmocsv", "sutaupnmo"]
+    },
+    {
+      "name": "sunmo_a",
+      "path": "su/main/stretching_moveout_resamp/sunmo_a.c",
+      "purpose": "Apply or approximately invert NMO with optional anisotropic moveout coefficients.",
+      "selfdoc_first_line": " SUNMO_a - NMO for an arbitrary velocity function of time and CDP with\t     ",
+      "params": [
+        {"name": "tnmo", "type": "float array", "default": "0.0", "required": false, "description": "Velocity and anisotropy function times, repeated per CDP."},
+        {"name": "vnmo", "type": "float array", "default": "1500.0", "required": false, "description": "NMO velocities, repeated per CDP."},
+        {"name": "anis1", "type": "float array", "default": "0.0 for each velocity", "required": false, "description": "First anisotropy coefficient, repeated per CDP."},
+        {"name": "anis2", "type": "float array", "default": "0.0 for each velocity", "required": false, "description": "Second anisotropy coefficient, repeated per CDP."},
+        {"name": "cdp", "type": "float array", "default": "computed: first trace header cdp", "required": false, "description": "CDPs of velocity functions."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "Stretch mute threshold."},
+        {"name": "lmute", "type": "int", "default": "25", "required": false, "description": "Mute ramp length."},
+        {"name": "sscale", "type": "int", "default": "1", "required": false, "description": "Apply stretch amplitude scaling."},
+        {"name": "invert", "type": "int", "default": "0", "required": false, "description": "Approximate inverse NMO."},
+        {"name": "upward", "type": "int", "default": "0", "required": false, "description": "Scan upward for the mute boundary."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "countparval", "countparname", "ealloc1float", "ealloc2float", "getparfloat", "countnparval", "getnparfloat", "intlin", "free1float", "getparint", "checkpars", "ints8r", "yxtoxy", "puttr", "xindex", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Anisotropic quartic moveout, square roots, interpolation and inverse mapping are sensitive to rounding; invalid anisotropy can cause explicit errors.",
+      "c_lines": 478,
+      "difficulty": "medium",
+      "difficulty_reason": "It extends forward and inverse NMO with interpolated anisotropy functions.",
+      "test_cases": [
+        {"description": "Anisotropic forward correction.", "command": "suplane nt=128 ntr=8 | sunmo_a tnmo=0,0.4 vnmo=1500,2000 anis1=0,0 anis2=0,0 smute=2"},
+        {"description": "Inverse correction with non-default mute and scaling.", "command": "suplane nt=128 ntr=8 | sunmo_a vnmo=1800 invert=1 sscale=0 lmute=8 upward=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sunmo", "sunmocsv", "sutaupnmo"]
+    },
+    {
+      "name": "sunmocsv",
+      "path": "su/main/stretching_moveout_resamp/sunmocsv.c",
+      "purpose": "Apply or approximately invert NMO using command-line or Q-file velocity functions on a 2D or 3D grid.",
+      "selfdoc_first_line": " SUNMOCSV - NMO for an arbitrary velocity function of time and 3D or 2D CDP ",
+      "params": [
+        {"name": "qin", "type": "string", "default": "", "required": false, "description": "Q-file containing velocity functions; otherwise cdp, tnmo and vnmo are required."},
+        {"name": "cdp", "type": "double array", "default": "", "required": false, "description": "Velocity function CDPs; required when qin is absent."},
+        {"name": "tnmo", "type": "double array", "default": "", "required": false, "description": "Velocity function times; required when qin is absent; repeat or supply one shared array."},
+        {"name": "vnmo", "type": "double array", "default": "", "required": false, "description": "Velocity arrays; required once per CDP when qin is absent."},
+        {"name": "rfile", "type": "string", "default": "", "required": false, "description": "K-file containing a 3D grid definition."},
+        {"name": "voutfile", "type": "string", "default": "", "required": false, "description": "Optional binary interpolated velocity output."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "Positive stretch mute threshold."},
+        {"name": "lmute", "type": "int", "default": "25", "required": false, "description": "Mute ramp length."},
+        {"name": "sscale", "type": "int", "default": "1", "required": false, "description": "Apply stretch amplitude scaling."},
+        {"name": "invert", "type": "int", "default": "0", "required": false, "description": "Approximate inverse NMO."},
+        {"name": "upward", "type": "int", "default": "0", "required": false, "description": "Scan upward for mute boundary."},
+        {"name": "check", "type": "int", "default": "0", "required": false, "description": "Print grid checking information."},
+        {"name": "print", "type": "int", "default": "0", "required": false, "description": "Print input velocity functions."},
+        {"name": "grid_xa", "type": "double", "default": "", "required": false, "description": "Grid corner A world X; required with a complete command-line grid."},
+        {"name": "grid_ya", "type": "double", "default": "", "required": false, "description": "Grid corner A world Y; required with a complete command-line grid."},
+        {"name": "grid_xb", "type": "double", "default": "", "required": false, "description": "Grid corner B world X; required with a complete command-line grid."},
+        {"name": "grid_yb", "type": "double", "default": "", "required": false, "description": "Grid corner B world Y; required with a complete command-line grid."},
+        {"name": "grid_xc", "type": "double", "default": "", "required": false, "description": "Grid corner C world X; required with a complete command-line grid."},
+        {"name": "grid_yc", "type": "double", "default": "", "required": false, "description": "Grid corner C world Y; required with a complete command-line grid."},
+        {"name": "grid_wb", "type": "double", "default": "", "required": false, "description": "Grid cell width along B; required with a complete command-line grid."},
+        {"name": "grid_wc", "type": "double", "default": "", "required": false, "description": "Grid cell width along C; required with a complete command-line grid."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparstring", "getparfloat", "getparint", "err", "gridcommand", "gridread", "gridset", "gridcheck", "warn", "gettr", "ealloc1float", "ealloc1double", "ealloc1", "getviacommand", "getviaqfile", "checkpars", "ealloc1int", "gridcdpic", "compSort2", "qsplit", "linterpd", "binterpfind", "binterpapply", "ints8r", "yxtoxy", "puttr", "efwrite", "efclose", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Velocity input and interpolation mix double and float, use sorting and bilinear interpolation, and feed square-root moveout and sinc interpolation. Grid rounding uses lrint and can depend on the rounding mode.",
+      "c_lines": 784,
+      "difficulty": "hard",
+      "difficulty_reason": "It combines Q-file parsing, 2D or 3D grid handling, velocity sorting and interpolation, and forward and inverse NMO.",
+      "test_cases": [
+        {"description": "2D forward NMO from command-line functions.", "command": "suplane nt=128 ntr=8 | sunmocsv cdp=1 tnmo=0,0.4 vnmo=1500,2000 smute=2"},
+        {"description": "Inverse NMO with output velocity file.", "command": "suplane nt=128 ntr=8 | sunmocsv cdp=1 tnmo=0,0.4 vnmo=1500,2000 invert=1 sscale=0 voutfile=vel.bin"}
+      ],
+      "license_note": "",
+      "related_programs": ["sunmo", "sunmo_a"]
+    },
+    {
+      "name": "sureduce",
+      "path": "su/main/stretching_moveout_resamp/sureduce.c",
+      "purpose": "Shift each trace to reduced time using its offset and a reducing velocity.",
+      "selfdoc_first_line": " SUREDUCE - convert traces to display in reduced time\t\t",
+      "params": [
+        {"name": "rv", "type": "float", "default": "8.0", "required": false, "description": "Positive reducing velocity in km/s."},
+        {"name": "dt", "type": "float", "default": "computed: first trace header dt divided by 1000000", "required": false, "description": "Required when the first header dt is zero, but the supplied value is immediately overwritten with the zero header value."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparfloat", "err", "fgettr", "checkpars", "puttr", "gettr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Offset-to-sample conversion uses floating-point division and NINT. If header dt is zero, the code overwrites the required dt argument with zero and divides by zero.",
+      "c_lines": 79,
+      "difficulty": "easy",
+      "difficulty_reason": "It computes an integer sample shift and copies or zero-fills each trace.",
+      "test_cases": [
+        {"description": "Default-style reducing velocity.", "command": "suplane nt=128 ntr=8 | sureduce rv=8"},
+        {"description": "Slower reducing velocity.", "command": "suplane nt=128 ntr=8 | sureduce rv=4"}
+      ],
+      "license_note": "",
+      "related_programs": ["sushift"]
+    },
+    {
+      "name": "suresamp",
+      "path": "su/main/stretching_moveout_resamp/suresamp.c",
+      "purpose": "Resample seismic or non-seismic traces onto a new regular time axis.",
+      "selfdoc_first_line": " SURESAMP - Resample in time                                       ",
+      "params": [
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print advisory messages."},
+        {"name": "dt_in", "type": "float", "default": "computed: first trace dt/1000000 for seismic data or d1 for non-seismic data", "required": false, "description": "Read only if the header input interval is zero; an error occurs if the resulting interval is zero."},
+        {"name": "rf", "type": "float", "default": "0.0", "required": false, "description": "Resampling factor; zero means no factor-based change."},
+        {"name": "nt", "type": "int", "default": "computed: NINT(input ns times rf) if rf is nonzero, otherwise input ns", "required": false, "description": "Output sample count."},
+        {"name": "dt", "type": "float", "default": "computed: input interval divided by rf if rf is nonzero, otherwise input interval", "required": false, "description": "Output sampling interval."},
+        {"name": "tmin", "type": "float", "default": "computed: first trace delrt/1000 for seismic data or f1 for non-seismic data", "required": false, "description": "First output sample coordinate."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "getparint", "gettr", "err", "warn", "getparfloat", "checkpars", "ealloc1float", "ints8r", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sinc interpolation and repeated float addition of output coordinates affect exact samples; the seismic dt header is rounded to integer microseconds.",
+      "c_lines": 182,
+      "difficulty": "medium",
+      "difficulty_reason": "It constructs a new sample grid and uses sinc interpolation for each trace.",
+      "test_cases": [
+        {"description": "Upsample using a factor.", "command": "suplane nt=128 ntr=8 | suresamp rf=2 verbose=1"},
+        {"description": "Set a new interval, count and start time.", "command": "suspike nt=128 ntr=4 | suresamp nt=64 dt=0.008 tmin=0.016"}
+      ],
+      "license_note": "",
+      "related_programs": ["sushift", "suttoz", "suztot"]
+    },
+    {
+      "name": "sushift",
+      "path": "su/main/stretching_moveout_resamp/sushift.c",
+      "purpose": "Window and pad traces to a common time range.",
+      "selfdoc_first_line": " SUSHIFT - shifted/windowed traces in time\t\t\t\t",
+      "params": [
+        {"name": "dt", "type": "int", "default": "computed: first trace header dt", "required": false, "description": "Sample interval in microseconds."},
+        {"name": "fill", "type": "float", "default": "0.0", "required": false, "description": "Padding value."},
+        {"name": "tmin", "type": "float", "default": "computed: first trace delrt divided by 1000", "required": false, "description": "Output start time in seconds."},
+        {"name": "tmax", "type": "float", "default": "computed: output start time plus first trace ns times dt", "required": false, "description": "Exclusive output end time in seconds."},
+        {"name": "verbose", "type": "short", "default": "0", "required": false, "description": "Print advisory messages."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparint", "getparfloat", "getparshort", "checkpars", "warn", "ealloc1float", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Time bounds are rounded to integer microseconds; the output sample count is stored in an unsigned short before its maximum-size check.",
+      "c_lines": 175,
+      "difficulty": "easy",
+      "difficulty_reason": "It copies an integer-aligned window and fills samples outside the input.",
+      "test_cases": [
+        {"description": "Crop a time window.", "command": "suplane nt=128 ntr=8 | sushift tmin=0.04 tmax=0.3"},
+        {"description": "Pad a window with a nonzero value.", "command": "suspike nt=128 ntr=4 | sushift dt=4000 tmin=-0.04 tmax=0.6 fill=2 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sureduce", "suresamp"]
+    },
+    {
+      "name": "sutaupnmo",
+      "path": "su/main/stretching_moveout_resamp/sutaupnmo.c",
+      "purpose": "Apply NMO to tau-p traces using velocity functions of tau and CDP.",
+      "selfdoc_first_line": " SUTAUPNMO - NMO for an arbitrary velocity function of tau and CDP\t",
+      "params": [
+        {"name": "tnmo", "type": "float array", "default": "0.0", "required": false, "description": "Tau values corresponding to velocities; repeat per CDP."},
+        {"name": "vnmo", "type": "float array", "default": "1500.0", "required": false, "description": "Velocity values; repeat per CDP."},
+        {"name": "cdp", "type": "float array", "default": "computed: first trace header cdp", "required": false, "description": "CDPs of velocity functions."},
+        {"name": "smute", "type": "float", "default": "1.5", "required": false, "description": "Stretch mute threshold."},
+        {"name": "lmute", "type": "int", "default": "25", "required": false, "description": "Mute ramp length."},
+        {"name": "sscale", "type": "int", "default": "1", "required": false, "description": "Apply stretch amplitude scaling."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "countparval", "countparname", "ealloc1float", "ealloc2float", "getparfloat", "countnparval", "getnparfloat", "intlin", "free1float", "getparint", "checkpars", "ints8r", "puttr", "xindex", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Velocity interpolation, square roots, stretch derivatives and sinc interpolation depend on float rounding and operation order.",
+      "c_lines": 309,
+      "difficulty": "medium",
+      "difficulty_reason": "It interpolates velocity functions and resamples traces according to tau-p moveout.",
+      "test_cases": [
+        {"description": "Constant-velocity tau-p NMO.", "command": "suplane nt=128 ntr=8 | sutaup dx=25 option=2 pmin=0 pmax=0.0004 | sutaupnmo vnmo=1800 smute=2"},
+        {"description": "Time-varying velocity without stretch scaling.", "command": "suplane nt=128 ntr=8 | sutaup dx=25 option=2 pmin=0 pmax=0.0004 | sutaupnmo tnmo=0,0.4 vnmo=1500,2000 lmute=8 sscale=0"}
+      ],
+      "license_note": "",
+      "related_programs": ["sunmo", "sunmo_a"]
+    },
+    {
+      "name": "sutsq",
+      "path": "su/main/stretching_moveout_resamp/sutsq.c",
+      "purpose": "Resample traces between time and time-squared coordinates.",
+      "selfdoc_first_line": " SUTSQ -- time axis time-squared stretch of seismic traces\t",
+      "params": [
+        {"name": "tmin", "type": "float", "default": "computed: 0.1 times first trace ns times header dt in seconds", "required": false, "description": "Minimum time controlling forward sampling."},
+        {"name": "flag", "type": "int", "default": "1", "required": false, "description": "One selects forward transform; any other value selects inverse."},
+        {"name": "dt", "type": "float", "default": "0.004", "required": false, "description": "Read only for inverse transformation. The code mistakenly stores a supplied value in the input interval variable and leaves output dt at zero."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "getparint", "ealloc1float", "checkpars", "ints8r", "puttr", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Square roots and sinc interpolation are platform-sensitive. Explicit inverse dt leaves dtout zero, causing division by zero and invalid output size.",
+      "c_lines": 91,
+      "difficulty": "medium",
+      "difficulty_reason": "It computes nonlinear coordinates and uses sinc interpolation for forward or inverse resampling.",
+      "test_cases": [
+        {"description": "Forward time-squared stretch.", "command": "suplane nt=128 ntr=8 | sutsq flag=1 tmin=0.08"},
+        {"description": "Forward and inverse stretch using the inverse default interval.", "command": "suspike nt=128 ntr=4 | sutsq flag=1 tmin=0.08 | sutsq flag=-1"}
+      ],
+      "license_note": "",
+      "related_programs": ["sulog", "suilog"]
+    },
+    {
+      "name": "suttoz",
+      "path": "su/main/stretching_moveout_resamp/suttoz.c",
+      "purpose": "Resample time-domain traces onto a depth axis using interval velocity.",
+      "selfdoc_first_line": " SUTTOZ - resample from time to depth\t\t\t\t\t",
+      "params": [
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary file of one velocity float per input time sample; overrides t and v."},
+        {"name": "t", "type": "float array", "default": "0.0", "required": false, "description": "Times of interval velocity samples."},
+        {"name": "v", "type": "float array", "default": "1500.0", "required": false, "description": "Interval velocities corresponding to t."},
+        {"name": "dz", "type": "float", "default": "computed: minimum velocity times input dt divided by 2", "required": false, "description": "Output depth interval."},
+        {"name": "fz", "type": "float", "default": "computed: first velocity times first trace delrt in seconds divided by 2", "required": false, "description": "First output depth."},
+        {"name": "nz", "type": "int", "default": "computed: 1+(nt-1)*dt*vmax/(2*dz), converted to int", "required": false, "description": "Output depth sample count."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print sampling information."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "ealloc1float", "getparstring", "countparval", "getparfloat", "intlin", "getparint", "checkpars", "warn", "ints8r", "puttr", "free1float", "yxtoxy", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sequential integration of velocity, inverse mapping and sinc interpolation are rounding-sensitive. Extrapolation loops lack explicit array bounds and can overrun for unsuitable output ranges.",
+      "c_lines": 252,
+      "difficulty": "medium",
+      "difficulty_reason": "It integrates and inverts a velocity function and resamples with sinc interpolation.",
+      "test_cases": [
+        {"description": "Constant velocity conversion.", "command": "suplane nt=128 ntr=8 | suttoz v=1500 dz=3 nz=128"},
+        {"description": "Time-varying velocity conversion.", "command": "suspike nt=128 ntr=4 | suttoz t=0,0.4 v=1500,2000 dz=3 fz=0 nz=150 verbose=1"}
+      ],
+      "license_note": "",
+      "related_programs": ["suztot"]
+    },
+    {
+      "name": "suztot",
+      "path": "su/main/stretching_moveout_resamp/suztot.c",
+      "purpose": "Resample depth-domain traces onto a time axis using interval velocity.",
+      "selfdoc_first_line": " SUZTOT - resample from depth to time\t\t\t\t\t",
+      "params": [
+        {"name": "dz", "type": "float", "default": "computed: first trace header d1", "required": false, "description": "Input depth sampling interval."},
+        {"name": "vfile", "type": "string", "default": "", "required": false, "description": "Binary file of one velocity float per input depth sample; overrides z and v."},
+        {"name": "z", "type": "float array", "default": "0.0", "required": false, "description": "Depths of interval velocity samples."},
+        {"name": "v", "type": "float array", "default": "1500.0", "required": false, "description": "Interval velocities corresponding to z."},
+        {"name": "dt", "type": "float", "default": "computed: 2*dz/minimum velocity", "required": false, "description": "Output time sample interval."},
+        {"name": "ft", "type": "float", "default": "0.0", "required": false, "description": "First output time; the code computes the default from initially zero ft, not fz."},
+        {"name": "fz", "type": "float", "default": "0.0", "required": false, "description": "First input depth."},
+        {"name": "nt", "type": "int", "default": "computed: 1+(nz-1)*dz*2/(dt*vmax), converted to int", "required": false, "description": "Output time sample count."},
+        {"name": "verbose", "type": "int", "default": "0", "required": false, "description": "Print sampling information."}
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": ["initargs", "requestdoc", "gettr", "err", "getparfloat", "ealloc1float", "getparstring", "countparval", "intlin", "getparint", "checkpars", "warn", "ints8r", "puttr", "free1float", "yxtoxy", "CWP_Exit"],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Sequential integration of reciprocal velocity, inverse mapping and sinc interpolation are rounding-sensitive. Extrapolation loops lack explicit array bounds; the final extrapolation formula uses output last time in its base term.",
+      "c_lines": 257,
+      "difficulty": "medium",
+      "difficulty_reason": "It integrates and inverts a velocity function and resamples with sinc interpolation.",
+      "test_cases": [
+        {"description": "Convert constant-velocity depth traces back to time.", "command": "suplane nt=128 ntr=8 | suttoz v=1500 dz=3 nz=128 | suztot v=1500 dt=0.004 nt=128"},
+        {"description": "Use a depth-dependent velocity function.", "command": "suspike nt=128 ntr=4 | suttoz v=1500 dz=3 nz=128 | suztot z=0,300 v=1500,1800 dt=0.004 ft=0 fz=0 nt=128 verbose=1"}
+      ],
+      "license_note": "Credits John Stockwell and states that the program is based on suttoz.c by Dave Hale.",
+      "related_programs": ["suttoz"]
+    }
+  ]
+}

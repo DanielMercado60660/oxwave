@@ -1,0 +1,88 @@
+# Seeded distributions, defaults, odd sizes, zero signal, and ratios.
+suplane nt=31 ntr=3 | suaddnoise seed=42
+suspike nt=1 ntr=1 | suaddnoise seed=7 noise=flat sn=2
+sunull nt=17 ntr=2 | suaddnoise seed=0 noise=gauss
+suplane nt=33 ntr=1 | suaddnoise seed=4294967295 sn=0.5
+# Filtering parameters and header sampling interval.
+suplane nt=63 ntr=2 | suaddnoise seed=4 f=10,20 amps=1,0 dt=0.004
+suplane nt=64 ntr=2 | suaddnoise seed=4 f=10,20
+suplane nt=64 ntr=2 | suaddnoise seed=4 amps=0,1
+# Verbosity and temporary directory selection.
+[stderr] suplane nt=16 ntr=2 | suaddnoise seed=3 verbose=1
+[stderr] suplane nt=16 ntr=2 | suaddnoise seed=3 tmpdir=. verbose=1
+suplane nt=16 ntr=2 | CWP_TMPDIR=. suaddnoise seed=3
+# Errors.
+suaddnoise seed=1 </dev/null
+suaddnoise noise=bad </dev/null
+suaddnoise sn=0 </dev/null
+suaddnoise sn=-1 </dev/null
+suaddnoise tmpdir=/no-such-suaddnoise-directory </dev/null
+
+# Explicit defaults and empty filter options; dt and unknown args are ignored
+# without filtering (the C program never calls checkpars).
+[stderr] suplane nt=19 ntr=1 | suaddnoise seed=1 noise=gauss sn=20 verbose=0 tmpdir= f= amps=
+[stderr] suplane nt=23 ntr=2 | suaddnoise seed=5 dt=0 ignored=1
+sunull nt=1 ntr=1 | suaddnoise seed=0
+sunull nt=1 ntr=1 | suaddnoise seed=0 noise=flat
+sunull nt=37 ntr=3 | suaddnoise seed=4294967295 noise=flat
+suspike nt=127 ntr=3 | suaddnoise seed=17 noise=flat sn=0.001
+suspike nt=511 ntr=7 | suaddnoise seed=31 noise=gauss sn=1000
+suplane nt=29 ntr=3 | suaddnoise seed=1 seed=9 noise=flat
+
+# tmpdir= overrides the environment, including an unusable CWP_TMPDIR.
+[stderr] suplane nt=11 ntr=2 | CWP_TMPDIR=/no-such-suaddnoise-directory suaddnoise seed=9 tmpdir= verbose=1
+[stderr] suplane nt=13 ntr=1 | CWP_TMPDIR=. suaddnoise seed=9 verbose=1
+printf x >not-a-directory; suaddnoise seed=1 tmpdir=not-a-directory </dev/null
+mkdir locked; chmod 500 locked; suaddnoise seed=1 tmpdir=locked </dev/null
+
+# Filtering with missing dt, invalid dt, mismatched arrays, and flat noise.
+# Original fails opening its root-level band output filename in this sandbox;
+# retain the requested filtering cases for when that path is accessible.
+suplane nt=21 ntr=2 | sushw key=dt a=0 | suaddnoise seed=13 f=10,20 amps=0,1
+suplane nt=25 ntr=1 | suaddnoise seed=13 noise=flat f=10,20 amps=0,1 dt=0
+suplane nt=27 ntr=1 | suaddnoise seed=13 f=10,20 amps=1 dt=-0.004
+[stderr] suplane nt=31 ntr=1 | suaddnoise seed=13 f=10,20 amps=1,0 verbose=1
+
+# Empty input, parameter precedence, malformed values, and fractional sn error.
+[stderr] suaddnoise </dev/null
+[stderr] suaddnoise seed=1 verbose=1 </dev/null
+[stderr] suaddnoise noise= </dev/null
+[stderr] suaddnoise sn=-0.1 </dev/null
+[stderr] suaddnoise sn=-0 </dev/null
+[stderr] suaddnoise sn=abc </dev/null
+[stderr] suaddnoise seed=4294967296 </dev/null
+[stderr] (sunull nt=5 ntr=1; sunull nt=7 ntr=1) | suaddnoise seed=1
+suplane nt=17 ntr=1 | suaddnoise seed=-1 noise=flat
+suplane nt=17 ntr=1 | suaddnoise seed=abc noise=flat
+suplane nt=13 ntr=2 | suaddnoise seed=21 sn= noise=flat
+printf 'seed=17\nnoise=flat\nsn=4\n' >params; suplane nt=15 ntr=2 | suaddnoise par=params
+
+# Signed C-int seed boundaries for both generators. Zero-valued input leaves
+# noiscale=1, exposing the generator samples without power normalization.
+sunull nt=193 ntr=3 | suaddnoise seed=2147483647 noise=flat
+sunull nt=193 ntr=3 | suaddnoise seed=2147483647 noise=gauss
+sunull nt=193 ntr=3 | suaddnoise seed=2147483648 noise=flat
+sunull nt=193 ntr=3 | suaddnoise seed=2147483648 noise=gauss
+sunull nt=4093 ntr=3 | suaddnoise seed=123 noise=flat
+sunull nt=4093 ntr=3 | suaddnoise seed=123 noise=gauss
+
+# Missing samples and a partial header fail before noise generation.
+[stderr] sunull nt=7 ntr=1 | head -c 240 | suaddnoise seed=1
+[stderr] printf short | suaddnoise seed=1
+
+# Default clock seed: compare only headers so this remains deterministic while
+# exercising successful processing without an explicit seed.
+[stderr] suplane nt=9 ntr=3 | suaddnoise | sugethw key=tracl,ns,dt output=ascii
+
+# Preserve varying signed, short, and floating-point header fields while adding
+# noise to every trace; the SU comparator checks every header byte.
+suplane nt=35 ntr=3 | sushw key=offset,scalco,d1 a=-30,-10,0.004 b=20,1,0.001 | suaddnoise seed=73 noise=flat
+
+# Named temporary files must be distinct while in use and removed on success.
+mkdir scratch; suplane nt=15 ntr=3 | suaddnoise seed=19 tmpdir=scratch && test -z "$(ls -A scratch)"
+
+# Exact generator samples with no signal normalization: Gaussian seeding at its
+# modulo boundary, and uniform seeding after conversion from unsigned to -2.
+# Odd trace lengths also ensure generator state continues across trace borders.
+[exact] sunull nt=1021 ntr=3 | suaddnoise seed=32707 noise=gauss
+[exact] sunull nt=1021 ntr=3 | suaddnoise seed=4294967294 noise=flat

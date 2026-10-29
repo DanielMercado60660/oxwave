@@ -1,0 +1,17 @@
+[package]
+name = "sunearcsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "sunearcsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-header-case = { path = "../../crates/oxwave-header-case" }
+oxwave-q-file = { path = "../../crates/oxwave-q-file" }

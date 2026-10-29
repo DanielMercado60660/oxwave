@@ -1,0 +1,88 @@
+# Default parameters, including cubic interpolation and the default window.
+suplane nt=125 ntr=6 | sueipofi
+suplane nt=125 ntr=3 | sueipofi dt=0.004 wl=0.1 pwr=1 interp=cubic rl1=0 rl2=0 pln=0 verbose=0
+# All three auxiliary outputs are read back so they are actually compared.
+suplane nt=125 ntr=6 | sueipofi rl1=1 > /dev/null && cat polar.rl1
+suplane nt=125 ntr=6 | sueipofi rl2=1 file=second > /dev/null && cat second.rl2
+suplane nt=125 ntr=6 | sueipofi pln=1 file=plane > /dev/null && cat plane.pln
+sunull nt=65 ntr=6 | suaddnoise seed=123 | sueipofi wl=0.02 pwr=1.5 rl1=1 rl2=1 pln=1 file=weights > filtered && cat filtered weights.rl1 weights.rl2 weights.pln
+# Linear interpolation, nonzero full-rank data, odd lengths and unfiltered tail.
+sunull nt=65 ntr=6 | suaddnoise seed=123 | sueipofi interp=linear wl=0.02 pwr=1.5
+sunull nt=65 ntr=6 | suaddnoise seed=123 | sueipofi interp=linear wl=0.02 rl1=1 rl2=1 pln=1 file=linear > filtered && cat filtered linear.rl1 linear.rl2 linear.pln
+suplane nt=125 ntr=6 | sueipofi interp=linear
+[stderr] suplane nt=31 ntr=3 | sueipofi interp=linear wl=0.012 pwr=0
+# One/two window cubic interpolation, and one window linear extrapolation.
+sunull nt=7 ntr=3 | suaddnoise seed=321 | sueipofi wl=0.028
+sunull nt=7 ntr=3 | suaddnoise seed=321 | sueipofi wl=0.012
+sunull nt=7 ntr=3 | suaddnoise seed=321 | sueipofi wl=0.028 interp=linear
+sunull nt=27 ntr=3 | sueipofi interp=linear
+# Verbose messages, complete stations and incomplete final stations.
+[stderr] suplane nt=125 ntr=7 | sueipofi interp=linear verbose=1
+[stderr] suplane nt=125 ntr=1 | sueipofi verbose=1
+[stderr] suplane nt=125 ntr=2 | sueipofi verbose=1
+suplane nt=125 ntr=1 | sueipofi
+# Header dt fallback, explicit override, repeated values and negative flags.
+[stderr] suplane nt=125 ntr=3 | sushw key=dt a=0 | sueipofi dt=0 interp=linear
+sunull nt=33 ntr=3 | suaddnoise seed=19 | sueipofi dt=0.002 wl=0.01 pwr=0.5 interp=linear
+[stderr] suplane nt=30 ntr=3 | sueipofi interp=linear wl=0.02 pwr=2 pwr=0 file=neg rl1=-1 rl2=-1 pln=-1 > /dev/null && cat neg.rl1 neg.rl2 neg.pln
+# Errors, validation order, empty input and minimum trace size.
+[stderr] sueipofi
+[stderr] suplane nt=1 ntr=1 | sueipofi
+[stderr] suplane nt=125 ntr=3 | sueipofi interp=unknown
+[stderr] suplane nt=125 ntr=3 | sueipofi interp=
+[stderr] suplane nt=125 ntr=3 | sueipofi wl=0
+[stderr] suplane nt=125 ntr=3 | sueipofi wl=-0.02
+[stderr] suplane nt=125 ntr=3 | sueipofi wl=0.008
+[stderr] suplane nt=125 ntr=3 | sueipofi wl=2
+[stderr] suplane nt=125 ntr=3 | sueipofi pwr=-1
+[stderr] suplane nt=125 ntr=3 | sueipofi dt=-0.004
+[stderr] suplane nt=125 ntr=3 | sueipofi rl1=1 file=absent/directory
+[stderr] suplane nt=125 ntr=1 | sueipofi unknown=9
+[stderr] suplane nt=125 ntr=3 | sueipofi pwr=1e-310
+[stderr] suplane nt=125 ntr=3 | sueipofi rl1=999999999999999999999
+# Minimum valid SVD window, rank-deficient matrices, and repeated stations.
+sunull nt=3 ntr=3 | suaddnoise seed=71 | sueipofi wl=0.012 interp=linear
+sunull nt=4 ntr=3 | suaddnoise seed=71 | sueipofi wl=0.012 interp=linear
+[stderr] suplane nt=37 ntr=9 | sueipofi wl=0.012 interp=linear pwr=0
+[stderr] suplane nt=65 ntr=6 | sueipofi wl=0.02 interp=linear pwr=0.25
+[stderr] suplane nt=125 ntr=3 | sushw key=dt a=0 | sueipofi interp=linear
+[stderr] suplane nt=125 ntr=4 | sueipofi interp=linear verbose=2
+[stderr] suplane nt=2 ntr=3 | sueipofi wl=0.012
+[stderr] suplane nt=125 ntr=3 | sueipofi wl=0.004 pwr=-1 interp=invalid
+sunull nt=75 ntr=3 | sueipofi
+sunull nt=75 ntr=3 | sueipofi pwr=0
+# Minimal sparse matrix exposing compute_svd compatibility, independent of prior stations.
+printf '0 0 0\n1 1 0\n0 1 0\n' | a2b n1=3 | suaddhead ns=3 | sueipofi dt=0.004 wl=0.012 interp=linear pwr=0
+# Zero windows exercise both exchanges with the C sort's extra column.
+sunull nt=9 ntr=6 | sueipofi wl=0.012 interp=linear pwr=0 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+(sunull nt=37 ntr=3; suplane nt=37 ntr=6) | sueipofi wl=0.012 interp=linear pwr=0
+# Dense full-rank stations, including an incomplete final station and tail samples.
+[stderr] sunull nt=43 ntr=10 | suaddnoise seed=823 | sueipofi wl=0.028 interp=linear pwr=0 verbose=1
+# Auxiliary-file open failures after earlier files have been opened.
+[stderr] suplane nt=125 ntr=3 | sueipofi rl2=1 file=absent/directory
+[stderr] suplane nt=125 ntr=3 | sueipofi pln=1 file=absent/directory
+# Explicit zero output flags still leave the filtered stream on stdout.
+sunull nt=33 ntr=3 | suaddnoise seed=421 | sueipofi wl=0.02 interp=linear file=unused rl1=0 rl2=0 pln=0
+# Empty numeric assignments retain defaults, including the header sample interval.
+[stderr] sunull nt=31 ntr=3 | sueipofi interp=linear dt= wl= pwr= rl1= rl2= pln= verbose=
+# An empty basename writes dotfiles; compare every auxiliary stream and its headers.
+sunull nt=13 ntr=6 | suaddnoise seed=927 | sushw key=cdp a=11 b=1 | sueipofi interp=linear wl=0.012 file= rl1=1 rl2=1 pln=1 > filtered && cat filtered .rl1 .rl2 .pln
+# Negative verbosity is enabled, and two trailing traces are skipped.
+[stderr] sunull nt=13 ntr=5 | suaddnoise seed=927 | sueipofi interp=linear wl=0.012 verbose=-1
+# Window rounding at exactly 2.5 samples and immediately below it. Binary-exact
+# dt makes these exercise NINT rather than decimal division rounding.
+[stderr] sunull nt=7 ntr=3 | suaddnoise seed=531 | sueipofi interp=linear dt=0.00390625 wl=0.009765625 verbose=1
+[stderr] sunull nt=7 ntr=3 | sueipofi interp=linear dt=0.00390625 wl=0.009765624
+# Both negative time parameters yield a valid positive sample window in C.
+[stderr] sunull nt=13 ntr=3 | suaddnoise seed=531 | sueipofi interp=linear dt=-0.004 wl=-0.012 verbose=1
+# Cubic one- and two-point splines: compare weights including extrapolated samples.
+sunull nt=7 ntr=3 | suaddnoise seed=321 | sueipofi wl=0.028 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+sunull nt=7 ntr=3 | suaddnoise seed=321 | sueipofi wl=0.012 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+# Equal singular values in windows 1/4, rank two in windows 2/3: each initial
+# attribute is [0,1,1,0]. The cubic exceeds both bounds and must be clipped.
+# The final sample of each filtered trace is outside the complete windows.
+printf '1 0 0 1 0 0 1 0 0 1 0 0 7\n0 1 0 0 1 0 0 1 0 0 1 0 8\n0 0 1 0 0 0 0 0 0 0 0 1 9\n' | a2b n1=13 | suaddhead ns=13 | sueipofi dt=0.004 wl=0.012 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+# The sparse SVD cancellation regression also exercises default cubic mode.
+printf '0 0 0\n1 1 0\n0 1 0\n' | a2b n1=3 | suaddhead ns=3 | sueipofi dt=0.004 wl=0.012 pwr=0
+# Cubic multi-station output preserves distinct headers and skips the last trace.
+[stderr] sunull nt=43 ntr=7 | suaddnoise seed=823 | sushw key=cdp a=21 b=1 | sueipofi wl=0.028 pwr=0.5 verbose=1 file=cubic rl1=1 rl2=1 pln=1 > filtered && cat filtered cubic.rl1 cubic.rl2 cubic.pln

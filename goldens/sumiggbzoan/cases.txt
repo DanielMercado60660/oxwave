@@ -1,0 +1,52 @@
+# Required arguments and empty input.
+[stderr] sumiggbzoan
+[stderr] sunull nt=9 ntr=1 | sumiggbzoan
+[stderr] sunull nt=9 ntr=1 | sumiggbzoan a3333file=missing
+[stderr] sunull nt=9 ntr=1 | sumiggbzoan a3333file=missing nx=1
+[stderr] sunull nt=9 ntr=1 | sumiggbzoan a3333file=missing nx=1 nz=9
+[stderr] sunull nt=9 ntr=1 | sumiggbzoan a3333file=/dev/null nx=1 nz=9
+# Default isotropic path; compare migrated traces on stdout.
+[stderr] sunull nt=16 ntr=16 | sugain bias=2250000 | sustrip outpar=par > a.bin && suplane nt=128 ntr=16 dt=0.004 | sumiggbzoan a3333file=a.bin nx=16 nz=16 dz=10 dx=10
+# Explicit parameters, Thomsen epsilon, asymmetric angles, verbose.
+[stderr] sunull nt=16 ntr=16 | sugain bias=2250000 | sustrip outpar=par > a.bin && sunull nt=16 ntr=16 | sugain bias=0.1 | sustrip outpar=par > e.bin && suplane nt=128 ntr=16 npl=1 dt=0.004 | sumiggbzoan a3333file=a.bin epsilonfile=e.bin nx=16 nz=16 dz=10 dx=10 dt=0.004 fmin=8 fmax=40 amin=-30 amax=45 bwh=80 verbose=1
+# Odd dimensions, reversed emergence angles, seeded noisy input.
+[stderr] sunull nt=19 ntr=17 | sugain bias=2560000 | sustrip outpar=par > a.bin && suplane nt=73 ntr=17 dt=0.002 npl=1 | suaddnoise seed=123 sn=12 | sumiggbzoan a3333file=a.bin nx=0 nz=19 dz=7 dx=12 dt=0.002 fmin=12 fmax=65 amin=40 amax=-25 bwh=65
+# Single trace, single time/depth sample, default dx/dz and beam parameters.
+[stderr] sunull nt=1 ntr=1 | sugain bias=2250000 | sustrip outpar=par > a.bin && sunull nt=1 ntr=1 | sugain bias=1 | sumiggbzoan a3333file=a.bin nx=-1 nz=1
+# Defaults from d2 and missing dt, negative/zero angle and verbose=0 explicitly.
+[stderr] sunull nt=9 ntr=5 | sugain bias=2250000 | sustrip outpar=par > a.bin && suspike nt=31 ntr=5 dt=0.004 | sushw key=dt,d2 a=0,15 | sumiggbzoan a3333file=a.bin nx=999 nz=9 amin=0 amax=0 verbose=0
+# Every stiffness file, with spatial gradients and nonzero tilt coefficients.
+[stderr] makevel nx=17 nz=21 v000=2250000 dvdx=4000 dvdz=8000 > a33 && makevel nx=17 nz=21 v000=2600000 dvdx=3500 dvdz=7000 > a11 && makevel nx=17 nz=21 v000=900000 dvdx=1200 dvdz=2400 > a13 && makevel nx=17 nz=21 v000=675000 dvdx=900 dvdz=1800 > a55 && makevel nx=17 nz=21 v000=10000 dvdx=50 dvdz=70 > a15 && makevel nx=17 nz=21 v000=-15000 dvdx=30 dvdz=-50 > a35 && suplane nt=111 ntr=17 npl=1 dt=0.002 | suaddnoise seed=314 sn=20 | sumiggbzoan a3333file=a33 a1111file=a11 a1133file=a13 a1313file=a55 a1113file=a15 a3313file=a35 nx=17 nz=21 dx=10 dz=8 fmin=10 fmax=60 bwh=55 amin=-25 amax=35 verbose=1
+# Thomsen delta only (epsilon defaults to zero), negative anisotropy.
+[stderr] makevel nx=9 nz=13 v000=2250000 dvdx=2500 dvdz=5000 > a33 && makevel nx=9 nz=13 v000=-0.05 dvdz=0.002 > delta && suspike nt=79 ntr=9 dt=0.004 | sumiggbzoan a3333file=a33 deltafile=delta nx=9 nz=13 dx=10 dz=6 bwh=50 amin=-20 amax=30
+# Both Thomsen files override supplied a1111/a1133, with zero shear stiffness.
+[stderr] makevel nx=11 nz=17 v000=2250000 dvdx=2000 dvdz=3000 > a33 && makevel nx=11 nz=17 v000=3000000 > a11 && makevel nx=11 nz=17 v000=1200000 > a13 && makevel nx=11 nz=17 v000=0 > a55 && makevel nx=11 nz=17 v000=0.07 dvdz=0.001 > delta && makevel nx=11 nz=17 v000=0.12 dvdx=0.002 > epsilon && suplane nt=97 ntr=11 dt=0.003 npl=1 | sumiggbzoan a3333file=a33 a1111file=a11 a1133file=a13 a1313file=a55 deltafile=delta epsilonfile=epsilon nx=11 nz=17 dx=12 dz=9 fmin=11 fmax=55 amin=-35 amax=50 bwh=65
+# Larger odd grid spans multiple interpolation cells and beam centers.
+[stderr] makevel nx=33 nz=35 v000=2400000 dvdx=-9000 dvdz=7000 vlens=120000 dlens=20 tlens=15 xlens=16 zlens=12 > a33 && suplane nt=151 ntr=33 dt=0.003 npl=2 | suaddnoise seed=712 sn=10 | sumiggbzoan a3333file=a33 nx=33 nz=35 dx=10 dz=10 fmin=10 fmax=50 bwh=45
+# Explicit numerical defaults; zero offset in every input header.
+[stderr] makevel nx=5 nz=7 v000=2250000 > a && sunull nt=45 ntr=5 dt=0.004 | sugain bias=1 | sushw key=d2 a=10 | sumiggbzoan a3333file=a nx=5 nz=7 dz=1 dt=0.004 dx=10 fmin=6.25 fmax=62.5 amax=60 amin=-60 bwh=120 verbose=0
+# Unknown parameter is reported at the original checkpars position.
+[stderr] makevel nx=3 nz=5 v000=2250000 > a && sunull nt=9 ntr=3 | sumiggbzoan a3333file=a nx=3 nz=5 dx=10 bogus=1 verbose=1
+# Numeric conversion errors precede model reads.
+[stderr] sunull nt=5 ntr=1 | sumiggbzoan a3333file=missing nx=2147483648 nz=3
+[stderr] sunull nt=5 ntr=1 | sumiggbzoan a3333file=missing nx=1 nz=3 dt=1e-310
+[stderr] sunull nt=5 ntr=1 | sumiggbzoan a3333file=missing nx=1 nz=-1 dx=10
+[stderr] sunull nt=5 ntr=1 | sumiggbzoan a3333file=missing nx=1 nz=0 dx=10
+# Trace-size mismatch occurs while collecting traces, before model loading.
+[stderr] (sunull nt=5 ntr=1; sunull nt=7 ntr=1) | sumiggbzoan a3333file=missing nx=2 nz=3 dx=10
+
+# Each optional model file reports both open and short-read errors.
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1111file=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1111file=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1133file=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1133file=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1313file=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1313file=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1113file=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a1113file=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a3313file=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 a3313file=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 deltafile=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 deltafile=/dev/null
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 epsilonfile=missing
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 epsilonfile=/dev/null

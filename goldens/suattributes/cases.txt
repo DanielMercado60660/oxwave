@@ -1,0 +1,21 @@
+# Modes, defaults, and phase controls on non-power-of-two traces.
+suplane nt=129 ntr=1 | suattributes
+suplane nt=129 ntr=2 | suattributes mode=phase
+suplane nt=129 ntr=2 | suattributes mode=phase unwrap=2
+suplane nt=129 ntr=2 | suattributes mode=freq unwrap=0
+suplane nt=129 ntr=2 | suattributes mode=uphase
+suplane nt=129 ntr=2 | suattributes mode=bandwidth
+suplane nt=129 ntr=2 | suattributes mode=normamp
+suplane nt=129 ntr=2 | suattributes mode=freqw
+suplane nt=129 ntr=2 | suattributes mode=thin wint=2 unwrap=0
+suplane nt=129 ntr=2 | suattributes mode=fdenv
+suplane nt=129 ntr=2 | suattributes mode=q
+sunull nt=17 ntr=1 | suattributes mode=freqw wint=0
+sunull nt=1 ntr=1 | suattributes mode=amp
+suplane nt=65 ntr=1 | suattributes mode=freq unwrap=-1
+suplane nt=65 ntr=1 | suattributes mode=thin wint=-1
+sunull nt=17 ntr=1 | sushw key=dt a=0 | suattributes mode=amp
+[stderr] suplane nt=64 ntr=1 | suattributes mode=amp verbose=1
+[stderr] suplane nt=64 ntr=1 | sushw key=trid a=123 | suattributes mode=amp
+suplane nt=64 ntr=1 | suattributes mode=invalid
+suattributes mode=amp

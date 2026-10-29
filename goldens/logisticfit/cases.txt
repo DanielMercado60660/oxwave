@@ -1,0 +1,57 @@
+# Numeric results are written to a regular file then printed: /dev/stdout
+# cannot be reopened when it is a pipe under a sandbox.
+# Ordinary data, implicit and explicit default windows, and odd n.
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 nstart=0 nend=3 outpar=fit.par && cat fit.par
+[stderr] python3 -c 'import math,struct,sys; t=[i*0.5 for i in range(17)]; p=[100/(1+19*math.exp(-0.4*x)) for x in t]; sys.stdout.buffer.write(struct.pack("=34f",*(t+p)))' | logisticfit n=17 outpar=fit.par && cat fit.par
+# Both inventory inputs with an observable output file.
+(lorenz stepmax=8 mode=x h=0.1; sird_epidemic stepmax=8 mode=I h=0.1) | logisticfit n=8 outpar=fit.par && cat fit.par
+(lorenz stepmax=8 mode=x h=0.1; sird_epidemic stepmax=6 mode=I h=0.1) | logisticfit n=8 nstart=2 nend=8 outpar=fit.par && cat fit.par
+# Start and end windows; shortened population input avoids the C overrun.
+[stderr] printf '%s\n' 0 1 2 3 4 5 1 2 3 4 5 6 | a2b n1=1 outpar=/dev/null | logisticfit n=6 nstart=2 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 3 4 5 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=6 nend=3 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 3 4 5 1 2 3 4 | a2b n1=1 outpar=/dev/null | logisticfit n=6 nstart=1 nend=4 outpar=fit.par && cat fit.par
+# One surplus population fits in the reference allocator padding. Larger
+# overruns can corrupt the C heap and have no reproducible exit status.
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 nend=2 outpar=fit.par && cat fit.par
+# Small windows, zero window, and empty or incomplete input (C undefined accesses).
+[stderr] printf '%s\n' 0 1 | a2b n1=1 outpar=/dev/null | logisticfit n=1 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 1 2 | a2b n1=1 outpar=/dev/null | logisticfit n=2 outpar=fit.par && cat fit.par
+logisticfit n=0 outpar=fit.par && cat fit.par
+logisticfit n=3 nstart=1 nend=1 outpar=fit.par && cat fit.par
+[stderr] logisticfit n=3 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=fit.par && cat fit.par
+# Constant, zero, negative, decreasing populations and repeated times.
+[stderr] printf '%s\n' 0 1 2 3 4 2 2 2 2 2 | a2b n1=1 outpar=/dev/null | logisticfit n=5 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 3 4 0 0 0 0 0 | a2b n1=1 outpar=/dev/null | logisticfit n=5 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 3 4 -1 -2 -3 -4 -5 | a2b n1=1 outpar=/dev/null | logisticfit n=5 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 1 2 3 4 9 6 4 2 1 | a2b n1=1 outpar=/dev/null | logisticfit n=5 outpar=fit.par && cat fit.par
+[stderr] printf '%s\n' 0 0 0 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=fit.par && cat fit.par
+# K below the last population produces the original warning and invalid logs.
+[stderr] printf '%s\n' 0 1 2 3 4 1 1.1 1.4 2 4 | a2b n1=1 outpar=/dev/null | logisticfit n=5 outpar=fit.par && cat fit.par
+# There is no checkpars call: verbose and unknown arguments are ignored.
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 verbose=1 unused=2 outpar=fit.par && cat fit.par
+# Repeated and parameter-file values retain getpar precedence.
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=9 n=3 outpar=fit.par && cat fit.par
+printf '%s\n' 'n=8 nstart=0 nend=3 outpar=fit.par' > params; printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit par=params n=3 && cat fit.par
+# Output suppressed via /dev/null and the literal /dev/stdout output path.
+[exact] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=/dev/null
+printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=/dev/stdout
+# Also exercise /dev/stdout with stdout redirected to a regular file.
+[stderr] printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=/dev/stdout > result && cat result
+# Errors, including opening outpar before parsing n and the default /dev/tty.
+[stderr] logisticfit n=3
+[stderr] logisticfit
+[stderr] logisticfit outpar=fit.par
+[stderr] logisticfit n= outpar=fit.par
+[stderr] logisticfit n=2147483648 outpar=fit.par
+[stderr] logisticfit n=3 nstart=2 nend=1 outpar=fit.par
+[stderr] logisticfit n=3 nend=4 outpar=fit.par
+[stderr] logisticfit n=3 nstart=-1 outpar=fit.par
+[stderr] logisticfit n=3 nend=-1 outpar=fit.par
+[stderr] logisticfit n=-1 outpar=fit.par
+[stderr] logisticfit n=-1 nstart=-2 nend=-1 outpar=fit.par
+[stderr] logisticfit n=0 nstart=1 outpar=fit.par
+[stderr] logisticfit n=3 outpar=missing/fit.par
+[stderr] logisticfit n=3 outpar=
+[stderr] logisticfit n=bogus nstart=1 outpar=fit.par

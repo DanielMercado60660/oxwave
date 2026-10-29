@@ -1,0 +1,13 @@
+# Empty input and arguments ignored by the original program.
+downfort </dev/null
+downfort verbose=1 unknown=abc </dev/null
+# Comment markers only have special meaning in the first column.
+printf 'C KEEP MIXED Case\n* ALSO KEEP\nc LOWER COMMENT\n C CODE\n' | downfort
+# The first character of every line is copied verbatim, including code.
+printf 'ABC XYZ\nZ\n\n' | downfort
+# Ordinary strings remain unchanged; strings beginning with ( are lowercased.
+printf "      PRINT *, 'MiXeD', '(A5, I3)', 'NEXT'\n" | downfort
+# Repeated quotes and punctuation in source.
+printf "      X='A''B'; Y=ABC123 ! COMMENT\n" | downfort
+# Non-ASCII bytes and CRLF.
+printf '\200\377 ABC\r\n' | downfort

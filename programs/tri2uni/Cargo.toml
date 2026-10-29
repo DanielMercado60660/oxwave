@@ -1,0 +1,16 @@
+[package]
+name = "tri2uni"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "tri2uni"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-lib-tri = { path = "../../crates/oxwave-lib-tri" }

@@ -1,0 +1,21 @@
+# Header defaults, missing headers, and explicit sampling.
+suplane nt=31 ntr=7 | suspecfk
+sunull nt=17 ntr=3 | suspecfk verbose=1
+suplane nt=32 ntr=5 | sushw key=d2 a=12.5 | suspecfk
+suplane nt=25 ntr=6 | suspecfk dt=0.001 dx=15
+# Small and odd transforms, signed and zero sampling.
+sunull nt=1 ntr=1 | suspecfk dt=0.004 dx=1
+suspike nt=13 ntr=1 | suspecfk dt=-0.002 dx=-2
+sunull nt=7 ntr=3 | suspecfk dt=0 dx=0
+# Temporary file selection and diagnostics.
+[stderr] suplane nt=16 ntr=3 | suspecfk tmpdir=. verbose=1
+[stderr] suplane nt=16 ntr=3 | CWP_TMPDIR=. suspecfk verbose=1
+[stderr] suplane nt=16 ntr=3 | suspecfk tmpdir=/no/such/directory
+[stderr] suspecfk
+[stderr] suplane nt=16 ntr=3 | suspecfk verbose=1 extra=2
+sunull nt=65535 ntr=1 | suspecfk
+# Reject an excessive padded spatial dimension before allocating workspaces.
+[stderr] sunull nt=1 ntr=65535 | suspecfk dt=0.004 dx=1
+# Explicit empty tmpdir overrides the environment; malformed numeric input.
+[stderr] suplane nt=8 ntr=2 | CWP_TMPDIR=/no/such/directory suspecfk tmpdir= verbose=1
+[stderr] suplane nt=8 ntr=2 | suspecfk verbose=999999999999999999999999999999

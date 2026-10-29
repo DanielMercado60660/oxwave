@@ -1,0 +1,72 @@
+# No input or required parameters; defaults and every output mode.
+[f32] lorenz
+[f32] lorenz stepmax=500 verbose=0 rho=28 sigma=10 eta=1.666666667 y0=1 y1=-1 y2=1 h=.01 tol=1e-8 mode=xy
+[f32] lorenz stepmax=17 mode=xy
+[f32] lorenz stepmax=17 mode=xz
+[f32] lorenz stepmax=17 mode=yz
+[f32] lorenz stepmax=17 mode=xyz
+[f32] lorenz stepmax=17 mode=x
+[f32] lorenz stepmax=17 mode=y
+[f32] lorenz stepmax=17 mode=z
+# Inventory cases write files; cat them so the numerical output is checked.
+[f32] lorenz stepmax=32 mode=xyz h=0.02 rho=25 sigma=9 eta=2 > lorenz_xyz.bin; cat lorenz_xyz.bin
+[f32] lorenz stepmax=32 mode=z y0=2 y1=1 y2=3 tol=1e-7 > lorenz_z.bin; cat lorenz_z.bin
+# Individual coefficients, initial conditions, step sizes, and tolerance.
+[f32] lorenz stepmax=31 mode=xyz rho=15
+[f32] lorenz stepmax=31 mode=xyz sigma=4
+[f32] lorenz stepmax=31 mode=xyz eta=3
+[f32] lorenz stepmax=31 mode=xyz y0=-2
+[f32] lorenz stepmax=31 mode=xyz y1=2
+[f32] lorenz stepmax=31 mode=xyz y2=0
+[f32] lorenz stepmax=31 mode=xyz h=.025
+[f32] lorenz stepmax=31 mode=xyz tol=1e-12
+# Longer example trajectory and single output step.
+[f32] lorenz stepmax=2000 mode=xyz
+[exact] lorenz stepmax=1 mode=xyz y0=2.5 y1=-3.25 y2=7.125
+[exact] lorenz stepmax=1 mode=xy
+[exact] lorenz stepmax=1 mode=yz
+[exact] lorenz stepmax=1 mode=xz
+[exact] lorenz stepmax=1 mode=x
+[exact] lorenz stepmax=1 mode=y
+[exact] lorenz stepmax=1 mode=z
+# Zero/negative sizes and zero/negative model values are accepted by C.
+[exact] [stderr] lorenz stepmax=0 verbose=1
+[exact] [stderr] lorenz stepmax=-3 verbose=1
+[exact] lorenz stepmax=7 h=0 mode=xyz
+[exact] lorenz stepmax=7 h=1e-8 mode=xyz
+[f32] lorenz stepmax=5 h=-.002 mode=xyz
+[f32] lorenz stepmax=7 rho=0 sigma=0 eta=0 mode=xyz
+[f32] lorenz stepmax=7 rho=-2 sigma=-1 eta=-.5 mode=xyz
+[exact] lorenz stepmax=7 y0=0 y1=0 y2=0 mode=xyz
+[f32] lorenz stepmax=7 tol=0 mode=xyz
+[f32] lorenz stepmax=2 tol=-1 mode=xyz
+# Whole stderr checks the solver counters and tolerance formatting.
+[f32] [stderr] lorenz stepmax=7 verbose=1 mode=xyz
+[f32] [stderr] lorenz stepmax=7 verbose=2 h=.2 tol=1e-10 mode=xyz
+[f32] [stderr] lorenz stepmax=3 verbose=-1 h=0 tol=.125 mode=xyz
+# getpar defaults, last occurrence, par files, and lack of checkpars().
+[f32] lorenz stepmax=7 stepmax=9 rho=1 rho=25 mode=x mode=xyz
+[f32] lorenz stepmax=7 h= tol= y0= y1= y2= rho= sigma= eta= verbose=
+[exact] lorenz stepmax=abc
+[exact] lorenz stepmax=7 h=abc mode=xyz
+[f32] [stderr] lorenz stepmax=7 unknown=ignored mode=xyz
+[f32] printf 'stepmax=9 rho=23 sigma=8 eta=2 y0=2 y1=1 y2=3 h=.02 tol=1e-9 mode=xyz\n' > params; lorenz par=params stepmax=11
+# Invalid mode and numeric range errors, including callback-time errors
+# after the first output sample has already been written.
+[stderr] lorenz mode=invalid
+[stderr] lorenz mode=
+[stderr] lorenz mode=XYZ stepmax=0
+[stderr] lorenz stepmax=2147483648
+[stderr] lorenz verbose=2147483648
+[stderr] lorenz y0=1e999
+[stderr] lorenz y1=1e999
+[stderr] lorenz y2=1e999
+[stderr] lorenz h=1e999
+[stderr] lorenz tol=1e999
+[stderr] lorenz y0=1e-310
+[f32] [stderr] lorenz stepmax=1 rho=1e999 mode=xyz
+[f32] [stderr] lorenz stepmax=1 sigma=1e999 mode=xyz
+[f32] [stderr] lorenz stepmax=1 eta=1e999 mode=xyz
+# Coefficients are not parsed when no solver callback is needed.
+[exact] [stderr] lorenz stepmax=0 rho=1e999
+[exact] [stderr] lorenz stepmax=3 h=0 rho=1e999

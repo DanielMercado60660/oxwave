@@ -1,0 +1,18 @@
+# Default sampling and single sample.
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=3 n2=3
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=1 n2=1
+# Non-default origins and intervals, odd sizes, and boundary snapping.
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=5 n2=3 d1=0.5 d2=0.5 f1=0 f2=0.5
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=3 n2=3 d1=-0.5 d2=-0.5 f1=2 f2=2
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=3 n2=3 d1=0 d2=0 f1=1 f2=1
+[f32] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=3 n2=3 d1=1 d2=1 f1=-0.005 f2=-0.005
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=1 n2=1 verbose=1
+tri2uni n2=1
+tri2uni n1=1
+tri2uni n1=1 n2=1
+python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=1 n2=1 f2=3
+python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.1 for i in range(9)]))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=1 n2=1 f1=-1
+# Negative dimensions must fail allocation, including when both are negative.
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=5 n2=-1
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=-1 n2=5
+[stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=-1 n2=-1

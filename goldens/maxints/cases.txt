@@ -1,0 +1,5 @@
+# maxints ignores arguments, including verbose and invalid-looking parameters.
+[exact] maxints verbose=1 unknown=bad
+# Input is ignored; a small producer completes without triggering SIGPIPE.
+[exact] printf '123\n' | maxints
+[exact] maxints -h

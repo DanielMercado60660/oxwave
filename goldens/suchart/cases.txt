@@ -1,0 +1,16 @@
+# Default keys and one trace with one sample.
+[f32] suplane nt=1 ntr=1 | suchart
+# Nonzero signed coordinate values and multiple traces.
+[f32] suplane nt=7 ntr=3 | sushw key=sx,gx a=-123,456 b=10,-20 | suchart
+# Integer, short, unsigned short and float header conversions.
+[f32] suplane nt=5 ntr=3 | sushw key=cdp,nhs a=-4,2 b=3,1 | suchart key1=cdp key2=nhs
+[f32] suplane nt=3 ntr=3 | sushw key=d1,dt a=0.25,1000 b=0.5,100 | suchart key1=d1 key2=dt
+# Parameter file contents and default labels.
+suplane nt=3 ntr=3 | suchart outpar=chart.par > chart.bin && cat chart.par
+suplane nt=3 ntr=1 | suchart key1=cdp key2=nhs outpar=chart.par > chart.bin && cat chart.par
+# Invalid keys, missing input, failed parameter file and unrecognized options.
+suchart key1=bad </dev/null
+suchart key2=bad </dev/null
+suchart </dev/null
+suplane nt=1 ntr=1 | suchart outpar=/no/such/directory/file
+[stderr] suplane nt=1 ntr=1 | suchart verbose=1 unknown=3 > /dev/null

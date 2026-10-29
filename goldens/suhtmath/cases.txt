@@ -1,0 +1,19 @@
+# Default and explicitly documented nop are rejected by the original.
+suhtmath
+suplane nt=3 ntr=1 | suhtmath op=nop
+suhtmath op=invalid
+suhtmath op=add
+suhtmath key=invalid op=add
+# Default key, scale, and const; odd sample and trace counts.
+suplane nt=7 ntr=3 | suhtmath op=add
+suplane nt=1 ntr=1 | suhtmath op=mult
+suplane nt=7 ntr=3 | suhtmath op=div const=2
+# Integer, short, unsigned, and floating header values; negative and zero factors.
+suplane nt=9 ntr=3 | sushw key=offset a=-3 b=2 | suhtmath key=offset op=mult scale=-0.5 const=1.25
+suplane nt=5 ntr=2 | sushw key=delrt a=-7 b=3 | suhtmath key=delrt op=add scale=2 const=-1
+suplane nt=5 ntr=2 | suhtmath key=ns op=div scale=0 const=-2
+suplane nt=5 ntr=2 | sushw key=d1 a=0.5 b=0.25 | suhtmath key=d1 op=add scale=3 const=-2
+suplane nt=5 ntr=2 | suhtmath op=mult scale=0 const=0
+suplane nt=5 ntr=2 | suhtmath op=div scale=0 const=0
+[stderr] suplane nt=3 ntr=1 | suhtmath op=add verbose=1
+[stderr] suhtmath op=invalid verbose=1

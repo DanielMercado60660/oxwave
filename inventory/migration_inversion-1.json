@@ -1,0 +1,164 @@
+{
+  "scope": "su/main/migration_inversion part 1 of 2. Inventory incomplete: only sugazmig is included; the other ten programs still require source review.",
+  "programs": [
+    {
+      "name": "sugazmig",
+      "path": "su/main/migration_inversion/sugazmig.c",
+      "purpose": "Migrate zero-offset traces using Gazdag phase shifts with an optional attenuation correction.",
+      "selfdoc_first_line": " SUGAZMIGQ - SU version of Jeno GAZDAG's phase-shift migration \t",
+      "params": [
+        {
+          "name": "dt",
+          "type": "float",
+          "default": "computed: from first trace header dt in microseconds; 0.004 if zero",
+          "required": false,
+          "description": "Input time sampling interval."
+        },
+        {
+          "name": "dx",
+          "type": "float",
+          "default": "computed: from first trace header d2; 1.0 if zero",
+          "required": false,
+          "description": "Midpoint sampling interval."
+        },
+        {
+          "name": "ft",
+          "type": "float",
+          "default": "0.0",
+          "required": false,
+          "description": "First input time."
+        },
+        {
+          "name": "ntau",
+          "type": "int",
+          "default": "computed: first trace header ns",
+          "required": false,
+          "description": "Number of output time samples."
+        },
+        {
+          "name": "dtau",
+          "type": "float",
+          "default": "computed: dt",
+          "required": false,
+          "description": "Output time sampling interval."
+        },
+        {
+          "name": "ftau",
+          "type": "float",
+          "default": "computed: ft",
+          "required": false,
+          "description": "First output time."
+        },
+        {
+          "name": "Q",
+          "type": "float",
+          "default": "1.0e6",
+          "required": false,
+          "description": "Quality factor used for attenuation correction."
+        },
+        {
+          "name": "ceil",
+          "type": "float",
+          "default": "1.0e6",
+          "required": false,
+          "description": "Cumulative gain ceiling."
+        },
+        {
+          "name": "verbose",
+          "type": "int",
+          "default": "0",
+          "required": false,
+          "description": "Print diagnostic information."
+        },
+        {
+          "name": "tmpdir",
+          "type": "string",
+          "default": "computed: CWP_TMPDIR environment variable if set, otherwise empty string",
+          "required": false,
+          "description": "Directory for named temporary files; an empty value uses tmpfile."
+        },
+        {
+          "name": "vfile",
+          "type": "string",
+          "default": "",
+          "required": false,
+          "description": "Binary float velocity file; when supplied, tmig and vmig are ignored."
+        },
+        {
+          "name": "tmig",
+          "type": "float array",
+          "default": "0.0",
+          "required": false,
+          "description": "Increasing times for interval velocities; read only when vfile is absent."
+        },
+        {
+          "name": "vmig",
+          "type": "float array",
+          "default": "1500.0",
+          "required": false,
+          "description": "Interval velocities corresponding to tmig; read only when vfile is absent."
+        }
+      ],
+      "stdin": "su_traces",
+      "stdout": "su_traces",
+      "lib_calls": [
+        "initargs",
+        "requestdoc",
+        "gettr",
+        "err",
+        "getparfloat",
+        "warn",
+        "getparint",
+        "getparstring",
+        "etmpfile",
+        "temporary_filename",
+        "efopen",
+        "efwrite",
+        "erewind",
+        "npfar",
+        "alloc2float",
+        "alloc2complex",
+        "efread",
+        "efclose",
+        "ealloc1float",
+        "countparval",
+        "intlin",
+        "checkpars",
+        "pfa2rc",
+        "pfa2cr",
+        "puttr",
+        "eremove",
+        "CWP_Exit",
+        "npfa",
+        "alloc1complex",
+        "alloc1float",
+        "cneg",
+        "cmplx",
+        "pfacc",
+        "cmul",
+        "cadd",
+        "crmul",
+        "free1complex",
+        "free1float"
+      ],
+      "calls_programs": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "FFT results, complex frequency accumulation, interpolation, and pow, sqrt, sin, cos and exp can vary across implementations. The vfile branch allocates ntau velocities but reads nt floats, so ntau < nt can overflow and ntau > nt leaves values uninitialized. The nonzero ftau loop compares an integer index directly with the floating-point ftau and can access velocity samples outside the allocated range.",
+      "c_lines": 386,
+      "difficulty": "hard",
+      "difficulty_reason": "The program combines multidimensional FFTs, frequency-by-frequency migration, interpolation, attenuation correction and temporary trace storage.",
+      "test_cases": [
+        {
+          "description": "Constant velocity and explicit input sampling.",
+          "command": "suplane nt=128 ntr=16 | sugazmig dt=0.004 dx=10 vmig=1500 Q=1000 ceil=100"
+        },
+        {
+          "description": "Time-varying velocity and a different output sampling interval.",
+          "command": "suplane nt=128 ntr=16 | sugazmig dt=0.004 dx=10 tmig=0,0.4 vmig=1500,2000 ntau=96 dtau=0.005 Q=500"
+        }
+      ],
+      "license_note": "",
+      "related_programs": []
+    }
+  ]
+}

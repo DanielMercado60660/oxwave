@@ -1,0 +1,31 @@
+{
+  "scope": "tetra/lib part 1",
+  "functions": [
+    {
+      "name": "tetra_volume",
+      "file": "tetra/lib/tetra.c",
+      "signature": "float tetra_volume(float x0[3], float x1[3], float x2[3], float x3[3]);",
+      "purpose": "Compute the absolute volume of a tetrahedron from its four vertices.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The expanded determinant uses float operations and sequential assignments to vv; preserve the expression and accumulation order, particularly for nearly degenerate tetrahedra where cancellation can dominate. ABS is a macro, and division by the double literal 6.0 occurs in double precision before conversion to float.",
+      "c_lines": 22,
+      "difficulty": "medium",
+      "group": "tetra-geometry",
+      "license_note": ""
+    },
+    {
+      "name": "area3d",
+      "file": "tetra/lib/tetra.c",
+      "signature": "float area3d( float x0[3], float x1[3], float x2[3]);",
+      "purpose": "Compute a triangle area from three 3D vertices using the formula implemented in the source.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "Squared-distance sums and the final product are evaluated in float, while sqrt takes and returns double; each distance is rounded to float, and the final division by 12.0 is in double before conversion to float. Preserve the source formula and operation order: its final factors differ from Heron's formula and can produce nonzero values for degenerate triangles.",
+      "c_lines": 17,
+      "difficulty": "medium",
+      "group": "tetra-geometry",
+      "license_note": ""
+    }
+  ]
+}

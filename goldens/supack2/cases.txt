@@ -1,0 +1,17 @@
+# Packed output is byte-oriented, so compare it exactly.
+[exact] suplane nt=63 ntr=3 | supack2
+[exact] suplane nt=63 ntr=3 | supack2 gpow=1
+[exact] suplane nt=63 ntr=3 | supack2 gpow=0.7
+[exact] sunull nt=1 ntr=1 | supack2
+[exact] suspike nt=1 ntr=1 | supack2 gpow=2
+[exact] suplane nt=37 ntr=2 | suaddnoise seed=42 | supack2 gpow=0.5
+[exact] suplane nt=37 ntr=2 | suaddnoise seed=42 | supack2 gpow=1
+[exact] suplane nt=37 ntr=2 | suaddnoise seed=42 | supack2 gpow=0.7
+[exact] suplane nt=17 ntr=1 | suaddnoise seed=7 | supack2 gpow=
+[exact] suplane nt=17 ntr=1 | suaddnoise seed=7 | supack2 gpow=2 gpow=1
+[exact] sunull nt=17 ntr=2 | supack2 gpow=0.7
+[stderr] suplane nt=9 ntr=1 | supack2 verbose=1
+supack2 gpow=0
+supack2 gpow=-1
+supack2 gpow=abc
+supack2

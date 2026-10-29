@@ -1,0 +1,20 @@
+[package]
+name = "susmoqcsv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "susmoqcsv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-taup = { path = "../../crates/oxwave-f-taup" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true
+oxwave-grid-geometry = { path = "../../crates/oxwave-grid-geometry" }
+oxwave-grid-parameters = { path = "../../crates/oxwave-grid-parameters" }
+oxwave-linear-interp = { path = "../../crates/oxwave-linear-interp" }
+oxwave-q-file = { path = "../../crates/oxwave-q-file" }

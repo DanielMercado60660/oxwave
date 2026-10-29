@@ -1,0 +1,47 @@
+# Emit traces directly: the inventory cases redirect away the numerical output.
+suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmovz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1
+suplane nt=128 ntr=16 | sushw key=cdp a=1 b=1 | sushw key=offset a=200 | sudmovz cdpmin=1 cdpmax=16 dxcdp=25 noffmix=1 tdmo=0,0.4 vdmo=1500,2000 speed=0.8 smute=2 fmax=80
+[stderr] suplane nt=127 ntr=7 | sushw key=cdp a=1 b=1 | sushw key=offset a=100 | sudmovz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500 fmax=125 speed=1 smute=1.5 verbose=1
+suplane nt=129 ntr=1 | sushw key=cdp,offset a=1,80 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suplane nt=95 ntr=5 | sushw key=cdp a=-2 b=1 | sushw key=offset a=-100 | sudmovz cdpmin=-2 cdpmax=2 dxcdp=20 noffmix=1 fmax=60 verbose=0
+# Multiple offset gathers, complete and partial mixes, repeated CDPs.
+[stderr] suplane nt=128 ntr=12 | sushw key=cdp a=1 b=1 j=4 | sushw key=offset a=100 b=0 c=100 j=4 | sudmovz cdpmin=1 cdpmax=4 dxcdp=25 noffmix=2 verbose=1
+suplane nt=128 ntr=12 | sushw key=cdp a=1 b=1 j=4 | sushw key=offset a=100 b=0 c=100 j=4 | sudmovz cdpmin=1 cdpmax=4 dxcdp=25 noffmix=1
+suplane nt=128 ntr=5 | sushw key=cdp a=1 b=1 | sushw key=offset a=80 | sudmovz cdpmin=2 cdpmax=4 dxcdp=25 noffmix=0
+suplane nt=128 ntr=5 | sushw key=cdp a=1 b=1 | sushw key=offset a=80 | sudmovz cdpmin=2 cdpmax=4 dxcdp=25 noffmix=-1
+# Binary native-float velocity input, and insufficient file contents.
+python3 -c 'import struct; open("v.bin","wb").write(struct.pack("=128f", *[1500+2*i for i in range(128)]))'; suplane nt=128 ntr=5 | sushw key=cdp a=1 b=1 | sushw key=offset a=100 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 vfile=v.bin
+printf '' > short.bin; sunull nt=16 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 vfile=short.bin
+# Required parameters, invalid ranges, velocity table validation, empty input.
+sudmovz
+sunull nt=16 | sudmovz
+sunull nt=16 | sudmovz cdpmin=1
+sunull nt=16 | sudmovz cdpmin=2 cdpmax=1
+sunull nt=16 | sudmovz cdpmin=1 cdpmax=2
+sunull nt=16 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25
+sunull nt=16 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0,0.1 vdmo=1500
+sunull nt=16 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0.1,0 vdmo=1500,1800
+sunull nt=16 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0,0 vdmo=1500,1800
+sunull nt=16 | sushw key=delrt a=10 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 verbose=1
+[stderr] sunull nt=16 ntr=1 | sushw key=cdp,offset a=1,1000 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] sunull nt=128 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 smute=0
+[stderr] sunull nt=128 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 smute=-1
+suplane nt=127 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=-25 noffmix=1
+[stderr] suplane nt=127 ntr=5 | sushw key=cdp,offset a=1,100 b=1,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 unknown=7 verbose=1
+# Nonzero signals across odd FFT sizes and steeper, piecewise velocity models.
+sunull nt=257 ntr=9 dt=0.002 | suaddnoise seed=12345 | sushw key=cdp,offset a=1,150 b=1,0 | sudmovz cdpmin=1 cdpmax=9 dxcdp=12.5 noffmix=1 tdmo=0,0.15,0.4 vdmo=1400,1700,2200 fmax=110 speed=0.7 smute=2.5
+sunull nt=143 ntr=11 dt=0.004 | suaddnoise seed=765 | sushw key=cdp,offset a=1,125 b=1,0 | sudmovz cdpmin=1 cdpmax=11 dxcdp=20 noffmix=1 tdmo=0,0.3,0.6 vdmo=2000,1800,1600 fmax=90 speed=1.3 smute=1.7
+suplane nt=137 ntr=3 dt=0.008 | sushw key=cdp,offset a=3,90 b=0,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=30 noffmix=1 tdmo=-1,0.2,1 vdmo=1500,1800,2000
+sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 fmax=0
+sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 fmax=-10
+[stderr] sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 speed=0
+[stderr] sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 speed=-1
+[stderr] sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 vdmo=0
+sunull nt=127 ntr=1 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 vdmo=-1500
+suplane nt=127 ntr=3 | sushw key=cdp,offset a=1,0 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+[stderr] sunull nt=16 ntr=1 | sushw key=delrt a=-100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# One-sample inverse mappings: extrapolation reads the preceding contiguous row.
+suplane nt=40 ntr=3 dt=0.002 | sushw key=cdp,offset a=1,25 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vdmo=500 speed=0.25 smute=5
+[stderr] sunull nt=21 ntr=1 dt=0.004 | suaddnoise seed=420 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,0.08 vdmo=500,4000 smute=5 verbose=1
+suplane nt=40 ntr=5 dt=0.004 | sushw key=cdp,offset a=1,100 b=1,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 tdmo=0,0.156 vdmo=500,1500 speed=0.1 smute=5

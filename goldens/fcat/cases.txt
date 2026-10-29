@@ -1,0 +1,11 @@
+# Raw bytes, empty files, odd sizes, and repeated inputs.
+[exact] printf 'abc\000\377z' > a; : > empty; printf '12345' > b; fcat empty a b a empty
+[exact] : > empty; fcat empty
+[exact] printf x > a; fcat a
+# Oversized input and an unreadable directory.
+[stderr] truncate -s 8388609 large; fcat large
+[stderr] fcat .
+# An open failure after a successful stat has a deterministic prior size.
+[stderr] printf x > a; fcat a missing
+# Write error when standard output is a read-only descriptor.
+[stderr] printf x > a; fcat a 1<a

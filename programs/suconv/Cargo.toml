@@ -1,0 +1,16 @@
+[package]
+name = "suconv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "suconv"
+path = "src/main.rs"
+
+[dependencies]
+oxwave-f-convolution = { path = "../../crates/oxwave-f-convolution" }
+oxwave-core.workspace = true
+oxwave-cwp.workspace = true

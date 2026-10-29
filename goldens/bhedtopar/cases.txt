@@ -1,0 +1,15 @@
+# Capture the output file, including defaults and both byte orders.
+suplane nt=32 ntr=4 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result < binary && cat result
+suplane nt=1 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=1 < binary && cat result
+suplane nt=13 ntr=3 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=-1 verbose=1 < binary && cat result
+# Exercise signed values and all fields with an arbitrary complete header.
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256))+bytes(range(144)))' | bhedtopar outpar=result swap=0 && cat result
+python3 -c 'import sys; sys.stdout.buffer.write(bytes(range(256))+bytes(range(144)))' | bhedtopar outpar=result swap=1 && cat result
+# Empty and short input, and malformed numeric arguments.
+bhedtopar outpar=result </dev/null && cat result
+printf '\001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020' | bhedtopar outpar=result && cat result
+bhedtopar outpar=result swap=abc </dev/null && cat result
+bhedtopar outpar=result swap=99999999999999999999 </dev/null
+bhedtopar outpar=/missing/directory/result </dev/null
+bhedtopar </dev/null
+[stderr] bhedtopar outpar=result unknown=1 verbose=1 </dev/null && cat result

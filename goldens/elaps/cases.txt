@@ -1,0 +1,13 @@
+# elamodel and elaps return 1 even on success; sed compares the filtered PostScript.
+elamodel fill=0.5,0.5,2,1,2 > model; elaps < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 gedge=0.4 gtri=0.3 gmin=0.2 gmax=0.8 pgmin=0 pgmax=3 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 style=normal xbox=1 ybox=2 wbox=5 hbox=4 xbeg=0.1 xend=0.9 zbeg=0.1 zend=0.9 dxnum=0.2 fxnum=0.1 nxtic=2 dznum=0.2 fznum=0.1 nztic=3 gridx=dot gridz=solid labelx=Distance labelz=Depth title=Model labelfont=Courier titlefont=Times-Bold labelsize=14 titlesize=20 titlecolor=red axescolor=blue gridcolor=green axeswidth=2 ticwidth=0.5 gridwidth=0.25 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 gridx=dash gridz=dash gedge=-1 gtri=-1 pgmin=1 pgmax=1 verbose=1 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel fill=0.5,0.5,2,1,2 > model; elaps p=4 < model
+[stderr] elamodel fill=0.5,0.5,2,1,2 > model 2>/dev/null; elaps p=2 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elaps < /dev/null
+
+# Two regions with different elastic properties and a fixed interface.
+elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=0 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=2 style=normal gridx=solid gridz=dot < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=3 gedge=0.5 gtri=0.2 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot

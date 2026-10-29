@@ -1,0 +1,65 @@
+{
+  "scope": "tri/lib part 3",
+  "functions": [
+    {
+      "name": "readModel",
+      "file": "tri/lib/readwrite.c",
+      "signature": "Model *readModel (FILE *fp);",
+      "purpose": "Read a binary triangulated model and reconstruct its linked objects and attributes.",
+      "calls": [],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; the binary format contains native structs, pointers and attributes, so compatibility depends on ABI, pointer size, layout, endianness and floating-point representation. Static helpers call updateAddressTree to reconstruct references.",
+      "c_lines": 32,
+      "difficulty": "hard",
+      "group": "tri-model-io",
+      "license_note": ""
+    },
+    {
+      "name": "writeModel",
+      "file": "tri/lib/readwrite.c",
+      "signature": "void writeModel (Model *m, FILE *fp);",
+      "purpose": "Write a triangulated model, its objects and attributes to a binary stream.",
+      "calls": [
+        "updateAddressTree"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; serialized native structs include pointer values and padding, making byte output dependent on process addresses, ABI, layout and endianness. Traversal order determines record order.",
+      "c_lines": 70,
+      "difficulty": "hard",
+      "group": "tri-model-io",
+      "license_note": ""
+    },
+    {
+      "name": "updateAddressTree",
+      "file": "tri/lib/readwrite.c",
+      "signature": "Address *updateAddressTree(Address *p, address_t oa, int *found)",
+      "purpose": "Insert or find an original address in a binary search tree and report whether it was already present.",
+      "calls": [
+        "updateAddressTree"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "No floating-point arithmetic; pointer-to-off_t conversions and subtraction depend on platform widths and can produce implementation-dependent or undefined behavior.",
+      "c_lines": 19,
+      "difficulty": "medium",
+      "group": "tri-model-io",
+      "license_note": "Comment credits the tree approach to Kernighan and Ritchie, The C Programming Language, 2nd edition, p. 139ff."
+    },
+    {
+      "name": "main",
+      "file": "tri/lib/readwrite.c",
+      "signature": "main()",
+      "purpose": "Provide conditional test entry points for reading and writing a model.",
+      "calls": [
+        "readModel",
+        "writeModel",
+        "makeModel"
+      ],
+      "uses_randomness": false,
+      "float_sensitive_notes": "The two definitions are both guarded by TEST, so enabling TEST defines main twice; the first also uses obsolete argument lists for readModel and writeModel. The signatures use implicit int and are definitions rather than full prototypes.",
+      "c_lines": 7,
+      "difficulty": "easy",
+      "group": "tri-model-io-test",
+      "license_note": ""
+    }
+  ]
+}

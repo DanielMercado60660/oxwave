@@ -1,0 +1,20 @@
+# Inspect output files as well as reports, including default key and ranges.
+[stderr] suplane nt=5 ntr=3 | sucleave print=1; cat cleave_offset_*.su
+[stderr] suplane nt=7 ntr=7 | sushw key=offset a=-300 b=100 | sucleave size=100 low=50 high=150 abs=0 outbase=s_ print=1; cat s_*.su
+[stderr] suplane nt=5 ntr=7 | sushw key=offset a=-300 b=100 | sucleave size=100 low=50 high=150 abs=1 outbase=a_ print=1; cat a_*.su
+[stderr] suplane nt=1 ntr=1 | sucleave key=tracl size=2 low=0 high=0 outbase=one_ verbose=1 print=1; cat one_*.su
+[stderr] suplane nt=3 ntr=5 | sushw key=d1 a=0.5 b=0.5 | sucleave key=d1 size=1 low=0.5 high=2 print=1; cat cleave_d1_*.su
+[stderr] sucleave key=bad
+[stderr] sucleave key=null
+[stderr] sucleave abs=-1
+[stderr] sucleave abs=2
+[stderr] sucleave size=0
+[stderr] sucleave size=-1
+[stderr] sucleave low=-1
+[stderr] sucleave size=10 low=6
+[stderr] sucleave low=50 high=49
+[stderr] sucleave print=-1
+[stderr] sucleave print=2
+[stderr] sucleave size=1 high=1073741823 abs=0
+[stderr] sucleave print=1
+[stderr] suplane nt=3 ntr=1 | sucleave outbase=/nonexistent/path/

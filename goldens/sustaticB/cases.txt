@@ -1,0 +1,77 @@
+# Header statics, both signs, odd sample and trace counts.
+suspike ntr=3 nt=17 dt=0.004 | sushw key=sstat,gstat a=2,-1 | sustaticB hdrs=1
+suspike ntr=1 nt=1 | sushw key=sstat,gstat a=-2,1 | sustaticB hdrs=1 sign=-1
+# Computed statics with supplied and header velocities, and negative scale.
+suspike ntr=3 nt=31 | sushw key=selev,gelev,sdel,sdepth,sut,scalel,swevel,wevel a=100,80,10,5,2,-10,1500,500 | sustaticB
+suspike ntr=1 nt=19 | sushw key=selev,gelev,scalel a=10,20,1 | sustaticB v0=500 v1=1500 sign=-1
+# Native float files for both file modes; indices are within allocation.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("4f", 0, 1, -2, 3)); open("r", "wb").write(struct.pack("5f", 0, -1, 2, 3, 4))' && suspike ntr=3 nt=17 | sustaticB hdrs=2 ns=4 nr=5 no=2 sou_file=s rec_file=r
+python3 -c 'import struct; open("s", "wb").write(struct.pack("4f", 0, 1, -2, 3)); open("r", "wb").write(struct.pack("5f", 0, -1, 2, 3, 4))' && suspike ntr=1 nt=17 | sushw key=fldr,tracf a=1,2 | sustaticB hdrs=3 ns=4 nr=5 no=2 sou_file=s rec_file=r
+# Missing files, empty input, and verbose parameter.
+[stderr] suspike ntr=1 nt=17 | sustaticB hdrs=2 sou_file=missing rec_file=missing
+[stderr] sustaticB hdrs=1
+suspike ntr=1 nt=17 | sustaticB hdrs=1 verbose=1
+# Additional parameter and file errors.
+[stderr] suspike ntr=1 nt=7 | sustaticB hdrs=99999999999999999999
+
+# Explicit defaults and zero-valued elevation scale/velocities, as in C.
+sunull ntr=1 nt=1 | sustaticB
+suspike ntr=1 nt=23 | sushw key=scalel,swevel a=1,1500 | sustaticB hdrs=0 sign=1
+# Zero scalel follows log10(0); v0 falls back to v1 when wevel is zero.
+suspike ntr=1 nt=23 | sushw key=selev,gelev,sdel,sdepth,sut,swevel a=12,-3,20,4,2,1500 | sustaticB
+suspike ntr=3 nt=37 dt=0.002 | sushw key=selev,gelev,sdel,sdepth,sut,scalel,swevel,wevel,sstat,gstat,tstat a=4,-3,15,2,-2,10,1800,600,3,-4,9 | sustaticB
+# Non-power-of-ten scales truncate the logarithm; negative velocities and sign=0.
+suspike ntr=2 nt=29 | sushw key=selev,gelev,sdel,sdepth,scalel a=-2,3,8,1,-25 | sustaticB v0=-700 v1=-1400 sign=0
+suspike ntr=1 nt=29 | sushw key=selev,gelev,sdel,scalel a=2,3,8,25 | sustaticB v1=1400
+# Header mode wraps the short sum and overwrites tstat; arbitrary signs are accepted.
+suspike ntr=2 nt=33 | sushw key=sstat,gstat,tstat,delrt a=3,-1,99,-7 | sustaticB hdrs=1 sign=2
+suspike ntr=1 nt=9 | sushw key=sstat,gstat a=32767,1 | sustaticB hdrs=1
+suspike ntr=1 nt=9 | sushw key=sstat,gstat a=-32768,-1 | sustaticB hdrs=1 sign=-1
+# Unknown hdrs values leave tstat zero but still replace the output tstat header.
+[stderr] suspike ntr=1 nt=13 | sushw key=sstat,gstat,tstat a=3,-1,99 | sustaticB hdrs=-1 verbose=1 ignored=1
+# No checkpars() in C: verbose and unknown arguments produce no warnings.
+[stderr] suspike ntr=1 nt=17 | sustaticB hdrs=1 verbose=1 unknown=1
+# First trace's dt/delrt fix all interpolation coordinates, even if later headers differ.
+suspike ntr=3 nt=27 | sushw key=dt,delrt,sstat,gstat a=1000,-5,-2,1 b=1000,3,1,-1 | sustaticB hdrs=1
+# Random samples exercise interpolation on both sides of the trace boundaries.
+suspike ntr=5 nt=43 dt=0.002 | suaddnoise seed=137 sn=2 | sushw key=sstat,gstat a=-3,1 b=1,0 | sustaticB hdrs=1 sign=-1
+# hdrs=2 starts receiver zero with trd=0 and carries trd over shot boundaries.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("8f", 0.5,-1.5,2.5,3.5,4,5,6,7)); open("r", "wb").write(struct.pack("8f", 17,-2,3,-4,5,6,7,8))' && suspike ntr=7 nt=35 | sushw key=sstat,gstat,tstat a=10,-4,99 | sustaticB hdrs=2 ns=8 nr=8 no=3 sou_file=s rec_file=r sign=-1
+# Default ns=240, nr=335, no=96, including a source transition at trace 97.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("240f", *[i*0.125 for i in range(240)])); open("r", "wb").write(struct.pack("335f", *[i*-0.25 for i in range(335)]))' && suspike ntr=99 nt=11 | sustaticB hdrs=2 sou_file=s rec_file=r
+# no=0/negative resets the offset on every trace, like the C comparison.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("4f", 0,1,2,3)); open("r", "wb").write(struct.pack("4f", 9,-1,2,-3))' && suspike ntr=3 nt=15 | sustaticB hdrs=2 ns=4 nr=4 no=0 sou_file=s rec_file=r
+python3 -c 'import struct; open("s", "wb").write(struct.pack("4f", 0,1,2,3)); open("r", "wb").write(struct.pack("4f", 9,-1,2,-3))' && suspike ntr=3 nt=15 | sustaticB hdrs=2 ns=4 nr=4 no=-2 sou_file=s rec_file=r
+# Irregular hdrs=3 lookup, with zero and highest in-bounds indices.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("4f", 1,-2,3,-4)); open("r", "wb").write(struct.pack("5f", -5,4,-3,2,-1))' && suspike ntr=4 nt=31 | sushw key=fldr,tracf,sstat,gstat,tstat a=0,3,2,-1,55 b=1,-1,1,1,0 | sustaticB hdrs=3 ns=4 nr=5 no=1 sou_file=s rec_file=r sign=-1
+# hdrs=3 defaults and a one-sample trace.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("240f", *([0]*240))); open("r", "wb").write(struct.pack("335f", *([0]*335)))' && suspike ntr=1 nt=1 | sushw key=fldr,tracf a=239,334 | sustaticB hdrs=3 sou_file=s rec_file=r
+# Receiver opens before source; a source-open error needs a valid receiver file.
+[stderr] python3 -c 'import struct; open("r", "wb").write(struct.pack("2f", 0,0))' && suspike ntr=1 nt=5 | sustaticB hdrs=3 ns=2 nr=2 sou_file=missing rec_file=r
+[stderr] suspike ntr=1 nt=7 | sustaticB sign=2147483648
+[stderr] suspike ntr=1 nt=7 | sustaticB hdrs=2 ns=2147483648 sou_file=missing rec_file=missing
+[stderr] suspike ntr=1 nt=7 | sustaticB v1=1e-310
+# Nonzero corrections with a zero sample interval follow the C interpolation behavior.
+suspike ntr=1 nt=7 | sushw key=dt,sstat a=0,1 | sustaticB hdrs=1
+# Both file lookups at index zero, with header accumulation but no time shift.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("f", -1.5)); open("r", "wb").write(struct.pack("f", 0.5))' && suspike ntr=1 nt=21 | sushw key=fldr,tracf,sstat,gstat,tstat a=0,0,3,-2,77 | sustaticB hdrs=3 ns=1 nr=1 sou_file=s rec_file=r sign=0
+# hdrs=2 reaches the last valid source and receiver indices with no=1.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("3f", 0.5,-1.5,2.5)); open("r", "wb").write(struct.pack("3f", 99,1,-2))' && suspike ntr=3 nt=19 | sustaticB hdrs=2 ns=3 nr=3 no=1 sou_file=s rec_file=r
+# hdrs=2 skips all receiver lookups for nr=0, including positive indices.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("f", 1.5)); open("r", "wb").close()' && suspike ntr=4 nt=17 | sustaticB hdrs=2 ns=1 nr=0 no=4 sou_file=s rec_file=r
+# hdrs=3 accepts both final array elements together.
+python3 -c 'import struct; open("s", "wb").write(struct.pack("3f", 0,1,-1.5)); open("r", "wb").write(struct.pack("4f", 0,-1,2,0.5))' && suspike ntr=1 nt=23 | sushw key=fldr,tracf a=2,3 | sustaticB hdrs=3 ns=3 nr=4 sou_file=s rec_file=r
+# Out-of-bounds lookup errors are checked separately: C reads outside its
+# allocations, so those inputs cannot provide portable reference goldens.
+
+# Velocities default from the first trace; later velocity headers are copied
+# to output but do not change the correction velocities.
+suspike ntr=3 nt=41 | sushw key=scalel,selev,gelev,sdel,sdepth,sut,swevel,wevel a=1,8,3,12,2,1,1800,600 b=0,1,-1,0,0,0,200,100 | sustaticB
+# All parameter conversion errors precede opening the statics files.
+[stderr] suspike ntr=1 nt=7 | sustaticB v0=1e-310
+[stderr] suspike ntr=1 nt=7 | sustaticB hdrs=2 nr=2147483648 sou_file=missing rec_file=missing
+[stderr] suspike ntr=1 nt=7 | sustaticB hdrs=3 no=2147483648 sou_file=missing rec_file=missing
+# Explicit empty filenames avoid C's uninitialized missing-filename pointers.
+[stderr] suspike ntr=1 nt=7 | sustaticB hdrs=2 sou_file= rec_file=
+# Empty input fails before parameters are parsed, even if a parameter is invalid.
+[stderr] sustaticB hdrs=2147483648

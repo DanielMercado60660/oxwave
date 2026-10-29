@@ -1,0 +1,81 @@
+# Defaults; headers provide dt while d2 falls back to 1.0.
+[stderr] suspike nt=32 ntr=3 | sumigpsti
+# Explicit defaults, including parameters omitted from selfdoc.
+suspike nt=32 ntr=3 | sumigpsti dt=0.004 dx=1 ffil=0,0,125,125 tmig=0 vnmig=1500 vmig=1500 etamig=0 nxpad=0 ltaper=0 verbose=0 np=200 ntflag=1
+# Header-derived distance and the dt fallback warning.
+[stderr] suspike nt=17 ntr=3 | sushw key=dt,d2 a=0,25 | sumigpsti
+suspike nt=31 ntr=5 | sushw key=d2 a=25 | sumigpsti
+# Odd sizes and the smallest input dimensions.
+sunull nt=1 ntr=1 | sumigpsti dx=25
+suspike nt=17 ntr=1 | sumigpsti dx=25
+suspike nt=33 ntr=7 | sumigpsti dx=25 nxpad=3 ltaper=2 np=21
+# Normal, turned, combined and suppressed output modes.
+suspike nt=32 ntr=3 | sumigpsti dx=25 ntflag=1
+suspike nt=32 ntr=3 | sumigpsti dx=25 ntflag=2
+suspike nt=32 ntr=3 | sumigpsti dx=25 ntflag=3
+suspike nt=32 ntr=3 | sumigpsti dx=25 ntflag=0
+suspike nt=32 ntr=3 | sumigpsti dx=25 ntflag=-1
+# Diagnostics, unknown arguments, taper overlap, and padded transform.
+[stderr] suspike nt=17 ntr=3 | sumigpsti dx=25 np=20 verbose=1 nxpad=4 ltaper=1
+[stderr] suspike nt=17 ntr=3 | sumigpsti dx=25 unknown=1
+suspike nt=17 ntr=3 | sumigpsti dx=25 ltaper=5
+suspike nt=17 ntr=3 | sumigpsti dx=25 ltaper=-1
+# Filter ramps, custom sampling, velocity interpolation and anisotropy.
+suspike nt=33 ntr=5 | sumigpsti dx=25 dt=0.002 ffil=5,20,100,200
+suspike nt=33 ntr=5 | sumigpsti dx=25 ffil=-10,0,80,125
+suspike nt=33 ntr=5 | sumigpsti dx=25 tmig=0,0.064,0.128 vnmig=1500,1900,2300 vmig=1400,1800,2200 etamig=0,0.1,0.2 ntflag=3
+# vmig count mismatch follows the NMO function.
+suspike nt=17 ntr=3 | sumigpsti dx=25 vmig=1200,1800
+suspike nt=17 ntr=3 | sumigpsti dx=-25
+sunull nt=17 ntr=3 | sumigpsti dx=0
+sunull nt=17 ntr=3 | sumigpsti dx=25 vnmig=0
+sunull nt=17 ntr=3 | sumigpsti dx=25 etamig=-0.1
+# Native float files for each alternative model input.
+printf '1500\n1600\n1700\n1800\n1900\n' | a2b n1=1 >vn; printf '1400\n1500\n1600\n1700\n1800\n' | a2b n1=1 >v; printf '0\n0.02\n0.04\n0.06\n0.08\n' | a2b n1=1 >eta; suspike nt=5 ntr=3 | sumigpsti dx=25 vnfile=vn vfile=v etafile=eta
+printf '1500\n1500\n1500\n1500\n1500\n' | a2b n1=1 >vn; suspike nt=5 ntr=3 | sumigpsti dx=25 vnfile=vn
+printf '1400\n1400\n1400\n1400\n1400\n' | a2b n1=1 >v; suspike nt=5 ntr=3 | sumigpsti dx=25 vfile=v
+printf '0.1\n0.1\n0.1\n0.1\n0.1\n' | a2b n1=1 >eta; suspike nt=5 ntr=3 | sumigpsti dx=25 etafile=eta
+# Empty/malformed input and parser errors before numerical library calls.
+[stderr] sumigpsti
+[stderr] printf bad | sumigpsti
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 ffil=1,2,3
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 ffil=1
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 tmig=0,1
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 vnmig=1500,2000
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 tmig=0,0 vnmig=1500,1600
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 tmig=1,0 vnmig=1500,1600
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 tmig=0,1 vnmig=1500,1600 etamig=0
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 np=999999999999999999999
+[stderr] sunull nt=8 ntr=1 | sumigpsti dx=25 dt=1e-310
+[stderr] printf '' >vn; sunull nt=8 ntr=1 | sumigpsti dx=25 vnfile=vn
+# File errors in the eta and vertical velocity branches bypass interpolation.
+[stderr] printf '1500\n1500\n1500\n1500\n1500\n' | a2b n1=1 >vn; printf '' >eta; sunull nt=5 ntr=1 | sumigpsti dx=25 vnfile=vn etafile=eta
+[stderr] printf '1500\n1500\n1500\n1500\n1500\n' | a2b n1=1 >vn; printf '0\n0\n0\n0\n0\n' | a2b n1=1 >eta; printf '' >v; sunull nt=5 ntr=1 | sumigpsti dx=25 vnfile=vn etafile=eta vfile=v
+# Nonzero short traces and irregular dimensions.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpsti dx=25
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sumigpsti dx=25
+suspike nt=3 ntr=5 nspk=1 ix1=3 it1=2 | sumigpsti dx=100
+suspike nt=19 ntr=5 nspk=2 ix1=1 ix2=4 it1=2 it2=13 | sumigpsti dx=250 np=101 nxpad=2
+# Seeded broadband inputs exercise frequency and slope interpolation.
+sunull nt=65 ntr=7 | suaddnoise seed=451 noise=gauss | sumigpsti dx=25
+sunull nt=127 ntr=13 | suaddnoise seed=452 noise=gauss | sumigpsti dx=250 np=97 nxpad=3 ltaper=2
+sunull nt=129 ntr=11 | suaddnoise seed=453 noise=gauss | sumigpsti dx=100 ffil=3,15,80,110
+sunull nt=257 ntr=17 | suaddnoise seed=454 noise=gauss | sumigpsti dx=50 np=201 ntflag=3
+sunull nt=67 ntr=9 | suaddnoise seed=455 noise=gauss | sumigpsti dx=-150 dt=0.002 ntflag=1
+# Time-varying and constant anisotropic models with independent velocities.
+sunull nt=129 ntr=7 | suaddnoise seed=456 noise=gauss | sumigpsti dx=250 tmig=0,0.2,0.512 vnmig=1500,2200,3000 vmig=1400,1900,2600 etamig=0.05,0.15,0.3 ntflag=3
+sunull nt=129 ntr=7 | suaddnoise seed=457 noise=gauss | sumigpsti dx=250 tmig=0,0.2,0.512 vnmig=3000,2200,1500 vmig=2600,1900,1400 etamig=0.3,0.15,0.05 ntflag=2
+sunull nt=65 ntr=5 | suaddnoise seed=458 noise=gauss | sumigpsti dx=125 vnmig=1900 vmig=1700 etamig=0.2 np=51 ntflag=3
+# Trace headers, including the ignored delay, are preserved.
+suspike nt=35 ntr=3 nspk=1 ix1=2 it1=9 | sushw key=cdp,delrt,offset,d2 a=100,150,300,25 b=-1,0,50,0 | sumigpsti
+# Capture signals directly to avoid shell diagnostics containing process IDs.
+[stderr] sunull nt=8 ntr=1 | python3 -c 'import subprocess,sys; data=sys.stdin.buffer.read(); results=[(key,subprocess.run([sys.argv[1],"dx=25",key+"=absent"],input=data,capture_output=True)) for key in ("vnfile","vfile","etafile")]; [(print(key,p.returncode),sys.stdout.buffer.write(p.stdout),sys.stderr.buffer.write(p.stderr)) for key,p in results]' sumigpsti
+# Smallest valid slope table, with both image branches enabled.
+suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | sumigpsti dx=25 np=2 ntflag=3
+# Negative padding is valid when the chosen FFT still holds all input traces.
+sunull nt=17 ntr=5 | suaddnoise seed=459 noise=gauss | sumigpsti dx=25 nxpad=-1
+sunull nt=17 ntr=2 | suaddnoise seed=460 noise=gauss | sumigpsti dx=25 nxpad=-2
+# Undefined C cases (np<2, undersized/overflowed FFT) are checked directly
+# against controlled Rust diagnostics; they cannot have portable SU goldens.
+# Original Post_stack/Sumigpsti demo: layered reflector data and gradient velocity file.
+vtlvz dt=.01 nt=401 v0=1500 a=.6 >vt.F; susynlvfti angxs=0 er=1 ob=0 v00=1.5 delta=0.0 epsilon=0.2 fpeak=10 dvdx=0 dxm=.04 nxm=201 dt=.01 nt=401 dvdz=.6 smooth=1 ref="1:0.0,.5;1.0,.5;2.,2.0;3.0,2.0;4.0,3.0;5.0,2.0;6.0,2.0" | sumigpsti vnfile=vt.F vfile=vt.F dx=40 tmig=0. etamig=.2

@@ -1,0 +1,23 @@
+# Defaults and moveout options, including undocumented fallback.
+sunhmospike
+sunhmospike gopt=3 nt=317 ntr=7 offinc=-73.5 offref=900 cdp=42
+sunhmospike gopt=99 nt=301 ntr=3
+sunhmospike gopt=2 refdepth=0 offref=800 offinc=50 nt=301 ntr=3
+# All event parameters, coincident events and sample boundaries.
+sunhmospike nt=37 ntr=3 dt=0.002 offref=400 offinc=50 nspk=4 p1=4 t1=4 a1=-1 p2=-3 t2=8 a2=2 p3=0 t3=8 a3=3 p4=1 t4=70 a4=0.25
+sunhmospike nt=1 ntr=1 nspk=0
+sunhmospike nt=13 ntr=1 nspk=-1
+sunhmospike ntr=0
+sunhmospike ntr=-1
+sunhmospike nt=10 ntr=1 dt=0 offref=0 offinc=0
+sunhmospike ntr=1 nt=7 depthref=123 verbose=1
+# Parameter parsing error.
+[stderr] sunhmospike ntr=999999999999999999999999
+sunhmospike ntr=1 nt=3 dt=-0.001
+sunhmospike ntr=1 nt=0
+sunhmospike ntr=1 nt=11 nspk=1 t1=1 a1=3
+# Header sample interval uses float multiplication and unsigned-short conversion.
+sunhmospike ntr=1 nt=3 dt=0.065536
+sunhmospike ntr=1 nt=3 dt=0.001001
+sunhmospike gopt=4 ntr=3 nt=301 offinc=-123 offref=900 nspk=3
+[stderr] sunhmospike dt=1e-310
