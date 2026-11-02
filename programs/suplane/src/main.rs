@@ -82,15 +82,21 @@ fn plane(tr: &mut Trace, itr: i32, nt: i32, cx: i32, ct: i32, len: i32, dip: f32
         if fit >= 0.0 && fit <= nt as f32 {
             let itless = fit as usize;
             let eps = fit - itless as f32;
-            let itmore = (fit as f64 + 1.0) as usize;
-            // C permits fit == nt, so either write can exceed the fixed data
-            // buffer. Reject that undefined case before interpolation or taper.
-            // Keep writes beyond nt when they still fit in the C data array.
-            if itless >= tr.data.len() || itmore >= tr.data.len() {
+            // C's integer literal 1 converts to float: round the sum before
+            // truncating, even when fit is immediately below an integer.
+            let itmore = (fit + 1.0f32) as usize;
+            // Guarding C's one-past-the-buffer += 0 leaves its output unchanged
+            // (ub-2026-11 round 1). Skip that no-op when taper is off. Keep
+            // writes beyond nt within the array, and reject other overruns.
+            if itless >= tr.data.len()
+                || (itmore >= tr.data.len() && (eps != 0.0 || taper == 1))
+            {
                 err!("plane interpolation exceeds trace data buffer");
             }
             tr.data[itless] = (tr.data[itless] as f64 + (1.0 - eps as f64)) as f32;
-            tr.data[itmore] += eps;
+            if itmore < tr.data.len() {
+                tr.data[itmore] += eps;
+            }
             if taper == 1 {
                 if *tfe == 1 || *tfe == len + 1 {
                     tr.data[itless] = (tr.data[itless] as f64 / 6.0) as f32;

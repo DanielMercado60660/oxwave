@@ -44,6 +44,8 @@ use oxwave_linear_interp::intlin;
 use oxwave_pfa_fft::{npfaro, pfa2cr, pfa2rc};
 use oxwave_sinc_interp::{ress8c, ress8r};
 use oxwave_tempfile::{temporary_filename, temporary_stream};
+use std::ffi::{c_char, CString};
+use std::sync::atomic::{AtomicPtr, Ordering};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -96,6 +98,22 @@ const SDOC: &[&str] = &[
     "\t\t\t\t\t\t\t\t\t",
 ];
 
+/* Globals (so can trap signal) defining temporary disk files */
+struct TemporaryFiles {
+    tracefile: String,
+    headerfile: String,
+    tracefp: CFile,
+    headerfp: CFile,
+    istmpdir: bool,
+}
+
+static TEMPORARY_FILES: AtomicPtr<TemporaryFiles> = AtomicPtr::new(std::ptr::null_mut());
+
+unsafe extern "C" {
+    fn access(path: *const c_char, mode: i32) -> i32;
+    fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
+}
+
 fn main() {
     let argv = args();
     let mut tr = Trace::new();
@@ -140,10 +158,9 @@ fn main() {
     if getparstring("tmpdir", &mut tmpdir) == 0 {
         tmpdir = std::env::var("CWP_TMPDIR").unwrap_or_default();
     }
-    // std has no access(WRITE_OK) wrapper. This preserves the ordinary
-    // missing-path and read-only cases without introducing C linkage.
-    if !tmpdir.is_empty() && std::fs::metadata(&tmpdir).map_or(true, |m| m.permissions().readonly())
-    {
+    let path = CString::new(tmpdir.split('\0').next().unwrap()).unwrap();
+    // WRITE_OK is W_OK (2): test this user's access, including path traversal.
+    if !tmpdir.is_empty() && unsafe { access(path.as_ptr(), 2) } != 0 {
         err!("you can't write in %s (or it doesn't exist)", tmpdir);
     }
 
@@ -202,6 +219,7 @@ fn main() {
 
     /* copy traces and headers to temporary files */
     let (tracefp, headerfp, tracefile, headerfile, istmpdir);
+    let temporary_files;
     if tmpdir.is_empty() {
         tracefp = etmpfile();
         headerfp = etmpfile();
@@ -230,6 +248,25 @@ fn main() {
             tracefp = efopen(&tracefile, "w+");
             headerfp = efopen(&headerfile, "w+");
             istmpdir = true;
+        }
+        temporary_files = Box::new(TemporaryFiles {
+            tracefile: tracefile.clone(),
+            headerfile: headerfile.clone(),
+            tracefp: tracefp.clone(),
+            headerfp: headerfp.clone(),
+            istmpdir,
+        });
+        TEMPORARY_FILES.store(
+            std::ptr::from_ref(temporary_files.as_ref()).cast_mut(),
+            Ordering::Relaxed,
+        );
+        // Trap signals after opening both streams. C's handler during a
+        // partially completed fopen sequence could fclose a NULL stream.
+        unsafe {
+            signal(2, closefiles); // SIGINT
+            signal(3, closefiles); // SIGQUIT
+            signal(1, closefiles); // SIGHUP
+            signal(15, closefiles); // SIGTERM
         }
         if verbose != 0 {
             warn!("putting temporary files in %s", directory);
@@ -444,4 +481,18 @@ fn mig1k(k: f32, fmax: f32, speed: f32, nt: i32, dt: f32, v: &[f32], pq: &mut [C
 
     /* resample q(t) */
     ress8c(ds, 0.0, &gs, czero, czero, dt, 0.0, pq);
+}
+
+/* for graceful interrupt termination */
+extern "C" fn closefiles(_sig: i32) {
+    // Installed only once both streams exist; main retains the Box until exit.
+    // As in C, the handler closes stdio streams before removing their names.
+    let files = unsafe { &*TEMPORARY_FILES.load(Ordering::Relaxed) };
+    efclose(&files.headerfp);
+    efclose(&files.tracefp);
+    if files.istmpdir {
+        eremove(&files.headerfile);
+        eremove(&files.tracefile);
+    }
+    exit(EXIT_FAILURE);
 }

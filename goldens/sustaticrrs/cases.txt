@@ -93,3 +93,55 @@ python3 -c 'import struct;open("tcdp.b","wb").write(struct.pack("3f",0.004,0.012
 python3 -c 'import struct;open("s","wb").write(struct.pack("240f",*(i-3 for i in range(240))));open("r","wb").write(struct.pack("335f",*(i%7-2 for i in range(335))))' && suspike ntr=99 nt=11 | sustaticrrs hdrs=2 sou_file=s rec_file=r
 # Zero-length source/receiver arrays skip both reads and retain zero statics.
 python3 -c 'open("s","wb").close();open("r","wb").close()' && suspike ntr=3 nt=13 | sushw key=sstat,gstat,tstat a=2,-3,7 | sustaticrrs hdrs=2 ns=0 nr=0 no=1 sou_file=s rec_file=r
+
+# diff-2026-11 (round 1)
+# Short dense traces: fractional shifts and extrapolation at both ends.
+sunull ntr=1 nt=1 dt=0.0025 | suaddnoise seed=1101 | sushw key=scalel,tstat a=1,1 | sustaticrrs hdrs=1
+sunull ntr=2 nt=2 dt=0.0025 | suaddnoise seed=1102 | sushw key=scalel,tstat a=1,-1 b=0,2 | sustaticrrs hdrs=1 sign=-1
+sunull ntr=3 nt=3 dt=0.0013 | suaddnoise seed=1103 | sushw key=scalel,sstat,gstat a=1,2,-1 b=0,-1,0 | sustaticrrs hdrs=1
+sunull ntr=4 nt=4 dt=0.000037 | suaddnoise seed=1104 | sushw key=scalel,tstat a=1,1 b=0,-1 | sustaticrrs hdrs=5 sign=-1
+# Long traces, dense samples, prime sizes, and extreme valid timing headers.
+sunull ntr=3 nt=4097 dt=0.0013 | suaddnoise seed=1105 | sushw key=scalel,tstat,delrt a=1,-7,-32768 b=0,7,32767 | sustaticrrs hdrs=1
+suplane ntr=5 nt=8191 dt=0.0025 dip1=3 dip2=-7 dip3=11 | sushw key=scalel,tstat,delrt a=1,3,32767 b=0,-2,0 | sustaticrrs hdrs=5
+sunull ntr=1 nt=16381 dt=0.000037 | suaddnoise seed=1106 | sushw key=scalel,tstat a=1,1 | sustaticrrs hdrs=1 sign=2
+# Default elevation mode and explicit parameters, with the full scalar range.
+sunull ntr=3 nt=101 | suaddnoise seed=1107 | sushw key=scalel,swevel,wevel,selev,gelev,sdepth,sdel,sut a=-32768,21000,14000,19,-7,2,29,3 b=32767,0,0,0,0,0,0,0 | sustaticrrs
+sunull ntr=3 nt=101 | suaddnoise seed=1107 | sushw key=scalel,swevel,wevel,selev,gelev,sdepth,sdel,sut a=-32768,21000,14000,19,-7,2,29,3 b=32767,0,0,0,0,0,0,0 | sustaticrrs hdrs=0 v1=21000 v0=14000 sign=1
+suplane ntr=3 nt=97 | sushw key=scalel,wevel,selev,gelev,sdel a=1,0,11,7,23 | sustaticrrs v1=1700.125 sign=-1
+sunull ntr=4 nt=103 dt=0.0025 | suaddnoise seed=1108 | sushw key=scalel,swevel,wevel,selev,gelev,sdel a=1,1900,1200,9,4,17 b=0,200,100,2,-1,3 | sustaticrrs hdrs=0
+# First trace fixes dt and delrt even when subsequent trace headers change.
+sunull ntr=4 nt=127 dt=0.0013 | suaddnoise seed=1109 | sushw key=scalel,dt,delrt,tstat a=1,1300,-17,3 b=0,700,11,-2 | sustaticrrs hdrs=1
+suplane ntr=5 nt=109 | sushw key=scalel,tstat,sstat,gstat a=1,0,-3,5 b=0,2,1,-1 | sustaticrrs hdrs=5 sign=-1
+# Undocumented nonzero hdrs follows the header branch and adds header statics.
+sunull ntr=3 nt=107 | suaddnoise seed=1110 | sushw key=scalel,tstat,sstat,gstat a=1,0,3,-2 b=0,3,0,0 | sustaticrrs hdrs=7 sign=-1
+# Source/receiver rollover, exhausted arrays, zero source count, and defaults.
+python3 -c 'import struct;open("s","wb").write(struct.pack("2f",1.25,-2.75));open("r","wb").write(struct.pack("3f",-0.25,2.5,-3.5))' && sunull ntr=9 nt=71 | suaddnoise seed=1111 | sushw key=scalel,sstat,gstat,tstat a=1,4,-3,5 | sustaticrrs hdrs=2 ns=2 nr=3 no=2 sou_file=s rec_file=r sign=-1
+python3 -c 'import struct;open("s","wb").write(struct.pack("3f",0.4999,0.5001,-0.5001));open("r","wb").write(struct.pack("5f",0,-0.25,0.25,1,-1))' && suplane ntr=9 nt=113 | sushw key=scalel a=1 | sustaticrrs hdrs=2 ns=3 nr=5 no=3 sou_file=s rec_file=r
+python3 -c 'import struct;open("s","wb").close();open("r","wb").write(struct.pack("2f",1.5,-2.5))' && suspike ntr=4 nt=73 | sushw key=scalel a=1 | sustaticrrs hdrs=2 ns=0 nr=2 no=1 sou_file=s rec_file=r
+python3 -c 'import struct;open("s","wb").write(struct.pack("240f",*(i/4 for i in range(240))));open("r","wb").write(struct.pack("335f",*(i%5-2 for i in range(335))))' && suspike ntr=98 nt=17 | sushw key=scalel a=1 | sustaticrrs hdrs=2 sou_file=s rec_file=r sign=-1
+# Refraction model layout, negative origins, and fractional depth intervals.
+python3 -c 'import struct;open("b","wb").write(struct.pack("5f",8,13,7,19,23));open("f","wb").write(struct.pack("5f",-1,0,1,2,3));open("v","wb").write(struct.pack("20f",*(1000+73*i for i in range(20))))' && sunull ntr=5 nt=79 | suaddnoise seed=1112 | sushw key=scalel,sx,gx,cdp a=1,-20,20,-20 b=0,10,-10,10 | sustaticrrs hdrs=3 nsamp=5 fx=-20 dx=10 V_r=1750 mx=5 mz=4 dzv=2.5 blvl_file=b refr_file=f vfile=v
+# Expose accumulated sums and fold counts, including repeated CMPs.
+[f32] python3 -c 'import struct;open("b","wb").write(struct.pack("3f",7,12,17));open("f","wb").write(struct.pack("3f",-3,1,4));open("v","wb").write(struct.pack("15f",*(1100+97*i for i in range(15))))' && suspike ntr=7 nt=83 | sushw key=scalel,sx,gx,cdp a=1,-5,-1,-5 b=0,2,-2,0 j=1,3,3,1 | sustaticrrs hdrs=3 nsamp=3 fx=-5 dx=2 V_r=2100 mx=3 mz=5 dzv=1.75 blvl_file=b refr_file=f vfile=v > traces && cat tcdp.b num.b
+python3 -c 'import struct;open("b","wb").write(struct.pack("2f",3,8));open("f","wb").write(struct.pack("2f",7,2));open("v","wb").write(struct.pack("2f",1200,2300))' && suspike ntr=2 nt=89 | sushw key=scalel,sx,gx,cdp a=1,10,5,10 b=0,-5,5,-5 | sustaticrrs hdrs=3 nsamp=2 fx=10 dx=-5 V_r=1800 mx=2 mz=1 dzv=-3 blvl_file=b refr_file=f vfile=v sign=-1
+# Residual statics at either side of the 0.5 fold threshold.
+python3 -c 'import struct;open("tcdp.b","wb").write(struct.pack("5f",-0.007,0.01,0.009,0.004,-0.012));open("num.b","wb").write(struct.pack("5f",0.49999,0.5,0.50001,-1,3))' && sunull ntr=5 nt=131 | suaddnoise seed=1113 | sushw key=scalel,cdp,tstat a=1,-20,11 b=0,10,-3 | sustaticrrs hdrs=4 nsamp=5 fx=-20 dx=10 sign=-1
+python3 -c 'import struct;open("tcdp.b","wb").write(struct.pack("3f",0.0105,-0.0245,0.001));open("num.b","wb").write(struct.pack("3f",3,7,2))' && suplane ntr=3 nt=137 | sushw key=scalel,cdp,tstat a=1,5,-4 b=0,2,4 | sustaticrrs hdrs=4 nsamp=3 fx=5 dx=2
+# End-to-end side-file exchange, with nonzero average and residual corrections.
+python3 -c 'import struct;open("b","wb").write(struct.pack("2f",8,11));open("f","wb").write(struct.pack("2f",1,2));open("v","wb").write(struct.pack("6f",1100,1700,2500,1300,1900,2700))' && sunull ntr=4 nt=139 | suaddnoise seed=1114 | sushw key=scalel,sx,gx,cdp a=1,0,1,0 b=0,1,-1,1 j=1,2,2,2 | sustaticrrs hdrs=3 nsamp=2 fx=0 dx=1 V_r=2100 mx=2 mz=3 dzv=7 blvl_file=b refr_file=f vfile=v > stage3 && sustaticrrs hdrs=4 nsamp=2 fx=0 dx=1 < stage3 | sustaticrrs hdrs=5 sign=-1
+susynlv nxm=2 nxo=2 nt=151 dt=0.004 ref='1:-1,0.2;1,0.2' | sushw key=scalel,tstat a=1,3 b=0,-2 | sustaticrrs hdrs=1
+[stderr] suplane ntr=3 nt=149 | sushw key=scalel,tstat a=1,7 | sustaticrrs hdrs=1 sign=0 verbose=1
+# Checked errors: explicit empty filenames and parser overflow precede processing.
+[stderr] suspike ntr=1 nt=11 | sustaticrrs hdrs=2 ns=1 nr=1 no=1 sou_file=missing rec_file=
+[stderr] suspike ntr=1 nt=11 | sustaticrrs hdrs=1 sign=2147483648
+[stderr] suspike ntr=1 nt=11 | sustaticrrs hdrs=0 v0=inf v1=1500
+[stderr] python3 -c 'import struct;open("b","wb").write(struct.pack("f",0));open("f","wb").write(struct.pack("f",0))' && suspike ntr=1 nt=11 | sustaticrrs hdrs=3 nsamp=1 fx=0 dx=1 V_r=2000 mx=1 blvl_file=b refr_file=f vfile=v
+[stderr] mkdir r && suspike ntr=1 nt=11 | sustaticrrs hdrs=2 ns=1 nr=1 no=1 sou_file=missing rec_file=r
+# Zero-sized allocations are legal: these errors occur before any grid access.
+# Preserve C's file-open and required-parameter diagnostics in their original order.
+[stderr] suspike ntr=1 nt=11 | sustaticrrs hdrs=3 nsamp=0 fx=0 dx=1 V_r=2000 blvl_file=missing refr_file=missing
+[stderr] touch b && suspike ntr=1 nt=11 | sustaticrrs hdrs=3 nsamp=0 fx=0 dx=1 V_r=2000 blvl_file=b refr_file=missing
+[stderr] touch b f && suspike ntr=1 nt=11 | sustaticrrs hdrs=3 nsamp=0 fx=0 dx=1 V_r=2000 blvl_file=b refr_file=f
+[stderr] suspike ntr=1 nt=11 | sustaticrrs hdrs=4 nsamp=0 fx=0 dx=1
+[stderr] touch tcdp.b && suspike ntr=1 nt=11 | sustaticrrs hdrs=4 nsamp=0 fx=0 dx=1
+[stderr] touch b f && suspike ntr=1 nt=11 | sustaticrrs hdrs=3 nsamp=0 fx=0 dx=1 V_r=2000 blvl_file=b refr_file=f vfile=v mx=1 mz=1

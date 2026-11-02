@@ -55,3 +55,65 @@
 [stderr] wpccompress n1=3 n2=5 < .
 [stderr] wpccompress n1=3 n2=5 verbose=1 < .
 [stderr] wpccompress n1=3 n2=5 unknown=1 < .
+
+# diff-2026-11 (round 1)
+# Native-float input and the single native compressed-output mode: compare bytes.
+# Tiny zero sections, single traces, and prime dimensions across tile edges.
+[exact] sunull nt=1 ntr=2 | sustrip outpar=/dev/null | wpccompress n1=1 n2=2
+[exact] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=2 n2=1
+[exact] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=3 n2=1
+[exact] suplane nt=251 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=251 n2=263
+[exact] suplane nt=251 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=251 n2=263 error=0.01
+[exact] suplane nt=251 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=251 n2=263 error=0.001
+[exact] sunull nt=257 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=257 n2=263 error=0.01
+# Long traces, a single wavelet trace, and seventeen temporal tiles.
+[exact] suwaveform type=ricker1 ns=4097 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=1 error=0.001
+[exact] suplane nt=4097 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=256 error=0.01
+# Independent raw-float and SU synthetic generators; default versus explicit error.
+[exact] makevel nz=257 nx=263 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=257 n2=263
+[exact] makevel nz=257 nx=263 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=257 n2=263 error=0.01
+[exact] makevel nz=4097 nx=16 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=4097 n2=16
+[exact] suimp2d nt=257 nrec=263 | sustrip outpar=/dev/null | wpccompress n1=257 n2=263 error=0.001
+[exact] susynlv nt=257 nxm=263 dt=0.008 | sustrip outpar=/dev/null | wpccompress n1=257 n2=263 error=0.01
+# Fixed-seed noise exercises dense coefficients without overflowing the code buffer.
+[exact] sunull nt=256 ntr=256 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.01
+[exact] sunull nt=256 ntr=256 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.1
+[exact] sunull nt=257 ntr=263 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=257 n2=263 error=0.1
+# Headers are removed before this raw-array compressor; dimensions come from n1/n2.
+[exact] [stderr] suplane nt=251 ntr=263 | sushw key=dt,delrt,offset a=2000,-16,-125 | suchw key1=cdp key2=tracl a=100 b=3 | sustrip outpar=/dev/null | wpccompress n1=251 n2=263 error=0.1 verbose=1
+[exact] suplane nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=128 n2=512 error=0.1
+[exact] suplane nt=257 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=257 n2=256 error=0.01
+[exact] suplane nt=251 ntr=263 | sustrip outpar=/dev/null | wpccompress n1=251 n2=263 error=10
+# Error exits with a small, fully deterministic generator upstream.
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | wpccompress n2=1
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=2
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=2 n2=2147483648
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=2 n2=0
+
+# ub-2026-11 (round 1)
+# Refuted: wpc.c:261/280 stale-pointer fix leaves stdout unchanged.
+# Match C retries of the already transformed block on buffer growth.
+[exact] makevel nz=4097 nx=16 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=4097 n2=16 error=0.001
+[exact] sunull nt=4097 ntr=16 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=16 error=0.1
+
+# ub-2026-11 (round 2)
+# Reverified both refutations with SU's flags and the one-line wpc.c:280 pointer repair.
+# Neither stdout, stderr nor status changes; the port matches the original exactly.
+# Repeated here to record the round-2 decisions; the harness deduplicates commands.
+[exact] makevel nz=4097 nx=16 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=4097 n2=16 error=0.001
+[exact] sunull nt=4097 ntr=16 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=16 error=0.1
+
+# ub-2026-11 (round 3)
+# Refuted again: vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:261,280,506.
+# Publishing realloc's final pointer at line 280 does not change either output.
+# Original, fixed C, and Rust agree on stdout, stderr, and rc=0; see round3-summary.json.
+[exact] makevel nz=4097 nx=16 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=4097 n2=16 error=0.001
+[exact] sunull nt=4097 ntr=16 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=16 error=0.1
+
+# ub-2026-11 (round 4)
+# Refuted: vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:261,280,506.
+# Updating wpc->code with realloc's final result leaves stdout, stderr, and rc=0 unchanged.
+# Rust matches original C: 112084 and 124680 stdout bytes, respectively.
+# Evidence: diffcamp/ubx/wpccompress/evidence/round4-summary.json, cases 5 and 6.
+[exact] makevel nz=4097 nx=16 v000=1500 dvdz=0.5 dvdx=2 | wpccompress n1=4097 n2=16 error=0.001
+[exact] sunull nt=4097 ntr=16 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=16 error=0.1

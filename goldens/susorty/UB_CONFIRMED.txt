@@ -1,0 +1,2 @@
+# vendor/su-original/src/su/main/windowing_sorting_muting/susorty.c:83: negative nt converts to a huge size_t for memset, exceeding tr.data; rejecting negative nt changes the original signal 5 crash into exit 1 with a clean error. OxWave matches the fixed C.
+susorty nt=-1 nshot=1 noff=1

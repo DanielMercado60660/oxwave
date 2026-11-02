@@ -50,3 +50,45 @@ sunull nt=7 ntr=1 | sudmotx cdpmin=7 cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
 [stderr] sunull nt=7 ntr=1 | CWP_TMPDIR=/nonexistent-sudmotx sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
 [stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=999999999999 cdpmax=0 dxcdp=25 noffmix=1
 [stderr] sunull nt=7 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=1e-310 noffmix=1
+
+# diff-2026-11 (round 1)
+# Nonzero single-trace impulses at every size from one through four.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sushw key=cdp a=11 | sudmotx cdpmin=11 cdpmax=11 dxcdp=25 noffmix=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 offset=25 | sushw key=cdp a=-1 | sudmotx cdpmin=-1 cdpmax=-1 dxcdp=25 noffmix=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 offset=-75 | sushw key=cdp a=7 | sudmotx cdpmin=7 cdpmax=7 dxcdp=12.5 noffmix=1
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 offset=100 | sushw key=cdp a=0 | sudmotx cdpmin=0 cdpmax=0 dxcdp=50 noffmix=1
+# Long odd traces, including a late impulse near the SU sample limit.
+sunull nt=4097 ntr=5 | suaddnoise seed=27 | sushw key=cdp,offset a=1,400 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+suplane nt=4097 dt=0.001 ntr=5 | sushw key=cdp,offset a=1,-150 b=1,0 | sudmotx cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 offmax=400 tmute=0.25 vrms=2000 nsmax=80
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65000 offset=150 | sushw key=cdp a=1 | sudmotx cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# Physical reflection synthetics and prime trace lengths.
+susynlv nt=257 dt=0.004 nxm=3 dxm=0.025 nxo=2 fxo=0.05 dxo=0.05 ref="1:-1,0.25;1,0.25" | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=2 offmax=500 tmute=0.3 vrms=2000
+# Full explicit defaults with a real temporary directory and diagnostics.
+[stderr] suspike nt=257 ntr=3 nspk=1 ix1=2 it1=127 | sushw key=cdp a=1 b=1 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offmax=3000 tmute=2 vrms=1500 nsmax=400 verbose=1 tmpdir=.
+# Header-derived offset, descending CDPs, and nonzero start time.
+suplane nt=257 ntr=5 | sushw key=cdp,sx,gx,delrt a=5,100,375,120 b=-1,10,10,0 | suchw key1=offset key2=gx key3=sx a=0 b=1 c=-1 | sudmotx cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+# Filtering changes the offset history; excluded traces straddle mix boundaries.
+[stderr] suplane nt=127 ntr=20 | sushw key=cdp,offset a=-1,0 b=1,0 c=0,100 j=5,5 | sudmotx cdpmin=0 cdpmax=2 dxcdp=25 noffmix=2 verbose=1
+[stderr] sunull nt=19 ntr=4 | sushw key=cdp,offset a=1,100 b=1,100 | sudmotx cdpmin=20 cdpmax=21 dxcdp=25 noffmix=1 verbose=1
+# Duplicate CDPs accumulate every input and emit the saved headers in input order.
+suplane nt=127 ntr=80 | suaddnoise seed=419 | sushw key=cdp,offset,fldr,scalco a=1,125,100,-10 b=0,0,1,0 | sudmotx cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# Two full offset mixes followed by a short final mix.
+[stderr] suspike nt=257 ntr=21 nspk=4 ix1=1 ix2=7 ix3=14 ix4=21 it1=2 it2=80 it3=150 it4=250 | sushw key=cdp,offset a=1,-200 b=1,0 c=0,75 j=3,3 | sudmotx cdpmin=1 cdpmax=3 dxcdp=30 noffmix=3 verbose=1
+# Low and high shift-table caps, and signed design inputs.
+sunull nt=257 ntr=3 | suaddnoise seed=61 | sushw key=cdp,offset a=1,75 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 nsmax=2
+sunull nt=509 ntr=3 | suaddnoise seed=62 | sushw key=cdp,offset a=1,75 b=1,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 nsmax=1000
+suplane nt=257 ntr=5 | sushw key=cdp,offset a=-2,-400 b=1,0 | sudmotx cdpmin=-2 cdpmax=2 dxcdp=-20 noffmix=1 offmax=-1000 tmute=-0.75 vrms=-2000
+# Large positive and negative time origins still use the first trace header.
+sunull nt=257 ntr=3 | suaddnoise seed=63 | sushw key=cdp,offset,delrt a=1,400,30000 b=1,0,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+sunull nt=257 ntr=3 | suaddnoise seed=64 | sushw key=cdp,offset,delrt a=1,400,-30000 b=1,0,0 | sudmotx cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+# Empty required values and conversion overflow must fail at the C validation point.
+[stderr] sunull nt=2 ntr=1 | sudmotx cdpmin= cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=2 ntr=1 | sudmotx cdpmin=0 cdpmax= dxcdp=25 noffmix=1
+[stderr] sunull nt=2 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp= noffmix=1
+[stderr] sunull nt=2 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=
+[stderr] sunull nt=2 ntr=1 | sudmotx cdpmin=0 cdpmax=0 dxcdp=25 noffmix=2147483648
+
+# ub-2026-11 (round 1)
+# Refuted: sudmotx.c:419 writes before d[400], but guarding 0 <= i < ld
+# leaves stdout, stderr, and rc identical (five runs per C binary).
+suspike nt=257 ntr=1 nspk=1 ix1=1 it1=100 dt=0.001 | sushw key=cdp a=1 | sudmotx cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 nsmax=1000

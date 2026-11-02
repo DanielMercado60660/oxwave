@@ -1,0 +1,4 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/comp/dwpt/2d/lib/wpccoding.c:376-382 returns success without setting the zero tile's quantization state, allocated uninitialized at wpcendec.c:145. wpcquant.c:223-226 reads the unset zeroflag, step, and average and :240 may read unset coefficients.
+# Minimal fix: assign quant->zeroflag = zeroflag, quant->ave = ave, quant->step = 1. before the zero-tile return. With SU's logged flags, orig matches vendor byte-for-byte (rc 0, 262144 bytes, 65536 NaNs); fixed returns rc 0 with 65536 zeros and identical stderr. OxWave matches fixed byte-for-byte, stderr and rc included; no port changes needed. Three repetitions per binary; evidence and exact build commands: diffcamp/ubx/wpcuncompress/evidence/results.json and build-commands.txt; patch: diffcamp/ubx/wpcuncompress/fix.patch.
+[f32] [stderr] sunull nt=256 ntr=256 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress

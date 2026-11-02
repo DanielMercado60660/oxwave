@@ -125,3 +125,45 @@
 [stderr] printf '%s\n' 'S  1  10' 'S  2 -25' 'R  3  99' 'S  3 300' > geom.txt && sunull nt=2 ntr=3 | sugeomcsv rfile=geom.txt ufile=command rtype=fixed setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8
 [stderr] printf '0,1,1,5,2,101,103\n0,2,9,5,2,203,201\n' > geom.csv && python3 -c 'import pty,subprocess,sys; m,s=pty.openpty(); sys.exit(subprocess.call(" sugeomcsv rfile=geom.csv ufile=command setid=any match=fldr,tracf names=null,fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt create=all",shell=True,stdin=s))'
 [stderr] printf '1,10.126,-3.004\n2,-0.555,7.5\n' > geom.csv && sunull nt=2 ntr=2 | sushw key=sx,gx,scalco a=1000,2000,-100 | sugeomcsv rfile=geom.csv ufile=command setid=any match=tracl names=tracl,sx,gx action=add scalco=100
+
+# diff-2026-11 (round 1)
+# Successful boundary sizes, generators, ordering, arithmetic and every parameter.
+[stderr] printf '1,-1.25\n' > g.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,selev
+[stderr] printf '1,13.5,-4.5,10.5,0.5\n2,-8.5,5.5,2.5,1.5\n' > g.csv && sunull nt=2 ntr=2 | sushw key=sx,sy,gx,gy a=100,200,300,400 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,sx,sy,gx,gy action=subtract scalco=-10 verbose=1
+[stderr] printf '3,30\n1,10\n2,20\n' > g.csv && suplane nt=3 ntr=3 npl=1 ct1=2 cx1=2 len1=3 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,selev maxrecords=3 nicerecord=1 tolr=0.01
+[stderr] printf '3,30\n1,10\n2,20\n' > g.csv && suspike nt=4 ntr=3 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,selev create=all spikes=1
+[stderr] printf '1,0.125\n2,-0.25\n3,0.375\n' > g.csv && suspike nt=4097 ntr=2 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,selev create=3 spikes=2 unrepeat=1 scalel=1000
+[stderr] printf '1,1.5\n2,2.5\n3,-1.5\n' > g.csv && suplane nt=17 ntr=3 npl=1 | sushw key=cdp a=4 b=2 | sugeomcsv rfile=g.csv ufile=command setid=none match=tracl names=tracl,cdp action=add create=0
+[stderr] printf '1,7\n2,8\n' > g.csv && susynlv nt=19 nxm=2 nxo=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp
+[stderr] printf '2,22\n4,44\n' > g.csv && suspike nt=7 ntr=5 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,ep missing=pass
+[stderr] printf '2,22\n4,44\n' > g.csv && suplane nt=11 ntr=5 npl=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,ep missing=delete
+[stderr] printf 'ignored\nR,99,999\nS,2,20\nS,1,-10\nS,3,30\n' > g.csv && sunull nt=2 ntr=3 | sugeomcsv rfile=g.csv ufile=command setid=s match=tracl names=C_su_id,tracl,selev nicerecord=3 maxrecords=4 scalel=-100
+[stderr] printf '1\t1.25\n2\t-2.75\n' > g.csv && sunull nt=3 ntr=2 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,selev rdelim="$(printf '\t')" rtype=csv scalel=-1
+[stderr] printf '2|20|40\n1|10|30\n' > g.data && sunull nt=4 ntr=2 | sushw key=selev a=100 | sugeomcsv rfile=g.data ufile=command setid=ANY match=tracl names=tracl,selev,gelev rdelim='"|"' rtype=CSV action=ADD scalel=10
+[stderr] printf '1,7\n' > g && sunull nt=1 ntr=1 | sugeomcsv rfile=g ufile=command setid=any match=tracl names=tracl,ep
+[stderr] printf 'S002 -20\nS001  10\n' > g.fixed && suspike nt=3 ntr=2 | sugeomcsv rfile=g.fixed ufile=command setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8 rtype=fixed
+[stderr] printf 'C_SU_MATCH, fldr, tracf,,\nC_SU_SETID, R,\nC_SU_NAMES\nC_su_id,fldr,tracf,cdp\nR,7,2,22\nR,7,1,11\n' > g.csv && sunull nt=2 ntr=2 | sushw key=fldr,tracf a=7,1 b=0,1 | sugeomcsv rfile=g.csv
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,ANY\nC_SU_NAMES\ntracl,cdp\n' > opts && printf '2,222\n1,111\n' > g.csv && suplane nt=5 ntr=2 npl=1 | sugeomcsv rfile=g.csv ufile=opts
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,S\nC_SU_NAMES\nC_su_id,2_tracl_4\nC_SU_MORE,5_selev_8,9_sstat_12\nS001  10  -2\nS002 -20   3\n' > g.txt && sunull nt=3 ntr=2 | sugeomcsv rfile=g.txt
+[stderr] printf '2,3,4,5,222\n1,2,3,4,111\n' > g.csv && sunull nt=4 ntr=2 | sushw key=fldr,tracf,cdp,ep a=2,3,4,5 b=-1,-1,-1,-1 | sugeomcsv rfile=g.csv ufile=command setid=any match=fldr,tracf,cdp,ep names=match1,match2,matche2,matche1,mark
+[stderr] printf -- '-0.375,10\n0.125,20\n0.625,30\n' > g.csv && sunull nt=7 ntr=3 | sushw key=f1 a=-0.375 b=0.5 | sugeomcsv rfile=g.csv ufile=command setid=any match=f1 names=f1,cdp tolr=0.125
+[stderr] printf '1.003,11\n2.003,22\n3.003,33\n' > g.csv && suspike nt=3 ntr=3 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp tolr=0.01
+[stderr] printf '3,30\n2,20\n1,10\n2,200\n3,300\n2,2000\n' > g.csv && { sunull nt=2 ntr=3 | sushw key=tracl a=3 b=-1; sunull nt=2 ntr=2 | sushw key=tracl a=2 b=1; sunull nt=2 ntr=1 | sushw key=tracl a=2; } | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp unrepeat=1
+[stderr] printf '0,1,5,2,100,104\n0,2,6,2,200,204\n0,7,9,1,300,302\n' > g.csv && sunull nt=3 ntr=9 | sushw key=tracf a=1 b=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=fldr,tracf names=fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt
+[stderr] printf '0,5,1,-2,104,100\n' > g.csv && sunull nt=4 ntr=3 | sushw key=tracf a=1 b=2 | sugeomcsv rfile=g.csv ufile=command setid=any match=fldr,tracf names=fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt
+[stderr] printf '2,1,2,1,201,202\n1,1,3,1,101,103\n' > g.csv && suspike nt=7 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=fldr,tracf names=fldr,tracf_cf,tracf_ct,tracf_ci,gaps_rf,gaps_rt create=all spikes=1
+[stderr] printf '1,-2.5,1.5,-1.5,1.25,-0.75\n' > g.csv && sunull nt=1 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp,trid,mark,d1,f1
+[stderr] printf '1,65532.5,3\n' > g.csv && sunull nt=4 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,dt,ns
+[stderr] printf '1,10.25,-2.5,5.25,6.75,77\n' > g.csv && sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy,offset a=111,222,333,444,999 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,sx,sy,gx,gy,offset scalco=100 action=add
+[stderr] printf '1,1.5,2.5,3.5,4.5,5.5,6.5,7.5\n' > g.csv && sunull nt=3 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,gelev,selev,sdepth,gdel,sdel,swdep,gwdep scalel=1 action=subtract
+# Regressions: scanning the initialized tail of the reusable C record buffer.
+[stderr] printf '1,2,3,4,5\n2,2\n' > g.csv && sunull nt=2 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp,fldr,tracf,ep
+[stderr] printf '1,2\n2,2,3,4,5\n' > g.csv && sunull nt=3 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp,fldr,tracf,ep
+[stderr] printf '1,2,3,4,5\n2,2\r\n' > g.csv && sunull nt=4 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any match=tracl names=tracl,cdp,fldr,tracf,ep maxrecords=2
+# Embedded NULs terminate C fixed-format records before the requested columns.
+[stderr] printf 'S001  10\nS002\000 20\n' > g.txt && sunull nt=2 ntr=2 | sugeomcsv rfile=g.txt ufile=command setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8
+[stderr] printf 'S001  10\nS002\000 20\nS003  30\n' > g.txt && sunull nt=1 ntr=3 | sugeomcsv rfile=g.txt ufile=command setid=S match=tracl names=C_su_id,2_tracl_4,5_selev_8 maxrecords=3
+# Required/invalid parameters and duplicate or malformed metadata.
+[stderr] sunull nt=1 ntr=1 | sugeomcsv tolr=0.0000000001
+[stderr] printf '1,10\n' > g.csv && sunull nt=3 ntr=1 | sugeomcsv rfile=g.csv ufile=command setid=any names=tracl,cdp
+[stderr] printf 'C_SU_MATCH,tracl\nC_SU_SETID,ANY\nC_SU_SETID,S\nC_SU_NAMES\ntracl,cdp\n1,10\n' > g.csv && sunull nt=4 ntr=1 | sugeomcsv rfile=g.csv

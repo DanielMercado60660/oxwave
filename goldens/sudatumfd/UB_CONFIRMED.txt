@@ -1,0 +1,4 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/su/main/datuming/sudatumfd.c:138 allocates nt=2 samples (8 bytes); :158 overwrites nt with header ns=4; :188 writes 16 bytes into that allocation; :212 later reads beyond it. alloc3float uses the exact requested size via vendor/su-original/src/cwp/lib/alloc.c:552-554 and :284.
+# Minimal fix: remember allocated nt and reject larger trace ns before memcpy. Built with the exact SU build.log:1103 flags. orig reproduces archived 72.out/72.err byte-for-byte (rc=0, stdout=256 bytes, stderr empty); fixed returns rc=1, stdout empty, stderr "\nsudatumfd: trace ns=4 exceeds nt=2 allocation\n". OxWave matches fixed exactly (rc/stdout/stderr); existing Rust bounds check retained, no port changes. Evidence and patch: diffcamp/ubx/sudatumfd/.
+[stderr] makevel nx=1 nz=1 v000=1800 > v1; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sudatumfd nt=2 nx=1 nz=1 nsx=1 dz=2 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=10

@@ -20,3 +20,16 @@ suspike nt=5 ntr=1 | suilog nt=-1 ntmin=1 dt=4
 # suspike nt=5 ntr=1 | suilog nt=5 ntmin=6 dt=4   # exit 1: ntmin must be between 0 and nt
 suspike nt=5 ntr=1 | suilog nt=0 ntmin=0 dt=4
 suilog nt=5 ntmin=1 dt=4
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | sushw key=dt a=60000 | suilog nt=2 ntmin=1 dt=4000
+suspike nt=2 ntr=1 | sushw key=dt a=60000 | suilog nt=3 ntmin=1 dt=4000
+suspike nt=4 ntr=2 | sushw key=dt a=60000 | suilog nt=4 ntmin=2 dt=3000
+suplane nt=101 ntr=3 dt=0.05 | suilog nt=127 ntmin=5 dt=1234
+suspike nt=257 ntr=1 k1=10 | sushw key=dt a=60000 | suilog nt=4097 ntmin=13 dt=4000
+sunull nt=13 ntr=2 | sushw key=dt a=10000 | suilog nt=17 ntmin=17 dt=65535
+[stderr] suplane nt=23 ntr=2 dt=0.04 | suilog nt=29 ntmin=3 dt=2000 verbose=1
+suspike nt=31 ntr=1 k1=2 | sushw key=dt a=60000 | suilog nt=65535 ntmin=7 dt=32000
+
+# ub-2026-11 (round 1)
+suspike nt=4 ntr=1 | suilog nt=abc ntmin=1 dt=1000
+suspike nt=17 ntr=1 | sushw key=dt a=50000 | suilog nt=19 ntmin=1 dt=70000

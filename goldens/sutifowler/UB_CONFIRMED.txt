@@ -1,0 +1,12 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/migration_inversion/sutifowler.c:553,565-567:
+# iwmin can exceed ntfft; rindex[ntfft-iw] then writes before its allocation.
+# Minimal fix: stop the fill loop at iw < ntfft. Original matches the vendor
+# behavior on representative runs: 7236 stdout bytes, then guard abort (rc 134).
+# Fixed C emits the identical 7236 trace bytes and exits normally (rc 0).
+# OxWave was fixed to use the same loop bound; it matches fixed C (rc 0,
+# identical stdout and stderr). Evidence and vendor-flags builds are in
+# diffcamp/ubx/sutifowler/{fix.patch,build-commands.json,evidence/results.json}.
+# Both vendor and rebuilt orig occasionally bus-error earlier (rc 138, no
+# stdout); see evidence/repeat-crash.json. Fixed completed normally in 10/10.
+sunull nt=3 ntr=3 dt=0.0625 | sushw key=cdp a=100 b=-3 | sutifowler ncdps=3 nv=3 choose=3 dtout=0.03125 nxpad=31 ntpad=7 nonhyp=0 lmute=0 dx=17.9 vmin=1000000 vmax=1000010 etamin=0.5 etamax=-0.1 neta=3

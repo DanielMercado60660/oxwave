@@ -17,3 +17,29 @@ suplane nt=8 ntr=3 | env -u CWPBIN -u CWPROOT supswigb
 suplane nt=8 ntr=3 | supswigb tmpdir=/nonexistent/oxwave
 suplane nt=8 ntr=3 | supswigb key=notakey
 supswigb
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | supswigb n2=1 d1=0.004 d2=1 f1=0 f2=1 style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=2 | supswigb ntr=2 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4 ntr=2 | supswigb tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=3 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4097 ntr=2 | supswigb n2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=19 ntr=4 | sushw key=offset a=-30 b=15 | supswigb key=offset style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=4 | sushw key=gelev,scalel a=20,-1 b=10,0 | supswigb key=gelev style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=29 ntr=3 | sushw key=gx,scalco a=5,2 b=5,0 | supswigb key=gx style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=3 | sushw key=offset a=100 b=0 | supswigb key=offset n2=3 d2=4 f2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=15 ntr=3 | supswigb style=vsp verbose=1 tmpdir= | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=21 ntr=4 | sushw key=ntr,dt,delrt a=4,2000,-50 | supswigb style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=5 ntr=3 | sushw key=trid,dt,tracl,tracr a=30,0,0,0 | supswigb ntr=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=13 ntr=4 | supswigb n2=4 d1=0.0025 f1=-0.2 d2=2.5 f2=-3 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=31 ntr=4 | supswigb n2=4 ntr=4 key=tracl | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | supswigb n2=3 style=seismic clip=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=2 | supswigb key=not_a_header
+suplane nt=9 ntr=2 | supswigb tmpdir=/no/such/directory
+suplane nt=9 ntr=2 | supswigb d1=1e999
+sunull nt=1 ntr=1 | supswigb ntr=1 d1=1 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=37 ntr=5 | sushw key=tracr,tracl a=0,0 | supswigb n2=5 f2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=17 ntr=4 | sushw key=ntr a=4 | supswigb verbose=1 style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=4 | supswigb n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | supswigb n2=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | supswigb n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=3 | sushw key=trid,dt,tracl,tracr a=18,0,0,0 | supswigb | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

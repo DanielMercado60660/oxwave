@@ -148,7 +148,7 @@ pub fn dct_2(x: &mut [Vec<f32>], c1: &[Vec<f32>], c2: &[Vec<f32>], type_: i32) {
 /// C prototype: `void uniQuant(float *x, int n, float error, float *ave, float *step, int *qx);`
 pub fn uniQuant(x: &[f32], error: f32, ave: &mut f32, step: &mut f32, qx: &mut [i32]) {
     let n = x.len();
-    assert!(n > 0 && qx.len() >= n);
+    assert!(qx.len() >= n);
     let rn = (1.0 / n as f64) as f32;
     let mut lave = 0.0f32;
     for &v in x {
@@ -394,4 +394,24 @@ pub fn ilct(sig: &mut [f32], start: usize, n: usize, rcf: &RcFunct, c: &[Vec<f32
     dctiv(&mut sig[start..start + n], c);
     fold(sig, start, rcf, true);
     fold(sig, start + n, rcf, true);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_quantization_preserves_ieee_arithmetic() {
+        let mut ave = 1.0;
+        let mut step = -1.0;
+        uniQuant(&[], 0.01, &mut ave, &mut step, &mut []);
+        assert!(ave.is_nan());
+        assert!(step.is_nan());
+
+        // A supplied deviation is still used, even though the mean is NaN.
+        step = 2.0;
+        uniQuant(&[], 0.5, &mut ave, &mut step, &mut []);
+        assert!(ave.is_nan());
+        assert_eq!(step, (1.0 / 3.4641) as f32);
+    }
 }

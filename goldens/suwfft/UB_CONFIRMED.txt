@@ -1,0 +1,2 @@
+# vendor/su-original/src/su/main/transforms/suwfft.c:121,139: ct[i-1] and ct[i+1] read outside the nf-element allocation; the Nyquist neighbor affects its denominator. Bounds fix skips the unused first-bin calculation and supplies zero for the missing upper neighbor; second trace Nyquist changes from (0, 0) to (NaN, NaN). OxWave matches fixed byte for byte.
+suspike nt=3 ntr=2 | suwfft verbose=0 w0=0.2 w1=2 w2=3

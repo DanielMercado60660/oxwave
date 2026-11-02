@@ -109,6 +109,7 @@ fn main() {
     let mut data = vec![0.0f32; nz as usize];
     let mut num = alloc_accumulator(nz as usize, nr);
     let mut den = alloc_accumulator(nz as usize, nr); let mut nnz = alloc_accumulator(nz as usize, nr);
+    if nzout < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut sem = vec![0.0f32; nzout as usize]; let mut gottrace = true; let mut cdpprev = tr.cdp;
     loop {
         if gottrace { offset = tr.offset as f32; cdp = tr.cdp; data.copy_from_slice(&tr.data[..nz as usize]); }

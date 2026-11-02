@@ -324,8 +324,11 @@ fn main() {
     // C aliases crt as float *rt and char *ccrt. real/cbytes below expose
     // the same initialized storage, with each borrow ending before the next.
     fprintf!(fpl, "sutifowler: nv=%d nvstack=%d\n", nv, nvstack);
-    let mut v = vec![0.0f32; nv as usize];
-    let mut p2stack = vec![0.0f32; nvstack as usize];
+    // Negative counts drive empty C loops. A one-element allocation removes
+    // VNDemalloc's size wraparound without changing either negative-count case's
+    // output (including the existing nvstack validation below).
+    let mut v = vec![0.0f32; nv.max(1) as usize];
+    let mut p2stack = vec![0.0f32; nvstack.max(1) as usize];
     // C stores one extra offset/mute before checking noff > mxfold. Reserve
     // that slot so the original error is reached without a Rust bounds panic.
     let mut mute = vec![0.0f32; mxfold as usize + 1];
@@ -645,8 +648,8 @@ fn main() {
                         &ctemp[..nvstack as usize],
                         czero,
                         czero,
-                        &rindex[..(nv * neta) as usize],
-                        &mut crt[..(nv * neta) as usize],
+                        &rindex[..(nv * neta).max(0) as usize],
+                        &mut crt[..(nv * neta).max(0) as usize],
                     );
                     V2Dw1(vndb, iw as i64, cbytes(&mut crt), 42);
                 }
@@ -726,7 +729,10 @@ fn main() {
                         }
                         let fw = (-2.0 * PI / dtout as f64) as f32;
                         rindex[0] = fw;
-                        for iw in 1..iwmin + 1 {
+                        // The repaired C stops before ntfft: larger iw writes
+                        // rindex[ntfft-iw] before its allocation and corrupts
+                        // VND's allocation guard (sutifowler.c:565-567).
+                        for iw in 1..(iwmin + 1).min(ntfft) {
                             rindex[iw as usize] = fw;
                             rindex[(ntfft - iw) as usize] = fw;
                         }

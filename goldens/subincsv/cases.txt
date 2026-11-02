@@ -22,3 +22,80 @@ subincsv rfile=same wfile=same
 subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1
 subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=0 grid_wc=10
 suspike nt=1 ntr=1 | sushw key=cdp a=0 | subincsv bintype=-31 grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10
+
+# diff-2026-11 (round 1)
+# Point binning: default keys, half-even rounding, float keys, nonzero samples and large traces.
+[stderr] sunull nt=2 ntr=6 | sushw key=gaps,grnlof a=-5,0 b=2,0 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=gaps spkey=grnlof offset=0 check=0 verbose=1
+sunull nt=3 ntr=5 | sushw key=d1,f1 a=-1.25,2.5 b=0.5,-0.25 | subincsv bintype=20 point_crz=-3.5 point_cru=2 point_csz=1.25 point_csu=-4 rpkey=d1 spkey=f1
+suplane nt=4 ntr=5 npl=1 dip1=0 len1=5 ct1=2 cx1=3 | subincsv bintype=20 point_crz=10 point_cru=-2 point_csz=20 point_csu=3 rpkey=tracl spkey=ns offset=0
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=4097 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=ns spkey=dt
+# lrint returns a long, then narrows to the 32-bit header (no out-of-range float-to-int cast in C).
+sunull nt=2 ntr=1 | sushw key=sx,gx a=-2000000000,2000000000 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1
+sunull nt=1 ntr=1 | sushw key=sx,gx,scalco a=-1000000000,1000000000,32767 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=offset spkey=tracl
+sunull nt=3 ntr=1 | subincsv bintype=20 point_crz=6000000001 point_cru=0 point_csz=0 point_csu=0
+sunull nt=4 ntr=1 | subincsv bintype=20 point_crz=-6000000003 point_cru=0 point_csz=0 point_csu=0
+# Offset rounding and the smallest signed coordinate scalar.
+sunull nt=1 ntr=4 | sushw key=gx,scalco a=1,-2 b=2,0 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=offset spkey=tracl offset=1
+sunull nt=17 ntr=2 | sushw key=sx,sy,gx,gy,scalco a=-32768,-65536,98304,32768,-32768 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=offset spkey=scalco
+# All grid modes, exact cell edges, orientation, scaling and degenerate one-row grids.
+sunull nt=1 ntr=5 | sushw key=sx,gx,sy,gy a=-5,-5,-5,-5 b=10,10,0,0 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=10 offset=0
+suspike nt=11 ntr=6 nspk=1 ix1=1 it1=6 | sushw key=cdp,scalco a=1,-10 b=5,0 | subincsv bintype=-30 grid_xa=100 grid_ya=-100 grid_xb=130 grid_yb=-60 grid_xc=60 grid_yc=-70 grid_wb=10 grid_wc=10
+sunull nt=2 ntr=4 | sushw key=igi,igc,scalco a=1,1,2 b=1,1,0 | subincsv bintype=-32 grid_xa=10 grid_ya=20 grid_xb=50 grid_yb=20 grid_xc=10 grid_yc=-10 grid_wb=10 grid_wc=10 offset=1
+[stderr] sunull nt=3 ntr=1 | sushw key=cdp a=20 | subincsv bintype=-31 grid_xa=10 grid_ya=20 grid_xb=50 grid_yb=20 grid_xc=10 grid_yc=-10 grid_wb=10 grid_wc=10 check=-1 verbose=1
+sunull nt=4 ntr=4 | sushw key=sx,gx,sy,gy,scalco a=2,2,4,4,5 b=2,2,-2,-2,0 | subincsv bintype=30 grid_xa=10 grid_ya=20 grid_xb=50 grid_yb=20 grid_xc=10 grid_yc=-10 grid_wb=10 grid_wc=10
+[stderr] sunull nt=7 ntr=5 | sushw key=cdp a=1 b=1 | subincsv bintype=-30 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=0 grid_wb=10 grid_wc=10 check=1
+sunull nt=13 ntr=4 | sushw key=sx,gx,sy,gy a=100,100,-100,-100 b=6,6,8,8 | subincsv bintype=30 grid_xa=100 grid_ya=-100 grid_xb=130 grid_yb=-60 grid_xc=60 grid_yc=-70 grid_wb=10 grid_wc=10
+# K-file round trips and visible output files; all trace inputs still come from SU generators.
+[exact] sunull nt=1 ntr=1 | sushw key=cdp a=1 | subincsv bintype=-31 grid_xa=10 grid_ya=20 grid_xb=50 grid_yb=20 grid_xc=10 grid_yc=-10 grid_wb=10 grid_wc=10 wfile=right.csv > /dev/null && cat right.csv
+sunull nt=1 ntr=1 | sushw key=cdp a=1 | subincsv bintype=-30 grid_xa=100 grid_ya=-100 grid_xb=130 grid_yb=-60 grid_xc=60 grid_yc=-70 grid_wb=10 grid_wc=10 wfile=rotate.csv > /dev/null && sunull nt=19 ntr=3 | sushw key=cdp a=1 b=7 | subincsv rfile=rotate.csv offset=0
+[exact] sunull nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 wfile=points.csv > /dev/null && sunull nt=2 ntr=1 | subincsv rfile=points.csv wfile=updated.csv point_crz=-1.5 point_csu=2 offset=0 > /dev/null && cat updated.csv
+# Reject header names accepted only by the general headcase library, not this C helper.
+[stderr] sunull nt=2 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=shortpad
+[stderr] sunull nt=2 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 spkey=numb1
+[stderr] sunull nt=2 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=numb-999
+[stderr] sunull nt=2 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 spkey=shortpad
+# Error paths: grid bounds, invalid widths, missing parameters and file open errors.
+[stderr] sunull nt=1 ntr=1 | sushw key=sx,gx a=45,45 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=10
+[stderr] sunull nt=2 ntr=1 | sushw key=igi,igc a=0,1 | subincsv bintype=-32 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=10
+[stderr] sunull nt=3 ntr=1 | sushw key=cdp a=21 | subincsv bintype=-31 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=10
+[stderr] sunull nt=4 ntr=1 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=-1
+[stderr] sunull nt=1 ntr=1 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=1 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10 grid_wc=10
+[stderr] sunull nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0
+[stderr] sunull nt=1 ntr=1 | subincsv bintype=30 grid_xa=0 grid_ya=0 grid_xb=40 grid_yb=0 grid_xc=0 grid_yc=30 grid_wb=10
+[stderr] sunull nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 wfile=missing/out.csv
+[stderr] sunull nt=1 ntr=1 | subincsv bintype=20 point_crz=0 point_cru=1 point_csz=0 point_csu=1 rpkey=null
+
+# diff-2026-11 (round 2)
+# Direct fixtures put rfile on the only subincsv invocation, independent of its writer.
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[exact] [stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.3f,%.2f,%.1f,%.2f,%.2f,%e C_SU_NAMES C_SU_ID,point_csu,point_crz,BINTYPE,point_csz,point_cru,extra K,-4,-3.5,20,1.25,2,17 > input.csv && sunull nt=2 ntr=5 | sushw key=d1,f1,sx,gx,scalco a=-1.25,2.5,10,30,-2 b=0.5,-0.25,0,0,0 | subincsv rfile=input.csv wfile=updated.csv bintype=20 rpkey=d1 spkey=f1 offset=1 point_cru=-2 > traces.su && cat updated.csv traces.su
+[exact] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20.05,1,2,3,4 > input.csv && suspike nt=3 ntr=1 | subincsv rfile=input.csv bintype=-1 wfile=fraction.csv > /dev/null && cat fraction.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,,1,0,1 > input.csv && sunull nt=4 ntr=4 | sushw key=gaps,grnlof a=-3,2 b=2,1 | subincsv rfile=input.csv offset=-1 check=0 verbose=1
+# Read every grid mode from a regular K-file; headers and samples remain observable.
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,30,10,20,50,20,10,-10,10,10 > input.csv && sunull nt=3 ntr=2 | sushw key=sx,gx,sy,gy a=20,40,10,30 b=10,10,-10,-10 | subincsv rfile=input.csv offset=0
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,-30,10,20,50,20,10,-10,10,10 > input.csv && suplane nt=4 ntr=4 npl=1 dip1=0 len1=4 ct1=2 cx1=2 | sushw key=cdp,scalco a=1,-2 b=6,0 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,-31,100,-100,130,-60,60,-70,10,10 > input.csv && sunull nt=17 ntr=3 | sushw key=cdp a=1 b=7 | subincsv rfile=input.csv check=1 verbose=1
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,-32,10,20,50,20,10,-10,10,10 > input.csv && suspike nt=4097 ntr=3 nspk=1 ix1=3 it1=4097 | sushw key=igi,igc,scalco a=1,4,2 b=2,-1,0 | subincsv rfile=input.csv offset=1
+[exact] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,20,10,20,50,20,10,-10,10,10 > input.csv && sunull nt=2 ntr=3 | sushw key=cdp a=1 b=7 | subincsv rfile=input.csv bintype=-31 check=0 wfile=overridden.csv > /dev/null && cat overridden.csv
+[exact] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,-30.05,10,20,50,20,10,-10,10,10 > input.csv && sunull nt=1 ntr=1 | sushw key=cdp a=20 | subincsv rfile=input.csv wfile=negative.csv > /dev/null && cat negative.csv
+# Unused fields and formats survive updates; first K record wins; command line fills missing values.
+[exact] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%a C_SU_NAMES C_SU_ID,null1,bintype,point_crz,point_cru,point_csz,point_csu,extra K,999,20,0,1,0,1,0x1.4p+2 > input.csv && sunull nt=7 ntr=2 | subincsv rfile=input.csv wfile=hex.csv point_crz=1 > /dev/null && cat hex.csv
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,0,1,0,1 K,30,10,20,30,40 > input.csv && sunull nt=11 ntr=3 | subincsv rfile=input.csv rpkey=tracl spkey=tracr offset=0
+printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz K,20,0,2,3 > input.csv && sunull nt=13 ntr=2 | subincsv rfile=input.csv point_csu=-3 rpkey=ns spkey=dt
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,0,1,0,1 > input.csv && sunull nt=65535 ntr=1 | subincsv rfile=input.csv rpkey=ns spkey=dt offset=0
+# Failed reads report each parser error with no dependency on an earlier subincsv stage.
+[stderr] printf '%s\n' C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_crz,point_csu K,20,2,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,bad,3,4,5 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu 'K,20,2 4,3,4,5' > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,20,2,3,4 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+# Missing and invalid required values, explicit defaults, and a partial successful stream before failure.
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,30,10,20,50,20,10,-10,10,0 > input.csv && sunull nt=1 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz K,20,0,1,0 > input.csv && sunull nt=2 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,point_crz,point_cru,point_csz,point_csu K,42,0,1,0,1 > input.csv && sunull nt=3 ntr=1 | subincsv rfile=input.csv
+[stderr] printf '%s\n' C_SU_SETID,K C_SU_FORMS C_SU_ID,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g,%.20g C_SU_NAMES C_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc K,30,10,20,50,20,10,-10,10,10 > input.csv && sunull nt=4 ntr=2 | sushw key=cdp a=20 b=1 | subincsv rfile=input.csv bintype=-31 offset=-1

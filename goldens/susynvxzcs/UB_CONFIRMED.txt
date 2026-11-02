@@ -1,0 +1,13 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/par/lib/modeling.c:520-522,538-540,
+# called by vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynvxzcs.c:597.
+# A negative (time-ft)/dt truncates toward zero, producing jsinc=-50;
+# sinc[jsinc] accesses before the 101-row static table. The minimal fix
+# checks the index only when the wavelet overlaps the trace, then calls err().
+# orig matches installed SU and retained golden 82.out exactly: rc=0,
+# stdout=364 bytes, SHA256=5e8d132c8a024914bf7cbcc59abf33f5c52b78c40b83d2f414ce1adee479cb1c.
+# fixed: rc=1, empty stdout, stderr="\nsusynvxzcs: addsinc: sinc index -50 out of bounds\n".
+# OxWave previously panicked (rc=101); the program-local pre-call bounds
+# check now matches fixed exactly (rc/stdout/stderr), verified twice each.
+# Reproduction: diffcamp/ubx/susynvxzcs/{fix.patch,build.log,verify_claim.py,evidence/after.json}.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=31 ft=0.07 'ref=1:442,50;448,50'

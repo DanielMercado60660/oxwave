@@ -1,0 +1,16 @@
+# diff-2026-11 (round 1)
+# getpars.c stores all argument names/values together in argstr. Its string
+# getter returns a pointer into that buffer (getpars.c:308). At horizon 1,
+# tetramod.c:478-482 sprintf writes the next grid key over the preceding
+# filename. With these short names it overwrites the following argument key,
+# so C skips the second additive grid. Each write here stays inside argstr:
+# the following grid argument and verbose=1 provide ample allocated storage.
+# This is distinct from writing past argstr when a short filename is last.
+# All three original outputs/stderr were identical across six repeat runs.
+# Compare hzfile, written before the C's exterior-tetrahedron reads at :1932.
+[exact] makevel nx=3 nz=3 v000=0.1 | { cat >z; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin nhz=2 z0file=z z1file=z verbose=1 >/dev/null && cat horizon.bin; }
+# oxwave-core::par::getparstring/getnparstring (par.rs:355-368): copies a value into an owned String; ParState::argtbl uses separate name/value Vecs, losing C's mutable argument-buffer alias. C skips z1file and writes zmax=1.6; Rust reads it and writes zmax=1.7. Needs shared parser storage/API support; do not reimplement getpars in the program.
+[exact] makevel nx=3 nz=3 v000=0.1 | { cat >v; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin nhz=2 v0file=v v1file=v verbose=1 >/dev/null && cat horizon.bin; }
+# oxwave-core::par::getparstring/getnparstring (par.rs:355-368): owned String and separately allocated argtbl entries cannot preserve the mutable alias through which C's next sprintf changes v1file's name. C's second-horizon velocity is 2; Rust's is 2.1. Same shared parser storage/API limitation.
+[exact] makevel nx=3 nz=3 v000=0.1 | { cat >d; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin nhz=2 dvdz0file=d dvdz1file=d verbose=1 >/dev/null && cat horizon.bin; }
+# oxwave-core::par::getparstring/getnparstring (par.rs:355-368): owned String and separate argtbl entries lose the mutable alias that changes dvdz1file's name. C leaves the second-horizon gradient zero; Rust adds 0.1 and changes bottom velocity. Same shared parser storage/API limitation.

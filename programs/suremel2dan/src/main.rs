@@ -327,7 +327,23 @@ fn main() {
         err!("stopped: nt must be > 0!\n");
     }
     let mut bufz = vec![0.0f32; nz as usize];
+    // C converts a negative width to size_t; ealloc1float then fails with
+    // ENOMEM. Check before the usize cast so Vec does not panic instead.
+    if nbwx < 0 {
+        err!(
+            "%s: malloc failed (%s)",
+            "ealloc.c",
+            oxwave_core::err::strerror(12)
+        );
+    }
     let mut bwx = vec![0.0f32; nbwx as usize];
+    if nbwz < 0 {
+        err!(
+            "%s: malloc failed (%s)",
+            "ealloc.c",
+            oxwave_core::err::strerror(12)
+        );
+    }
     let mut bwz = vec![0.0f32; nbwz as usize];
     let mut qux = grid(nx, nz);
     let mut quz = grid(nx, nz);
@@ -371,6 +387,13 @@ fn main() {
     if sflag == 2 {
         dtwave = dt;
         nwav = (8.0f64 / (dt * fmax) as f64) as i32;
+        if nwav < 0 {
+            err!(
+                "%s: malloc failed (%s)",
+                "ealloc.c",
+                oxwave_core::err::strerror(12)
+            );
+        }
         wave = vec![0.0; nwav as usize];
         for it in 0..nwav {
             wave[it as usize] = fwave((it + 1) as f32 * dt, fmax);
@@ -484,6 +507,13 @@ fn main() {
     let m2 = m / 2;
     if verbose != 0 {
         fprintf!(jpfp(), "r=%e  tmax*r=%e  m=%d\n", r, tmax * r, m);
+    }
+    if m2 < 0 || nsnap < 0 {
+        err!(
+            "%s: malloc failed (%s)",
+            "ealloc.c",
+            oxwave_core::err::strerror(12)
+        );
     }
     let mut bessn = vec![vec![0.0f64; m2 as usize]; nsnap.max(0) as usize];
     let mut bestr = vec![vec![0.0f64; m2 as usize]; nt as usize];

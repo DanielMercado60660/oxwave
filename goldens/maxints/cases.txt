@@ -3,3 +3,13 @@
 # Input is ignored; a small producer completes without triggering SIGPIPE.
 [exact] printf '123\n' | maxints
 [exact] maxints -h
+
+# diff-2026-11 (round 1)
+[exact] [stderr] sunull nt=2 ntr=1 | { maxints verbose=0 && cat >/dev/null; }
+[exact] [stderr] sunull nt=3 ntr=1 | { maxints verbose=1 && cat >/dev/null; }
+[exact] [stderr] sunull nt=4 ntr=1 | { maxints --help && cat >/dev/null; }
+[exact] [stderr] suspike nt=17 ntr=1 | { maxints bogus= foo=1 foo=2 && cat >/dev/null; }
+[exact] [stderr] sunull nt=7 ntr=2 | sushw key=cdp a=-17 b=3 | { maxints par=missing && cat >/dev/null; }
+[exact] [stderr] suspike nt=3 ntr=1 | { maxints -1 arbitrary words && cat >/dev/null; }
+[exact] [stderr] sunull nt=4097 ntr=1 | { maxints && cat >/dev/null; }
+[exact] [stderr] suspike nt=1 ntr=1 | { maxints && cat >/dev/null; }

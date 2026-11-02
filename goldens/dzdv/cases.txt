@@ -16,3 +16,28 @@
 [f32] python3 -c 'import struct; open("p","wb").write(struct.pack("45f",*[((i%11)-5)*0.25 for i in range(45)])); open("a","wb").write(struct.pack("45f",*[(i%7)*0.3-0.8 for i in range(45)]))' && dzdv nx=3 nz=5 dx=1 dz=1 off0=-1 doff=1 noff=3 cip=0,1,0.2 cip=2,3,0.5 nxw=1 nzw=1 afile=a < p
 [f32] python3 -c 'import struct; open("a","wb").write(struct.pack("45f",*[((i%11)-5)*0.25 for i in range(45)]))' && dzdv nx=3 nz=5 dx=1 dz=1 off0=0 doff=1 noff=3 cip=0,2,0 nxw=-1 nzw=-1 afile=a < a
 [stderr] python3 -c 'import struct; open("p","wb").write(struct.pack("f",1)); open("a","wb").close()' && dzdv nx=1 nz=1 dx=1 dz=1 off0=0 doff=0 noff=1 cip=0,0,0 afile=a < p
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=1 k1=1 | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=2 dx=1 dz=1 off0=0 doff=1 noff=1 cip=0,0,0 < afile
+[f32] suspike nt=3 ntr=2 k1=2 | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=3 dx=1 dz=1 off0=0 doff=1 noff=2 cip=0,1,0 < afile
+[f32] suspike nt=4 ntr=3 k1=3 | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=4 dx=1 dz=1 off0=0 doff=1 noff=3 cip=0,2,0 < afile
+[f32] suspike nt=7 ntr=6 k1=4 | sustrip outpar=/dev/null > a && sunull nt=7 ntr=6 | suop op=exp | sustrip outpar=/dev/null | dzdv nx=2 nz=7 dx=2 dz=1 off0=0 doff=1 noff=3 cip=0,3,0 nxw=1 nzw=2 afile=a
+[f32] suplane nt=11 ntr=6 | sustrip outpar=/dev/null > a && dzdv nx=3 nz=11 dx=1 dz=1 off0=-2 doff=2 noff=2 cip=0,2,0.25 cip=2,7,0.5 afile=a < a
+[f32] suplane nt=11 ntr=6 | sustrip outpar=/dev/null > a && dzdv nx=3 nz=11 dx=1 dz=1 off0=-2 doff=2 noff=2 cip=0,2,0.25 cip=2,7,0.5 afile=a dfile=depth < a > /dev/null && cat depth
+[f32] sunull nt=4097 ntr=1 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=1 nz=4097 dx=1 dz=1 off0=3 doff=1 noff=1 cip=0,4096,0 afile=a < a
+[f32] sunull nt=13 ntr=12 | sushw key=offset a=50 b=10 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=4 nz=13 dx=2 dz=0.5 fx=-3 fz=1 off0=-3 doff=1.5 noff=3 cip=-3,2,0.1 cip=3,5,0.4 nxw=2 nzw=3 afile=a dfile=depth < a
+[f32] sunull nt=13 ntr=12 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=4 nz=13 dx=2 dz=0.5 fx=-3 fz=1 off0=-3 doff=1.5 noff=3 cip=-3,2,0.1 cip=3,5,0.4 nxw=2 nzw=3 afile=a dfile=depth < a > /dev/null && cat depth
+[f32] suspike nt=5 ntr=6 k1=1 | sustrip outpar=/dev/null > a && dzdv nx=3 nz=5 dx=1 dz=1 fx=0 fz=0 off0=0 doff=1 noff=2 cip=0,-10,0 cip=1,0,0 cip=2,20,0 nxw=0 nzw=0 afile=a < a
+[f32] suspike nt=5 ntr=6 k1=5 | sustrip outpar=/dev/null > a && dzdv nx=3 nz=5 dx=1 dz=1 off0=1 doff=1 noff=2 cip=0,2,-10 nxw=20 nzw=20 afile=a < a
+[f32] sunull nt=5 ntr=4 | sustrip outpar=/dev/null > a && dzdv nx=2 nz=5 dx=1 dz=1 off0=0 doff=1 noff=2 cip=0,2,0 nxw=1 nzw=1 afile=a < a
+[f32] sunull nt=5 ntr=4 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=2 nz=5 dx=-1 dz=1 fx=1 off0=0 doff=1 noff=2 cip=0,1,0 cip=1,3,0 afile=a < a
+[f32] sunull nt=7 ntr=3 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=3 nz=7 dx=1 dz=1 off0=0 doff=1 noff=1 cip=0,1,0 cip=1,3,0 cip=2,5,0 afile=a dfile=depth < a > /dev/null && cat depth
+[f32] suspike nt=17 ntr=8 k1=7 | sustrip outpar=/dev/null > a && dzdv nx=2 nz=17 dx=5 dz=2 fx=10 fz=-2 off0=4 doff=-2 noff=4 cip=10,10,0.5 cip=15,14,0.1 nxw=1 nzw=4 afile=a < a
+[stderr] sunull nt=3 ntr=1 | suop op=exp | sustrip outpar=/dev/null > afile && dzdv nx=1 nz=3 dx=1 dz=1 fx=0 fz=0 off0=0 doff=0 noff=1 cip=0,1,0 nxw=0 nzw=0 afile=afile dfile=depth verbose=1 < afile
+[f32] sunull nt=2 ntr=2 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=2 nz=2 dx=1 dz=1 off0=0 doff=0 noff=1 cip=0,0,0 cip=1,1,0 afile=a < a
+[f32] suspike nt=3 ntr=3 k1=2 | sustrip outpar=/dev/null > a && dzdv nx=1 nz=3 dx=1 dz=0.5 fz=10 off0=2 doff=1 noff=3 cip=0,1,0 afile=a < a
+[f32] suspike nt=4 ntr=4 k1=4 | sustrip outpar=/dev/null > a && dzdv nx=2 nz=4 dx=1 dz=1 off0=0 doff=1 noff=2 cip=0,100,0 afile=a < a
+[stderr] dzdv nz=1 dx=1 dz=1 off0=0 doff=1 noff=1 cip=0,0,0
+[f32] sunull nt=1 ntr=1 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=1 nz=1 dx=2 dz=3 fx=4 fz=5 off0=6 doff=7 noff=1 cip=4,5,0 afile=a dfile=depth < a > /dev/null && cat depth
+[f32] suplane nt=31 ntr=12 | suop op=neg | sustrip outpar=/dev/null > a && suplane nt=31 ntr=12 | sustrip outpar=/dev/null | dzdv nx=3 nz=31 dx=1 dz=1 off0=-2 doff=1 noff=4 cip=0,5,0.5 cip=2,20,0.2 nxw=1 nzw=5 afile=a
+[f32] suspike nt=11 ntr=6 k1=4 | suop op=sum | sustrip outpar=/dev/null > a && suspike nt=11 ntr=6 k1=6 | suop op=sum | sustrip outpar=/dev/null | dzdv nx=2 nz=11 dx=1 dz=1 off0=0 doff=1 noff=3 cip=0,5,0.5 nxw=1 nzw=4 afile=a
+[f32] sunull nt=7 ntr=4 | suop op=exp | sustrip outpar=/dev/null > a && dzdv nx=2 nz=7 dx=1 dz=1 off0=0 doff=1 noff=2 cip=1,5,0.2 cip=0,1,0.1 afile=a dfile=depth < a > /dev/null && cat depth

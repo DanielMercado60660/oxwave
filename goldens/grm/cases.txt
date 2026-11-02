@@ -56,3 +56,50 @@ printf 'nt=99 dx=10 v0=200 abtime=20 xymax=0\n' > params; printf '0 0 10 20\n10 
 [stderr] grm nt=1 dx=1e-310 v0=500 abtime=20
 # Alphabetic nt parses as zero, with no input reads or data rows.
 grm nt=abc dx=10 v0=500 abtime=20 xymax=0
+# diff-2026-11 (round 1)
+# GRM consumes ASCII arrival pairs, so extract four columns from SU headers.
+# One trace/one pair, then nt=2,3,4 with valid generators and bounded searches.
+sunull nt=1 ntr=1 | sushw key=sx,sy,sstat,gstat a=0,100,20,20 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=1 dx=10 v0=500 abtime=20 xymax=0
+suspike nt=2 ntr=2 nspk=1 ix1=1 it1=1 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,10,-10 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=2 dx=10 v0=200 abtime=30 xymax=0 depthres=.3
+sunull nt=3 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=3 dx=10 v0=500 abtime=0 xymax=20
+sunull nt=4 ntr=4 | sushw key=sx,sy,sstat,gstat a=0,100,20,35 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=4 dx=10 v0=500 abtime=35 xy=19.999 xymax=0 depthres=.1
+# Prime length and nonlinear header-derived elevations and arrivals.
+sunull nt=17 ntr=17 | suchw key1=d1,f1,d2,f2 key2=tracl,tracl,tracl,tracl key3=tracl,tracl,tracl,tracl a=-7,100,20,90 b=7,.01,3.1,-3.1 c=0,.02,.003,.005 e=1,2,1,1 f=1,1,2,2 | sugethw key=d1,f1,d2,f2 output=geom | grm nt=17 dx=7 v0=400 abtime=90 xymax=42 depthres=.25
+# Default optional parameters versus their explicit values, on identical data.
+suplane nt=31 ntr=31 npl=1 | sushw key=sx,sy,sstat,gstat a=-100,80,20,170 b=10,-1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=31 dx=10 v0=500 abtime=0
+suplane nt=31 ntr=31 npl=1 | sushw key=sx,sy,sstat,gstat a=-100,80,20,170 b=10,-1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=31 dx=10 v0=500 abtime=0 xy=99999.9 xymax=200 depthres=.5
+# The specified XY is truncated to half-offsets, including just below a step.
+suspike nt=11 ntr=11 nspk=1 ix1=1 it1=1 | sushw key=sx,sy,sstat,gstat a=0,50,20,70 b=10,2,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=11 dx=10 v0=500 abtime=70 xy=39.999 xymax=60 depthres=.7
+suspike nt=11 ntr=11 nspk=1 ix1=1 it1=1 | sushw key=sx,sy,sstat,gstat a=0,50,20,70 b=10,2,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=11 dx=10 v0=500 abtime=70 xy=40 xymax=60 depthres=.7
+# Fractional spacing, a nonintegral XYmax, and an explicitly zero XY.
+sunull nt=7 ntr=7 | sushw key=d1,f1,d2,f2 a=-2.1,3.25,20,24.2 b=.7,.03,.7,-.7 | sugethw key=d1,f1,d2,f2 output=geom | grm nt=7 dx=.7 v0=100 abtime=24.2 xy=0 xymax=2.79 depthres=.07
+# Large arrival table; all three result sections remain under one MB.
+sunull nt=1 ntr=4097 | sushw key=d1,f1,d2,f2 a=0,100,20,224.8 b=1,0,.05,-.05 | sugethw key=d1,f1,d2,f2 output=geom | grm nt=4097 dx=1 v0=200 abtime=224.8 xy=0 xymax=20 depthres=.5
+# Large sample count in the generator, one trace, and four arrival pairs.
+sunull nt=4097 ntr=1 | sushw key=sx,sy,sstat,gstat a=0,100,20,35 | sugethw key=sx,sy,sstat,gstat output=geom | awk '{for(i=0;i<4;i++) print $1+10*i,$2+i,$3+5*i,$4-5*i}' | grm nt=4 dx=10 v0=500 abtime=35 xymax=0
+# Input after nt pairs is ignored; short input reuses already initialized values.
+sunull nt=5 ntr=13 | sushw key=sx,sy,sstat,gstat a=0,100,20,80 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=5 dx=10 v0=300 abtime=40 xymax=0
+sunull nt=2 ntr=2 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=5 dx=10 v0=300 abtime=30 xymax=0
+# scanf permits arbitrary whitespace and adjacent signed numbers.
+sunull nt=4 ntr=4 | sushw key=sx,sy,sstat,gstat a=0,100,20,35 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk '{printf "\t%+.6e%+.6e\n%+.6e\t%+.6e\n",$1,$2,$3,$4}' | grm nt=4 dx=10 v0=500 abtime=35 xymax=0
+# Negative depth has no arc search; negative v0 with a negative step does search.
+sunull nt=5 ntr=5 | sushw key=sx,sy,sstat,gstat a=0,100,20,40 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=5 dx=10 v0=500 abtime=100 xymax=0
+sunull nt=5 ntr=5 | sushw key=sx,sy,sstat,gstat a=0,100,20,40 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=5 dx=10 v0=-500 abtime=40 xymax=0 depthres=-.5
+# Reverse coordinates and slopes; source does not sort the input points.
+sunull nt=7 ntr=7 | sushw key=sx,sy,sstat,gstat a=60,100,50,20 b=-10,-1,-5,5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=7 dx=-10 v0=300 abtime=50 xymax=0 xy=0 depthres=1
+# Full stderr, including verbose format notice and case-sensitive unknown names.
+[stderr] sunull nt=7 ntr=7 | sushw key=sx,sy,sstat,gstat a=0,100,20,50 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=7 dx=10 v0=500 abtime=50 xymax=20 verbose=1
+[stderr] sunull nt=7 ntr=7 | sushw key=sx,sy,sstat,gstat a=0,100,20,50 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=7 dx=10 v0=500 abtime=50 xymax=20 XY=0 XYmax=0
+# Error cases retain a generator pipeline; the input fits in a pipe buffer.
+[stderr] sunull nt=1 ntr=1 | sugethw key=sx,sy,sstat,gstat output=geom | grm dx=10 v0=500 abtime=20
+[stderr] sunull nt=1 ntr=1 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=1 v0=500 abtime=20
+[stderr] sunull nt=1 ntr=1 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=1 dx=10 abtime=20
+[stderr] sunull nt=1 ntr=1 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=1 dx=10 v0=500
+[stderr] sunull nt=1 ntr=1 | sugethw key=sx,sy,sstat,gstat output=geom | grm nt=2147483648 dx=10 v0=500 abtime=20
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=1 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk 'NR==2 {$3="0x1.9p4"} {print}' | grm nt=3 dx=10 v0=200 abtime=30 xymax=0
+sunull nt=1 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk 'NR==2 {$2="nan"} {print}' | grm nt=3 dx=10 v0=200 abtime=30 xymax=0
+sunull nt=1 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk 'NR==2 {$2="inf"} {print}' | grm nt=3 dx=10 v0=200 abtime=30 xymax=0
+sunull nt=1 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk 'NR==2 {$3="25e+"} {print}' | grm nt=3 dx=10 v0=200 abtime=30 xymax=0
+sunull nt=1 ntr=3 | sushw key=sx,sy,sstat,gstat a=0,100,20,30 b=10,1,5,-5 | sugethw key=sx,sy,sstat,gstat output=geom | awk 'NR==2 {$1="16.0000009536743164062500000000000001"} {print}' | grm nt=3 dx=10 v0=200 abtime=30 xymax=0

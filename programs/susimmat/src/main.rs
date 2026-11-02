@@ -113,6 +113,8 @@ fn main() {
     let mut trace = vec![0.0f32; nt + pad];
     let mut data = vec![0.0f32; nt + pad];
     let mut mat = vec![0.0f32; nt * nt];
+    // ealloc1float converts a negative mt to size_t and its malloc fails.
+    if mt < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut x = vec![0.0f32; mt.max(1) as usize];
     let mut y = vec![0.0f32; mt.max(1) as usize];
     let mut sufile = String::new();

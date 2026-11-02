@@ -80,3 +80,49 @@
 # The inventory redirects outputs; also check the resulting file contents.
 [f32] sird_epidemic stepmax=32 h=0.25 N=200 i0=2 b=0.6 k=0.2 nu=0.05 gamma=5 scale=1 mode=SIRD > sird_all.bin; cat sird_all.bin
 [f32] sird_epidemic stepmax=32 h=0.1 normalize=0 N=10 s0=9 i0=1 d0=0 b=0.02 nu=0.1 scale=2 mode=D > sird_d.bin; cat sird_d.bin
+
+# diff-2026-11 (round 1)
+# sird_epidemic does not read stdin or trace headers. Drain after it exits,
+# preserving its status, so generators and header stages cannot get SIGPIPE.
+# Exercise input nt=1..4, prime/odd/4097, plus corresponding solver lengths.
+[f32] [stderr] sunull nt=1 ntr=1 | { sird_epidemic; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | { sird_epidemic stepmax=40 verbose=0 normalize=1 N=1000 s0=1000 i0=1 r0=0 d0=0.01 scale=0 h=1 tol=1e-8 mode=SIRD b=0.5 k=0.333 nu=0 gamma=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=1 ntr=1 | { sird_epidemic stepmax=1 mode=S scale=1 N=997 s0=991 i0=6; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=2 ntr=1 | { sird_epidemic stepmax=2 mode=I scale=2 N=997 s0=991 i0=6 h=0.2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { sird_epidemic stepmax=3 mode=R normalize=0 s0=9 i0=1 r0=2 b=0.03 k=0.4 h=0.1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4 ntr=1 | { sird_epidemic stepmax=4 mode=D d0=5 nu=0.2 h=0.125 scale=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] suplane nt=17 ntr=3 npl=1 ct1=9 cx1=2 len1=3 | { sird_epidemic stepmax=17 mode=SIRD h=0.3 b=3 k=0.4 nu=0.1 gamma=7 tol=1e-12 verbose=2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4097 ntr=1 | { sird_epidemic stepmax=4097 h=0.01 gamma=1000000 mode=SIRD; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=101 ntr=2 nspk=1 ix1=2 it1=51 | { sird_epidemic stepmax=257 mode=I h=0.25 N=7900000 i0=10 b=0.5 k=0.3333; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=13 ntr=3 | sushw key=dt,delrt,offset,cdp a=2000,-100,-300,17 b=0,0,100,-1 | suchw key1=tracr key2=cdp a=20 b=-1 | { sird_epidemic stepmax=11 h=0.5 mode=SIRD verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suplane nt=19 ntr=2 npl=1 ct1=10 cx1=1 len1=2 | { sird_epidemic stepmax=23 normalize=0 s0=9 i0=1 r0=2 d0=3 b=0.02 k=0.3 nu=0.1 gamma=0.2 h=-0.1 mode=SIRD; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { sird_epidemic stepmax=4 h=0.0000005 b=1e999 k=1e999 nu=1e999 gamma=1e999 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=3 ntr=1 | { sird_epidemic stepmax=4 h=0.000000500001 b=2 k=0.5 nu=0.1 tol=1e-14 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=4 | { sird_epidemic stepmax=5 h=0.2 tol=-0.000001 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=7 ntr=1 | { sird_epidemic stepmax=19 gamma=-2 b=0.1 k=0.4 nu=0.03 h=0.5; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=11 ntr=1 | { sird_epidemic stepmax=11 i0=0 s0=950 r0=40 d0=10 nu=0.7 gamma=100 scale=2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=13 ntr=1 nspk=1 ix1=1 it1=7 | { sird_epidemic stepmax=13 s0=0 i0=100 r0=10 d0=1 nu=0.1 k=0.4 scale=1 mode=D; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=5 ntr=2 | { sird_epidemic stepmax=5 b=0 k=0 nu=0 s0=789 i0=211 r0=7 d0=3 normalize=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=5 ntr=1 | { sird_epidemic stepmax=13 scale=1 N=16777217.125 s0=12345679.625 i0=4321.125 r0=123.5 d0=45.25 mode=S h=0.25; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=5 ntr=1 | { sird_epidemic stepmax=13 scale=2 N=16777217.125 s0=12345679.625 i0=4321.125 r0=123.5 d0=45.25 mode=D nu=0.15 h=0.25; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=17 ntr=1 | { sird_epidemic stepmax=17 normalize=-3 N=17 s0=12 i0=3 r0=1 d0=1 b=0.9 k=0.1 nu=0.05 gamma=4 h=0.125; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { sird_epidemic stepmax=2 h=0 b=1e999 k=1e999 nu=1e999 gamma=1e999 verbose=-2 mode=R; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { sird_epidemic stepmax=2 N= s0= i0= r0= d0= b= k= nu= gamma= scale= normalize= h= tol= verbose=; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { sird_epidemic stepmax=3, N=762, s0=750, i0=12, b=2, k=0.5, nu=0.1, gamma=4, h=0.25, mode=I; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4 ntr=1 | { sird_epidemic stepmax=4 N=0x1.8p+9 s0=0x1.7cp+9 i0=0x1p+3 h=0x1p-2 b=0x1p+1 k=0x1p-1 nu=0x1p-4 tol=0x1p-30 mode=D scale=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=7 ntr=1 | { sird_epidemic stepmax=7 stepmax=2 h=2 h=0.125 mode=D mode=S N=99 N=101 scale=2 scale=1 verbose=1 verbose=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { sird_epidemic stepmax=3 r0=-100 d0=-20 i0=2 nu=0.1 mode=SIRD scale=-2; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 mode=SIRDS; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 mode=; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 par=missing.par; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 scale=2147483648; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 verbose=-2147483649; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 h=1e-310; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 s0=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 h=-1 nu=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=4 par=/dev/null unknown=123 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=17 ntr=1 | { sird_epidemic stepmax=17 h=0.01 b=0 k=1000 nu=50 gamma=0 mode=R scale=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=31 ntr=1 | { sird_epidemic stepmax=200 h=0.1 N=762 i0=1 b=2 k=0.5 nu=0.1 mode=SIRD scale=1; rc=$?; cat >/dev/null; exit "$rc"; }
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 tol=0x1.8p-1074; rc=$?; cat >/dev/null; exit "$rc"; }

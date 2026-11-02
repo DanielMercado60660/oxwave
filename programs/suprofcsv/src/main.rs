@@ -305,8 +305,9 @@ fn main() {
     let mut qin = String::new();
     let has_qin = getparstring("qin", &mut qin) != 0;
     let mut qout = String::new();
-    getparstring("qout", &mut qout);
-    if has_qin && qin == qout {
+    let has_qout = getparstring("qout", &mut qout) != 0;
+    // C compares names only when both filename pointers are present.
+    if has_qin && has_qout && qin == qout {
         err!("**** Error: qout= output Q-file name must be different than qin= input Q-file name.");
     }
     let fp = match fopen(&qout, "w") {
@@ -600,7 +601,10 @@ fn main() {
     let mut dalls;
     if chordf > 0.0 {
         ncdp = msize;
-        let mut dpaths = vec![0.0; ncdp];
+        // Initial chording can leave one point. Provide an initialized boundary
+        // distance for nhere=1, as in the minimally fixed C. The spare dalla
+        // row is already zeroed; the output loop omits this single endpoint.
+        let mut dpaths = vec![0.0; ncdp + 1];
         for jcdp in 1..ncdp {
             let pint = (dalla[jcdp][locx] - dalla[jcdp - 1][locx])
                 * (dalla[jcdp][locx] - dalla[jcdp - 1][locx])
@@ -608,6 +612,7 @@ fn main() {
                     * (dalla[jcdp][locy] - dalla[jcdp - 1][locy]);
             dpaths[jcdp] = dpaths[jcdp - 1] + pint.sqrt();
         }
+        dpaths[ncdp] = dpaths[ncdp - 1];
         let mut chordhere = 0.0 - chordf * nmaxs as f64;
         let chordfmax = dpaths[ncdp - 1] + chordf * nmaxs as f64;
         let mout = (9.0 + (chordfmax - chordhere) / chordf) as usize;
@@ -711,12 +716,14 @@ fn main() {
         }
     }
     fprintf!(fp, "\n");
-    // C uses lrint (round to nearest, ties to even) for the first cdp.
+    // C's lrint returns a long: subtract in i64 before narrowing to int.
+    // Converting directly to i32 would saturate large profile origins.
     let jcrf = if let Some(lp) = locp {
-        (dalls[1][lp] * pcru + pcrz).round_ties_even() as i32 - 1
+        (dalls[1][lp] * pcru + pcrz).round_ties_even() as i64
     } else {
-        pcrz.round_ties_even() as i32 - 1
-    };
+        pcrz.round_ties_even() as i64
+    }
+    .wrapping_sub(1) as i32;
     for jcdp in 1..msize - 1 {
         fprintf!(fp, "Q");
         fprintf!(fp, &formxylong, (jcdp as i32 + jcrf) as f64);

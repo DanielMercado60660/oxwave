@@ -27,3 +27,35 @@ printf '~C\nDEPT\n~P\n~A\n1\n2\n' | las2su dz=100
 # Last valid row index, with and without both explicit subsampling passes
 [stderr] python3 -c 'print("~A"); print("\n".join("%d %d" % (i, 2*i) for i in range(65535)))' | las2su ncurve=2
 [stderr] python3 -c 'print("~A"); print("\n".join("%d %d" % (i, 2*i) for i in range(65535)))' | las2su ncurve=2 ss=1 verbose=1
+# diff-2026-11 (round 1)
+# SU samples converted to LAS rows: default flags and depths 1, 2, 3, 4.
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\nDEPT\n~P\n~A"} {print NR+99.5}' | las2su
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\nDEPT\nGR\n~P\n~A"} {print 100+NR/2, $1}' | las2su ncurve=2 dz=0.5 m=0 ss=0 verbose=0
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\nDEPT\n~P\n~A"} {print -10+NR/4}' | las2su m=1 dz=0.25
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\nDEPT\nAMP\n~P\n~A"} {print 100+NR*2, $1}' | las2su ncurve=2 ss=1 dz=2 verbose=1
+# Subsampling runs twice, including zero-length output traces for nz < 4.
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~A"} {print 7}' | las2su ncurve=1 ss=1 verbose=1
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~A"} {print 8+NR}' | las2su ncurve=1 ss=1 verbose=1
+[stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~A"} {print 9+NR}' | las2su ncurve=1 ss=1 verbose=1
+# Odd, prime, and large sample counts, retaining nonzero curve samples.
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\n# comment\nDEPT\nAMP\n~P\n~A"} {print 500+NR/8, $1}' | las2su dz=0.125 ss=1 m=1
+suplane nt=31 ntr=3 npl=1 len1=3 cx1=2 ct1=16 dip1=0 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~A"} {print NR, $1, -999.25}' | las2su ncurve=3 dz=1 m=-1 ss=2
+[stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~A"} {print 200+NR/2, $1}' | las2su ncurve=2 ss=1 dz=0.5 verbose=1
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk 'BEGIN {print "~C\nDEPT\n~P\n~A"} {print NR/16}' | las2su dz=0.0625
+# Header-driven LAS rows, with fractional depth and an independently derived curve.
+sunull nt=1 ntr=17 | sushw key=d1,f1 a=0.5,123.25 b=0.25,0.5 | suchw key1=d2 key2=f1 key3=d1 a=0 b=2 c=-1 d=1 | sugethw key=f1,d1,d2 output=geom | awk 'BEGIN {print "~C\n# depth first\nDEPT\nRATE\nVALUE\n~P\n~A"} {print}' | las2su m=1 dz=0.5
+# All header bytes are observable, including C-string NUL termination.
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk 'BEGIN {printf "~V%cignored header suffix\n~C\nDEPT\n~P\n~A\n", 0} {print}' | las2su outhdr=header > /dev/null && cat header
+[exact] sunull nt=2 ntr=1 | sugethw key=ns output=geom | awk 'BEGIN {printf "~C\nDEPT%cignored curve suffix\n~P\n~A\n", 0} {print}' | las2su outhdr=header > /dev/null && cat header
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk 'BEGIN {printf "~V\r\nVERS. 2\r\n~C\r\n# curves\r\nDEPT\r\n~P\r\n~A\r\n"} {printf "%s\r\n", $1}' | las2su outhdr=header > /dev/null && cat header
+# Header lines split at LAS_MAXLINE-1; automatic counting follows the split.
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk 'BEGIN {printf "~V\n"; for (i=0;i<1001;i++) printf "x"; print "\n~C\nDEPT\n~P\n~A"} {print}' | las2su outhdr=header > /dev/null && cat header
+# Explicit counts bypass curve inference; extra data columns are ignored.
+sunull nt=1 ntr=5 | sugethw key=tracl,ns output=geom | awk 'BEGIN {print "~A"} {printf "%s\t%s\t-999.25\r\n", $1, $2}' | las2su ncurve=1 dz=0
+# No final newline, C atof prefix parsing, and empty numeric parameter defaults.
+sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk 'BEGIN {print "~C\nDEPT\nGR\n~P\n~A"} {printf "0x1.8p+2  -999.25suffix"}' | las2su ncurve=2 m= dz= ss= verbose=
+[stderr] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk 'BEGIN {print "~C\nDEPT\n~P\n~A"} {print}' | las2su verbose=1 nskip=99
+# Deterministic parameter errors occur before LAS parsing.
+[stderr] sunull nt=1 ntr=1 | las2su m=2147483648
+[stderr] sunull nt=1 ntr=1 | las2su dz=1e-310
+[stderr] sunull nt=1 ntr=1 | las2su outhdr=missing/header

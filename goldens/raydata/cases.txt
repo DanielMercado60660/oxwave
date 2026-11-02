@@ -91,3 +91,52 @@
 [f32] elamodel fill=0.5,0.5,3,1.5,2 > model.bin; elaray mode=1 nangle=9 fangle=-35 langle=45 < model.bin > rays.bin; raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=0 kend=2147483647 < rays.bin; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data
 # A single real endpoint with explicit kend=0; every ASCII output and pair order.
 [exact] elamodel fill=0.5,0.5,2,1,1 > model.bin; elaray nangle=1 fangle=15 langle=15 < model.bin > rays.bin; raydata kend=0 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1 < rays.bin; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data
+
+# diff-2026-11 (round 1)
+# raydata consumes native 108-byte RayEnd records, not SU traces. Raw SU
+# headers below deliberately exercise record framing; sustrip/makevel and
+# sugethw provide native floats for the data cases. Successful cases assert
+# SU raydata's unconditional status 1, then collect files with status 0.
+# Boundary SU trace sizes, including headers modified before raydata. No
+# polarization here: interpreting arbitrary headers as g tensors can be UB.
+[exact] sunull nt=1 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=2 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=3 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=4 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=17 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=4097 ntr=1 | sushw key=sx,gx,offset a=125,-250,375 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+# Default flags versus explicit zeros over the same prime-sized stripped input.
+[exact] suspike nt=29 ntr=7 nspk=1 ix1=3 it1=6 | sustrip outpar=/dev/null | { raydata ; s=$?; test "$s" -eq 1 || exit 99; cat outpar; find . -type f | sort; }
+[exact] suspike nt=29 ntr=7 nspk=1 ix1=3 it1=6 | sustrip outpar=/dev/null | { raydata kend=2147483647 t=0 px=0 pz=0 vgx=0 vgz=0 pxvx=0 pol=0 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar; find . -type f | sort; }
+# Prime trace sizes split records across traces; partial last record is ignored.
+[exact] suplane nt=109 ntr=7 npl=1 dip1=3 ct1=40 cx1=4 len1=7 | sustrip outpar=/dev/null | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+# A constant float 2 has native integer bits 1073741824 at kend. Every
+# polarization tensor is positive and all records match, avoiding C filtering UB.
+[exact] makevel nx=13 nz=27 v000=2 | { raydata kend=1073741824 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; }
+[exact] makevel nx=13 nz=27 v000=2 | { raydata kend=1073741824 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; }
+# Repeated growth through 4097 endpoints with distinct values and safe tensors.
+[exact] makevel nx=4097 nz=27 v000=0.125 dvdx=0.03125 dvdz=0.0625 | { raydata t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; }
+# Negative tensors take the g13<0 polarization branch; nonunit enabled flags.
+[exact] makevel nx=19 nz=27 v000=-4 dvdx=-0.03125 dvdz=-0.125 | { raydata pxvx=-7 pol=2 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat px_vgx.data x_pol.data; }
+# Header-derived endpoints: x changes in acquisition order, g13 is negative.
+[exact] [stderr] sunull nt=3 ntr=11 | sushw key=f1,d1,f2,d2 a=0.25,0.5,2,-3 b=1,0.125,0,0 | suchw key1=f1 key2=f1 key3=d1 a=0 b=2 c=-1 | sugethw output=binary key=d1,f1,f2,d2,f1,d1,f2,d2,f1,d1,f2,f2,d2,d1,f2,f2,f1,d1,f2,f2,f2,d2,f2,f2,f2,f2,f2 | { raydata kend=1073741824 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 pol=1 ascci=1 verbose=1; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data x_pol.data; }
+# No-match filtering of header-derived records without polarization.
+[exact] sunull nt=3 ntr=11 | sushw key=f1,d1,f2,d2 a=0.25,0.5,2,-3 b=1,0.125,0,0 | suchw key1=f1 key2=f1 key3=d1 a=0 b=2 c=-1 | sugethw output=binary key=d1,f1,f2,d2,f1,d1,f2,d2,f1,d1,f2,f2,d2,d1,f2,f2,f1,d1,f2,f2,f2,d2,f2,f2,f2,f2,f2 | { raydata kend=0 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat outpar x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+# Output flags truncate existing files even when their nonunit values suppress writes.
+[exact] makevel nx=2 nz=27 v000=3 | { printf stale > x_t.data; printf stale > x_px.data; raydata t=2 px=-3 pz=2 vgx=-5 vgz=2 pxvx=0 pol=0 ascci=-2; s=$?; test "$s" -eq 1 || exit 99; wc -c x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data; test ! -e outpar; }
+# Empty optional values fall back to defaults; final repeated option wins.
+[exact] makevel nx=3 nz=27 v000=1 | { raydata kend= t=2 t=1 px= pxvx=1 ascci=2 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data px_vgx.data; }
+# Invalid numeric values fail before reading input. No parameters are required.
+[stderr] sunull nt=1 ntr=1 | raydata px=-2147483649
+[stderr] sunull nt=1 ntr=1 | raydata pol=2147483648
+[stderr] sunull nt=1 ntr=1 | raydata ascci=9223372036854775808
+[stderr] sunull nt=1 ntr=1 | raydata kend=+2147483648
+# Bare names without equals are ignored; verbose diagnostics are compared.
+[exact] [stderr] sunull nt=4 ntr=1 | { raydata t px ascci=1 verbose=1; s=$?; test "$s" -eq 1 || exit 99; find . -type f | sort; }
+# Alternating kend values select interleaved records, with distinct output
+# values. Polarization is disabled because filtering makes the C loop unsafe.
+[exact] sunull nt=2 ntr=17 | sushw key=f1,d1,f2,d2 a=0.25,0.5,0,-3 b=1,0.125,1,0 j=999,999,2,999 | sugethw output=binary key=d1,f1,f2,d2,f1,d1,f2,d2,f1,d1,f2,f2,d2,d1,f2,f2,f1,d1,f2,f2,f2,d2,f2,f2,f2,f2,f2 | { raydata kend=1065353216 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=0; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+[exact] sunull nt=2 ntr=17 | sushw key=f1,d1,f2,d2 a=0.25,0.5,0,-3 b=1,0.125,1,0 j=999,999,2,999 | sugethw output=binary key=d1,f1,f2,d2,f1,d1,f2,d2,f1,d1,f2,f2,d2,d1,f2,f2,f1,d1,f2,f2,f2,d2,f2,f2,f2,f2,f2 | { raydata kend=1065353216 t=1 px=1 pz=1 vgx=1 vgz=1 pxvx=1 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_t.data x_px.data x_pz.data x_vgx.data x_vgz.data px_vgx.data; }
+# Very small/large signed tensors at both allocation and buffering boundaries.
+[exact] makevel nx=302 nz=27 v000=1e-30 | { raydata pol=1 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_pol.data; }
+[exact] makevel nx=13001 nz=27 v000=-1e30 | { raydata pol=1 ascci=1; s=$?; test "$s" -eq 1 || exit 99; cat x_pol.data; }

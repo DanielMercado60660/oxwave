@@ -44,3 +44,53 @@ suspike nt=abc ntr=4
 [stderr] suspike offset=1e-310
 [stderr] suspike ix1=2147483648
 [stderr] suspike it4=2147483648
+# diff-2026-11 (round 1)
+# All parameters explicitly supplied, in reverse trace/sample order.
+[exact] suspike nt=29 ntr=11 dt=0.0020019 offset=-987.75 nspk=4 ix1=11 it1=29 ix2=7 it2=17 ix3=3 it3=7 ix4=1 it4=1
+# Boundary sizes with all selected sample indices inside the data array.
+[exact] suspike nt=1 ntr=2 nspk=4 ix1=2 it1=1 ix2=1 it2=1 ix3=2 it3=1 ix4=1 it4=1
+[exact] suspike nt=2 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=2
+[exact] suspike nt=3 ntr=3 nspk=3 ix1=3 it1=3 ix2=2 it2=2 ix3=1 it3=1
+[exact] suspike nt=4 ntr=1 nspk=4 ix1=1 it1=1 ix2=1 it2=2 ix3=1 it3=3 ix4=1 it4=4
+[exact] suspike nt=4 ntr=4
+[exact] suspike nt=7 ntr=7 nspk=4 ix1=1 it1=7 ix2=7 it2=1 ix3=4 it3=4 ix4=4 it4=5
+[exact] suspike nt=4097 ntr=7 dt=0.000125 offset=100000.75 nspk=4 ix1=1 it1=1 ix2=7 it2=4097 ix3=3 it3=2049 ix4=5 it4=4096
+[exact] suspike nt=65535 ntr=2 nspk=2 ix1=1 it1=65535 ix2=2 it2=1
+# Coincident spikes are assigned, never summed; spike #1 is unconditional.
+[exact] suspike nt=13 ntr=5 nspk=4 ix1=3 it1=7 ix2=3 it2=7 ix3=3 it3=7 ix4=3 it4=7
+[exact] suspike nt=13 ntr=5 nspk=0 ix1=5 it1=13
+[exact] suspike nt=13 ntr=5 nspk=-2147483648 ix1=1 it1=1
+[exact] suspike nt=13 ntr=5 nspk=2147483647 ix1=5 it1=13 ix2=4 it2=12 ix3=2 it3=2 ix4=1 it4=1
+[exact] suspike nt=19 ntr=3 nspk=4 ix1=0 it1=1 ix2=4 it2=19 ix3=-1 it3=10 ix4=2147483647 it4=5
+# Header conversion: truncate fractional microseconds and signed offsets.
+[exact] suspike nt=5 ntr=2 dt=0.0000019 offset=1.999 nspk=1 ix1=1 it1=5
+[exact] suspike nt=5 ntr=2 dt=0.0000021 offset=-1.999 nspk=1 ix1=2 it1=1
+[exact] suspike nt=5 ntr=2 dt=0.065535 offset=2147483520 nspk=1 ix1=1 it1=1
+[exact] suspike nt=5 ntr=2 dt=0.0000001 offset=-2147483648 nspk=1 ix1=2 it1=5
+# Empty numeric values leave each initialized default unchanged.
+[exact] suspike nt= ntr= dt= offset= nspk= ix1= it1= ix2= it2= ix3= it3= ix4= it4=
+[exact] suspike nt=4 nt=17 ntr=1 ntr=3 nspk=4 nspk=1 ix1=1 ix1=3 it1=1 it1=17 dt=0.004 dt=0.002 offset=400 offset=-25
+[exact] suspike nt=+17junk ntr=+3junk nspk=+1junk ix1=+3junk it1=+17junk dt=0.002junk offset=-25.75junk
+[exact] suspike nt=17 ntr=3 nspk=1 ix1=3 it1=17 dt=0x1p-9 offset=-0x1.9p4
+# There is no checkpars call in C, so verbose and unknown arguments are silent.
+[exact] [stderr] suspike nt=23 ntr=5 nspk=4 verbose=1 unknown=ignored
+[exact] suspike nt=23 ntr=0 nspk=4 ix1=1 it1=23
+# suspike ignores stdin, including headers altered by sushw and suchw.
+# Drain after generation to keep upstream stages alive and avoid SIGPIPE races.
+[exact] sunull nt=5 ntr=2 dt=0.001 | sushw key=offset,cdp,tracl a=-999,42,100 | { suspike nt=3 ntr=1 dt=0.002 offset=17 nspk=1 ix1=1 it1=3; suspike_status=$?; cat >/dev/null; exit "$suspike_status"; }
+[exact] suplane nt=17 ntr=4 npl=1 dip1=0 ct1=8 cx1=2 | suchw key1=offset key2=tracl a=50 b=2 | { suspike nt=7 ntr=2 dt=0.001 offset=-51 nspk=2 ix1=1 it1=7 ix2=2 it2=1; suspike_status=$?; cat >/dev/null; exit "$suspike_status"; }
+# No required parameters exist. Exercise invalid values in the optional ones.
+[stderr] suspike nt=65537 ntr=1
+[stderr] suspike nt=4 ntr=-2147483649
+[stderr] suspike nt=4 ntr=1 nspk=2147483648
+[stderr] suspike nt=4 ntr=1 ix2=-2147483649
+[stderr] suspike nt=4 ntr=1 it2=2147483648
+[stderr] suspike nt=4 ntr=1 ix3=2147483648
+[stderr] suspike nt=4 ntr=1 it3=-2147483649
+[stderr] suspike nt=4 ntr=1 ix4=-2147483649
+[stderr] suspike nt=4 ntr=1 dt=1e39
+[stderr] suspike nt=4 ntr=1 offset=-1e39
+# ub-2026-11 (round 1)
+# suspike.c:87 writes outside segy, but a bounds guard leaves all output and rc unchanged.
+suspike nt=8 ntr=1 nspk=1 ix1=1 it1=65536
+suspike nt=8 ntr=1 nspk=1 ix1=1 it1=-60

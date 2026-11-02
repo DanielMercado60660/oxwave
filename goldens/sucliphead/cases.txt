@@ -12,3 +12,21 @@ sucliphead min=1 </dev/null
 sucliphead key=cdp,offset min=1 </dev/null
 sucliphead key=cdp max=1,2 </dev/null
 sucliphead key=notakey </dev/null
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sushw key=cdp a=-8 | sucliphead key=cdp min=-3 max=7
+suspike nt=3 ntr=4 | sushw key=offset a=-3 b=2 | sucliphead key=offset min=-1.8 max=1.8
+suspike nt=4 ntr=3 | sushw key=delrt a=-5 b=5 | sucliphead key=delrt min=-2.9 max=2.9
+sunull nt=13 ntr=4 | sushw key=dt a=100 b=200 | sucliphead key=dt min=250 max=500
+sunull nt=4097 ntr=2 | sushw key=d1 a=-2 b=4 | sucliphead key=d1 min=-1.25 max=1.25
+suplane nt=17 ntr=4 | sushw key=cdp,offset a=-4,8 b=3,-3 | sucliphead key=cdp,offset min=-2,0 max=2,5
+sunull nt=3 ntr=3 | sushw key=cdp a=-2 b=2 | sucliphead key=cdp,cdp min=0,1 max=10,2
+sunull nt=2 ntr=3 | sushw key=cdp a=-3 b=3 | sucliphead key=cdp min=2 max=-2
+[stderr] suspike nt=4 ntr=1 | sucliphead key=tracl min=1 max=1 verbose=1
+sunull nt=1 ntr=1 | sucliphead key=cdp,offset max=2
+sunull nt=1 ntr=1 | sucliphead key=bogus min=0 max=1
+sunull nt=4 ntr=2 | sucliphead key=ns min=2 max=3
+sunull nt=2 ntr=2 | sucliphead key=ns min=3 max=4
+sunull nt=2 ntr=1 | sushw key=cdp a=16777217 | sucliphead key=cdp min=16777218 max=16777220
+sunull nt=3 ntr=1 | sushw key=dt a=65535 | sucliphead key=dt min=0 max=32000.5
+sunull nt=1 ntr=1 | sucliphead key=cdp min=1e-310

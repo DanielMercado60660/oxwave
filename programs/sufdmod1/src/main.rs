@@ -257,6 +257,15 @@ fn main() {
         }
     }
 
+    // Reject coordinates outside the model before the C source injection
+    // and receiver recording would access beyond their allocated arrays.
+    if isz < 0 || isz >= nz {
+        err!("source index %d outside [0, %d)", isz, nz);
+    }
+    if irz < 0 || irz >= nz {
+        err!("receiver index %d outside [0, %d)", irz, nz);
+    }
+
     /* allocate space */
     let mut p = vec![0.0f32; nz as usize];
     let mut v = vec![0.0f32; nz as usize];

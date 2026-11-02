@@ -66,3 +66,55 @@
 [stderr] sunull nt=16 | sudmotivz cdpmin=2147483648
 [stderr] sunull nt=16 | sushw key=delrt a=-20 | sudmotivz
 [stderr] (sunull nt=16 ntr=1; sunull nt=17 ntr=1) | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1
+# diff-2026-11 (round 1)
+# Long records, including a single nonzero trace and prime FFT input lengths.
+[stderr] suplane nt=4097 ntr=3 | sushw key=cdp,offset a=1,100 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+[stderr] suspike nt=4099 ntr=1 nspk=1 ix1=1 it1=2000 offset=300 | sushw key=cdp a=42 | sudmotivz cdpmin=42 cdpmax=42 dxcdp=30 noffmix=1
+# Short records: mute errors and small successful mappings.
+[stderr] sunull nt=2 ntr=1 | sushw key=offset a=100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] sunull nt=4 ntr=1 | sushw key=offset a=-100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1
+[stderr] suplane nt=17 ntr=3 | sushw key=cdp,offset a=1,20 b=1,0 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+[stderr] suspike nt=31 ntr=3 nspk=1 ix1=2 it1=20 offset=20 | sushw key=cdp a=1 b=1 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+# Explicit defaults, finer slope sampling, different dt, and band limits.
+[stderr] suplane nt=113 ntr=7 | sushw key=cdp,offset a=1,120 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 fmax=125 verbose=0 speed=1 smute=1.5 tdmo=0 vndmo=1500 vdmo=1500 etadmo=0
+[stderr] suplane nt=257 ntr=13 | suaddnoise seed=28 sn=2 | sushw key=cdp,offset a=1,250 b=1,0 | sudmotivz cdpmin=1 cdpmax=13 dxcdp=25 noffmix=1 speed=0.2
+[stderr] suplane nt=509 ntr=17 dt=0.001 | sushw key=cdp,offset a=1,70 b=1,0 | sudmotivz cdpmin=1 cdpmax=17 dxcdp=25 noffmix=1 vndmo=3800 vdmo=3420 etadmo=0.17 fmax=400
+[stderr] suspike nt=313 ntr=5 dt=0.008 offset=240 | sushw key=cdp a=1 b=1 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 vndmo=900 vdmo=810 etadmo=0.17 fmax=50
+[stderr] suplane nt=257 ntr=9 | sushw key=cdp,offset a=1,250 b=1,0 | sudmotivz cdpmin=1 cdpmax=9 dxcdp=25 noffmix=1 fmax=1 verbose=1
+[stderr] suplane nt=97 ntr=11 | sushw key=cdp,offset a=1,200 b=1,0 | sudmotivz cdpmin=1 cdpmax=11 dxcdp=25 noffmix=1 fmax=500
+[stderr] suplane nt=257 ntr=5 | sushw key=cdp,offset a=1,120 b=1,0 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 smute=5
+# Header-driven order, repeated bins, offset mixes, and an empty CDP window.
+[stderr] suplane nt=193 ntr=24 | sushw key=cdp,offset a=6,-100 b=-1,0 c=0,-80 j=6,6 | sudmotivz cdpmin=1 cdpmax=6 dxcdp=25 noffmix=3 verbose=1
+[stderr] suplane nt=193 ntr=24 | sushw key=cdp,offset a=1,100 b=1,80 c=0,0 j=6,2 | sudmotivz cdpmin=1 cdpmax=6 dxcdp=25 noffmix=2 verbose=1
+[stderr] suplane nt=193 ntr=12 | sushw key=cdp,offset a=1,120 b=1,0 c=0,80 j=3,3 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=3 verbose=1
+[stderr] suplane nt=193 ntr=8 | sushw key=cdp,offset a=5,150 | sudmotivz cdpmin=3 cdpmax=7 dxcdp=25 noffmix=1 verbose=1
+[stderr] suplane nt=193 ntr=12 | sushw key=cdp,offset a=1,120 b=1,0 c=0,80 j=3,3 | sudmotivz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=0 verbose=1
+[stderr] suplane nt=193 ntr=5 | sushw key=cdp,offset a=10,150 b=1,0 | sudmotivz cdpmin=-3 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+# Independent physical synthetic generator, including sorted multiple offsets.
+[stderr] susynlv nt=257 dt=0.004 nxm=5 fxo=0.12 fpeak=25 ref="1:0,0.2;1,0.3" | sudmotivz cdpmin=1 cdpmax=5 dxcdp=50 noffmix=1
+[stderr] (susynlv nt=257 dt=0.004 nxm=5 fxo=0.12 fpeak=25 ref="1:0,0.2;1,0.3"; susynlv nt=257 dt=0.004 nxm=5 fxo=0.20 fpeak=25 ref="1:0,0.2;1,0.3"; susynlv nt=257 dt=0.004 nxm=5 fxo=0.28 fpeak=25 ref="1:0,0.2;1,0.3") | sudmotivz cdpmin=1 cdpmax=5 dxcdp=50 noffmix=2 verbose=1
+# Native binary models made by SU's makevel; every file parameter exits zero.
+[stderr] (makevel nx=1 nz=257 dz=0.004 v000=1700 dvdz=800 >vn; makevel nx=1 nz=257 dz=0.004 v000=1600 dvdz=600 >vv; makevel nx=1 nz=257 dz=0.004 v000=0.1 dvdz=0.1 >eta; suplane nt=257 ntr=7) | sushw key=cdp,offset a=1,180 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vnfile=vn vfile=vv etafile=eta verbose=1
+[stderr] (makevel nx=1 nz=257 dz=0.004 v000=1800 dvdz=400 >vn; suspike nt=257 ntr=5 offset=180) | sushw key=cdp a=1 b=1 | sudmotivz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 vnfile=vn etadmo=0.05
+[stderr] (makevel nx=1 nz=257 dz=0.004 v000=0.05 dvdz=0.2 >eta; suplane nt=257 ntr=7) | sushw key=cdp,offset a=1,180 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 etafile=eta tdmo=0,1 vndmo=1600,2400 vdmo=1500,2200
+[stderr] (makevel nx=1 nz=257 dz=0.004 v000=1450 dvdz=200 >vv; suplane nt=257 ntr=7) | sushw key=cdp,offset a=1,180 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vfile=vv tdmo=0,1 vndmo=1600,2000 etadmo=0.1,0.2
+[stderr] (makevel nx=1 nz=257 dz=0.004 v000=1800 dvdz=400 >vn; makevel nx=1 nz=257 dz=0.004 v000=0.1 >eta; suplane nt=257 ntr=7) | sushw key=cdp,offset a=1,180 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vnfile=vn etafile=eta tdmo=0,1 vdmo=1650,2100
+# Curved and decreasing models, signed bins, and zero-offset anisotropy.
+[stderr] suplane nt=317 ntr=11 | suaddnoise seed=28 sn=2 | sushw key=cdp,offset a=-5,200 b=1,0 | sudmotivz cdpmin=-5 cdpmax=5 dxcdp=25 noffmix=1 tdmo=0,0.1,0.3 vndmo=1700,2200,1500 vdmo=1200,1900,1400 etadmo=0.05,0.1,0.2 speed=1.7 smute=2
+[stderr] suplane nt=97 ntr=11 | sushw key=cdp,offset a=1,-200 b=1,0 | sudmotivz cdpmin=1 cdpmax=11 dxcdp=25 noffmix=1 tdmo=0,0.1,0.2 vndmo=2200,1600,1400 etadmo=0.1,0.3,0.2
+[stderr] suspike nt=193 ntr=7 offset=0 | sushw key=cdp a=1 b=1 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 vndmo=2000 vdmo=1800 etadmo=0.2 verbose=1
+# Additional parser and model-count errors, preserving original validation order.
+[stderr] sunull nt=8 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 vndmo=1500,1800
+[stderr] sunull nt=8 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 etadmo=0,0.1
+[stderr] sunull nt=8 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=
+[stderr] sunull nt=8 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 dxcdp= noffmix=1
+[stderr] sunull nt=8 ntr=1 | sudmotivz cdpmin=0 cdpmax=0 cdpmin=2 dxcdp=25 noffmix=1
+# Complete the tiny-record boundaries and preserve changing dt headers.
+[stderr] sunull nt=1 ntr=1 | sushw key=offset a=-100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 smute=2
+[stderr] sunull nt=3 ntr=1 | sushw key=offset a=-100 | sudmotivz cdpmin=0 cdpmax=0 dxcdp=25 noffmix=1 smute=2
+[stderr] suplane nt=97 ntr=5 | sushw key=offset,dt a=120,4000 b=0,1000 | suchw key1=cdp key2=tracl a=4 b=-1 | sudmotivz cdpmin=-1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+
+# ub-2026-11 (round 1)
+# Refuted: inttable8.c:101,105-106 can overflow for far mapping times, but
+# returning the documented zero extrapolation before indexing changes no output.
+suplane nt=317 ntr=7 dt=0.0005 | suaddnoise seed=28 sn=2 | sushw key=cdp,offset a=1,800 b=1,0 | sudmotivz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 speed=1.7 smute=4 tdmo=0,0.04755,0.1268 vndmo=2900,2300,2200 vdmo=3625,2530,2750 etadmo=0.1,0.1,0.8

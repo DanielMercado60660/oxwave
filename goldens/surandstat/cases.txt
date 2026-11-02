@@ -55,3 +55,42 @@ suspike nt=11 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=11 | surandstat seed=2 max=5
 # One-sample nonzero traces with random shifts in both directions.
 [exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | surandstat seed=1 max=5
 [exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | surandstat seed=2 max=5
+
+# diff-2026-11 (round 1)
+# Dense short traces: zero, positive and negative shifts; copying is byte-exact.
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | surandstat seed=2 max=1 scale=1
+[exact] sunull nt=2 ntr=3 | suaddnoise seed=127 | surandstat seed=2 max=5
+[exact] sunull nt=3 ntr=3 | suaddnoise seed=127 | surandstat seed=1 max=5
+[exact] sunull nt=4 ntr=3 | suaddnoise seed=127 | surandstat seed=17 max=5 scale=0.5
+# Long odd/prime traces and the last safe negative-shift buffer boundary.
+[exact] sunull nt=4097 ntr=3 | suaddnoise seed=127 | surandstat seed=2 max=17 scale=-0.75
+[exact] suplane nt=32749 ntr=3 | surandstat seed=17 max=17
+[exact] sunull nt=65531 ntr=1 | suaddnoise seed=127 | surandstat seed=2 max=5
+# Header defaults use the first dt (cast to int before multiplying by 1000).
+# The static-related headers are preserved rather than updated with the shift.
+[exact] sunull nt=17 ntr=3 | suaddnoise seed=127 | sushw key=dt,delrt,tstat,offset a=65535,-123,32767,-100 b=-20000,17,-30000,123 | surandstat seed=2
+[exact] sunull nt=17 ntr=3 | suaddnoise seed=127 | sushw key=dt,delrt,tstat,offset a=65535,-123,32767,-100 b=-20000,17,-30000,123 | surandstat seed=2 max=0 scale=1
+[exact] suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=dt a=0 | surandstat seed=17 max=5
+# Finite extreme max with a small scale; a large positive shift skips copying.
+[exact] sunull nt=17 ntr=2 | suaddnoise seed=127 | surandstat seed=1 max=2147483647 scale=1e-10
+[exact] sunull nt=17 ntr=2 | suaddnoise seed=127 | surandstat seed=2 max=-2147483648 scale=1e-10
+[exact] sunull nt=17 ntr=2 | suaddnoise seed=127 | surandstat seed=2 max=100000 scale=-1
+# Packed trace I/O, including CHARPACK's C fall-through into SHORTPACK.
+[exact] sunull nt=31 ntr=4 | suaddnoise seed=127 | supack1 | surandstat seed=2 max=5
+[exact] sunull nt=31 ntr=4 | suaddnoise seed=127 | supack2 | surandstat seed=17 max=5 scale=-0.5
+# Verbose diagnostics with all parameters supplied, plus new parser errors.
+[stderr] suplane nt=17 ntr=3 | surandstat seed=19 max=-7 scale=0.25 verbose=1
+[stderr] sunull nt=4 ntr=1 | surandstat seed=1 max=-2147483649
+[stderr] sunull nt=4 ntr=1 | surandstat seed=1 scale=1e309
+# A short first data block errors; a short later data block retains old samples.
+[stderr] sunull nt=3 ntr=2 | suaddnoise seed=127 | head -c 250 | surandstat seed=2 max=5
+[exact] sunull nt=3 ntr=2 | suaddnoise seed=127 | head -c 496 | surandstat seed=2 max=5
+# Short first/later headers and a changing ns header exercise gettr error paths.
+[stderr] sunull nt=3 ntr=1 | head -c 239 | surandstat seed=1
+[exact] sunull nt=3 ntr=2 | suaddnoise seed=127 | head -c 491 | surandstat seed=1
+[stderr] sunull nt=4 ntr=2 | sushw key=ns a=4 b=1 | surandstat seed=1
+
+# ub-2026-11 (round 1)
+# Refuted: surandstat.c:80-81 reads data[65535..65536], but only into
+# un-emitted destinations. A source bounds check leaves stdout/rc unchanged.
+[exact] sunull nt=65533 ntr=1 | surandstat seed=2 max=5

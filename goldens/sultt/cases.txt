@@ -97,3 +97,80 @@ sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=-0.25 > b
 sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=-0.25 > b; sunull nt=1 ntr=1 | sugain bias=0.5 > c; sunull nt=1 ntr=1 | sugain bias=-1 > d; for w in 0 1 2 5; do sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=1 wl=$w && cat alpha || exit; done
 # Small but nonzero amplitudes take the asymmetry eigenvalue threshold branch.
 sunull nt=5 ntr=3 | sugain bias=0.000001 > a; sunull nt=5 ntr=3 | sugain bias=0.0000001 > b; sunull nt=5 ntr=3 > c; sultt inS11=a inS12=b inS21=c inS22=a mode=1 ntraces=1 wl=3 && cat theta gamma
+
+# diff-2026-11 (round 1)
+# Nonzero singleton asymmetry; observe both named attribute files.
+sunull nt=1 ntr=1 | sugain bias=2 > a; sunull nt=1 ntr=1 | sugain bias=0.1 > b; sunull nt=1 ntr=1 | sugain bias=0.4 > c; sunull nt=1 ntr=1 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=1 wl=1 theta=tilt gamma=ratio && cat tilt ratio
+# Two samples with default mixing, window, mode, and output name.
+sunull nt=2 ntr=1 | sugain bias=2 > a; sunull nt=2 ntr=1 | sugain bias=0.1 > b; sunull nt=2 ntr=1 | sugain bias=0.4 > c; sunull nt=2 ntr=1 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d  && cat alpha
+# Explicit defaults and every output-name parameter; component files remain unused.
+[stderr] sunull nt=3 ntr=2 | sugain bias=2 > a; sunull nt=3 ntr=2 | sugain bias=0.1 > b; sunull nt=3 ntr=2 | sugain bias=0.4 > c; sunull nt=3 ntr=2 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d ntraces=5 wl=3 mode=2 Total=0 alpha=pol theta=tilt gamma=ratio outS11=o11 outS12=o12 outS21=o21 outS22=o22 verbose=1 && cat pol && test ! -e o11 && test ! -e o12 && test ! -e o21 && test ! -e o22
+# Four samples, even window, and an endpoint impulse.
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 > a; sunull nt=4 ntr=1 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 ntraces=1 wl=4 && cat alpha
+# Long prime-length seeded traces, mode 1, wl=29.
+suplane nt=4097 ntr=3 | suaddnoise seed=101 > a; suplane nt=4097 ntr=3 | suaddnoise seed=102 > b; suplane nt=4097 ntr=3 | suaddnoise seed=103 > c; suplane nt=4097 ntr=3 | suaddnoise seed=104 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=2 wl=29 && cat theta gamma
+# Long prime-length seeded traces, mode 2, wl=30.
+suplane nt=4097 ntr=3 | suaddnoise seed=101 > a; suplane nt=4097 ntr=3 | suaddnoise seed=102 > b; suplane nt=4097 ntr=3 | suaddnoise seed=103 > c; suplane nt=4097 ntr=3 | suaddnoise seed=104 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=2 wl=30 && cat alpha
+# Long prime-length seeded traces, mode 3, wl=1.
+suplane nt=4097 ntr=3 | suaddnoise seed=101 > a; suplane nt=4097 ntr=3 | suaddnoise seed=102 > b; suplane nt=4097 ntr=3 | suaddnoise seed=103 > c; suplane nt=4097 ntr=3 | suaddnoise seed=104 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=2 wl=1 && cat alpha
+# Maximum legal SU trace length, one trace, mode 2.
+suspike nt=65535 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=65535 > a; sunull nt=65535 ntr=1 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=2 ntraces=1 wl=1 && cat alpha
+# Maximum legal SU trace length, one trace, mode 3.
+suspike nt=65535 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=65535 > a; sunull nt=65535 ntr=1 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 ntraces=1 wl=3 && cat alpha
+# Mix panel much wider than the one-trace input.
+sunull nt=13 ntr=1 | sugain bias=2 > a; sunull nt=13 ntr=1 | sugain bias=0.1 > b; sunull nt=13 ntr=1 | sugain bias=0.4 > c; sunull nt=13 ntr=1 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=257 wl=5 && cat theta gamma
+# Preserve S11 sequence, coordinate, scale, and timing headers.
+suspike nt=17 ntr=5 nspk=2 ix1=1 it1=1 ix2=5 it2=17 | sushw key=tracl,tracr,fldr,cdp,offset,dt,delrt,scalco,trid a=19,91,5,701,-800,250,120,-100,1 b=3,-2,1,-7,200,0,-4,0,0 | suchw key1=sx key2=cdp a=10 b=2 > a; sunull nt=17 ntr=5 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 ntraces=3 wl=5 && cat alpha
+# Different component dt values are accepted and S11 headers are copied.
+suspike nt=7 ntr=3 nspk=1 ix1=2 it1=4 | sushw key=dt a=0 > a; sunull nt=7 ntr=3 dt=0.001 > b; suspike nt=7 ntr=3 dt=0.002 nspk=1 ix1=2 it1=5 > c; sunull nt=7 ntr=3 dt=0.008 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=1 wl=3 && cat theta gamma
+# Shortest component S11 stops a numerical mode with unequal headers.
+suspike nt=11 ntr=5 nspk=2 ix1=1 it1=2 ix2=4 it2=9 > a; sunull nt=11 ntr=2 | sushw key=cdp a=808 b=9 > b; sultt inS11=b inS12=a inS21=a inS22=a mode=1 ntraces=3 wl=2 && cat theta gamma
+# Shortest component S12 stops a numerical mode with unequal headers.
+suspike nt=11 ntr=5 nspk=2 ix1=1 it1=2 ix2=4 it2=9 > a; sunull nt=11 ntr=2 | sushw key=cdp a=808 b=9 > b; sultt inS11=a inS12=b inS21=a inS22=a mode=3 ntraces=3 wl=2 && cat alpha
+# Shortest component S21 stops a numerical mode with unequal headers.
+suspike nt=11 ntr=5 nspk=2 ix1=1 it1=2 ix2=4 it2=9 > a; sunull nt=11 ntr=2 | sushw key=cdp a=808 b=9 > b; sultt inS11=a inS12=a inS21=b inS22=a mode=2 ntraces=3 wl=2 && cat alpha
+# Shortest component S22 stops a numerical mode with unequal headers.
+suspike nt=11 ntr=5 nspk=2 ix1=1 it1=2 ix2=4 it2=9 > a; sunull nt=11 ntr=2 | sushw key=cdp a=808 b=9 > b; sultt inS11=a inS12=a inS21=a inS22=b mode=1 ntraces=3 wl=2 && cat theta gamma
+# Progress updates include the read attempt beyond the shorter S22 volume.
+[exact] suspike nt=5 ntr=5 nspk=1 ix1=1 it1=3 > a; sunull nt=5 ntr=2 > b; sultt inS11=a inS12=a inS21=a inS22=b mode=2 ntraces=2 wl=3 Total=-7
+# Whole verbose diagnostics during nonzero asymmetry computation.
+[stderr] sunull nt=4 ntr=3 | sugain bias=2 > a; sunull nt=4 ntr=3 | sugain bias=0.1 > b; sunull nt=4 ntr=3 | sugain bias=0.4 > c; sunull nt=4 ntr=3 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=2 wl=2 verbose=1 theta=t gamma=g && cat t g
+# Repeated parameters use the last value, including switching output modes.
+suplane nt=19 ntr=4 | suaddnoise seed=101 > a; suplane nt=19 ntr=4 | suaddnoise seed=102 > b; suplane nt=19 ntr=4 | suaddnoise seed=103 > c; suplane nt=19 ntr=4 | suaddnoise seed=104 > d; sultt inS11=a inS12=b inS21=c inS22=d wl=1 wl=4 ntraces=1 ntraces=3 mode=1 mode=3 alpha=p && cat p
+# Mode zero skips attribute calculations with a zero-length window.
+sunull nt=2 ntr=2 | sugain bias=2 > a; sunull nt=2 ntr=2 | sugain bias=0.1 > b; sunull nt=2 ntr=2 | sugain bias=0.4 > c; sunull nt=2 ntr=2 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=0 wl=0 ntraces=1 && cat alpha
+# Unknown positive mode allocates and smooths vectors but returns zero alpha.
+sunull nt=4 ntr=2 | sugain bias=2 > a; sunull nt=4 ntr=2 | sugain bias=0.1 > b; sunull nt=4 ntr=2 | sugain bias=0.4 > c; sunull nt=4 ntr=2 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=4 wl=2 ntraces=2 && cat alpha
+# Subnormal squared inputs underflow during eigenvector calculation.
+sunull nt=4 ntr=3 | sugain bias=2e-22 > a; sunull nt=4 ntr=3 | sugain bias=3e-22 > b; sunull nt=4 ntr=3 | sugain bias=-4e-22 > c; sunull nt=4 ntr=3 | sugain bias=-1e-22 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=2 wl=2 && cat alpha
+# Finite large inputs overflow the asymmetry products; NaNs are defined.
+sunull nt=4 ntr=3 | sugain bias=2e19 > a; sunull nt=4 ntr=3 | sugain bias=3e19 > b; sunull nt=4 ntr=3 | sugain bias=-4e19 > c; sunull nt=4 ntr=3 | sugain bias=-1e19 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=1 ntraces=2 wl=2 && cat theta gamma
+# Exact off-diagonal cancellation and zero diagonal difference in mode 2.
+suplane nt=23 ntr=4 | suaddnoise seed=211 > a; suplane nt=23 ntr=4 | suaddnoise seed=212 > b; sugain scale=-1 < b > c; sultt inS11=a inS12=b inS21=c inS22=a mode=2 ntraces=3 wl=5 && cat alpha
+# Reflector synthetics rather than plane or spike inputs.
+susynlv nt=67 nxm=3 nxo=1 dt=0.004 fpeak=35 ref="1:0,0.1;0.3,0.1" > a; sunull nt=67 ntr=3 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=1 ntraces=2 wl=7 && cat theta gamma
+# Born-integral shot synthetics with physical geometry headers.
+suimp2d nt=67 nrec=3 nshot=1 x0=100 z0=100 dgx=50 > a; sunull nt=67 ntr=3 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 ntraces=2 wl=3 && cat alpha
+# Missing last required parameter with real generated input files.
+[stderr] sunull nt=2 ntr=1 > a; sultt inS11=a inS12=a inS21=a
+# Window integer underflow is rejected by the parameter parser.
+[stderr] sunull nt=2 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a wl=-2147483649
+# Mode integer overflow is rejected before output creation.
+[stderr] sunull nt=2 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=2147483648
+# An explicitly empty theta output name fails in mode 1.
+[stderr] sunull nt=3 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=1 theta=
+# An explicitly empty gamma output name fails after opening theta.
+[stderr] sunull nt=3 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=1 gamma=
+# Different S22 sample count fails even though component dt is unused.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > a; sunull nt=3 ntr=1 > b; sultt inS11=a inS12=a inS21=a inS22=b mode=3
+# Oversized window on a short nonzero trace.
+sunull nt=3 ntr=1 | sugain bias=2 > a; sunull nt=3 ntr=1 | sugain bias=0.1 > b; sunull nt=3 ntr=1 | sugain bias=0.4 > c; sunull nt=3 ntr=1 | sugain bias=1 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=3 ntraces=1 wl=4097 && cat alpha
+# Large finite inputs in the simple arctangent mode.
+sunull nt=4 ntr=3 | sugain bias=1e38 > a; sunull nt=4 ntr=3 | sugain bias=1e38 > b; sunull nt=4 ntr=3 | sugain bias=1e38 > c; sunull nt=4 ntr=3 | sugain bias=-1e38 > d; sultt inS11=a inS12=b inS21=c inS22=d mode=2 ntraces=2 wl=2 && cat alpha
+# Fractional progress rounding across several output traces.
+[exact] suspike nt=3 ntr=8 nspk=1 ix1=4 it1=2 > a; sultt inS11=a inS12=a inS21=a inS22=a mode=3 ntraces=1 wl=1 Total=6
+# A 512-TiB panel fails allocation immediately, without touching huge memory.
+[stderr] sunull nt=65535 ntr=1 > a; sultt inS11=a inS12=a inS21=a inS22=a ntraces=2147483647
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+suplane nt=17 ntr=7 > a; sunull nt=17 ntr=7 > b; sultt inS11=a inS12=b inS21=a inS22=b mode=3 alpha=a && cat a

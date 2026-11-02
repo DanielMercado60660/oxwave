@@ -16,3 +16,19 @@ python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1+i*0.
 [stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=5 n2=-1
 [stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=-1 n2=5
 [stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("9f",*[1]*9))' | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=-1 n2=-1
+
+# diff-2026-11 (round 1)
+[f32] makevel nx=3 nz=3 dvdx=0.2 dvdz=0.1 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=2 n2=2
+[f32] makevel nx=4 nz=4 dvdx=0.3 dvdz=0.2 | uni2tri n1=4 n2=4 verbose=0 | tri2uni n1=4 n2=4 d1=1 d2=1 f1=0 f2=0
+[f32] makevel nx=5 nz=7 dvdx=0.1 dvdz=0.2 | uni2tri n1=7 n2=5 verbose=0 | tri2uni n1=13 n2=9 d1=0.5 d2=0.5 f1=0 f2=0
+[f32] makevel nx=5 nz=7 dvdx=0.2 dvdz=0.3 | uni2tri n1=7 n2=5 verbose=0 | tri2uni n1=7 n2=5 d1=-1 d2=-1 f1=6 f2=4
+[f32] makevel nx=4 nz=4 dvdx=0.25 dvdz=0.125 | uni2tri n1=4 n2=4 d1=2 d2=3 f1=10 f2=20 verbose=0 | tri2uni n1=7 n2=7 d1=1 d2=1.5 f1=10 f2=20
+[f32] makevel nx=3 nz=3 dvdx=0.4 dvdz=0.2 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=4097 n2=1 d1=0.00048828125 d2=1 f1=0 f2=1
+[f32] makevel nx=3 nz=3 dvdx=0.3 dvdz=0.1 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=1 n2=4 d2=0.5 f1=1 f2=0.25
+[f32] suspike ntr=5 nt=7 k1=3 k2=3 | sustrip outpar=/dev/null | uni2tri n1=7 n2=5 errmax=0.01 method=1 verbose=0 | tri2uni n1=7 n2=5
+[f32] suplane ntr=5 nt=7 dip=1 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | uni2tri n1=7 n2=5 verbose=0 | tri2uni n1=7 n2=5
+[stderr] makevel nx=3 nz=3 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=2 n2=2 verbose=1
+[f32] makevel nx=3 nz=3 dvdx=0.2 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=3 n2=3 d1=0 d2=0 f1=0.7 f2=1.3
+makevel nx=3 nz=3 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=2 n2=2 f2=2 d2=1
+makevel nx=3 nz=3 | uni2tri n1=3 n2=3 verbose=0 | tri2uni n1=2 n2=2 f1=2 d1=1
+tri2uni n1= n2=1

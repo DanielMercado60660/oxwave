@@ -119,7 +119,10 @@ fn main() {
         for (k, token) in buf.split(|c| c == ' ' || c == '\t' || c == '\n').filter(|s| !s.is_empty()).enumerate() {
             if k >= v.len() { break; }
             let (number, used) = strtod(token);
-            if used != 0 { v[k] = number as f32; }
+            if used != 0 {
+                // sscanf("%f") rounds decimal input directly to float, not via double.
+                v[k] = token[..used].parse::<f32>().unwrap_or(number as f32);
+            }
         }
         let mut x = v[(ix - 1) as usize]; let mut y = v[(iy - 1) as usize];
         if logx != 0 && x > 0.0 { x = (x as f64).ln() as f32; }

@@ -14,3 +14,19 @@ ibm2float endian=999999999999999999999 outpar=count </dev/null
 # Confirm the count file is written after processing and unknown arguments warn.
 [exact] printf '\x41\x10\x00\x00\x41\x20\x00\x00\xff' | ibm2float outpar=count > floats; cat count
 [stderr] ibm2float outpar=count unexpected=1 </dev/null
+# diff-2026-11 (round 1)
+[f32] suspike nt=1 ntr=1 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float outpar=count
+[f32] suspike nt=2 ntr=1 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=0 outpar=count
+[f32] suspike nt=3 ntr=2 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=1 outpar=count
+[f32] sunull nt=4 ntr=2 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=1 outpar=count
+[f32] suspike nt=13 ntr=3 k1=2,5,9 mag=1,-2,3 | sushw key=offset a=100 b=25 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float outpar=count
+[f32] suspike nt=4097 ntr=2 k1=1,2048,4097 mag=1,-3,0.125 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=0 outpar=count
+[f32] suplane nt=31 ntr=5 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float outpar=count
+[stderr] [f32] suspike nt=5 ntr=1 k1=2 mag=-2 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float outpar=/dev/stderr verbose=1
+[exact] sunull nt=11 ntr=3 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=0 outpar=count > floats; cat count
+[stderr] [f32] suspike nt=7 ntr=2 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=-2 outpar=count verbose=1
+sunull nt=1 ntr=1 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=999999999999999999999 outpar=count
+[exact] suplane nt=101 ntr=9 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=0 outpar=count
+[exact] suspike nt=17 ntr=4 k1=1,7,15 mag=-1,0.03125,123.5 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float endian=1 outpar=count
+[exact] sunull nt=3 ntr=1 | sustrip outpar=strip | float2ibm outpar=ibm | head -c 11 | ibm2float outpar=count >floats && cat count
+[stderr] [f32] suspike nt=5 ntr=1 k1=2 mag=-2 | sustrip outpar=strip | float2ibm outpar=ibm | ibm2float outpar=count verbose=1

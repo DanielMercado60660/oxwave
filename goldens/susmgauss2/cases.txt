@@ -9,3 +9,21 @@ sunull nt=13 ntr=3 | susmgauss2 a1=0 a2=0
 [stderr] suplane nt=17 ntr=3 | susmgauss2 verbose=1 a1=1
 susmgauss2 a1=1 </dev/null
 susmgauss2 a1=1e999 </dev/null
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | susmgauss2 a1=0 a2=0
+suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 | susmgauss2 a1=0.5 a2=1.25
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | susmgauss2 a1=2 a2=0
+suspike nt=17 ntr=7 | susmgauss2 a1=0 a2=2.5
+suspike nt=101 ntr=11 | susmgauss2 a1=1.7 a2=0.8
+suspike nt=4097 ntr=3 | susmgauss2 a1=3 a2=1
+suplane nt=127 ntr=13 | sushw key=trid,cdp,offset a=130,17,-100 b=0,1,25 | susmgauss2 a1=0.25 a2=4
+suplane nt=19 ntr=2 | susmgauss2 a1=0 a2=0
+[stderr] suspike nt=23 ntr=5 | susmgauss2 verbose=1 a1=0.3 a2=0.9
+sunull nt=4 ntr=2 | susmgauss2 a1=1 a2=2
+suspike nt=29 ntr=4 | susmgauss2 a1= a2=1
+suspike nt=31 ntr=3 | susmgauss2 a1=1 a1=3 a2=-1
+susmgauss2 a2=1e999 </dev/null
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | susmgauss2 a1=1 a2=2
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=1 | susmgauss2 a1=1
+suspike nt=257 ntr=17 | susmgauss2 a1=0.01 a2=12

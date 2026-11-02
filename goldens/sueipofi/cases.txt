@@ -86,3 +86,45 @@ printf '1 0 0 1 0 0 1 0 0 1 0 0 7\n0 1 0 0 1 0 0 1 0 0 1 0 8\n0 0 1 0 0 0 0 0 0 
 printf '0 0 0\n1 1 0\n0 1 0\n' | a2b n1=3 | suaddhead ns=3 | sueipofi dt=0.004 wl=0.012 pwr=0
 # Cubic multi-station output preserves distinct headers and skips the last trace.
 [stderr] sunull nt=43 ntr=7 | suaddnoise seed=823 | sushw key=cdp a=21 b=1 | sueipofi wl=0.028 pwr=0.5 verbose=1 file=cubic rl1=1 rl2=1 pln=1 > filtered && cat filtered cubic.rl1 cubic.rl2 cubic.pln
+# diff-2026-11 (round 1)
+# Minimum sizes: reject traces shorter than three samples; process one complete
+# three-sample station, preserve a fourth tail sample, and skip a lone component.
+[stderr] sunull nt=1 ntr=3 | sueipofi wl=0.012
+[stderr] sunull nt=2 ntr=1 | sueipofi dt=0.002 wl=0.006
+[stderr] sunull nt=4 ntr=1 | sueipofi wl=0.012 verbose=1 rl1=1 rl2=1 pln=1 file=skipped > filtered && cat filtered skipped.rl1 skipped.rl2 skipped.pln
+sunull nt=3 ntr=3 | suaddnoise seed=9347 | sueipofi wl=0.012 pwr=0.125 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+suspike nt=4 ntr=3 nspk=3 ix1=1 it1=1 ix2=2 it2=2 ix3=3 it3=3 | sueipofi wl=0.012 pwr=0 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+sunull nt=4 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.016 interp=cubic pwr=0.125
+sunull nt=5 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.012 interp=linear pwr=0.125
+# Prime lengths: short and many-point interpolation, entire-trace windows,
+# sparse orthogonal components, and unprocessed samples after the last window.
+sunull nt=11 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.012 interp=cubic pwr=0.125
+sunull nt=97 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.028 interp=cubic pwr=0.125 rl1=1 rl2=1 pln=1 file=prime > filtered && cat filtered prime.rl1 prime.rl2 prime.pln
+sunull nt=97 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.388 interp=linear pwr=0.125
+suspike nt=97 ntr=6 nspk=3 ix1=1 it1=3 ix2=2 it2=4 ix3=3 it3=5 | sueipofi wl=0.04 pwr=0.01 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+# Long traces, including a large single SVD window and many short windows.
+sunull nt=4097 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.012 interp=cubic pwr=0.125 rl1=1 rl2=1 pln=1 file=long > filtered && cat filtered long.rl1 long.rl2 long.pln
+sunull nt=4097 ntr=6 | suaddnoise seed=9347 | sueipofi wl=0.028 interp=linear pwr=0.125 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+sunull nt=4097 ntr=3 | suaddnoise seed=9347 | sueipofi wl=16.388 interp=cubic pwr=0.125
+sunull nt=32749 ntr=3 | suaddnoise seed=9347 | sueipofi wl=0.068 interp=cubic pwr=0.125
+sunull nt=65521 ntr=3 | suaddnoise seed=9347 | sueipofi wl=0.388 interp=linear pwr=0.125
+# Different deterministic synthetics with nonzero arrivals; defaults versus
+# explicit settings, and all output modes for the scatterer response.
+susynlv nt=101 dt=0.004 nxm=6 ref="1:0,0.1;1,0.1" | sueipofi
+susynlv nt=101 dt=0.004 nxm=6 ref="1:0,0.1;1,0.1" | sueipofi dt=0.004 wl=0.1 pwr=1 interp=cubic file=unused rl1=0 rl2=0 pln=0 verbose=0
+suimp2d nt=257 nrec=6 | sueipofi wl=0.04 pwr=0.01 rl1=1 rl2=1 pln=1 file=scatter > filtered && cat filtered scatter.rl1 scatter.rl2 scatter.pln
+# First-trace dt controls every station despite changes in subsequent headers.
+# Distinct computed identifiers must survive in filtered and attribute streams.
+[stderr] sunull nt=31 ntr=7 | suaddnoise seed=193 | sushw key=dt a=1000 b=1000 | sueipofi wl=0.012 verbose=1 rl1=1 rl2=1 pln=1 file=headers > filtered && cat filtered headers.rl1 headers.rl2 headers.pln
+sunull nt=31 ntr=6 | suaddnoise seed=193 | sushw key=dt a=65535 | sueipofi dt=0.004 wl=0.012
+sunull nt=31 ntr=6 | suaddnoise seed=193 | sushw key=trid a=2 b=1 | sueipofi wl=0.012
+sunull nt=31 ntr=6 | suaddnoise seed=193 | sushw key=cdp,cdpt,offset a=-3,10,-100 b=1,3,100 | suchw key1=tracr key2=cdp a=1000 b=7 | sueipofi wl=0.012 rl1=1 rl2=1 pln=1 file=identifiers > filtered && cat filtered identifiers.rl1 identifiers.rl2 identifiers.pln
+# Amplitude underflow/overflow in weight calculations and strong exponents.
+sunull nt=97 ntr=6 | suaddnoise seed=879 | sugain scale=1e-30 | sueipofi wl=0.028 pwr=0.5 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+sunull nt=97 ntr=6 | suaddnoise seed=879 | sugain scale=1e30 | sueipofi wl=0.028 pwr=0.5 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+sunull nt=101 ntr=9 | suaddnoise seed=11 noise=flat | sueipofi wl=0.044 pwr=10000 rl1=1 rl2=1 pln=1 > filtered && cat filtered polar.rl1 polar.rl2 polar.pln
+# Validation precedes component grouping, even when no station is complete.
+[stderr] sunull nt=31 ntr=1 | sueipofi pwr=-0.25 verbose=1
+[stderr] sunull nt=31 ntr=2 | sueipofi wl=0.128
+[stderr] sunull nt=31 ntr=3 | sueipofi wl=0.008 interp=LINEAR
+[stderr] sunull nt=31 ntr=3 | sueipofi rl1=1 rl2=1 pln=1 file=missing/weights

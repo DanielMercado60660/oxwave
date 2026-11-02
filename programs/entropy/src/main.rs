@@ -65,6 +65,8 @@ fn main() {
     let mut f = vec![0.0f32; n.max(0) as usize];
     // The C ignores the read count. Its unread samples are uninitialized;
     // this initialized buffer supplies zeros if the input is short.
+    // With n=0, C's fread also leaves stdin unread. An upstream writer may
+    // receive SIGPIPE (pipeline status 141) although entropy exits success.
     fread(&mut f, &stdin());
     let mut hist = [0i32; 1024];
     let mut fhist = [0.0f32; 1024];
@@ -92,7 +94,13 @@ fn main() {
         let diff = (nint(max as f64) as f32) * step - f[i];
         error += diff * diff;
         let index = nint(max as f64).wrapping_add(512) as usize;
-        hist[index] = hist[index].wrapping_add(1);
+        // entropy.c:66 writes outside hist for out-of-range bins. The SU
+        // build's output is unchanged by a bounds check in the three reviewed
+        // cases (indices 2360, 1089, -65). Omit those counts, retaining their
+        // quantization error above and the original normalization by n.
+        if index < hist.len() {
+            hist[index] = hist[index].wrapping_add(1);
+        }
     }
     error /= n as f32;
     error = (error as f64).sqrt() as f32;

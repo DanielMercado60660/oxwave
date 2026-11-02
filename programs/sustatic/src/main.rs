@@ -244,14 +244,37 @@ fn main() {
             t[itime] = tmin + itime as f32 * dt + sign as f32 * tstat;
         }
 
+        // inttable8.c:177 converts the normalized coordinate to int. Beyond
+        // that range C has UB, but a minimal bounds fix still produces zero
+        // extrapolation, byte-identical to SU for the huge-shift regression.
+        // Interpolate valid spans normally and supply zero for those points.
+        let xouts = (1.0f64 / dt as f64) as f32;
+        let xoutb = (8.0f64 - (tmin * xouts) as f64) as f32;
+        let mut start = 0;
+        for itime in 0..nt {
+            let xoutn = xoutb + t[itime] * xouts;
+            if xoutn as f64 > i32::MAX as f64 || (xoutn as f64) < i32::MIN as f64 + 11.0 {
+                ints8r(
+                    dt,
+                    tmin,
+                    &intrace.data[..nt],
+                    0.0,
+                    0.0,
+                    &t[start..itime],
+                    &mut outtrace.data[start..itime],
+                );
+                outtrace.data[itime] = 0.0;
+                start = itime + 1;
+            }
+        }
         ints8r(
             dt,
             tmin,
             &intrace.data[..nt],
             0.0,
             0.0,
-            &t,
-            &mut outtrace.data[..nt],
+            &t[start..],
+            &mut outtrace.data[start..nt],
         );
         if hdrs == 0 || hdrs == 2 || hdrs == 3 {
             outtrace.sstat = (outtrace.sstat as f64 + 1000.0 * tsd as f64) as i32 as i16;

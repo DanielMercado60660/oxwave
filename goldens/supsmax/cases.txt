@@ -16,3 +16,20 @@ suplane nt=16 ntr=3 | env -u CWPROOT -u CWPBIN supsmax
 supsmax </dev/null
 suplane nt=16 ntr=3 | supsmax outpar=/dev/null mode=invalid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=16 ntr=3 | supsmax outpar=/dev/null n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+
+# diff-2026-11 (round 1)
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=2 ntr=1 | CWPBIN="$PWD/bin" supsmax mode=max | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=3 ntr=2 | CWPBIN="$PWD/bin" supsmax mode=min | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=4 ntr=4 | CWPBIN="$PWD/bin" supsmax mode=abs | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=37 ntr=11 | CWPBIN="$PWD/bin" supsmax d1=.003 d2=2.5 f1=-.2 f2=10 mode=max | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=4097 ntr=3 | CWPBIN="$PWD/bin" supsmax mode=abs | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suspike nt=17 ntr=5 | CWPBIN="$PWD/bin" supsmax mode=min | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; sunull nt=4 ntr=3 | CWPBIN="$PWD/bin" supsmax mode=max | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; sunull nt=31 ntr=7 | CWPBIN="$PWD/bin" supsmax mode=min verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=19 ntr=4 | sushw key=d1,d2,f1,f2 a=.002,3,-1,7 | CWPBIN="$PWD/bin" supsmax mode=abs | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=29 ntr=4 | sushw key=dt,delrt,tracr a=0,250,20 | CWPBIN="$PWD/bin" supsmax verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=41 ntr=6 | sushw key=trid,dt,tracl,tracr a=30,0,0,0 | CWPBIN="$PWD/bin" supsmax mode=max | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] mkdir bin; ln -s "$(command -v psgraph)" bin/psgraph; printf '#!/bin/sh\nexec "%s" outpar=/dev/null "$@"\n' "$(command -v sumax)" > bin/sumax; chmod +x bin/sumax; suplane nt=53 ntr=8 | CWPBIN="$PWD/bin" supsmax d1=.004 d2=1 f1=0 f2=1 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | supsmax tmpdir=/no/such/diff-supsmax-directory
+suplane nt=7 ntr=3 | supsmax d1=1e999
+suplane nt=27 ntr=3 | supsmax outpar=/dev/null tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

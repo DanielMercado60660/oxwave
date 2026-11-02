@@ -14,3 +14,22 @@ suchart key2=bad </dev/null
 suchart </dev/null
 suplane nt=1 ntr=1 | suchart outpar=/no/such/directory/file
 [stderr] suplane nt=1 ntr=1 | suchart verbose=1 unknown=3 > /dev/null
+# diff-2026-11 (round 1)
+# Explicit defaults and short traces from a different generator.
+[f32] sunull nt=2 ntr=1 | sushw key=sx,gx a=12,-30 | suchart key1=sx key2=gx
+[f32] sunull nt=3 ntr=4 | sushw key=tracl,offset a=1,-200 b=1,75 | suchart key1=tracl key2=offset
+[f32] suspike nt=4 ntr=3 | sushw key=gelev,selev a=-100,500 b=25,-60 | suchart key1=gelev key2=selev
+[f32] suspike nt=17 ntr=5 | sushw key=f1,d2 a=-1.25,0.125 b=0.5,0.25 | suchart key1=f1 key2=d2
+[f32] sunull nt=4097 ntr=2 | sushw key=sx,gx a=100000,-100000 b=-200000,200000 | suchart
+[f32] suplane nt=13 ntr=7 | sushw key=cdp,nhs a=10,-3 b=-2,1 | suchart key1=nhs key2=cdp
+[f32] sunull nt=1 ntr=3 | sushw key=dt,delrt a=60000,-200 b=1000,100 | suchart key1=dt key2=delrt
+[f32] suplane nt=2 ntr=4 | sushw key=sx,gx a=5,10 b=2,-3 | suchart key1=gx key1=sx key2=sx key2=gx
+# Exercise the parameter file with nondefault labels and a larger count.
+sunull nt=4 ntr=8 | suchart key1=tracl key2=ns outpar=chart.par > chart.bin && cat chart.par
+[stderr] sunull nt=2 ntr=2 | suchart key1=ns key2=tracl verbose=1 > /dev/null
+# Invalid and empty key names, and an unusable output path.
+suchart key1= </dev/null
+suchart key2= </dev/null
+sunull nt=1 ntr=1 | suchart outpar=.
+# A larger number of trace headers.
+[f32] sunull nt=1 ntr=10001 | sushw key=cdp,offset a=-5000,20000 b=1,-2 | suchart key1=cdp key2=offset

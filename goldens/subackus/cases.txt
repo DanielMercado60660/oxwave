@@ -19,3 +19,19 @@ sunull nt=21 ntr=3 | subackus navg=3 all=1
 suplane nt=31 ntr=3 | sugain bias=2000 | subackus navg=-2 all=1
 # One-sample trace and window.
 sunull nt=1 ntr=3 | sugain bias=2 | subackus navg=1
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=3 | sugain bias=2 | subackus navg=1 all=1 ang=45
+suspike nt=3 ntr=3 k1=2 mag=1 | sugain bias=3 | subackus navg=1 all=1 ang=90
+suplane nt=4 ntr=3 | sugain bias=2 | subackus navg=2 all=0 ang=0
+sunull nt=17 ntr=1 | sugain bias=2 | subackus navg=3 all=1 ang=-45
+suspike nt=53 ntr=3 k1=15 mag=2 | sugain bias=4 | sushw key=cdp,dt,d1,f1 a=42,1000,0.5,3 b=1,0,0,0 | subackus navg=9 all=1 ang=37
+sunull nt=4097 ntr=3 | suaddnoise seed=19 | sugain bias=4 | subackus navg=31 all=1 ang=15
+suplane nt=257 ntr=4 | suop op=abs | sugain bias=3 | subackus navg=201 all=0 ang=30
+[stderr] suspike nt=23 ntr=3 k1=5 | sugain bias=3 | subackus navg=5 all=1 ang=120 verbose=1
+sunull nt=19 ntr=2 | sugain bias=5 | subackus navg=3 all=2 ang=10
+sunull nt=9 ntr=3 | subackus all=999999999999999999999
+sunull nt=127 ntr=3 | suaddnoise seed=7 | sugain bias=1.3 | subackus navg=3 all=1 ang=47
+sunull nt=211 ntr=3 | suaddnoise seed=23 | sugain bias=10 | subackus navg=51 all=1 ang=89
+suspike nt=101 ntr=3 k1=1,30,60,100 mag=1,2,3,4 | sugain bias=3 | subackus navg=1 all=1 ang=135
+sunull nt=31 ntr=3 | suaddnoise seed=93 | sugain bias=2 | subackus navg=-4 all=1 ang=-30

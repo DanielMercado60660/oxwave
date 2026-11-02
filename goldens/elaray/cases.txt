@@ -80,3 +80,74 @@ elamodel fill=0.5,0.5,2,1,2 > m; elaray outparfile=/nonexistent/count < m
 [exact] elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5 > m; elaray xs=0.3 zs=0.4 nangle=3 fangle=-20 langle=20 refseq=7,1 infofile=info < m > /dev/null; cat info
 [exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 refseq=0 < m
 [exact] elamodel fill=0.5,0.5,2,1,2 > m; elaray nangle=3 refseq= < m
+
+# diff-2026-11 (round 1)
+# elaray consumes elastic triangle models, not SU traces; sizes below are ray/wave samples.
+# Both model generation and successful tracing return 1 in SU. Check the generator status;
+# expose the requested outputs with cat so successful file-output pipelines exit 0.
+# R01: defaults, including all 101 ray ends.
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray > ends; cat ends; }
+# R02: explicit parameters, transmission sequence, and all optional files.
+[f32] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray mode=0 xs=0.31 zs=0.11 nangle=3 reftrans=0 fangle=-15 langle=15 f0=1 fdip=0 fazi=0 rayfile=r infofile=i nxz=17 wavefile=w nt=3 tw=3.402823466e38 krecord=7 prim=0 outparfile=count refseq=7,-1 > ends; cat ends r w; }
+# R03-R08: single, small, prime, and large ray counts; exact native RayEnd bytes.
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=1 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=2 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=4 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=17 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=4097 xs=0.31 zs=0.11 fangle=-37 langle=53 > ends; cat ends; }
+# R09-R14: wave sampling sizes 1..4, odd prime, and 4097.
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=1 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=2 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=3 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=4 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=17 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 wavefile=w nt=4097 > ends; cat ends w; }
+# R15-R18: truncation and padding of ray paths.
+[f32] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 rayfile=r nxz=1 > ends; cat ends r; }
+[f32] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 rayfile=r nxz=2 > ends; cat ends r; }
+[f32] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 rayfile=r nxz=4 > ends; cat ends r; }
+[f32] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray nangle=3 xs=0.31 zs=0.11 rayfile=r nxz=4097 > ends; cat ends r; }
+# R19-R21: each anisotropic mode, source force, and a time-selected wavefront.
+[f32] [stderr] (elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2; test $? -eq 1) | { elaray mode=0 nangle=7 xs=0.31 zs=0.11 fangle=-55 langle=55 f0=-1.7 fdip=37 fazi=23 wavefile=w tw=0.15 > ends; cat ends w; }
+[f32] [stderr] (elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2; test $? -eq 1) | { elaray mode=1 nangle=7 xs=0.31 zs=0.11 fangle=-55 langle=55 f0=-1.7 fdip=37 fazi=23 wavefile=w tw=0.15 > ends; cat ends w; }
+[f32] [stderr] (elamodel fill=0.5,0.5,2,1,0.15,0.05,0.1,20,2; test $? -eq 1) | { elaray mode=2 nangle=7 xs=0.31 zs=0.11 fangle=-55 langle=55 f0=-1.7 fdip=37 fazi=23 wavefile=w tw=0.15 > ends; cat ends w; }
+# R22-R24: coefficients on curved isotropic transmitting interfaces.
+[f32] [stderr] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray mode=0 nangle=7 xs=0.31 zs=0.11 fangle=-30 langle=30 f0=2 fdip=50 fazi=65 reftrans=1 refseq=7,0 rayfile=r nxz=37 > ends; cat ends r; }
+[f32] [stderr] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray mode=1 nangle=7 xs=0.31 zs=0.11 fangle=-30 langle=30 f0=2 fdip=50 fazi=65 reftrans=1 refseq=7,0 rayfile=r nxz=37 > ends; cat ends r; }
+[f32] [stderr] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray mode=2 nangle=7 xs=0.31 zs=0.11 fangle=-30 langle=30 f0=2 fdip=50 fazi=65 reftrans=1 refseq=7,0 rayfile=r nxz=37 > ends; cat ends r; }
+# R25-R26: recording filters mutate kend and select ray paths.
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray xs=0.31 zs=0.11 nangle=3 refseq=7,-1 krecord=7 prim=0 rayfile=r nxz=4 outparfile=count > ends; cat ends r count; }
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray xs=0.31 zs=0.11 nangle=3 refseq=7,-1 krecord=7 prim=1 rayfile=r nxz=4 outparfile=count > ends; cat ends r count; }
+# R27-R28: exact diagnostics with coefficients; refseq is parsed after checkpars.
+[exact] [stderr] (elamodel xedge=0,0.5,1 zedge=0.5,0.3,0.5 kedge=7 fill=0.5,0.1,2,1,2 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray xs=0.31 zs=0.11 nangle=3 fangle=-15 langle=15 reftrans=1 refseq=7,0 infofile=i rayfile=r nxz=11 outparfile=count verbose=1 > /dev/null; cat i count; }
+[exact] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray xs=0.31 zs=0.11 nangle=1 refseq=7,-1 infofile=i wavefile=w nt=4 verbose=1 > /dev/null; cat i; }
+# R29-R31: shifted model defaults, source on an edge, and vertex perturbation limit.
+[exact] (elamodel xmin=-2 xmax=3 zmin=-1 zmax=2 fill=0,0,2,1,2; test $? -eq 1) | { elaray nangle=7 rayfile=r nxz=7 > ends; cat ends r; }
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,2.5; test $? -eq 1) | { elaray xs=0.5 zs=0.5 nangle=3 refseq=7,-1 > ends; cat ends; }
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray xs=1 zs=1 nangle=3 fangle=160 langle=200
+# R32-R33: repeated parameter last-wins behavior and default nt sentinel.
+[exact] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray mode=2 mode=0 nangle=9 nangle=3 f0=2 f0=0 > ends; cat ends; }
+[f32] [stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | { elaray nangle=1 wavefile=w nt=2147483647 tw=0 > ends; cat ends w; }
+# R34-R39: controlled mode/parameter/file errors with valid generated models.
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray mode=17
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray mode=-3
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray xs=1e999
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray prim=1 nangle=2
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray rayfile=
+[stderr] (elamodel fill=0.5,0.5,2,1,2; test $? -eq 1) | elaray infofile=
+# R40-R41: SU trace generators are invalid model input, including changed headers.
+[stderr] sunull nt=1 ntr=1 | sushw key=tracl a=11 | elaray mode=3
+[stderr] suplane nt=4 ntr=3 | suchw key1=tracl key2=tracl a=3 b=1 | elaray mode=3
+
+# R42-R44: isotropic to anisotropic conversion; integer RayEnd fields compared exactly.
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=0 refseq=7,2 > ends; python3 -c 'import sys,struct; b=open("ends","rb").read(); assert len(b)==540; print([tuple(struct.unpack_from("i",b,i+j)[0] for j in (40,44,60,76,92,96)) for i in range(0,len(b),108)])'; }
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=1 refseq=7,2 > ends; python3 -c 'import sys,struct; b=open("ends","rb").read(); assert len(b)==540; print([tuple(struct.unpack_from("i",b,i+j)[0] for j in (40,44,60,76,92,96)) for i in range(0,len(b),108)])'; }
+[exact] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=2 refseq=7,2 > ends; python3 -c 'import sys,struct; b=open("ends","rb").read(); assert len(b)==540; print([tuple(struct.unpack_from("i",b,i+j)[0] for j in (40,44,60,76,92,96)) for i in range(0,len(b),108)])'; }
+# R45-R47: mixed-material ray ends and uniformly sampled wavefronts.
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=0 fdip=40 fazi=30 refseq=7,2 wavefile=w nt=17 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=1 fdip=40 fazi=30 refseq=7,2 wavefile=w nt=17 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.5,0.5 kedge=7 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,-10,2.5; test $? -eq 1) | { elaray nangle=5 xs=0.31 zs=0.11 fangle=-15 langle=15 mode=2 fdip=40 fazi=30 refseq=7,2 wavefile=w nt=17 > ends; cat ends w; }
+# R48-R49: multiple interface sequences, first transmission/conversion then stopping.
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.35,0.35 xedge=0,1 zedge=0.7,0.7 kedge=7,8 fill=0.5,0.1,2,1,2 fill=0.5,0.5,2.5,1.2,2.3 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray nangle=7 xs=0.31 zs=0.11 fangle=-25 langle=25 refseq=7,0 refseq=8,-1 wavefile=w nt=31 > ends; cat ends w; }
+[f32] [stderr] (elamodel xedge=0,1 zedge=0.35,0.35 xedge=0,1 zedge=0.7,0.7 kedge=7,8 fill=0.5,0.1,2,1,2 fill=0.5,0.5,2.5,1.2,2.3 fill=0.5,0.9,3,1.5,2.5; test $? -eq 1) | { elaray mode=1 nangle=7 xs=0.31 zs=0.11 fangle=-25 langle=25 refseq=7,2 refseq=8,-1 wavefile=w nt=31 > ends; cat ends w; }

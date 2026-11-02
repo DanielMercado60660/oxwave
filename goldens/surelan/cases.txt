@@ -24,3 +24,21 @@ suspike nt=101 ntr=6 k1=20,45,70 mag=1,-2,3 | suaddnoise seed=17 sn=3 | sushw ke
 suplane nt=37 ntr=2 | sushw key=d1 a=2 | surelan nr=1 fr=0 nsmooth=-3
 # Empty numeric value uses the default
 suplane nt=25 ntr=1 | sushw key=d1 a=2 | surelan nr=1 dr= fr=0
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 k1=1 | sushw key=d1,f1,offset a=1,0,0 | surelan nr=1 fr=0 dzratio=1 nsmooth=1
+suspike nt=3 ntr=2 k1=2 | sushw key=d1,offset a=1,0 b=0,1 | surelan nr=3 fr=-0.1 dr=0.1 dzratio=1 nsmooth=2
+suspike nt=4 ntr=3 k1=2,3 mag=1,-1 | sushw key=d1,offset a=2,-2 b=0,2 | surelan nr=4 fr=-0.2 dr=0.1 smute=2 dzratio=2 nsmooth=3
+suplane nt=17 ntr=1 | sushw key=d1,f1,offset a=0.5,3,2 | surelan nr=5 fr=-0.2 dr=0.1 dzratio=1 nsmooth=1
+suplane nt=4097 ntr=3 | sushw key=d1,offset a=2,-10 b=0,10 | surelan nr=3 fr=-0.1 dr=0.1 dzratio=7 nsmooth=5
+sunull nt=19 ntr=4 | sushw key=d1,cdp,offset a=1,10,-4 b=0,1,2 c=0,2,0 | surelan nr=2 fr=0 dr=0.05 dzratio=3
+[stderr] suspike nt=23 ntr=4 k1=4,11,20 mag=1,-2,3 | sushw key=d1,f1,offset,cdp a=1,2,-3,7 b=0,0,2,1 c=0,0,0,2 | surelan nr=3 fr=-0.05 dr=0.05 smute=1.2 dzratio=2 nsmooth=4 verbose=1
+suplane nt=29 ntr=5 | sushw key=d1,f1,offset a=1.25,-2,-8 b=0,0,4 | surelan nr=7 fr=-0.3 dr=0.1 smute=3 dzratio=4 nsmooth=9
+suspike nt=31 ntr=5 k1=5,15,25 mag=1,2,-1 | sushw key=d1,offset a=1,0 b=0,3 | surelan nr=1 fr=0 dr=0 dzratio=1 nsmooth=31
+suplane nt=37 ntr=4 | sushw key=d1,offset a=2,1 b=0,3 | surelan nr=3 fr=0 dr=-0.05 smute=1.5 dzratio=50 nsmooth=100
+suplane nt=43 ntr=3 | sushw key=d1,f1,offset a=3,6,0 b=0,0,5 | surelan nr=5 dr=0.01 fr=-0.25 smute=1.5 dzratio=5 nsmooth=11 verbose=0
+[stderr] suspike nt=47 ntr=3 k1=10,20 mag=1,-1 | sushw key=d1,offset a=1,0 b=0,2 | surelan smute=1.01 nr=4 fr=0 dr=0.02 verbose=1
+[stderr] suplane nt=16 ntr=1 | surelan smute=0.5
+[stderr] suplane nt=16 ntr=1 | surelan nr=999999999999999999999
+[stderr] suplane nt=20 ntr=1 | sushw key=d1 a=1 | surelan nr=1 dzratio=-1
+suspike nt=1 ntr=1 | sushw key=d1 a=1 | surelan nr=1 fr=0 dzratio=-1 nsmooth=1
+suplane nt=53 ntr=4 | sushw key=d1,f1,offset a=0.75,4,-9 b=0,0,6 | surelan nr=9 fr=-0.4 dr=0.07 smute=1.4 dzratio=3 nsmooth=0

@@ -15,3 +15,28 @@ suplane nt=128 ntr=4 | sulfaf maxmix=999999999999999999999
 suplane nt=128 ntr=4 dt=0.004 | sulfaf f1=0 f2=125 fr=2
 # Later gathers with shorter headers retain the first gather's FFT size.
 ( suplane nt=128 ntr=3 dt=0.004 | sushw key=ep a=1; suplane nt=100 ntr=3 dt=0.004 | sushw key=ep a=2 ) | sulfaf
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=3 dt=0.004 | sulfaf
+suplane nt=3 ntr=3 dt=0.004 | sulfaf
+suplane nt=4 ntr=4 dt=0.004 | sulfaf
+suplane nt=4097 ntr=3 dt=0.004 | sulfaf f1=5 f2=18 fr=2 maxmix=3
+suspike nt=257 ntr=7 dt=0.004 | sulfaf key=ep f1=3 f2=20 dx=10 vel=1000 fr=5 maxmix=7 tri=0 adb=1 verbose=0
+suspike nt=251 ntr=9 dt=0.002 | sulfaf f1=8 f2=45 fr=10 vel=800 dx=2 maxmix=5 tri=1 adb=0.5
+sunull nt=193 ntr=5 dt=0.004 | sulfaf f1=2 f2=30 fr=8
+suplane nt=301 ntr=7 dt=0.002 | sulfaf f1=10 f2=50 fr=15 vel=600 dx=5 maxmix=4 adb=0.75
+suplane nt=255 ntr=8 dt=0.004 | sulfaf f1=6 f2=30 fr=0 maxmix=5 tri=1
+suplane nt=256 ntr=6 dt=0.004 | sulfaf f1=4 f2=25 fr=6 adb=-0.5 maxmix=3
+suplane nt=256 ntr=6 dt=0.004 | sulfaf f1=4 f2=25 fr=6 adb=1.5 maxmix=3
+[stderr] suspike nt=128 ntr=4 dt=0.004 | sulfaf f1=4 f2=16 fr=4 maxmix=3 tri=1 verbose=1
+suplane nt=129 ntr=12 dt=0.004 | sushw key=cdp a=10 b=1 j=4 | sulfaf key=cdp f1=5 f2=25 fr=4 maxmix=3
+suplane nt=127 ntr=10 dt=0.004 | sushw key=fldr a=2 b=1 j=5 | sulfaf key=fldr f1=4 f2=22 fr=3 tri=1
+suplane nt=128 ntr=4 dt=0.004 | sulfaf f1=30 f2=20 fr=0
+suplane nt=128 ntr=4 dt=0.004 | sulfaf f1=999999999999999999999999999999999999999999999999999999999999999999999
+suplane nt=128 ntr=4 dt=0.004 | sulfaf key=invalid_header
+sulfaf f1=3 < /dev/null
+( suplane nt=191 ntr=3 dt=0.004 | sushw key=ep a=1; suspike nt=191 ntr=8 dt=0.004 | sushw key=ep a=2 ) | sulfaf f1=4 f2=30 fr=5 tri=1
+suplane nt=192 ntr=11 dt=0.004 | sushw key=ep a=0 b=1 j=2 | sulfaf f1=4 f2=30 fr=4
+suspike nt=1021 ntr=5 dt=0.001 | sulfaf f1=2 f2=100 fr=20 vel=0.1 dx=0.1 maxmix=1
+suplane nt=65520 ntr=1 dt=0.004 | sulfaf
+suplane nt=128 ntr=4 dt=0.004 | sushw key=dt a=0 | sulfaf f1=4 f2=20
+suplane nt=512 ntr=5 dt=0.004 | sulfaf f1=2 f2=40 fr=10 vel=100000 dx=100 maxmix=9 tri=2 adb=0.3

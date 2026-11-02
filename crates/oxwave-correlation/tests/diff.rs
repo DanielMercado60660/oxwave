@@ -37,8 +37,36 @@
 use oxwave_cref::XorShift;
 
 extern "C" {
-    fn xcor(lx: i32, ifx: i32, x: *const f32, ly: i32, ify: i32, y: *const f32,
+    fn convolve_cwp(lx: i32, ifx: i32, x: *const f32, ly: i32, ify: i32, y: *const f32,
             lz: i32, ifz: i32, z: *mut f32);
+}
+
+// xcor.c reverses x and calls convolve_cwp. Do that reversal here so
+// both C operands can have guards: convolution.c preloads x[-1] on rolling
+// on and x[lx] in an even-length middle, although neither value is used.
+// Guards also keep C's origin-adjusted pointers inside their allocations.
+fn guarded_c_xcor(ifx: i32, x: &[f32], ify: i32, y: &[f32], ifz: i32, z: &mut [f32]) {
+    fn guarded(values: &[f32], first: i32) -> (Vec<f32>, usize) {
+        let guard = first.unsigned_abs() as usize + 1;
+        let mut storage = vec![f32::NAN; values.len() + 2 * guard];
+        storage[guard..guard + values.len()].copy_from_slice(values);
+        (storage, guard)
+    }
+    let reversed: Vec<_> = x.iter().rev().copied().collect();
+    let first = 1 - ifx - x.len() as i32;
+    let (xr, x_start) = guarded(&reversed, first);
+    let (yr, y_start) = guarded(y, ify);
+    let (mut zr, z_start) = guarded(z, ifz);
+    unsafe {
+        convolve_cwp(
+            x.len() as i32, first, xr.as_ptr().add(x_start),
+            y.len() as i32, ify, yr.as_ptr().add(y_start),
+            z.len() as i32, ifz, zr.as_mut_ptr().add(z_start),
+        );
+    }
+    assert!(zr[..z_start].iter().all(|v| v.is_nan()));
+    assert!(zr[z_start + z.len()..].iter().all(|v| v.is_nan()));
+    z.copy_from_slice(&zr[z_start..z_start + z.len()]);
 }
 
 #[test]
@@ -57,7 +85,7 @@ fn xcor_matches_c() {
         let y: Vec<f32> = (0..ny).map(|i| if case % 9 == 0 && i % 2 == 0 { -scale } else { rng.uniform_f32(-scale, scale) }).collect();
         let mut expected = vec![123.0; nz];
         let mut actual = vec![123.0; nz];
-        unsafe { xcor(nx as i32, ifx, x.as_ptr(), ny as i32, ify, y.as_ptr(), nz as i32, ifz, expected.as_mut_ptr()) };
+        guarded_c_xcor(ifx, &x, ify, &y, ifz, &mut expected);
         oxwave_correlation::xcor(ifx, &x, ify, &y, ifz, &mut actual);
         let max = expected.iter().fold(0.0f32, |m, &v| m.max(v.abs()));
         for (i, (&a, &b)) in actual.iter().zip(&expected).enumerate() {

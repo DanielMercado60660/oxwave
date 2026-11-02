@@ -96,7 +96,10 @@ fn scaledfromhead(tr: &Trace, k: i32) -> f64 {
         111 => (tr.selev as f64, tr.scalel), 112 => (tr.gelev as f64, tr.scalel),
         113 => (tr.sdepth as f64, tr.scalel), 114 => (tr.sdel as f64, tr.scalel),
         115 => (tr.gdel as f64, tr.scalel), 116 => (tr.swdep as f64, tr.scalel),
-        117 => (tr.gwdep as f64, tr.scalel), _ => return fromhead(tr, k),
+        117 => (tr.gwdep as f64, tr.scalel),
+        1..=80 => return fromhead(tr, k),
+        // The SU build returns zero for this uninitialized fromhead result.
+        _ => return 0.0,
     };
     if scale > 1 { dval *= scale as f64; }
     else if scale < 0 { dval /= -(scale as i32) as f64; }

@@ -16,3 +16,39 @@
 [exact] suspike nt=3 ntr=2 | segyhdrs ns=2 ns=3 dt=4000 dt=1000 > copy; cat binary copy
 [stderr] suspike nt=1 ntr=1 | segyhdrs ntrpr=32768 > /dev/null
 [stderr] suspike nt=1 ntr=1 | segyhdrs bfile=/nonexistent/binary > /dev/null
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 | segyhdrs ns=1 dt=1000 jobid=12 lino=-3 reno=99 > copy; cat header binary copy
+[exact] suspike nt=2 ntr=1 | segyhdrs ntrpr=12 nart=-7 dto=65000 nso=2 > copy; cat binary copy
+[exact] suspike nt=3 ntr=1 | segyhdrs format=3 fold=-6 tsort=4 vscode=32767 > copy; cat binary copy
+[exact] suspike nt=4 ntr=1 | segyhdrs hsfs=-1 hsfe=32767 hslen=-32768 hstyp=4 > copy; cat binary copy
+[exact] suplane nt=11 ntr=2 | segyhdrs schn=21 hstas=32 hstae=43 htatyp=3 > copy; cat binary copy
+[exact] suplane nt=19 ntr=3 | segyhdrs hcorr=2 bgrcv=1 rcvm=4 mfeet=2 polyt=2 vpol=8 > copy; cat binary copy
+[exact] suspike nt=4097 ntr=1 | segyhdrs hfile=ascii bfile=bh > traces; cat ascii bh traces
+[exact] sunull nt=31 ntr=4 dt=0.002 | segyhdrs > copy; cat header binary copy
+[exact] suplane nt=23 ntr=5 | sushw key=dt a=12345 | segyhdrs > copy; cat binary copy
+[exact] suspike nt=13 ntr=3 | sushw key=dt a=0 | segyhdrs > copy; cat binary copy
+[exact] suspike nt=17 ntr=2 | sushw key=dt a=2222 | segyhdrs dt=4444 ns=5 > copy; cat binary copy
+[exact] sunull nt=1 ntr=1 | segyhdrs hfile=txt bfile=dat > /dev/null; cat txt dat
+[exact] suspike nt=2 ntr=2 | segyhdrs > /dev/null; cat header binary
+[exact] suspike nt=3 ntr=4 | segyhdrs | sugethw key=ns,dt output=ascii
+[stderr] suspike nt=4 ntr=1 | segyhdrs verbose=1 hfile=txt bfile=dat > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs ns=0 dt=0 > /dev/null
+[exact] segyhdrs ns=4097 dt=65535 hfile=txt bfile=dat < .; cat txt dat
+[exact] segyhdrs ns=1 dt=1 jobid=-2147483648 lino=2147483647 reno=0 < .; cat binary
+[exact] segyhdrs ns=2 dt=2 fold=-32768 tsort=32767 vscode=-1 hsfs=0 hsfe=-100 hslen=100 hstyp=-2 < .; cat binary
+[exact] segyhdrs ns=3 dt=3 schn=-32768 hstas=32767 hstae=-1 htatyp=0 hcorr=-2 bgrcv=3 rcvm=-4 mfeet=5 polyt=-6 vpol=7 < .; cat binary
+[exact] suspike nt=7 ntr=1 | segyhdrs ns= dt= jobid= format= > copy; cat binary copy
+[exact] suspike nt=5 ntr=1 | segyhdrs jobid=abc lino=12x reno=-0 format=0 > copy; cat binary copy
+[stderr] suspike nt=1 ntr=1 | segyhdrs dt=65536 > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs nso=-1 > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs jobid=2147483648 > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs vpol=-32769 > /dev/null
+[stderr] suspike nt=1 ntr=1 | segyhdrs hfile=/nonexistent/sub/header bfile=bin > /dev/null
+[stderr] segyhdrs ns=3 dt=1000 < /dev/null
+[stderr] segyhdrs ns=3 unused=1 < .
+[stderr] segyhdrs dt=1000 unused=1 < .
+[exact] suspike nt=9 ntr=1 | segyhdrs hfile=same bfile=same > copy; cat same copy
+[stderr] (suspike nt=3 ntr=1; suspike nt=4 ntr=1) | segyhdrs > /dev/null
+[exact] suspike nt=7 ntr=2 | sushw key=trid a=2 | segyhdrs > copy; cat binary copy
+[exact] suspike nt=3 ntr=2 | segyhdrs hfile=/dev/null bfile=bin > copy; cat bin copy
+[exact] suspike nt=3 ntr=2 | segyhdrs hfile=txt bfile=/dev/null > copy; cat txt copy

@@ -110,7 +110,11 @@ fn main() {
             line.push(c as u8);
             if c == 10 { break; }
         }
-        for &c in &line { fputc(c as i32, &outhdrfp); }
+        // C's header-copy loop stops at the first NUL in the input line.
+        for &c in &line {
+            if c == 0 { break; }
+            fputc(c as i32, &outhdrfp);
+        }
         fputc(10, &outhdrfp);
         if line.starts_with(b"~C") { in_tilde_c_block = true; }
         else if line.starts_with(b"~P") { in_tilde_c_block = false; }

@@ -108,6 +108,7 @@ fn main() {
         getparint("nx1", &mut nx1);
         getparfloat("dx1", &mut dx1);
         getparfloat("fx1", &mut fx1);
+        if nx1 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
         x1 = vec![0.0; nx1 as usize];
         for ix1 in 0..nx1 { x1[ix1 as usize] = fx1 + ix1 as f32 * dx1; }
     }
@@ -136,6 +137,7 @@ fn main() {
         getparint("nx2", &mut nx2);
         getparfloat("dx2", &mut dx2);
         getparfloat("fx2", &mut fx2);
+        if nx2 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
         x2 = vec![0.0; nx2 as usize];
         for ix2 in 0..nx2 { x2[ix2 as usize] = fx2 + ix2 as f32 * dx2; }
     }
@@ -161,8 +163,11 @@ fn main() {
     if !b"lmas".contains(&m1) { err!("%s is an unknown interpolation method!\n", method1); }
     if !b"lmas".contains(&m2) { err!("%s is an unknown interpolation method!\n", method2); }
 
+    // A negative C int becomes an enormous size_t in ealloc1float, so malloc fails.
+    if n1 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut u1 = vec![0.0; n1 as usize];
     for i1 in 0..n1 { u1[i1 as usize] = f1 + i1 as f32 * d1; }
+    if n2 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut u2 = vec![0.0; n2 as usize];
     for i2 in 0..n2 { u2[i2 as usize] = f2 + i2 as f32 * d2; }
     let (nx1, nx2, n1, n2) = (nx1 as usize, nx2 as usize, n1 as usize, n2 as usize);

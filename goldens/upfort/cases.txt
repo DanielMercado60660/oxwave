@@ -11,3 +11,14 @@
 [exact] printf ' hello world\n' | upfort verbose=1 unknown=2
 # Bytes outside ASCII and carriage returns.
 [exact] printf ' abc\377z\r\n' | upfort
+# diff-2026-11 (round 1)
+# Convert generator headers to terminated Fortran-like text; upfort consumes text, not SU traces.
+[exact] sunull ntr=1 nt=1 | sugethw key=tracl,ns output=ascii | upfort
+[exact] suspike ntr=1 nt=2 | sugethw key=tracl,ns output=ascii | awk 'NF {print "c comment mixed " $0; print "d lower first " $0}' | upfort verbose=1
+[exact] sunull ntr=2 nt=3 | sushw key=cdp a=101 b=7 | sugethw key=cdp,ns output=ascii | awk 'NF {print "* comment " $0; print "C comment " $0; print "D comment " $0; print " code " $0}' | upfort unknown=1
+[exact] suspike ntr=1 nt=4 | sugethw key=ns output=ascii | awk 'NF {print " x = \047Mixed Case\047; z=" $0; print " y = \047(abc Def)\047"}' | upfort
+[exact] suplane ntr=3 nt=17 | sugethw key=tracl,ns output=ascii | awk 'NF {print "xfirst " $0 " \047abc\047 tail \047(xyZ)\047 end"}' | upfort
+[exact] sunull ntr=1 nt=4097 | sugethw key=ns output=ascii | awk 'NF {printf " "; for (i=0;i<4097;i++) printf "a"; print " " $0}' | upfort
+[exact] suspike ntr=3 nt=31 | sushw key=offset a=-100 b=50 | sugethw key=offset output=ascii | awk 'NF {print " \047\047 \047a\047\047b\047 " $0; print " \047(format,abc)\047 " $0}' | upfort arbitrary positional=bad
+[exact] sunull ntr=1 nt=7 | sugethw key=ns output=ascii | awk 'NF {print ""; print "c"; print "*"; print "D"; print "a"; print " " $0 "\r"}' | upfort
+[exact] sunull ntr=1 nt=11 | sugethw key=ns output=ascii | awk 'NF {print "\047first column"; print " x=\047first line"; print "dEf\047 tail " $0}' | upfort

@@ -12,3 +12,22 @@ suplane nt=129 ntr=3 | suop op=abs | sugain bias=2000 | subackush navg=201
 sunull nt=1 ntr=1 | subackush navg=1
 sunull nt=9 ntr=3 | subackush navg=0 gr=2 smode=2
 sunull nt=9 ntr=3 | subackush navg=-1
+# diff-2026-11 (round 1)
+(sunull nt=2 ntr=3 | sugain bias=2000; sunull nt=2 ntr=1 | sugain bias=40) | subackush navg=1 gr=1
+(sunull nt=3 ntr=3 | sugain bias=2000; sunull nt=3 ntr=1 | sugain bias=100) | subackush navg=1 gr=1 smode=0
+(sunull nt=4 ntr=3 | sugain bias=2000; sunull nt=4 ntr=1 | sugain bias=5) | subackush navg=2 gr=1 smode=1 grc=10 grs=100 se=0.4 sd=0.12 sg=0.3
+(sunull nt=17 ntr=3 | sugain bias=2200; sunull nt=17 ntr=1 | sugain bias=50) | subackush navg=5 gr=1 smode=0
+(sunull nt=17 ntr=3 | sugain bias=2200; sunull nt=17 ntr=1 | sugain bias=50) | subackush navg=5 gr=1 smode=1
+(sunull nt=17 ntr=3 | sugain bias=2200; sunull nt=17 ntr=1 | sugain bias=150) | subackush navg=3 gr=1 smode=1
+(sunull nt=17 ntr=3 | sugain bias=2200; sunull nt=17 ntr=1 | sugain bias=0) | subackush navg=3 gr=1 grc=20 grs=80
+suplane nt=127 ntr=4 | suop op=abs | sugain bias=1200 | subackush navg=7 gr=1 grs=2500 grc=1000 se=0.15 sd=0.05 sg=0.1
+suspike nt=101 ntr=4 k1=25,50,75 mag=100,200,300 | sugain bias=2000 | subackush navg=9 gr=1 smode=1
+(sunull nt=4097 ntr=3 | sugain bias=2000; sunull nt=4097 ntr=1 | sugain bias=70) | subackush navg=101 gr=1
+(sunull nt=31 ntr=4 | sugain bias=1800) | sushw key=dt,d1,f1,cdp a=4000,2.5,100,42 | subackush navg=5 gr=1 verbose=1
+sunull nt=4 ntr=1 | sugain bias=2000 | subackush navg=1 gr=1
+(sunull nt=31 ntr=3 | sugain bias=2000; sunull nt=31 ntr=1 | sugain bias=70) | subackush navg=3 gr=1 grs=100 grc=10 se=0.209 sd=0.033 sg=0.203 smode=1
+sunull nt=9 ntr=4 | subackush navg=999999999999999999999 gr=1
+sunull nt=9 ntr=4 | subackush grs=1e999 gr=1
+(suspike nt=97 ntr=1 k1=12,38,71 mag=500,-300,1200 | sugain bias=3200; suspike nt=97 ntr=1 k1=20,38,80 mag=300,500,-250 | sugain bias=1700; suspike nt=97 ntr=1 k1=12,50,71 mag=300,-200,500 | sugain bias=2300; suspike nt=97 ntr=1 k1=12,38,71 mag=50,-20,90 | sugain bias=45) | subackush navg=11 gr=1 se=0.27 sd=0.08 sg=0.19
+(sunull nt=103 ntr=1 | sugain bias=3111; sunull nt=103 ntr=1 | sugain bias=1789; sunull nt=103 ntr=1 | sugain bias=2468; sunull nt=103 ntr=1 | sugain bias=73) | subackush navg=1 gr=1 smode=1
+(sunull nt=103 ntr=1 | sugain bias=3111; sunull nt=103 ntr=1 | sugain bias=1789; sunull nt=103 ntr=1 | sugain bias=2468; sunull nt=103 ntr=1 | sugain bias=73) | subackush navg=201 gr=1 smode=0

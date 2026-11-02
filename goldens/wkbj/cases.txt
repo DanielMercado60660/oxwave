@@ -66,3 +66,54 @@
 # Inventory scenarios with sustrip outpar set for the harness without a tty.
 [f32] sunull nt=16 ntr=16 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=16 nz=16 xs=700 zs=0 dx=100 dz=100 sfile=sigma.bin bfile=beta.bin afile=angle.bin > times && cat times sigma.bin angle.bin beta.bin
 [f32] sunull nt=16 ntr=16 | suop op=exp | sugain scale=2000 | sustrip outpar=strip.par | wkbj nx=16 nz=16 fx=100 fz=50 dx=50 dz=50 xs=350 zs=150 sfile=sigma.bin bfile=beta.bin afile=angle.bin > times && cat times sigma.bin angle.bin beta.bin
+
+# diff-2026-11 (round 1)
+# R01-R04: nt=1..4, including ntr=1. Raw grids can reshape stripped traces.
+[f32] sunull nt=1 ntr=12 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=3 nz=4 xs=0.5 zs=1.5 > times && cat times sfile afile bfile
+[f32] sunull nt=2 ntr=3 | suop op=exp | sugain scale=1600 | sustrip outpar=strip.par | wkbj nx=3 nz=2 xs=1 zs=0 > times && cat times sfile afile bfile
+[f32] sunull nt=3 ntr=2 | suop op=exp | sugain scale=1700 | sustrip outpar=strip.par | wkbj nx=2 nz=3 xs=0 zs=1 > times && cat times sfile afile bfile
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.001 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=2 nz=2 xs=0.5 zs=0.5 > times && cat times sfile afile bfile
+# R05-R06: long and prime trace lengths; keep the polar workspace modest.
+[f32] sunull nt=4097 ntr=1 | suop op=exp | sugain scale=2100 | sustrip outpar=strip.par | wkbj nx=17 nz=241 xs=8 zs=120 > times && cat times sfile afile bfile
+[f32] sunull nt=97 ntr=3 | suop op=exp | sugain scale=1900 | sustrip outpar=strip.par | wkbj nx=3 nz=97 xs=1 zs=48 > times && cat times sfile afile bfile
+# R07-R09: raw velocity generator, defaults, explicit sampling/origins, edge sources.
+[f32] makevel nx=11 nz=13 v000=1500 dvdz=20 | wkbj nx=11 nz=13 xs=0 zs=0
+[f32] makevel nx=17 nz=19 v000=2200 dvdx=3 dvdz=12 | wkbj nx=17 nz=19 xs=15 zs=40 dx=2.5 fx=-5 dz=5 fz=10 sfile=sigma.bin bfile=beta.bin afile=angle.bin > times && cat times sigma.bin angle.bin beta.bin
+[f32] makevel nx=7 nz=11 v000=1800 dvdx=15 dvdz=5 | wkbj nx=7 nz=11 xs=-8 zs=16 fx=-20 fz=-4 dx=2 dz=2 > times && cat times sfile afile bfile
+# R10-R13: compare each output separately so sigma cannot mask angle/time errors.
+[f32] makevel nx=23 nz=29 v000=2000 dvdx=10 dvdz=20 | wkbj nx=23 nz=29 xs=8.5 zs=12.25
+[f32] makevel nx=23 nz=29 v000=2000 dvdx=10 dvdz=20 | wkbj nx=23 nz=29 xs=8.5 zs=12.25 > times && cat sfile
+[f32] makevel nx=23 nz=29 v000=2000 dvdx=10 dvdz=20 | wkbj nx=23 nz=29 xs=8.5 zs=12.25 > times && cat afile
+[f32] makevel nx=23 nz=29 v000=2000 dvdx=10 dvdz=20 | wkbj nx=23 nz=29 xs=8.5 zs=12.25 > times && cat bfile
+# R14-R17: smooth lens, isolated perturbation, seeded noise, layered model.
+[f32] makevel nx=31 nz=37 v000=2000 vlens=100 xlens=15 zlens=18 dlens=20 tlens=30 | wkbj nx=31 nz=37 xs=15 zs=36 > times && cat times sfile afile bfile
+[f32] suspike nt=17 ntr=11 nspk=1 ix1=5 it1=9 | sugain scale=0.01 | suop op=exp | sugain scale=2000 | sustrip outpar=strip.par | wkbj nx=11 nz=17 xs=3.25 zs=0.5 > times && cat times sfile afile bfile
+[f32] sunull nt=13 ntr=11 | suop op=exp | suaddnoise seed=76543 sn=20 | sugain scale=50 bias=1950 | sustrip outpar=strip.par | wkbj nx=11 nz=13 xs=4.5 zs=5.5 > times && cat times sfile afile bfile
+[f32] printf '0 0\n100 0\n1 -99999\n0 40\n100 50\n1 -99999\n' | unif2 ninf=1 nx=11 nz=13 dx=10 dz=10 v00=1800,2000 dvdz=1,2 | wkbj nx=11 nz=13 xs=50 zs=0 dx=10 dz=10 > times && cat times sfile afile bfile
+# R18-R19: input headers vary before stripping; wkbj consumes only velocity samples.
+[f32] suplane nt=17 ntr=11 | sushw key=sx,gx,scalco,dt,delrt a=-300,500,-10,2000,-100 b=25,50,0,0,0 | sugain scale=0.001 | suop op=exp | sugain scale=2000 | sustrip outpar=strip.par | wkbj nx=11 nz=17 xs=4 zs=8 > times && cat times sfile afile bfile
+[f32] sunull nt=7 ntr=5 | sushw key=cdp a=20 b=-2 | suchw key1=offset key2=cdp key3=tracl a=-50 b=3 c=2 | suop op=exp | sugain scale=1800 | sustrip outpar=strip.par | wkbj nx=5 nz=7 xs=2 zs=3 dx=1 dz=1 fx=0 fz=0
+# R20-R24: verbose, empty defaults, filename parsing, auxiliary aliases, surplus input.
+[stderr] [f32] makevel nx=7 nz=11 v000=2000 | wkbj nx=7 nz=11 xs=0 zs=0 sfile=/dev/null bfile=/dev/null afile=/dev/null verbose=1
+[f32] makevel nx=7 nz=11 v000=2000 | wkbj nx=7 nz=11 xs=0 zs=0 dx= dz= fx= fz= sfile='sigma grid' bfile='beta grid' afile='angle grid' > times && cat times 'sigma grid' 'angle grid' 'beta grid'
+[f32] makevel nx=33 nz=37 v000=1800 dvdz=5 | wkbj nx=33 nz=37 xs=16 zs=18 sfile=aux bfile=aux afile=aux > times && cat times aux
+[f32] makevel nx=7 nz=11 v000=2000 | wkbj nx=7 nz=11 xs=0 zs=0 sfile=times > times && cat times afile bfile
+[f32] makevel nx=5 nz=7 v000=1600 dvdx=5 dvdz=2 | wkbj nx=3 nz=3 xs=1 zs=1 > times && cat times sfile afile bfile
+# R25-R28: conversion errors, empty required value, and fopen on a directory.
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=strip.par | wkbj nx=-2147483649 nz=3 xs=0 zs=0
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=strip.par | wkbj nx=3 nz=3 xs=0 zs=0 dz=1e309
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=strip.par | wkbj nx=3 nz=3 xs=0 zs=
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=strip.par | wkbj nx=3 nz=3 xs=0 zs=0 afile=.
+# R29-R31 moved to PENDING_LIB.txt; R32 moved to PENDING_UB.txt.
+# R33-R34: solver's excessive-curvature error and negative input velocities.
+[stderr] makevel nx=11 nz=13 v000=1 dvdx=100 | wkbj nx=11 nz=13 xs=0 zs=0
+[f32] makevel nx=7 nz=11 v000=-1500 | wkbj nx=7 nz=11 xs=0 zs=0 > times && cat times sfile afile bfile
+
+# ub-2026-11 (round 1)
+# R32 refuted: polar.c:131,140-143 reads ix=-1 with zero weight; bounding the read leaves all 80 bytes and rc=0 unchanged.
+[f32] sunull nt=1 ntr=5 | suop op=exp | sugain scale=1500 | sustrip outpar=strip.par | wkbj nx=5 nz=1 xs=0 zs=0 > times && cat times sfile afile bfile
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[f32] makevel nx=33 nz=37 v000=1500 | wkbj nx=33 nz=37 xs=0 zs=0 sfile=times > times && cat times
+[f32] makevel nx=33 nz=37 v000=1500 | wkbj nx=33 nz=37 xs=0 zs=0 bfile=times > times && cat times
+[f32] makevel nx=33 nz=37 v000=1500 | wkbj nx=33 nz=37 xs=0 zs=0 afile=times > times && cat times

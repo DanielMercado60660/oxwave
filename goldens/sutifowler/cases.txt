@@ -102,3 +102,55 @@ suspike nt=65 ntr=1 offset=0 nspk=1 ix1=1 it1=19 | sutifowler ncdps=1
 [stderr] mkdir disk1 disk2; sunull nt=65 ntr=3 | suaddnoise seed=11 | sushw key=cdp a=1 b=1 | sutifowler ncdps=3 nv=2 nvstack=8 p=disk1 p=disk2 file=panels
 # Longer-than-declared gather with an even mxfold reaches the same error.
 [stderr] sunull nt=17 ntr=4 | sutifowler ncdps=1 nv=2 choose=5 mxfold=2
+
+# diff-2026-11 (round 1)
+# Live boundary traces; generator spikes are explicitly placed in range.
+[stderr] suspike nt=1 ntr=1 offset=0 nspk=1 ix1=1 it1=1 | sutifowler ncdps=1 nv=1 nvstack=6 nonhyp=0 lmute=0
+suspike nt=2 ntr=1 offset=0 nspk=1 ix1=1 it1=2 | sutifowler ncdps=1 nv=2 nvstack=7 choose=2 dtout=0.004 nonhyp=0 lmute=0
+suspike nt=3 ntr=1 offset=0 nspk=1 ix1=1 it1=2 | sutifowler ncdps=1 nv=2 choose=3 dtout=0.004 nonhyp=0 lmute=0
+suspike nt=4 ntr=1 offset=0 nspk=1 ix1=1 it1=3 | sutifowler ncdps=1 nv=2 choose=4 dtout=0.004 nonhyp=0 lmute=0
+suspike nt=4 ntr=1 offset=0 nspk=1 ix1=1 it1=1 | sutifowler ncdps=1 nv=1 choose=5 dtout=0.05 nonhyp=0 lmute=0
+# 4097 samples, all modes, live data and a non-power-of-two spatial dimension.
+sunull nt=4097 ntr=3 | suaddnoise seed=202611 | sushw key=cdp a=31 b=-3 | sutifowler ncdps=3 nv=2 nvstack=8 choose=1 nonhyp=0 lmute=0
+sunull nt=4097 ntr=3 | suaddnoise seed=202611 | sushw key=cdp a=31 b=-3 | sutifowler ncdps=3 nv=2 nvstack=8 choose=2 nonhyp=0 lmute=0
+sunull nt=4097 ntr=3 | suaddnoise seed=202611 | sushw key=cdp a=31 b=-3 | sutifowler ncdps=3 nv=2 choose=3 nonhyp=0 lmute=0
+sunull nt=4097 ntr=3 | suaddnoise seed=202611 | sushw key=cdp a=31 b=-3 | sutifowler ncdps=3 nv=2 choose=4 nonhyp=0 lmute=0
+sunull nt=4097 ntr=3 | suaddnoise seed=202611 | sushw key=cdp a=31 b=-3 | sutifowler ncdps=3 nv=2 choose=5 nonhyp=0 lmute=0
+# Prime nt, dipping planes, and finite offsets exercise different NMO paths.
+suplane nt=251 ntr=7 offset=40 dip1=-3 dip2=5 dip3=9 | sushw key=cdp a=-12 b=2 | sutifowler ncdps=7 nv=3 nvstack=13 choose=1 dx=18.5 vmin=1379.1 vmax=4976.3 vminstack=1191.7 nxpad=3 ntpad=17 lmute=5 nonhyp=0 salias=0.7
+suplane nt=251 ntr=7 offset=40 dip1=-3 dip2=5 dip3=9 | sushw key=cdp a=-12 b=2 | sutifowler ncdps=7 nv=3 nvstack=13 choose=2 dx=18.5 vmin=1379.1 vmax=4976.3 vminstack=1191.7 nxpad=3 ntpad=17 lmute=5 nonhyp=0 salias=0.7
+suplane nt=251 ntr=7 offset=40 dip1=-3 dip2=5 dip3=9 | sushw key=cdp a=-12 b=2 | sutifowler ncdps=7 nv=3 choose=3 dx=18.5 vmin=1379.1 vmax=4976.3 nxpad=3 ntpad=17 lmute=5 nonhyp=0
+suplane nt=251 ntr=7 offset=40 dip1=-3 dip2=5 dip3=9 | sushw key=cdp a=-12 b=2 | sutifowler ncdps=7 nv=3 choose=4 dx=18.5 vmin=1379.1 vmax=4976.3 lmute=5 nonhyp=0
+suplane nt=251 ntr=7 offset=40 dip1=-3 dip2=5 dip3=9 | sushw key=cdp a=-12 b=2 | sutifowler ncdps=7 nv=3 choose=5 dx=18.5 vmin=1379.1 vmax=4976.3 lmute=5 nonhyp=0
+# Header sample interval, rather than the generator's dt, determines output.
+[stderr] suspike nt=97 ntr=3 offset=0 nspk=1 ix1=2 it1=37 | sushw key=cdp,dt a=900,123 b=-7,0 | sutifowler ncdps=3 nv=3 nvstack=9 dtout=0.0000861 lmute=0 nonhyp=0 ngroup=2 verbose=1
+suspike nt=97 ntr=3 offset=0 nspk=1 ix1=2 it1=37 | sushw key=cdp,dt a=900,123 b=-7,0 | sutifowler ncdps=3 nv=3 choose=3 dtout=0.0002337 lmute=0 nonhyp=0
+# Anisotropy with descending eta/velocity scans and simultaneous tapers.
+sunull nt=97 ntr=9 | suaddnoise seed=904 | sushw key=cdp,offset a=50,-20 b=0,20 j=3,3 c=-3,0 | sutifowler ncdps=3 nv=3 nvstack=11 choose=1 d=0.01 etamin=0.3 etamax=-0.05 neta=3 vsvp=0.6 vmin=3100 vmax=1700 lbtaper=40 lstaper=4 mxfold=3 nonhyp=1 lmute=8
+sunull nt=97 ntr=9 | suaddnoise seed=904 | sushw key=cdp,offset a=50,-20 b=0,20 j=3,3 c=-3,0 | sutifowler ncdps=3 nv=3 nvstack=11 choose=2 d=0.01 etamin=0.3 etamax=-0.05 neta=3 vsvp=0.6 vmin=3100 vmax=1700 lbtaper=40 lstaper=4 mxfold=3 nonhyp=1 lmute=8
+sunull nt=97 ntr=9 | suaddnoise seed=904 | sushw key=cdp,offset a=50,-20 b=0,20 j=3,3 c=-3,0 | sutifowler ncdps=3 nv=3 choose=3 d=0.01 etamin=0.3 etamax=-0.05 neta=3 vsvp=0.6 vmin=3100 vmax=1700 lbtaper=40 lstaper=4 mxfold=3 nonhyp=1 lmute=8
+# Precomputed stacks bypass scaling, mutes, tapers and output resampling.
+[stderr] suplane nt=127 ntr=18 offset=0 | sushw key=trid,delrt a=2,-12 | sutifowler ncdps=3 nv=2 nvstack=6 getcvstacks=1 choose=1 dtout=0.03 vminstack=1200 d=0.04 etamin=0.1 neta=2 nxpad=1
+[stderr] suplane nt=127 ntr=6 offset=0 | sushw key=trid,delrt a=2,-12 | sutifowler ncdps=3 nv=2 getcvstacks=1 choose=3 dtout=0.03 d=0.04 etamin=0.1 neta=2 nxpad=1
+[stderr] suplane nt=127 ntr=6 offset=0 | sutifowler ncdps=3 nv=2 getcvstacks=1 choose=4 dtout=0.03 ngroup=1 lbtaper=200 lstaper=10
+[stderr] suplane nt=127 ntr=6 offset=0 | sutifowler ncdps=3 nv=2 getcvstacks=1 choose=5 dtout=0.03 ngroup=-2
+# Temporary-file parameters need no external directories or fixtures.
+[stderr] suplane nt=67 ntr=5 offset=0 | sushw key=cdp a=7 b=1 | sutifowler ncdps=5 nv=2 nvstack=7 printfile=/dev/null p=. file=round1 salias=1.7 getcvstacks=0
+# A third physical generator and nonzero finite-offset reflectors.
+susynlv nt=129 dt=0.004 nxm=3 nxo=2 dxm=0.025 dxo=0.025 ref='1:-1,0.1;1,0.1' | sutifowler ncdps=3 nv=3 nvstack=10 vmin=1500 vmax=2500 nonhyp=0 lmute=0
+# Long temporal FFTs beyond 16-bit signed sample counts, small output volume.
+suspike nt=32771 ntr=1 offset=0 nspk=1 ix1=1 it1=15001 | sutifowler ncdps=1 nv=1 nvstack=6 nonhyp=0 lmute=0
+# A plain live default run supplements the explicit configurations.
+suplane nt=37 ntr=1 offset=0 npl=1 len1=1 cx1=1 ct1=12 | sutifowler ncdps=1
+# Stable errors: unsupported stacking counts, missing required value, short CV input.
+[stderr] sunull nt=4 ntr=1 | sutifowler ncdps=1 nvstack=1
+[stderr] sunull nt=4 ntr=1 | sutifowler ncdps=1 choose=2 nvstack=5
+[stderr] suplane nt=17 ntr=3 offset=0 | sutifowler ncdps= verbose=1
+[stderr] suplane nt=17 ntr=5 offset=0 | sutifowler ncdps=2 nv=3 choose=3 getcvstacks=1
+
+# ub-2026-11 (round 1)
+# Refuted: sutifowler.c:322-323 / par/lib/VND.c:1683-1694 allocation UB
+# is removed by allocating at least one float for an otherwise empty loop.
+# Both cases preserve stdout, exit status, and every stderr byte.
+sunull nt=9 ntr=1 | sutifowler ncdps=1 nv=-1
+sunull nt=9 ntr=1 | sutifowler ncdps=1 nvstack=-1

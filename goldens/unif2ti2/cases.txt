@@ -14,3 +14,67 @@
 [stderr] unif2ti2 ninf=1 nx=2 nz=2 npmax=4 < /dev/null
 [stderr] printf '0 100\n10 100\n1 -99999\n0 0\n10 0\n1 -99999\n' | unif2ti2 ninf=1 nx=2 nz=2 method=linear
 [f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=3 nz=1 dx=-2 dz=-1 fx=-1 fz=-1 method=linear > /dev/null && cat vp_file
+# diff-2026-11 (round 1)
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=1 nz=1 method=linear > /dev/null && cat vp_file vs_file rho_file c11_file c13_file c33_file c15_file c35_file c55_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=1 nz=2 dz=7 vp00=1700 vs00=700 rho00=1200 eps00=.1 delta00=.05 > /dev/null && cat vp_file vs_file c11_file c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=1 nz=3 fz=2 dz=3 dvpdz=2 dvsdz=1 drdz=.5 dedz=.001 dddz=.002 > /dev/null && cat vp_file vs_file rho_file epsilon_file delta_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=1 nz=4 fx=20 fz=10 x0=5 z0=3 vp00=1900 vs00=950 eps00=.12 delta00=.04 rho00=1100 dvpdx=2 dvpdz=3 dvsdx=1 dvsdz=2 dedx=.001 dedz=.002 dddx=.002 dddz=.001 drdx=.1 drdz=.2 > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file c11_file c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=2 nz=17 dx=13 dz=7 fx=-10 fz=-20 method=linear > /dev/null && cat vp_file rho_file c33_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=1 nz=4097 dz=.25 method=linear vp00=1500 dvpdz=.3 > /dev/null && cat vp_file c33_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=7 nz=51 dx=120 dz=10 method=linear vp00=1500,2300 vs00=700,1000 rho00=1000,1300 > /dev/null && cat vp_file vs_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=2 nx=13 nz=70 dx=83 dz=10 method=spline > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=2 nx=13 nz=70 dx=83 dz=10 method=mono > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=2 nx=13 nz=70 dx=83 dz=10 method=akima > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=3 nz=45 dz=10 ns=1 method=linear vp00=1500,2500 vs00=700,1200 eps00=.1,.2 delta00=.05,.1 rho00=1000,1300 > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=3 nz=45 dz=10 ns=4 method=linear vp00=1500,2500 vs00=700,1200 eps00=.1,.2 delta00=.05,.1 rho00=1000,1300 > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=3 nz=45 dz=10 ns=5 method=linear vp00=1500,2500 vs00=700,1200 eps00=.1,.2 delta00=.05,.1 rho00=1000,1300 > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file
+[f32] unif2ti2 tfile=model && vtlvz nt=12 dt=.004 v0=.3 a=0 > tilt && unif2ti2 < model ninf=0 nx=3 nz=4 nufile=tilt method=linear vp00=2200 vs00=1000 eps00=.2 delta00=.1 rho00=1200 c11_file=a c13_file=b c33_file=c c15_file=d c35_file=e c55_file=f vp_file=g vs_file=h epsilon_file=i delta_file=j rho_file=k > /dev/null && cat a b c d e f g h i j k
+[f32] unif2ti2 tfile=model && vtlvz nt=34 dt=.004 v0=0 a=.5 > tilt && unif2ti2 < model ninf=1 nx=2 nz=17 dz=25 nufile=tilt method=linear vp00=1800,2400 vs00=900,1100 eps00=.1,.2 delta00=.05,.1 rho00=1000,1200 > /dev/null && cat c11_file c13_file c33_file c15_file c35_file c55_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=4 nz=30 fx=50 fz=180 dx=100 dz=2 method=linear x0=5,10 z0=15,20 vp00=1600,2100 vs00=800,1000 eps00=.1,.2 delta00=.05,.1 rho00=1000,1200 drdx=.1,.2 drdz=.2,.3 dvpdx=.2,.3 dvpdz=.3,.4 dvsdx=.1,.2 dvsdz=.2,.3 dedx=.0001,.0002 dedz=.0002,.0003 dddx=.0001,.0002 dddz=.0002,.0003 > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file c11_file c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=5 nz=7 dx=0 dz=0 method=linear > /dev/null && cat vp_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=5 nz=7 dx=-10 dz=-10 fx=10 fz=10 method=linear > /dev/null && cat vp_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=5 nx=9 nz=101 dx=125 dz=10 method=linear npmax=8 > /dev/null && cat vp_file rho_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=2 nz=21 dz=10 method=linear vp00=1500,1500 vs00=1500,2000 eps00=0,0 delta00=0,0 rho00=1000,1010 > /dev/null && cat vp_file vs_file c33_file
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=1 nx=2 nz=2 method=invalid
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=2 nz=2 npmax=2
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=2 nz=2 nufile=absent
+[stderr] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=2 nz=2 verbose=1 method=linear
+[exact] unif2ti2 tfile=example && cat example
+[f32] unif2ti2 tfile=model && makevel nx=7 nz=19 v000=.05 dvdx=.0003 dvdz=.0007 > tilt && unif2ti2 < model ninf=1 nx=7 nz=19 dz=13 nufile=tilt method=linear vp00=1800,2400 vs00=800,1200 eps00=.2,.3 delta00=.1,.15 rho00=1000,1250 > /dev/null && cat c15_file c35_file
+[f32] unif2ti2 tfile=model && makevel nx=1 nz=37 v000=.7 dvdz=-.01 > tilt && unif2ti2 < model ninf=1 nx=1 nz=37 dz=10 nufile=tilt vp00=1800,2400 vs00=800,1200 eps00=.2,.3 delta00=.1,.15 rho00=1000,1250 > /dev/null && cat c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=7 nz=23 dz=3 method=linear vp00=2000 eps00=.15 delta00=-.25 dvpdz=.4 > /dev/null && cat c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=0 nx=9 nz=23 dx=7 dz=3 method=linear vp00=2000 eps00=.15 delta00=-.249999 dvpdx=.7 dvpdz=.4 > /dev/null && cat c13_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=3 nx=31 nz=107 fx=20 dx=29 dz=8 method=linear > /dev/null && cat vp_file
+[f32] unif2ti2 tfile=model && unif2ti2 < model ninf=3 nx=31 nz=107 fx=20 dx=29 dz=8 method=mono > /dev/null && cat vp_file
+# diff-2026-11 (round 2)
+[f32] unif2ti2 ninf=0 nx=1 nz=1 method=linear < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 ninf=0 nx=1 nz=2 dz=5 vp00=1750 vs00=800 rho00=1200 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file c33_file
+[f32] unif2ti2 ninf=0 nx=1 nz=3 dz=3 dvpdz=3 dvsdz=1 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file vs_file
+[f32] unif2ti2 ninf=0 nx=1 nz=4 fx=3 fz=5 dx=2 dz=4 x0=1 z0=2 vp00=1900 vs00=900 eps00=.1 delta00=.05 rho00=1100 drdx=.2 drdz=.3 dvpdx=.4 dvpdz=.5 dvsdx=.6 dvsdz=.7 dedx=.001 dedz=.002 dddx=.003 dddz=.004 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file c13_file
+[f32] unif2ti2 ninf=0 nx=1 nz=4097 dz=.25 dvpdz=.3 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=1 nx=7 nz=51 dx=120 dz=10 method=linear vp00=1500,2300 vs00=700,1000 rho00=1000,1300 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file vs_file rho_file
+[f32] unif2ti2 ninf=2 nx=13 nz=70 dx=83 dz=10 method=spline < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 ninf=2 nx=13 nz=70 dx=83 dz=10 method=mono < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 ninf=2 nx=13 nz=70 dx=83 dz=10 method=akima < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file c11_file
+[f32] unif2ti2 ninf=1 nx=3 nz=45 dz=10 ns=2 method=linear vp00=1500,2500 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=1 nx=3 nz=45 dz=10 ns=5 method=linear vp00=1500,2500 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=5 nx=9 nz=101 dx=125 dz=10 method=linear npmax=8 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file rho_file
+[f32] unif2ti2 ninf=0 nx=5 nz=7 dx=0 dz=0 method=linear < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=0 nx=5 nz=7 dx=-10 dz=-10 fx=10 fz=10 method=linear < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=3 nx=31 nz=107 fx=20 dx=29 dz=8 method=mono < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=1 nx=4 nz=30 fx=50 fz=180 dx=100 dz=2 method=linear x0=5,10 z0=15,20 vp00=1600,2100 vs00=800,1000 eps00=.1,.2 delta00=.05,.1 rho00=1000,1200 drdx=.1,.2 drdz=.2,.3 dvpdx=.2,.3 dvpdz=.3,.4 dvsdx=.1,.2 dvsdz=.2,.3 dedx=.0001,.0002 dedz=.0002,.0003 dddx=.0001,.0002 dddz=.0002,.0003 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file vs_file epsilon_file delta_file rho_file c11_file c13_file
+[f32] unif2ti2 ninf=0 nx=7 nz=23 dz=3 method=linear vp00=2000 eps00=.15 delta00=-.25 dvpdz=.4 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat c13_file
+[f32] unif2ti2 ninf=1 nx=2 nz=21 dz=10 method=linear vp00=1500,1500 vs00=1500,2000 eps00=0,0 delta00=0,0 rho00=1000,1010 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file vs_file c33_file
+[f32] unif2ti2 ninf=0 nx=1 nz=7 npmax=8 method=bad < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=1 nx=2 nz=41 dz=10 ns=3 method=linear vp00=1800,2400 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat vp_file
+[f32] unif2ti2 ninf=0 nx=3 nz=13 fx=8 fz=9 dx=5 dz=7 method=linear eps00=.2 delta00=.1 < <(unif2ti2 tfile=model && cat model) > /dev/null && cat c11_file c13_file c33_file c15_file c35_file c55_file
+[f32] unif2ti2 ninf=0 nx=3 nz=4 nufile=tilt method=linear vp00=2200 vs00=1000 eps00=.2 delta00=.1 rho00=1200 c11_file=a c13_file=b c33_file=c c15_file=d c35_file=e c55_file=f vp_file=g vs_file=h epsilon_file=i delta_file=j rho_file=k < <(makevel nx=3 nz=4 v000=.3 dvdx=.01 dvdz=.02 > tilt && unif2ti2 tfile=model && cat model) > /dev/null && cat a b c d e f g h i j k
+[stderr] unif2ti2 ninf=1 nx=2 nz=2 method=invalid < <(unif2ti2 tfile=model && cat model)
+[stderr] unif2ti2 ninf=0 nx=2 nz=2 npmax=2 < <(unif2ti2 tfile=model && cat model)
+[stderr] unif2ti2 ninf=0 nx=2 nz=2 nufile=absent < <(unif2ti2 tfile=model && cat model)
+[stderr] unif2ti2 ninf=0 nx=2 nz=2 verbose=1 method=linear < <(unif2ti2 tfile=model && cat model)
+[f32] unif2ti2 ninf=2 nx=17 nz=101 dx=47 dz=8 method=linear < <(unif2ti2 tfile=model && awk '{if ($2 != -99999) $2=$2+20*sin($1/150); print}' model) > /dev/null && cat vp_file c13_file
+[f32] unif2ti2 ninf=2 nx=17 nz=101 dx=47 dz=8 method=akima < <(unif2ti2 tfile=model && awk '{if ($2 != -99999) $2=$2+20*sin($1/150); print}' model) > /dev/null && cat vp_file c13_file
+[f32] unif2ti2 ninf=2 nx=17 nz=101 dx=47 dz=8 method=spline < <(unif2ti2 tfile=model && awk '{if ($2 != -99999) $2=$2+20*sin($1/150); print}' model) > /dev/null && cat vp_file c13_file
+[f32] unif2ti2 ninf=0 nx=11 nz=19 method=linear < <(unif2ti2 tfile=model && awk 'NR==1 || NR==3' model) > /dev/null && cat vp_file c33_file
+[f32] unif2ti2 ninf=0 nx=11 nz=19 method=mono < <(unif2ti2 tfile=model && awk 'NR==1 || NR==3' model) > /dev/null && cat vp_file c33_file

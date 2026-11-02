@@ -22,3 +22,58 @@ unisam xyfile=/dev/null npairs=2 nout=3
 unisam xfile=/dev/null yfile=/dev/null npairs=2 nout=3
 [f32] unisam xin=0,1,2,3,4,5,6,7 yin=0,2,1,3,2,4,3,5 nout=8 > xy.bin && unisam xyfile=xy.bin npairs=4 nout=7 dxout=0.5 method=spline
 [f32] unisam xin=0,1 yin=0,3 nout=4 > x.bin && unisam xin=0,1 yin=2,5 nout=4 > y.bin && unisam xfile=x.bin yfile=y.bin npairs=4 nout=7 dxout=0.5 method=mono sloth=2 smooth=1 r=5
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0 yin=7 nout=1
+[f32] sunull nt=2 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=1,3 nout=2 method=linear dxout=1 fxout=0
+[f32] sunull nt=3 ntr=1 | cat > /dev/null && unisam xin=0,2 yin=2,8 nout=3 dxout=1
+[f32] sunull nt=4 ntr=1 | cat > /dev/null && unisam xin=0,1,2 yin=2,4,1 nout=4 dxout=0.75 method=mono
+[f32] suspike nt=7 ntr=1 | cat > /dev/null && unisam xin=0,1,3 yin=2,5,1 nout=17 dxout=0.25 method=akima
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,3 yin=2,4,3 nout=4097 dxout=0.001 method=linear
+[f32] sunull nt=3 ntr=1 | sushw key=offset a=99 | cat > /dev/null && unisam xin=0,2,4 yin=2,5,3 nout=9 dxout=0.5
+[f32] suspike nt=5 ntr=1 | cat > /dev/null && unisam xin=0,2,4,6,8 yin=2,4,1,5,3 nout=17 dxout=0.5 isint=0,2 amp=0.5,1 phase0=0.1,0.2 totalphase=3,6
+[f32] sunull nt=2 ntr=1 | cat > /dev/null && unisam xin=0,2,4,6 yin=1,2,3,4 nout=13 dxout=0.5 isint=1 amp=0.3 phase0=0 totalphase=0
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=2,5,1,4 nout=13 dxout=0.25 nwidth=2
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=2,5,1,4 nout=13 dxout=0.25 nwidth=5
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=0,4,2,8 nout=13 dxout=0.25 sloth=1
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=2,4,6,8 nout=13 dxout=0.25 sloth=2 method=mono
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=2,4,6,8 nout=13 dxout=0.25 smooth=1 r=0.5
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=4,3,2,1 yin=8,3,6,2 nout=11 fxout=4 dxout=-0.3 method=linear
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=4,3,2,1 yin=8,3,6,2 nout=11 fxout=4 dxout=-0.3 method=mono
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=3,5 nout=4 fxout=-2 dxout=2 method=spline
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2 yin=3,5,1 nout=7 dxout=0.5 method=akima
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2 yin=3,5,1 nout=7 dxout=0.5 method=spline
+[stderr] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=1,2 nout=3 verbose=1 > /dev/null
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3,4,5 yin=0,4,1,3,2,5 nout=6 > xy.bin && unisam xyfile=xy.bin npairs=3 nout=5 dxout=0.5 method=mono
+[f32] sunull nt=4 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=0,3 nout=4 > x.bin && suspike nt=4 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2,5 nout=4 > y.bin && unisam xfile=x.bin yfile=y.bin npairs=4 nout=7 dxout=0.5
+sunull nt=1 ntr=1 | cat > /dev/null && unisam yin=1,2 nout=2
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=1,2 nout=2 method=unknown
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2 yin=1,2,3 nout=3 isint=0
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2,5 nout=7 dxout=0.2 method=mono
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2,5 nout=7 dxout=0.2 method=akima
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,4 yin=4,1,3,7 nout=25 dxout=0.2 smooth=1 r=10 nwidth=3 sloth=1 method=spline
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,2,4 yin=1,4,2 nout=3 dxout=0 fxout=1
+[f32] sunull nt=4097 ntr=1 | sustrip outpar=/dev/null > y.bin && sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=0,4096 nout=4097 > x.bin && unisam xfile=x.bin yfile=y.bin npairs=4097 nout=11 dxout=410
+# diff-2026-11 (round 2)
+[f32] sunull nt=1 ntr=5 | sushw key=d1,f1 a=0,2 b=1,2 | sugethw key=d1,f1 output=binary > xy.bin && unisam xyfile=xy.bin npairs=5 nout=9 dxout=0.5
+[f32] sunull nt=1 ntr=5 | sushw key=d1 a=0 b=1 | sugethw key=d1 output=binary > x.bin && sunull nt=1 ntr=5 | sushw key=f1 a=2 b=2 | sugethw key=f1 output=binary > y.bin && unisam xfile=x.bin yfile=y.bin npairs=5 nout=9 dxout=0.5 method=mono
+[f32] sunull nt=1 ntr=4 | sushw key=d1,f1 a=0,2 b=1,1 | sugethw key=d1,f1 output=binary > xy.bin && unisam xyfile=xy.bin npairs=4 nout=7 dxout=0.5 method=akima sloth=1
+[f32] sunull nt=1 ntr=4 | sushw key=d1,f1 a=0,2 b=1,1 | sugethw key=d1,f1 output=binary > xy.bin && unisam xyfile=xy.bin npairs=4 nout=7 dxout=0.5 method=spline smooth=1 r=3
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0 yin=2 nout=4 fxout=-1 dxout=0.5
+[f32] sunull nt=2 ntr=1 | cat > /dev/null && unisam xin=0,2 yin=-2,4 nout=9 fxout=-1 dxout=0.5
+[f32] suspike nt=3 ntr=2 | cat > /dev/null && unisam xin=0,1,2,3 yin=1,3,-2,4 nout=13 dxout=0.25 method=mono
+[f32] suplane nt=4 ntr=3 | cat > /dev/null && unisam xin=0,1,2,3 yin=1,3,-2,4 nout=13 dxout=0.25 method=akima
+[f32] sunull nt=7 ntr=2 | cat > /dev/null && unisam xin=0,1,2,3 yin=1,3,-2,4 nout=13 dxout=0.25 method=spline
+[f32] sunull nt=11 ntr=1 | cat > /dev/null && unisam xin=0,1,3,5 yin=1,4,2,5 nout=21 dxout=0.25 isint=1 amp=0.8 phase0=0.4 totalphase=2
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,3,5 yin=1,4,2,5 nout=21 dxout=0.25 isint=0 amp=1
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,3,5 yin=1,4,2,5 nout=21 dxout=0.25 nwidth=8
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=1,3,2,4 nout=13 dxout=0.25 sloth=1 smooth=1 r=2
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=1,3,2,4 nout=13 dxout=0.25 sloth=2 smooth=1 r=20
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,2,4 yin=4,0,8 nout=11 dxout=0.5 sloth=2
+[f32] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2,3 yin=2,4,1,3 nout=4097 dxout=0.001 method=spline
+[f32] sunull nt=1 ntr=1 | sushw key=offset a=10 | suchw key1=cdp key2=offset a=2 b=1 | cat > /dev/null && unisam xin=0,1,2 yin=2,5,3 nout=17 dxout=0.125
+[stderr] sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1,2 yin=2,5,3 nout=5 verbose=1 > /dev/null
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2,3
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2 nout=3
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xin=0,1 yin=2,3 nout=3 method=wrong
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xyfile=missing npairs=3 nout=2
+sunull nt=1 ntr=1 | cat > /dev/null && unisam xfile=missing yfile=missing npairs=3 nout=2

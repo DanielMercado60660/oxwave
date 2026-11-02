@@ -244,6 +244,11 @@ fn main() {
     tmin = max(tmin, max(ft, dt));
     let dsmax = ((vold[0][0] / (2 * ndpfz) as f32) as f64 * ((tmin / fpeak) as f64).sqrt()) as f32;
     let r = makeref(dsmax, &reflectors);
+    // For nz=1, no segment at or below the surface passes makeone's z<ez
+    // test. If every segment is rejected there, its trace is zero regardless
+    // of the travel-time arrays. Avoid the library's two-depth-sample assert.
+    // Fixing C polar.c's zero-weight p[0][-1] read gives the same zero trace.
+    let need_eiktam = nz != 1 || r.iter().any(|r| r.rs.iter().any(|rs| rs.z < ez));
     let mut ns = 0;
     for ir in 0..nr as usize {
         ns += r[ir].ns;
@@ -326,62 +331,64 @@ fn main() {
 
             if ixm == 0 || nxd1 == 1 {
                 /* no interpolation */
-                eiktam(
-                    xs,
-                    0.0,
-                    dz,
-                    0.0,
-                    dx,
-                    fx1,
-                    &v[..nx1 as usize]
-                        .iter()
-                        .map(Vec::as_slice)
-                        .collect::<Vec<_>>(),
-                    &mut ts[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut a_s[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut sgs[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut bas[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                );
-                eiktam(
-                    xg,
-                    0.0,
-                    dz,
-                    0.0,
-                    dx,
-                    fx1,
-                    &v[..nx1 as usize]
-                        .iter()
-                        .map(Vec::as_slice)
-                        .collect::<Vec<_>>(),
-                    &mut tg[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut ag[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut sgg[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut bag[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                );
+                if need_eiktam {
+                    eiktam(
+                        xs,
+                        0.0,
+                        dz,
+                        0.0,
+                        dx,
+                        fx1,
+                        &v[..nx1 as usize]
+                            .iter()
+                            .map(Vec::as_slice)
+                            .collect::<Vec<_>>(),
+                        &mut ts[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut a_s[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut sgs[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut bas[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                    );
+                    eiktam(
+                        xg,
+                        0.0,
+                        dz,
+                        0.0,
+                        dx,
+                        fx1,
+                        &v[..nx1 as usize]
+                            .iter()
+                            .map(Vec::as_slice)
+                            .collect::<Vec<_>>(),
+                        &mut tg[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut ag[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut sgg[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut bag[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                    );
+                }
                 let mut ixd = nint(((xs - fx) / dx) as f64);
                 let vs0 = vold[ixd as usize][0];
                 ixd = nint(((xg - fx) / dx) as f64);
@@ -423,62 +430,64 @@ fn main() {
                 puttr(&mut tr);
             } else {
                 /* linear interpolation */
-                eiktam(
-                    xs,
-                    0.0,
-                    dz,
-                    0.0,
-                    dx,
-                    fx1,
-                    &v[..nx1 as usize]
-                        .iter()
-                        .map(Vec::as_slice)
-                        .collect::<Vec<_>>(),
-                    &mut ts1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut as1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut sgs1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut bas[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                );
-                eiktam(
-                    xg,
-                    0.0,
-                    dz,
-                    0.0,
-                    dx,
-                    fx1,
-                    &v[..nx1 as usize]
-                        .iter()
-                        .map(Vec::as_slice)
-                        .collect::<Vec<_>>(),
-                    &mut tg1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut ag1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut sgg1[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                    &mut bag[..nx1 as usize]
-                        .iter_mut()
-                        .map(Vec::as_mut_slice)
-                        .collect::<Vec<_>>(),
-                );
+                if need_eiktam {
+                    eiktam(
+                        xs,
+                        0.0,
+                        dz,
+                        0.0,
+                        dx,
+                        fx1,
+                        &v[..nx1 as usize]
+                            .iter()
+                            .map(Vec::as_slice)
+                            .collect::<Vec<_>>(),
+                        &mut ts1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut as1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut sgs1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut bas[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                    );
+                    eiktam(
+                        xg,
+                        0.0,
+                        dz,
+                        0.0,
+                        dx,
+                        fx1,
+                        &v[..nx1 as usize]
+                            .iter()
+                            .map(Vec::as_slice)
+                            .collect::<Vec<_>>(),
+                        &mut tg1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut ag1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut sgg1[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                        &mut bag[..nx1 as usize]
+                            .iter_mut()
+                            .map(Vec::as_mut_slice)
+                            .collect::<Vec<_>>(),
+                    );
+                }
                 let mut ixd = nint(((xs - fx) / dx) as f64);
                 let vs0 = vold[ixd as usize][0];
                 ixd = nint(((xg - fx) / dx) as f64);
@@ -614,6 +623,11 @@ fn makeone(
             let ix = xi as i32;
             let zi = zd / dz;
             let iz = zi as i32;
+            // Match the fixed C allocation bound; retain initialized samples
+            // reached in preceding columns by the existing negative-z cases.
+            if ix as i64 * ts[0].len() as i64 + (iz as i64) < 0 {
+                continue;
+            }
             let sx = xi - ix as f32;
             let sz = zi - iz as f32;
 
@@ -621,13 +635,20 @@ fn makeone(
             macro_rules! bilinear {
                 ($a:expr) => {{
                     let a = $a;
-                    let ix = ix as usize;
-                    let iz = iz as usize;
+                    // C's ealloc2float rows point into one contiguous block.
+                    // A negative iz can still address an initialized sample in
+                    // the preceding x column; preserve that allocation index.
+                    let sample = |ix: i32, iz: i32| {
+                        let nz = a[0].len();
+                        let i = (ix as isize * nz as isize + iz as isize) as usize;
+                        a[i / nz][i % nz]
+                    };
                     ((1.0 - sz as f64)
-                        * ((1.0 - sx as f64) * a[ix][iz] as f64 + (sx * a[ix + 1][iz]) as f64)
+                        * ((1.0 - sx as f64) * sample(ix, iz) as f64
+                            + (sx * sample(ix + 1, iz)) as f64)
                         + sz as f64
-                            * ((1.0 - sx as f64) * a[ix][iz + 1] as f64
-                                + (sx * a[ix + 1][iz + 1]) as f64)) as f32
+                            * ((1.0 - sx as f64) * sample(ix, iz + 1) as f64
+                                + (sx * sample(ix + 1, iz + 1)) as f64)) as f32
                 }};
             }
             let tsd = bilinear!(ts);
@@ -645,6 +666,15 @@ fn makeone(
                 ((vs0 * vg0 / (sgsd * sggd * (sgsd + sggd))) as f64).sqrt() as f32
             };
             amp *= abs(ci + cr) * ar * ds;
+            // C modeling.c truncates negative tn toward zero, which can make
+            // its sinc-table index negative. Enforce the fixed C precondition
+            // before calling the shared library, rather than letting it panic.
+            let tn = (time - ft) / dt;
+            let jt = tn as i32;
+            let jsinc = ((tn - jt as f32) * 100.0) as i32;
+            if !(0..101).contains(&jsinc) && jt + 4 >= 0 && jt - 3 < nt {
+                err!("addsinc: sinc index out of bounds");
+            }
             addsinc(time, amp, dt, ft, trace);
         }
     }

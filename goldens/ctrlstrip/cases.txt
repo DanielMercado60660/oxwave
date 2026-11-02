@@ -7,3 +7,15 @@
 [exact] printf 'x\r\ny\t' | ctrlstrip verbose=1 unknown=abc
 # Locale environment does not change the C program's initial C locale.
 [exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes([32,126,127,128,160,255]))' | LC_ALL=C ctrlstrip
+
+# diff-2026-11 (round 1)
+[exact] sunull nt=1 ntr=1 | ctrlstrip
+[exact] sunull nt=2 ntr=1 | ctrlstrip ignored=1
+[exact] sunull nt=3 ntr=1 | ctrlstrip verbose=1
+[exact] sunull nt=4 ntr=1 | ctrlstrip --help
+[exact] sunull nt=17 ntr=3 | sushw key=tracl,offset a=9,32 b=1,127 | ctrlstrip
+[exact] sunull nt=4097 ntr=2 | ctrlstrip
+[exact] suspike | ctrlstrip
+[exact] suspike nt=31 ntr=7 nspk=1 ix1=3 it1=7 | ctrlstrip unknown=bad
+[exact] suplane nt=67 ntr=11 | ctrlstrip verbose=1
+[exact] suplane nt=101 ntr=4 | sushw key=cdp a=65 b=10 | ctrlstrip arbitrary arguments

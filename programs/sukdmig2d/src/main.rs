@@ -222,6 +222,14 @@ fn main() {
     if getparfloat("ds", &mut ds) == 0 {
         err!("must specify ds!\n");
     }
+    // The C interpolation uses two adjacent source/depth entries. Reject
+    // singleton tables like the UB-fixed C instead of indexing before them.
+    if ns < 2 {
+        err!("ns must be at least 2!\n");
+    }
+    if nzt < 2 {
+        err!("nzt must be at least 2!\n");
+    }
     let mut rscale = 1000.0f32;
     getparfloat("rscale", &mut rscale);
     let ext = nint((rscale * (fxt + (nxt - 1) as f32 * dxt)) as f64) as f32 / rscale;

@@ -533,8 +533,8 @@ fn eq_ci(b: &[u8], i: usize, word: &[u8]) -> bool {
 }
 
 /// C `strtod(s, &end)` with macOS semantics -> (value, bytes consumed).
-/// Sets errno=ERANGE on overflow and on underflow (zero or subnormal result
-/// from nonzero decimal input).
+/// Sets errno=ERANGE on overflow and underflow. Decimal subnormal results
+/// report underflow; hexadecimal subnormals report it only when inexact.
 pub fn strtod(s: &str) -> (f64, usize) {
     let b = s.as_bytes();
     let mut i = skip_ws(b);
@@ -590,10 +590,9 @@ pub fn strtod(s: &str) -> (f64, usize) {
         }
     }
     if ndig == 0 {
-        set_errno(EINVAL);
+        // Darwin strtod leaves errno unchanged when no conversion occurs.
         return (0.0, 0);
     }
-    let mant_end = j;
     if j < b.len() && (b[j] == b'e' || b[j] == b'E') {
         let mut k = j + 1;
         if k < b.len() && (b[k] == b'+' || b[k] == b'-') {
@@ -606,14 +605,14 @@ pub fn strtod(s: &str) -> (f64, usize) {
             j = k;
         }
     }
+    // Rust accepts the same decimal significands (including a leading dot).
+    // Parse the consumed prefix directly without allocating another string.
     let text = &s[start..j];
-    let text = if text.starts_with('.') { format!("0{}", text) } else { text.to_string() };
-    let _ = mant_end;
     // Rust's parser is correctly rounded like macOS strtod; it does not
     // accept huge exponents gracefully in all cases, so clamp them.
     let x: f64 = match text.parse::<f64>() {
         Ok(v) => v,
-        Err(_) => clamp_parse(&text),
+        Err(_) => clamp_parse(text),
     };
     if x.is_infinite() || (nonzero && (x == 0.0 || x.is_subnormal())) {
         set_errno(ERANGE);
@@ -674,28 +673,51 @@ fn parse_hexfloat(b: &[u8], mut i: usize) -> Option<(f64, usize)> {
         if k < b.len() && b[k].is_ascii_digit() {
             let mut e: i64 = 0;
             while k < b.len() && b[k].is_ascii_digit() {
-                e = (e * 10 + (b[k] - b'0') as i64).min(100_000);
+                e = e.saturating_mul(10).saturating_add((b[k] - b'0') as i64);
                 k += 1;
             }
-            exp += if eneg { -e } else { e };
+            exp = exp.saturating_add(if eneg { -e } else { e });
             i = k;
         }
     }
-    let m = if sticky { mant | 1 } else { mant };
-    let mut x = m as f64;
-    // scale by 2^exp in safe steps
-    let mut e = exp;
-    while e > 0 {
-        let s = e.min(1000);
-        x *= f64::powi(2.0, s as i32);
-        e -= s;
+    if mant == 0 {
+        return Some((0.0, i));
     }
-    while e < 0 {
-        let s = (-e).min(1000);
-        x /= f64::powi(2.0, s as i32);
-        e += s;
+
+    // mant holds the leading (at most 60) bits; sticky records any nonzero
+    // digits beyond them. Round directly to the destination's spacing so a
+    // subnormal is not rounded once to 53 bits and then again during scaling.
+    let top = exp.saturating_add(63 - mant.leading_zeros() as i64);
+    if top > 1023 {
+        set_errno(ERANGE);
+        return Some((f64::INFINITY, i));
     }
-    if x.is_infinite() || (mant != 0 && x == 0.0) {
+    let mut unit_exp = top.saturating_sub(52).max(-1074);
+    let shift = unit_exp.saturating_sub(exp);
+    let (mut sig, inexact) = if shift >= 64 {
+        (0, true)
+    } else if shift > 0 {
+        let rem = mant & ((1u64 << shift) - 1);
+        let half = 1u64 << (shift - 1);
+        let sig = mant >> shift;
+        let up = rem > half || (rem == half && (sticky || sig & 1 != 0));
+        (sig + u64::from(up), rem != 0 || sticky)
+    } else {
+        (mant << -shift, false)
+    };
+    if sig == 1u64 << 53 {
+        sig >>= 1;
+        unit_exp += 1;
+    }
+    let bits = if unit_exp == -1074 {
+        sig // Includes rounding up to the smallest normal.
+    } else {
+        ((unit_exp + 1075) as u64) << 52 | (sig & ((1u64 << 52) - 1))
+    };
+    let x = f64::from_bits(bits);
+    // Darwin detects hex underflow after rounding, and accepts exact
+    // subnormals. Successful conversions leave any previous errno intact.
+    if x.is_infinite() || (x < f64::MIN_POSITIVE && inexact) {
         set_errno(ERANGE);
     }
     Some((x, i))
@@ -830,6 +852,135 @@ mod tests {
         assert_eq!(errno(), 0);
         assert_eq!(strtol("99999999999999999999").0, i64::MAX);
         assert_eq!(errno(), ERANGE);
+    }
+
+    #[test]
+    fn hexfloat_rounding_and_range() {
+        let cases: &[(&str, u64, bool)] = &[
+            ("0x1.1p-1074", 1, true),
+            ("0x1.8p-1074", 2, true),
+            ("0x1.0000000000001p-1023", 1 << 51, true),
+            ("0x1p-1074", 1, false),
+            ("0x1.8p-1073", 3, false),
+            ("0x1p-1023", 1 << 51, false),
+            ("0x0.fffffffffffffp-1022", (1 << 52) - 1, false),
+            ("0x1p-1075", 0, true),
+            // Bits beyond the retained mantissa must break a midpoint tie.
+            ("0x1.0000000000000001p-1075", 1, true),
+            ("0x1.000000000000000000000000000001p-1075", 1, true),
+            ("0x2.fffffffffffffffep-1075", 1, true),
+            ("0x3p-1075", 2, true),
+            ("0x0.fffffffffffff7p-1022", (1 << 52) - 1, true),
+            // Tininess is detected after rounding, including at the tie.
+            ("0x0.fffffffffffff8p-1022", 1 << 52, false),
+            ("0x0.fffffffffffff9p-1022", 1 << 52, false),
+            ("0x1.00000000000008p0", 1.0f64.to_bits(), false),
+            ("0x1.00000000000008000001p0", 1.0f64.to_bits() + 1, false),
+            ("0x1.00000000000018p0", 1.0f64.to_bits() + 2, false),
+            ("0x1.fffffffffffff4p1023", f64::MAX.to_bits(), false),
+            ("0x1.fffffffffffff8p1023", f64::INFINITY.to_bits(), true),
+            ("0x1p9999999999999999999999", f64::INFINITY.to_bits(), true),
+            ("0x1p-9999999999999999999999", 0, true),
+            ("0x.1p-9999999999999999999999", 0, true),
+            ("0x0p9999999999999999999999", 0, false),
+            ("0x0p-9999999999999999999999", 0, false),
+        ];
+        for &(s, bits, range) in cases {
+            for sign in ["", "-"] {
+                let text = format!(" \t{}{}!", sign, s);
+                // A successful conversion must preserve even a nonzero errno.
+                set_errno(EINVAL);
+                let (x, used) = strtod(&text);
+                let sign_bit = if sign == "-" { 1u64 << 63 } else { 0 };
+                assert_eq!(x.to_bits(), bits | sign_bit, "{}", text);
+                assert_eq!(used, text.len() - 1, "{}", text);
+                assert_eq!(errno(), if range { ERANGE } else { EINVAL }, "{}", text);
+            }
+        }
+    }
+
+    #[test]
+    fn decimal_conversion_compatibility() {
+        // Decimal coordinates from the elamodel regression: preserve both
+        // strtod's double result and eatof's subsequent float rounding.
+        let cases = [
+            ("0.5280995857712361", 0x3fe0e6311a3d6538, 0x3f073189),
+            ("0.5816681028436204", 0x3fe29d066cdadef0, 0x3f14e833),
+            ("0.385852903967372", 0x3fd8b1d060e6d0c1, 0x3ec58e83),
+            ("0.6403706677278277", 0x3fe47deaa066adb1, 0x3f23ef55),
+            ("0.3497277229821637", 0x3fd661f0632da0d2, 0x3eb30f83),
+            ("0.5721368953465087", 0x3fe24ef208cb24b2, 0x3f127790),
+            ("0.45123948844005607", 0x3fdce11b9760e247, 0x3ee708dd),
+            ("0.7170173854732829", 0x3fe6f1ce71a8ad78, 0x3f378e74),
+            ("0.528327681141805", 0x3fe0e80f74026b0e, 0x3f07407c),
+            ("0.652199668607643", 0x3fe4ded1d6e4383c, 0x3f26f68f),
+            ("0.2328092997054671", 0x3fcdccb1f438463e, 0x3e6e6590),
+        ];
+        for (s, double_bits, float_bits) in cases {
+            set_errno(EINVAL);
+            let text = format!("{},ignored", s);
+            let (x, used) = strtod(&text);
+            assert_eq!(used, s.len());
+            assert_eq!(x.to_bits(), double_bits, "{}", s);
+            assert_eq!(eatod(&text).to_bits(), double_bits, "{}", s);
+            assert_eq!(eatof(&text).to_bits(), float_bits, "{}", s);
+            assert_eq!(errno(), EINVAL);
+        }
+    }
+
+    #[test]
+    fn strtod_no_conversion_preserves_errno() {
+        for s in ["", " ", "+", "-", ".", "+.e1", "garbage"] {
+            for previous in [0, EINVAL, ERANGE] {
+                set_errno(previous);
+                assert_eq!(strtod(s), (0.0, 0), "{}", s);
+                assert_eq!(errno(), previous, "{}", s);
+            }
+        }
+    }
+
+    #[test]
+    fn checked_conversion_range_errors() {
+        const CHILD: &str = "OXWAVE_TEST_CHECKED_RANGE";
+        if let Ok(conv) = std::env::var(CHILD) {
+            setup(&["range-probe"]);
+            if conv == "eatof" {
+                eatof("0x1.8p-1074");
+            } else if conv == "eatod" {
+                eatod("0x1.0000000000001p-1023");
+            } else {
+                // Like atopkge.c, every eato* also rejects a stale ERANGE.
+                atof("0x1.1p-1074");
+                match conv.as_str() {
+                    "eatoh" => { eatoh("1"); }
+                    "eatou" => { eatou("1"); }
+                    "eatoi" => { eatoi("1"); }
+                    "eatop" => { eatop("1"); }
+                    "eatol" => { eatol("1"); }
+                    "eatov" => { eatov("1"); }
+                    "eatof-invalid" => { eatof("garbage"); }
+                    "eatod-invalid" => { eatod("."); }
+                    _ => unreachable!(),
+                }
+            }
+            panic!("{} accepted ERANGE", conv);
+        }
+        for conv in ["eatoh", "eatou", "eatoi", "eatop", "eatol", "eatov", "eatof", "eatod",
+                     "eatof-invalid", "eatod-invalid"] {
+            let out = std::process::Command::new(std::env::current_exe().unwrap())
+                .args(["--exact", "par::tests::checked_conversion_range_errors", "--nocapture"])
+                .env(CHILD, conv)
+                .output()
+                .unwrap();
+            assert_eq!(out.status.code(), Some(1), "{}: {:?}", conv, out);
+            assert_eq!(String::from_utf8(out.stderr).unwrap(),
+                format!("\nrange-probe: atopkge.c: {}: overflow\n", conv.split('-').next().unwrap()));
+        }
+        set_errno(0);
+        assert_eq!(eatof("0x1p-1074"), 0.0);
+        assert_eq!(eatod("0x1p-1074").to_bits(), 1);
+        assert_eq!(eatof("0x1p-149").to_bits(), 1);
+        assert_eq!(errno(), 0);
     }
 
     #[test]

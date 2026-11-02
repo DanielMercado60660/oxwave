@@ -77,6 +77,7 @@ const HELP: &[&str] = &[
 ];
 unsafe extern "C" {
     fn access(path: *const i8, mode: i32) -> i32;
+    fn sscanf(input: *const i8, format: *const i8, ...) -> i32;
     fn qsort(base: *mut std::ffi::c_void, n: usize, size: usize, cmp: unsafe extern "C" fn(*const std::ffi::c_void, *const std::ffi::c_void) -> i32);
 }
 static mut SORT_DATA: *const f32 = std::ptr::null();
@@ -136,11 +137,13 @@ fn main() {
             }
             b'q' => exit(CWP_Exit()),
             b'p' => {
-                let mut nums = userin[1..].split_whitespace();
-                let first = nums.next().and_then(|x| x.parse::<i32>().ok());
-                let second = nums.next().and_then(|x| x.parse::<i32>().ok());
-                if let Some(v) = first { p1 = v; }
-                let p2 = if let Some(v) = second { if v < p1 { warn!("need p1=%d < p2=%d", p1, v); exit(0); } v.min(nt) } else { (p1+19).min(nt) };
+                let input = std::ffi::CString::new(&userin[1..]).unwrap();
+                let mut p2 = 0i32;
+                let count = unsafe { sscanf(input.as_ptr(), c"%d %d".as_ptr(), &mut p1, &mut p2) };
+                if count == 2 {
+                    if p2 < p1 { warn!("need p1=%d < p2=%d", p1, p2); exit(0); }
+                    p2 = p2.min(nt);
+                } else { p2 = (p1+19).min(nt); }
                 if p1 >= nt || p1 <= 0 { p1 = 1; }
                 tabplot(&tr.data, p1-1, p2-1); p1 = p2;
             }

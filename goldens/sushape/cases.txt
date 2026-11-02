@@ -19,3 +19,26 @@ suplane nt=9 ntr=1 | sushape w=1 dfile=missing
 suplane nt=9 ntr=1 | sushape wfile=missing d=1
 suplane nt=9 ntr=1 | sushw key=dt a=0 | sushape w=1 d=1
 suplane nt=9 ntr=1 | sushape w=1,-0.2 d=-1,0.5 nshape=3 pnoise=-0.1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sushape w=1 d=1
+suspike nt=3 ntr=1 | sushape w=1,0.5 d=0,1 nshape=2 pnoise=0
+suspike nt=4 ntr=2 | sushape w=1,-0.3,0.2 d=1 nshape=4 pnoise=0.1
+suplane nt=23 ntr=3 | sushape w=0.5,1,-0.4 d=0,0,1,0.3,0.2,0.1 nshape=9
+suplane nt=29 ntr=2 | sushape w=1,0.2,0.1,0.05,0.02,0.01 d=1,0.4 nshape=1
+suspike nt=4097 ntr=1 it1=2048 | sushape w=1,0.5 d=1,-0.2 nshape=8
+sunull nt=11 ntr=2 | sushw key=dt a=0 | sushape dt=0.004 w=1 d=2 nshape=3
+[stderr] suspike nt=7 ntr=1 | sushape w=1,0.4 d=1,0.2 nshape=7 showshaper=1 verbose=0
+[stderr] suplane nt=11 ntr=2 | sushape w=1,0.2 d=1 nshape=5 showshaper=1 verbose=1 pnoise=0.02
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 > wave.su && suplane nt=19 ntr=2 | sushape wfile=wave.su dfile=wave.su w=9 d=9 nshape=4
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 > desired.su && suplane nt=13 ntr=1 | sushape dfile=desired.su w=1,-0.4,0.1 nshape=6
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > wave.su && suspike nt=17 ntr=2 nspk=1 ix1=1 it1=5 | sushape wfile=wave.su d=0,1,0.5 nshape=6
+suplane nt=17 ntr=3 | sushw key=cdp a=100 b=2 | sushape w=1 d=1 pnoise=0 nshape=1 showshaper=0 verbose=0
+suplane nt=5 ntr=1 | sushape w=1,0.2 d=1 pnoise=1 nshape=9
+suplane nt=5 ntr=1 | sushape w=0 d=1 nshape=2
+suplane nt=5 ntr=1 | sushape d=1 wfile=absent
+suplane nt=5 ntr=1 | sushape w=1 dfile=absent
+suplane nt=5 ntr=1 | sushw key=dt a=0 | sushape w=1 d=1
+[stderr] suspike nt=19 ntr=1 nspk=1 ix1=1 it1=5 | sushape w=1,1 d=1,0 nshape=12 pnoise=-1 showshaper=1
+[stderr] suspike nt=23 ntr=1 nspk=1 ix1=1 it1=7 | sushape w=0.1,-0.2,0.3,-0.4,0.5 d=0.2,-0.1,0.7 nshape=31 pnoise=0 showshaper=1
+suplane nt=7 ntr=1 | sushape w=0.00000001 d=1 nshape=2

@@ -169,7 +169,9 @@ fn main() {
                 2 => for i in 0..nt { tr1.data[i] -= tr2.data[i]; },
                 3 if complex => { let mut i = 2; while i + 2 < nt { complex_mul(&mut tr1, &tr2, i); i += 2; } },
                 3 => for i in 0..nt { tr1.data[i] *= tr2.data[i]; },
-                4 if complex => { let mut i = 2; while i < nt { complex_div(&mut tr1, &tr2, i); i += 2; } },
+                // The C bounds fix skips the unpaired sample at capacity;
+                // for the verified quo case this preserves the original output.
+                4 if complex => { let mut i = 2; while i < nt && i + 1 < SU_NFLTS { complex_div(&mut tr1, &tr2, i); i += 2; } },
                 4 => for i in 0..nt { let denom = tr2.data[i]; if denom == 0.0 { tr1.data[i] = 0.0; } else { tr1.data[i] /= denom; } },
                 5 => { for i in (0..nt).rev() { tr1.data[2*i] = tr1.data[i]; tr1.data[2*i+1] = tr2.data[i]; } tr1.trid = trid as i16; tr1.ns = (2*nt) as u16; },
                 6 => { for i in (0..nt).rev() { tr1.data[2*i+1] = (tr1.data[i] as f64 * (tr2.data[i] as f64).sin()) as f32; tr1.data[2*i] = (tr1.data[i] as f64 * (tr2.data[i] as f64).cos()) as f32; } tr1.trid = trid as i16; tr1.ns = (2*nt) as u16; },
@@ -198,7 +200,9 @@ fn main() {
             let complex = tr1.trid == 111 && tr2.trid == 111;
             match iop {
                 8 => for i in 0..nt { tr1.data[i] -= tr2.data[i]; },
-                9 if complex => { let mut i = 0; while i < nt { complex_mul(&mut tr1, &tr2, i); i += 2; } },
+                // Match fixed C: leave the last sample unchanged when its
+                // imaginary partner would be beyond data[SU_NFLTS].
+                9 if complex => { let mut i = 0; while i < nt && i + 1 < SU_NFLTS { complex_mul(&mut tr1, &tr2, i); i += 2; } },
                 9 => for i in 0..nt { tr1.data[i] *= tr2.data[i]; },
                 10 if complex => { let mut i = 0; while i < nt { complex_div(&mut tr1, &tr2, i); i += 2; } },
                 10 => for i in 0..nt { let denom = tr2.data[i]; if denom == 0.0 { tr1.data[i] = 0.0; } else { tr1.data[i] /= denom; } },

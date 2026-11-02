@@ -20,3 +20,28 @@ suplane nt=3 ntr=2 | supermute n2=2 d2=0
 suplane nt=3 ntr=2 | supermute n2=2 d3=0
 suplane nt=3 ntr=2 | supermute n2=3 check=1
 suplane nt=3 ntr=2 | supermute n2=-1
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | supermute n2=1
+suplane nt=3 ntr=1 | supermute n1=3 n2=1 n3=1 o1=1 o2=2 o3=3 d1=1 d2=1 d3=1
+suplane nt=4 ntr=3 | supermute n2=3 o1=2 o2=1 o3=3
+suplane nt=7 ntr=6 | supermute n2=2 n3=3 o1=1 o2=3 o3=2
+suplane nt=7 ntr=6 | supermute n2=2 n3=3 o1=2 o2=1 o3=3
+suplane nt=7 ntr=6 | supermute n2=2 n3=3 o1=3 o2=1 o3=2
+suplane nt=11 ntr=6 | supermute n2=3 n3=2 o1=3 o2=2 o3=1 d1=-2 d2=2 d3=-2
+suplane nt=4097 ntr=2 | supermute n2=2 d1=3
+suplane nt=13 ntr=4 | sushw key=ntr a=4 | supermute
+suplane nt=13 ntr=4 | sushw key=cdp,offset,d1,f1,d2,f2 a=42,-99,2,3,4,5 b=1,7,0,0,0,0 | supermute n2=4 d1=-2 d2=-3
+suspike nt=11 ntr=4 | supermute n2=2 n3=2 o1=2 o2=3 o3=1
+sunull nt=17 ntr=3 | supermute n2=3 d1=-4 d2=2
+suplane nt=5 ntr=2 | supermute n1=3 n2=2
+suplane nt=3 ntr=2 | supermute n1=5 n2=2
+suplane nt=5 ntr=6 | supermute n2=2 n3=3 d1=9 d2=9 d3=9
+[stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=1 | supermute n1=3 n2=2 n3=1 o1=2 o2=1 o3=3 d1=-1 d2=2 d3=1 verbose=2 check=1
+[stderr] sunull nt=4 ntr=2 | supermute n2=2 verbose=3 check=1
+suplane nt=3 ntr=2 | supermute n2=2 n3=2
+suplane nt=3 ntr=2 | supermute n2=2 o1=4
+suplane nt=3 ntr=2 | supermute n2=2 d3=0 check=1
+suspike nt=19 ntr=12 nspk=4 ix1=1 it1=1 ix2=4 it2=7 ix3=8 it3=13 ix4=12 it4=19 | supermute n2=3 n3=4 o1=1 o2=3 o3=2 d1=-2 d2=-2 d3=2
+suspike nt=19 ntr=12 nspk=4 ix1=1 it1=1 ix2=4 it2=7 ix3=8 it3=13 ix4=12 it4=19 | supermute n2=3 n3=4 o1=3 o2=1 o3=2 d1=2 d2=-3 d3=-1
+[stderr] suplane nt=7 ntr=4 | sushw key=ntr a=4 | supermute verbose=1 check=1 d1=2 d2=-2 d3=1
+sunull nt=1 ntr=1 | supermute n1=1 n2=1 n3=1 d1=-1 d2=-1 d3=-1

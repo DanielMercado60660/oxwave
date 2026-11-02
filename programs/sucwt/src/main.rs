@@ -197,14 +197,34 @@ fn main() {
             err!("Too many scales, change params and re-run\n");
         }
     }
+    let nscales = scales.len() as i32 - 1;
     scales.pop();
-    let nscales = scales.len();
-    let mut nconv = vec![0i32; nscales];
-    let mut index = vec![0i32; nwavelet as usize];
+    // If maxscale is negative or NaN, C skips the loop, decrements
+    // nscales to -1, and fails ealloc1int before reading any traces.
+    let mut nconv = Vec::<i32>::new();
+    if nconv.try_reserve_exact(nscales as usize).is_err() {
+        err!(
+            "%s: malloc failed (%s)",
+            "ealloc.c",
+            oxwave_core::err::strerror(12)
+        );
+    }
+    let nscales = nscales as usize;
+    nconv.resize(nscales, 0);
+    // C sizes these buffers by nwavelet, but a convolution can be longer.
+    // Match the minimally fixed C allocation rather than its heap overwrite.
+    let mut nfilter = nwavelet as usize;
+    for i in 0..nscales {
+        nconv[i] = 1 + (scales[i] * (xvalues[nwavelet as usize - 1] - xvalues[0])) as i32;
+        if nconv[i] > nfilter as i32 {
+            nfilter = nconv[i] as usize;
+        }
+    }
+    let mut index = vec![0i32; nfilter];
     let mut waveletsum = vec![0.0f32; nwavelet as usize];
-    // ealloc2float(nwavelet, nscales) is one contiguous allocation in C.
-    let mut filt = vec![0.0f32; nwavelet as usize * nscales];
-    let mut f = vec![0.0f32; nwavelet as usize];
+    // C filter storage is contiguous; the fixed C uses nfilter as its stride.
+    let mut filt = vec![0.0f32; nfilter * nscales];
+    let mut f = vec![0.0f32; nfilter];
     for i in (0..nwavelet as usize).rev() {
         xvalues[i] -= xvalues[0];
     }
@@ -220,17 +240,17 @@ fn main() {
         waveletsum[i] = fmin * dx;
     }
     for i in 0..nscales {
-        nconv[i] = 1 + (scales[i] * xmax) as i32;
-        for j in 0..nconv[i] as usize {
+        for j in 0..nconv[i] {
+            let j = j as usize;
             // C adds one in float before converting the result to int.
             index[j] = (1.0f32 + j as f32 / (scales[i] * dx)) as i32;
         }
-        for j in 0..nconv[i] as usize {
-            f[j] = waveletsum[(index[j] - 1) as usize];
+        for j in 0..nconv[i] {
+            f[j as usize] = waveletsum[(index[j as usize] - 1) as usize];
         }
         let mut k = nconv[i] - 1;
-        for j in 0..nconv[i] as usize {
-            filt[i * nwavelet as usize + j] = f[k as usize];
+        for j in 0..nconv[i] {
+            filt[i * nfilter + j as usize] = f[k as usize];
             k -= 1;
         }
     }
@@ -253,7 +273,9 @@ fn main() {
     // For a one-sample filter C reads sucwt_buff[-1] for the first sample.
     // That read is zero in the reference build. Keep an explicit leading
     // zero and offset the convolution output by one to reproduce it safely.
-    let mut sucwt_buff = vec![0.0f32; ns + nconv[nscales - 1] as usize + 2];
+    // With zero scales, C reads nconv[-1], but fixing that read preserves
+    // its empty output. Keep reading input and skip the empty scale loop.
+    let mut sucwt_buff = vec![0.0f32; ns + nconv.last().copied().unwrap_or(0) as usize + 2];
 
     loop {
         outtr.d2 = waveletinc;
@@ -267,7 +289,7 @@ fn main() {
                 0,
                 &tr.data[..ns],
                 0,
-                &filt[i * nwavelet as usize..i * nwavelet as usize + nconv[i] as usize],
+                &filt[i * nfilter..i * nfilter + nconv[i] as usize],
                 0,
                 &mut sucwt_buff[1..ns + 1],
             );

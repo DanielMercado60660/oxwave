@@ -130,6 +130,7 @@ fn main() {
     if is_filter {
         nfilter = countparval("filter") as usize;
         if nfilter == 0 { warn!("must specify filter= desired filter"); err!(" or sufile= "); }
+        filter.resize(nfilter, 0.0);
         getparfloat("filter", &mut filter);
         panel = 0;
     } else {

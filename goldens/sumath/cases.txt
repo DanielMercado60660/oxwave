@@ -16,3 +16,20 @@ suspike nt=17 ntr=3 | sumath op=add a=1 a=2
 [stderr] suspike nt=17 ntr=1 | sumath verbose=1
 [stderr] suspike nt=17 ntr=1 | sumath op=bad
 [stderr] sumath op=add < /dev/null
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sumath op=add a=2 copy=1
+sunull nt=2 ntr=2 | sumath op=sub a=-3 copy=2
+suspike nt=3 ntr=1 | sumath op=mult a=0.125
+suspike nt=4 ntr=2 | sumath op=div a=3
+suplane nt=127 ntr=9 | sumath op=pow a=3
+suplane nt=127 ntr=9 | sumath op=sub a=1.5 | sumath op=spow a=1.25
+suspike nt=4097 ntr=2 | sumath op=add a=0.125
+suspike nt=11 ntr=3 | sushw key=tracl a=91 b=7 | sumath op=mult a=1 copy=3
+suspike nt=11 ntr=3 | sushw key=tracl a=91 b=7 | sumath copy=1
+sunull nt=3 ntr=1 | sumath op=pow a=0
+sunull nt=4 ntr=2 | sumath op=spow a=2
+suspike nt=7 ntr=1 | sumath op=add a= copy=
+[stderr] sunull nt=3 ntr=1 | sumath op=add a=2 copy=2 verbose=1
+[stderr] sunull nt=2 ntr=1 | sumath op=
+[stderr] sunull nt=2 ntr=1 | sumath op=add copy=999999999999999999999

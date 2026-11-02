@@ -15,3 +15,30 @@ sunull nt=119 ntr=2 | suaddnoise seed=123 sn=1 | suclogfft verbose=0 mode=ouphas
 [stderr] suspike nt=32 ntr=1 | suclogfft verbose=0 sign=0
 [stderr] suspike nt=32 ntr=1 | suclogfft verbose=0 sign=2
 [stderr] suspike nt=65535 ntr=1 | suclogfft verbose=0
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suclogfft verbose=0 mode=suphase trend=0 zeromean=0 sign=1 unwrap=0
+suspike nt=4 ntr=1 | suclogfft verbose=0 mode=ouphase trend=0 zeromean=0 sign=-1 unwrap=0
+suspike nt=7 ntr=2 | suclogfft verbose=0 mode=suphase trend=1 zeromean=1 sign=-1 unwrap=1
+suspike nt=4097 ntr=1 | suclogfft verbose=0 mode=suphase unwrap=0
+suplane nt=101 ntr=3 | suclogfft verbose=0 mode=ouphase trend=1 zeromean=0
+suplane nt=47 ntr=2 | suclogfft verbose=0 mode=suphase trend=0 zeromean=1 unwrap=0.5
+sunull nt=41 ntr=2 | suaddnoise seed=42 sn=1 | suclogfft verbose=0 mode=ouphase trend=1 zeromean=1 sign=-1
+[stderr] suspike nt=11 ntr=1 | sushw key=trid,d1 a=130,0.005 | suclogfft verbose=1 mode=suphase
+suspike nt=13 ntr=2 | sushw key=dt a=2000 | suclogfft verbose=0
+[stderr] suspike nt=9 ntr=1 | suclogfft verbose=0 mode=invalid
+[stderr] suspike nt=9 ntr=1 | suclogfft verbose=0 sign=-2
+suspike nt=19 ntr=1 | suclogfft verbose=0 mode=ouphase unwrap=0 trend=1 zeromean=1
+sunull nt=2 ntr=2 | suaddnoise seed=2 sn=1 | suclogfft verbose=0 mode=ouphase trend=1 zeromean=1 sign=1 unwrap=1
+sunull nt=3 ntr=2 | suaddnoise seed=3 sn=1 | suclogfft verbose=0 mode=ouphase trend=0 zeromean=0 sign=-1 unwrap=1
+sunull nt=5 ntr=2 | suaddnoise seed=5 sn=1 | suclogfft verbose=0 mode=suphase trend=1 zeromean=0 sign=1 unwrap=2
+sunull nt=29 ntr=2 | suaddnoise seed=29 sn=1 | suclogfft verbose=0 mode=suphase trend=1 zeromean=1 sign=-1 unwrap=-0.5
+sunull nt=127 ntr=2 | suaddnoise seed=127 sn=1 | suclogfft verbose=0 mode=ouphase trend=0 zeromean=1 sign=1 unwrap=1
+sunull nt=257 ntr=2 | suaddnoise seed=257 sn=1 | suclogfft verbose=0 mode=suphase trend=1 zeromean=1 sign=-1 unwrap=1
+sunull nt=1021 ntr=2 | suaddnoise seed=1021 sn=1 | suclogfft verbose=0 mode=ouphase trend=1 zeromean=0 sign=-1 unwrap=1
+sunull nt=4097 ntr=2 | suaddnoise seed=4097 sn=1 | suclogfft verbose=0 mode=ouphase trend=0 zeromean=0 sign=1 unwrap=1
+[stderr] suspike nt=17 ntr=1 | sushw key=trid,dt,d1 a=109,1000,0.01 | suclogfft verbose=1 mode=ouphase
+[stderr] suspike nt=17 ntr=1 | sushw key=trid,dt,d1 a=18,1000,0.01 | suclogfft verbose=1 mode=ouphase
+suspike nt=1 ntr=1 | suclogfft verbose=0 mode=ouphase unwrap=0 sign=-1
+suspike nt=3 ntr=1 | suclogfft verbose=0 mode=suphase trend=0 unwrap=1
+[stderr] suspike nt=15 ntr=1 | suclogfft verbose=0 mode=

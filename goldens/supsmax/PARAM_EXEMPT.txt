@@ -1,0 +1,2 @@
+n2  # Any parsed value enters the known-count path, which calls fclose on a null headerfp at supsmax.c:254 and does not exit 0 in this build.
+ntr  # Any parsed value enters the same known-count path and null fclose at supsmax.c:254.

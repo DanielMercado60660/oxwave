@@ -20,3 +20,30 @@ printf '1 2 32\n' | utmconv invert=1 letter=1
 printf '1 2 32?\n' | utmconv invert=1 letter=1
 printf '1 2 0\n' | utmconv invert=1 lon0=0
 printf '1\n' | utmconv
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sushw key=sx,sy a=0,0 | sugethw key=sx,sy output=geom | utmconv
+sunull nt=2 ntr=3 | sushw key=sx,sy a=-180,-80 b=179,80 | sugethw key=sx,sy output=geom | utmconv letter=1 format=%.6f
+suspike nt=3 ntr=4 | sushw key=sx,sy a=3,56 b=3,8 | sugethw key=sx,sy output=geom | utmconv idx=5 format=%.4f
+suspike nt=4 ntr=4 | sushw key=sx,sy a=0,72 b=9,0 | sugethw key=sx,sy output=geom | utmconv letter=1
+[stderr] suplane nt=17 ntr=3 | sushw key=sx,sy a=-75,-40 b=5,40 | sugethw key=sx,sy output=geom | utmconv idx=0 a=6378000 f=0 lon0=-70 xoff=123 ynoff=456 ysoff=789 verbose=1
+sunull nt=4097 ntr=1 | sushw key=sx,sy a=180,84 | sugethw key=sx,sy output=geom | utmconv invert=0 letter=0 idx=23 xoff=500000 ynoff=0 ysoff=10000000
+suspike nt=7 ntr=3 | sushw key=sx,sy a=500000,0 b=0,1000000 | sushw key=offset a=31 b=0 | sugethw key=sx,sy,offset output=geom | utmconv invert=1 format=%.8f
+[stderr] sunull nt=5 ntr=2 | sushw key=sx,sy,offset a=500000,10000000,-31 b=0,-1000000,0 | sugethw key=sx,sy,offset output=geom | utmconv invert=1 idx=13 verbose=1
+sunull nt=1 ntr=2 | sushw key=sx,sy,offset a=500000,0,31 b=0,1000000,0 | sugethw key=sx,sy,offset output=geom | awk '{print $1,$2,$3 "N"}' | utmconv invert=1 letter=1
+suspike nt=2 ntr=2 | sushw key=sx,sy,offset a=500000,10000000,31 b=0,-1000000,0 | sugethw key=sx,sy,offset output=geom | awk '{print $1,$2,$3 "m"}' | utmconv invert=1 letter=1 xoff=400000 ysoff=9000000 lon0=10
+sunull nt=3 ntr=3 | sushw key=sx,sy a=-10,-8 b=10,8 | sugethw key=sx,sy output=geom | utmconv letter=1 idx=22
+suspike nt=17 ntr=4 | sushw key=sx,sy a=21,72 b=6,4 | sugethw key=sx,sy output=geom | utmconv letter=1 lon0=30
+suplane nt=11 ntr=3 | sushw key=sx,sy a=1,-89 b=0,89 | sugethw key=sx,sy output=geom | utmconv format=%.2e
+[stderr] sunull nt=4 ntr=1 | sushw key=sx,sy a=15,45 | sugethw key=sx,sy output=geom | utmconv a=6378137 f=0.00335281066474748 idx=1 verbose=1
+sunull nt=1 ntr=1 | sushw key=sx,sy a=181,0 | sugethw key=sx,sy output=geom | utmconv
+sunull nt=1 ntr=1 | sushw key=sx,sy a=0,-90 | sugethw key=sx,sy output=geom | utmconv
+sunull nt=1 ntr=1 | sushw key=sx,sy a=1,2 | sugethw key=sx,sy output=geom | utmconv invert=1
+sunull nt=1 ntr=1 | sushw key=sx,sy,offset a=1,2,61 | sugethw key=sx,sy,offset output=geom | utmconv invert=1
+sunull nt=1 ntr=1 | sushw key=sx,sy,offset a=1,2,31 | sugethw key=sx,sy,offset output=geom | awk '{print $1,$2,$3 "?"}' | utmconv invert=1 letter=1
+sunull nt=1 ntr=1 | sugethw key=sx,sy output=geom | utmconv lon0=-181
+sunull nt=13 ntr=8 | sushw key=sx,sy a=-170,-70 b=47,19 | sugethw key=sx,sy output=geom | awk '{printf "%.8f %.8f\n", $1+0.12345678, $2+0.87654321}' | utmconv format=%.15f letter=1
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=1 ntr=1 | sugethw key=sx,sy output=geom | awk '{print "0x1p2 0x1p3"}' | utmconv
+sunull nt=1 ntr=1 | sugethw key=sx,sy output=geom | awk '{print "0 nan"}' | utmconv
+sunull nt=1 ntr=1 | sugethw key=sx,sy output=geom | awk '{print "1e 2"}' | utmconv

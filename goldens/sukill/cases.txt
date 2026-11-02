@@ -16,3 +16,21 @@ suspike ntr=1 nt=1 | sukill min=1 count=1
 [stderr] suspike ntr=2 nt=5 | sukill min=4
 [stderr] suspike ntr=2 nt=5 | sukill min=2 count=2
 [stderr] suspike ntr=3 nt=5 | sukill min=0 verbose=1
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=2 | sukill min=1 count=1
+suspike ntr=4 nt=3 | sukill min=4 count=1
+suspike ntr=4 nt=4 | sukill min=1 count=4
+suspike ntr=3 nt=4097 | sukill min=2 count=2
+suplane ntr=7 nt=31 | sushw key=trid a=2 b=-1 | sukill
+suplane ntr=6 nt=17 | sushw key=offset a=-3 b=2 | sukill key=offset a=1
+suspike ntr=5 nt=13 | sushw key=d1 a=-1.5 b=0.5 | sukill key=d1 a=-0.5
+suspike ntr=4 nt=11 | sushw key=trid a=2 | sukill min=0 key=trid a=2
+suspike ntr=4 nt=7 | sushw key=trid a=2 | sukill min=3 count=1 key=trid a=2
+sunull ntr=3 nt=3 | sukill key=tracl a=2
+suspike ntr=3 nt=2 | sukill min=2 count=-1
+[stderr] suplane ntr=3 nt=19 | sukill key=tracl a=2 verbose=1
+[stderr] suspike ntr=3 nt=7 | sukill min=-2
+[stderr] suspike ntr=3 nt=7 | sukill min=1 count=4
+[stderr] suspike ntr=3 nt=7 | sukill min=1 key=notakey
+suspike ntr=3 nt=5 | sukill min=1 min=3 count=1
+suspike ntr=3 nt=5 | sukill key=tracl a=2.0

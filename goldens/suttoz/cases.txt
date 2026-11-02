@@ -18,3 +18,23 @@ suspike nt=21 ntr=1 | suttoz dz=3 fz=-6 nz=25
 # neither implementation reports a Rust panic, regardless of the original exit.
 [exact] { suspike nt=21 ntr=1 | suttoz dz=3 fz=-6 nz=1; } >/dev/null 2>err || :; if grep -q 'panicked at' err; then exit 1; fi
 [exact] { suspike nt=21 ntr=1 | suttoz dz=3 fz=1000 nz=1; } >/dev/null 2>err || :; if grep -q 'panicked at' err; then exit 1; fi
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suttoz
+suspike nt=3 ntr=1 | suttoz t=0 v=2000
+suspike nt=4 ntr=2 | suttoz dz=2 nz=7
+suplane nt=101 ntr=3 | suttoz t=0,0.05,0.15,0.4 v=2200,1600,2500,1900
+suplane nt=127 ntr=1 | suttoz dz=1.5 fz=0 nz=270
+suspike nt=4097 ntr=1 | suttoz
+suspike nt=43 ntr=2 | sushw key=dt,delrt a=2000,40 | suttoz dz=2 fz=55 nz=80
+suplane nt=53 ntr=2 | sushw key=dt,delrt a=1000,-10 | suttoz t=0,0.02,0.1 v=1800,1500,2100
+[stderr] suspike nt=7 ntr=1 | suttoz dz=3 fz=0 nz=7 verbose=1
+python3 -c 'import struct; open("vel","wb").write(struct.pack("=13f", *[1400.+50.*i for i in range(13)]))' && suspike nt=13 ntr=1 | suttoz vfile=vel dz=3 nz=20
+sunull nt=23 ntr=2 | suttoz dz=3 nz=23
+suspike nt=29 ntr=1 | suttoz t=0,0.01 v=1500
+suplane nt=29 ntr=1 | suttoz t=0.1,0.05 v=1500,1800
+suplane nt=257 ntr=4 | sushw key=dt,delrt a=3000,12 | suttoz t=0,0.1,0.4,0.8 v=900,3400,1200,2800 dz=2 fz=8 nz=700
+suspike nt=31 ntr=1 | suttoz v=2500 dz=5 fz=-2 nz=32
+suspike nt=17 ntr=1 | suttoz nz=65537
+
+# ub-2026-11 (round 1)
+suspike nt=11 ntr=1 | suttoz nz=0

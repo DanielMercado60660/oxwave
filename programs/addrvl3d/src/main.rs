@@ -253,7 +253,14 @@ fn main() {
         let nn1 = i1end - i1beg;
         let nn2 = i2end - i2beg;
         let nn3 = i3end - i3beg;
-        let mut v2 = vec![0.0f32; (nn1 * nn2 * nn3) as usize];
+        // Reversed bounds leave both cell loops empty. C's alloc3float can
+        // return NULL for these negative extents; that buffer is never used.
+        // Keep an absent layer empty instead of casting its size to usize.
+        let mut v2 = if nn1 > 0 && nn2 > 0 && nn3 > 0 {
+            vec![0.0f32; (nn1 * nn2 * nn3) as usize]
+        } else {
+            Vec::new()
+        };
         // The original writes the perturbations into vel, rather than v2,
         // and starts at the origin even when the requested layer is offset.
         for i3 in 0..nn3 {
@@ -275,9 +282,12 @@ fn main() {
                 }
             }
         }
-        vsm3d(
-            &mut v2, nn3, nn2, nn1, iter, depth, r3, r2, r1, mu, slowness, vminc, vmaxc,
-        );
+        // Smoothing an absent layer cannot affect any velocity sample.
+        if nn1 > 0 && nn2 > 0 && nn3 > 0 {
+            vsm3d(
+                &mut v2, nn3, nn2, nn1, iter, depth, r3, r2, r1, mu, slowness, vminc, vmaxc,
+            );
+        }
         for i3 in i3beg..i3end {
             let j3 = i3 - i3beg;
             for i2 in i2beg..i2end {
@@ -362,6 +372,11 @@ fn vsm3d(
     vmin: f32,
     vmax: f32,
 ) {
+    // The C smoother indexes d[n-2] and calls tripd2 with n-1 rows.
+    // Reject singleton active dimensions as in the UB verification fix.
+    if (r1 > 0.0 && n1 < 2) || (r2 > 0.0 && n2 < 2) || (r3 > 0.0 && n3 < 2) {
+        err!("smoothing requires at least two samples in each active dimension");
+    }
     let mut ww = 1.0f32;
     let mut w = vec![0.0f32; (n1 + n2 + n3 - 2) as usize];
     if depth == 1 {

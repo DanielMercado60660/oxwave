@@ -1,0 +1,20 @@
+# ub-2026-11 (round 2; reverified round 1 claim)
+# vendor/su-original/src/comp/dct/main/dctcomp.c:55 divides by blocksize1=0.
+# Its :66 dctAlloc(0) also calls comp/dct/lib/dctalloc.c:75, reaching
+# cwp/lib/alloc.c:255: p[0] is written outside malloc(0) row-pointer storage.
+# Minimal fix: reject zero block sizes before division and allocation.
+# Rebuilt from byte-identical vendor main with SU's exact recorded flags;
+# fixed main differs only by the two-line check in diffcamp/ubx/dctcomp/fix.patch.
+# Orig stdout/stderr match the retained 65.out/65.err bytes. Orig dctcomp
+# itself exits 0; fixed exits 1, emits no stdout and reports:
+# "\ndctcomp: blocksize1 and blocksize2 must be nonzero\n".
+# OxWave matches fixed C's exit code, stdout and stderr (existing Rust check).
+# IMPORTANT: with bash -o pipefail the unmodified pipeline sometimes exits
+# 141 because sustrip gets SIGPIPE after dctcomp closes its unread stdin.
+# This also happens with vendor/su-build/bin/dctcomp; stdout/stderr still
+# match the golden. PIPESTATUS is 0 141 0, versus 0 0 0 on successful runs.
+# This explains an intermittent orig/golden exit-code mismatch; it is not
+# a difference introduced by rebuilding. No timing workaround was added.
+# Full trial results and a buffered-input control isolating dctcomp's rc:
+# diffcamp/ubx/dctcomp/evidence/round2-results.json; reproduce with verify.py.
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=0 n2=1 blocksize1=0

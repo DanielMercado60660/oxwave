@@ -10,3 +10,18 @@ suai2r </dev/null
 suai2r verbose=999999999999999999999 </dev/null
 # Unrecognized parameters are ignored because the original does not call checkpars.
 suspike nt=3 ntr=1 | suai2r unknown=1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 k1=1 mag=3 | sugain bias=2 | suai2r verbose=1
+suspike nt=3 ntr=2 k1=2 mag=-2 | sugain bias=3 | suai2r verbose=0
+suspike nt=4 ntr=3 k1=4 mag=7 | sugain bias=1 | suai2r verbose=-1
+suspike nt=13 ntr=4 k1=6 mag=5 | sugain bias=2 | sushw key=offset a=-100 b=50 | suai2r
+suspike nt=4097 ntr=2 k1=2049 mag=4 | sugain bias=5 | suai2r
+sunull nt=17 ntr=3 | sugain bias=4 | sushw key=cdp a=7 b=3 | suai2r verbose=1
+suplane ntr=5 nt=101 | sugain bias=2 | suai2r
+suspike nt=31 ntr=2 k1=15 mag=1 | suaddnoise seed=1234 sn=10 | sugain bias=3 | suai2r
+suspike nt=11 ntr=1 | suai2r verbose=2147483648
+[exact] sunull nt=3 ntr=2 | suai2r
+[exact] suspike nt=5 ntr=1 k1=3 mag=2 | sugain bias=-1 | suai2r
+[stderr] suplane ntr=3 nt=19 | sugain bias=2 | suai2r verbose=1
+suspike nt=65535 ntr=1 k1=32768 mag=4 | sugain bias=2 | suai2r

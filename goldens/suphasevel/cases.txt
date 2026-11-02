@@ -47,3 +47,43 @@
 [stderr] sunull nt=16 ntr=1 | sushw key=offset a=1 | suphasevel nv=0 fmax=1000
 [stderr] sunull nt=1 ntr=10000 | sushw key=offset a=1 | suphasevel nv=1 fmax=0
 [stderr] sunull nt=65520 ntr=1 | sushw key=offset a=1 | suphasevel nv=1 fmax=0
+
+# diff-2026-11 (round 1)
+# Nonzero unit and tiny traces: explicit spike positions avoid the generator's
+# zero-based default positions on these dimensions.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suphasevel nv=1 fmax=0
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suphasevel nv=2 norm=1 fmax=0
+[stderr] suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=3 | sushw key=offset a=-10 b=20 | suphasevel nv=3 out=0 fmax=0
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | suphasevel dt=0.002 fv=250 dv=50 nv=2 out=1 norm=1 fmax=0 verbose=1 tmpdir=.
+# Prime/odd lengths, fractional phase velocities, and dense seeded data.
+[stderr] suplane nt=127 ntr=11 | suaddnoise seed=1701 sn=3 | sushw key=offset a=-113 b=29 | suphasevel fv=123.25 dv=76.5 nv=5 out=2 norm=1 fmax=0
+[stderr] suplane nt=97 ntr=9 dip1=1.25 dip2=-3.5 dip3=6.75 taper=1 | sushw key=offset a=-201 b=53 | suphasevel fv=777.125 dv=-123.25 nv=4 out=0 fmax=37.5
+[stderr] suspike nt=1009 ntr=2 nspk=2 ix1=1 it1=337 ix2=2 it2=1009 | sushw key=offset a=16777217 b=2 | suphasevel fv=1500 dv=333 nv=3 norm=1 fmax=0
+# Long nonzero FFTs, including padding past 4097 and large output.
+[stderr] suspike nt=4097 ntr=5 nspk=2 ix1=1 it1=1 ix2=5 it2=4097 | sushw key=offset a=-300 b=117 | suphasevel nv=3 fmax=0
+[stderr] suplane nt=4097 ntr=11 | suaddnoise seed=1701 sn=3 | sushw key=offset a=-113 b=29 | suphasevel fv=123.25 dv=76.5 nv=3 norm=1 fmax=48
+[stderr] suspike nt=32749 ntr=1 nspk=1 ix1=1 it1=10916 | suphasevel nv=1 fmax=0
+# Geometry, input ordering, and headers other than offset must not group shots
+# or rescale offsets. dt comes from the first trace, or from the parameter.
+[stderr] suplane nt=37 ntr=7 | sushw key=sx,gx,scalco,fldr a=100,-100,-10,1 b=0,31,0,1 | suchw key1=offset key2=gx key3=sx a=0 b=1 c=-1 | suphasevel nv=4 fmax=0
+[stderr] suplane nt=37 ntr=7 | sushw key=offset,dt a=100,2000 b=-29,1000 | suphasevel nv=4 fmax=0
+[stderr] suplane nt=37 ntr=7 | sushw key=offset a=-74 b=29 | suphasevel nv=4 fmax=0
+[stderr] suspike nt=31 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=31 | sushw key=offset,dt a=0,2000 b=10,1000 | suphasevel nv=2 fmax=0
+[stderr] suspike nt=31 ntr=1 nspk=1 ix1=1 it1=13 | sushw key=dt a=0 | suphasevel dt=0.001003 nv=2 fmax=0
+# Independent physical generators, with nonzero signal in the recorded window.
+[stderr] susynlv nt=257 dt=0.004 nxs=1 nxo=5 fxo=0.01 dxo=0.02 ref="1:-1,0.3;2,0.3" | suphasevel fv=500 dv=250 nv=5 norm=1 fmax=0
+[stderr] suimp2d nt=257 nshot=2 nrec=3 gxmin=50 dgx=25 | suphasevel fv=1500 dv=500 nv=4 fmax=60 norm=1
+# Empty numeric values use defaults; out is parsed but never affects output.
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | suphasevel dt= fv= dv= nv= out= norm= fmax= verbose= tmpdir=
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | suphasevel dt=0.004 fv=330 dv=25 nv=100 out=0 norm=0 fmax=50 verbose=0 tmpdir=
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | suphasevel out=-7 norm=2 nv=2 fmax=0 verbose=2
+# Frequency truncation may select zero bins, or the last allocated bin.
+[stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=4 | suphasevel nv=2 fmax=0.0001
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suphasevel nv=2 norm=1 fmax=250
+# Defaults are independent of dt on later traces; zero spectra normalize to NaN.
+[stderr] sunull nt=4 ntr=3 | sushw key=offset,dt a=0,65535 b=-17,-1000 | suphasevel nv=2 norm=1 fmax=0
+# Invalid numeric values and missing header values, in C statement order.
+[stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | suphasevel nv=-2147483649
+[stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | suphasevel fv=1e-310
+[stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=dt a=0 | suphasevel dt= verbose=1
+[stderr] sunull nt=7 ntr=2 | sushw key=dt a=0 | suphasevel dt=0.002 tmpdir= verbose=1 nv=1 fmax=0

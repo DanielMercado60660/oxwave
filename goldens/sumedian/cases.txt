@@ -57,3 +57,49 @@ suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=8 dip1=4 len1=15 | suaddnoise seed=41 sn
 suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=8 dip1=4 len1=15 | suaddnoise seed=42 sn=5 | sumedian xshift=1,15 tshift=0,0.056 mix=0.5,1,2,1,0.5
 suplane npl=1 nt=64 ntr=15 dt=0.004 ct1=10 dip1=3 len1=15 | suaddnoise seed=43 sn=4 | sushw key=offset a=100 b=50 | sumedian key=offset xshift=100,450,800 tshift=0,0.016,0.044 median=1 nmed=7 subtract=0 tmpdir=.
 suplane npl=2 nt=48 ntr=31 dt=0.004 ct1=6 dip1=1 len1=31 ct2=40 dip2=-1 len2=31 | suaddnoise seed=44 sn=8 | sumedian xshift=1,31 tshift=0,0.12 median=1 nmed=9
+
+# diff-2026-11 (round 1)
+# Boundary samples, single-trace median, asymmetric weights, and end spikes.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumedian xshift=1 tshift=0 median=1 nmed=1 subtract=0
+suspike nt=2 ntr=9 nspk=1 ix1=3 it1=2 | sumedian xshift=1,9 tshift=0,0 mix=0.25,1,0.5 subtract=0
+suspike nt=3 ntr=9 nspk=1 ix1=5 it1=2 | sumedian xshift=1,9 tshift=0,0 median=1 nmed=3
+suspike nt=4 ntr=9 nspk=1 ix1=9 it1=4 | sumedian xshift=1,9 tshift=0,0 mix=-1,2,0.5 subtract=0
+suspike nt=4097 ntr=9 nspk=2 ix1=1 it1=1 ix2=9 it2=4097 | sumedian xshift=1,9 tshift=0,0 median=1 nmed=5 subtract=0
+suspike nt=4097 ntr=9 nspk=2 ix1=1 it1=1 ix2=9 it2=4097 | sumedian xshift=1,9 tshift=0,0 mix=0.25,1,0.5 subtract=1
+# A different waveform generator and seeded panels with nonuniform curves.
+susynlv nt=47 nxm=9 nxo=1 dt=0.04 | sumedian xshift=1,9 tshift=0,0
+suplane npl=2 nt=53 ntr=15 ct1=9 dip1=2 ct2=37 dip2=-2 | suaddnoise seed=202611 sn=4 | sumedian xshift=1,8,15 tshift=0,0.006,0.024 mix=0.3,-0.2,1,0.8,0.1 subtract=0
+# Descending coordinates; float and computed integer header keys; both extrapolations.
+suplane npl=1 nt=37 ntr=15 ct1=10 dip1=1 | suaddnoise seed=202612 sn=3 | sushw key=offset a=-70 b=10 | sumedian key=offset xshift=70,0,-70 tshift=0.016,0.008,0 median=1 nmed=7 subtract=1
+suplane npl=1 nt=41 ntr=15 ct1=9 dip1=1 | suaddnoise seed=202613 sn=6 | sushw key=d2 a=0.5 b=0.25 | sumedian key=d2 xshift=1,2,3 tshift=0.004,0.012,0.008 mix=1,0,2 subtract=0
+[stderr] suplane npl=1 nt=43 ntr=15 ct1=13 dip1=2 | suaddnoise seed=202614 sn=5 | sushw key=cdp a=3 b=2 | suchw key1=offset key2=cdp key3=cdp a=-100 b=10 c=0 | sumedian key=offset xshift=-100,100,300 tshift=0,0.004,0.012 median=1 nmed=4 subtract=0 verbose=1
+[stderr] suplane nt=29 ntr=9 | sushw key=delrt a=-4 b=-1 | sumedian xshift=1,9 tshift=0,0 mix=1 verbose=1
+# Pair defaults with their explicit values in both filter modes.
+suplane nt=23 ntr=9 | sumedian xshift=1,9 tshift=0,0 mix=0.6,1,1,1,0.6 median=0 sign=-1 subtract=1 verbose=0
+suplane nt=23 ntr=9 | sumedian xshift=1,9 tshift=0,0
+suplane nt=23 ntr=9 | sumedian xshift=1,9 tshift=0,0 median=1
+suplane nt=23 ntr=9 | sumedian xshift=1,9 tshift=0,0 median=1 nmed=5
+suplane nt=23 ntr=9 | sumedian xshift=1,9 tshift=0,0 mix=1 sign=1 subtract=0
+suspike nt=17 ntr=9 nspk=1 ix1=3 it1=5 | suaddnoise seed=202615 sn=5 | sumedian xshift=1,9 tshift=0,0 mix=-2,0,3 sign=0 subtract=2
+[stderr] suplane nt=31 ntr=9 | sumedian xshift=1,9 tshift=0,0 median=2 nmed=2 subtract=0 verbose=1 tmpdir=.
+# File coordinates, all file parameters passed to sumedian, with diagnostics.
+[stderr] python3 -c 'import struct; open("x","wb").write(struct.pack("3f",1,5,9)); open("t","wb").write(struct.pack("3f",0,0.004,0.012))' && suspike nt=31 ntr=9 nspk=1 ix1=3 it1=10 | sumedian xfile=x tfile=t nshift=3 mix=1,1,1 subtract=0 tmpdir=. verbose=1
+[stderr] sunull nt=3 ntr=9 | sumedian xshift=1 tshift=0 mix=1 sign=1 subtract=0 tmpdir=. verbose=1
+# Required vectors, invalid key, even mix (even in median mode), missing nshift.
+sunull nt=2 ntr=1 | sumedian tshift=0
+sunull nt=2 ntr=1 | sumedian xshift=1
+sunull nt=2 ntr=1 | sumedian xshift=1,2 tshift=0
+sunull nt=2 ntr=1 | sumedian xshift=1 tshift=0 key=bogus
+sunull nt=2 ntr=1 | sumedian xshift=1 tshift=0 mix=1,1 median=1
+sunull nt=2 ntr=1 | sumedian xfile=missing tfile=missing
+# Writable regular files pass access(), then fail efopen only after checking input.
+[stderr] touch scratch && sunull nt=3 ntr=1 | sumedian xshift=1 tshift=0 mix=1 tmpdir=scratch
+[stderr] touch scratch && sunull nt=3 ntr=0 | sumedian xshift=1 tshift=0 tmpdir=scratch
+[stderr] sunull nt=3 ntr=1 | sushw key=dt a=0 | sumedian xshift=1 tshift=0 tmpdir=/dev/null
+[stderr] touch scratch && sunull nt=3 ntr=1 | CWP_TMPDIR=scratch sumedian xshift=1 tshift=0 mix=1
+
+# ub-2026-11 (round 1)
+# Refuted: sumedian.c:357,367-368,386-387,407 underallocates negative-shift
+# buffers; allocating MAX(nt,nt+shiftmax) leaves all 2772 stdout bytes,
+# empty stderr, and rc=0 unchanged. See diffcamp/ubx/sumedian/evidence/claim.json.
+sunull nt=17 ntr=9 | sumedian xshift=1 tshift=-0.004 mix=1

@@ -16,3 +16,21 @@ suspike nt=16 ntr=1 | suslowft | suamp mode=amp
 suspike nt=16 ntr=1 | suslowft | suamp mode=phase
 suspike nt=16 ntr=1 | suslowft | suamp mode=real
 suspike nt=16 ntr=1 | suslowft | suamp mode=imag
+
+# diff-2026-11 (round 1)
+[stderr] suspike nt=2 ntr=1 | suslowft dt=0.002 sign=1
+[stderr] suspike nt=3 ntr=2 | suslowft sign=-1
+[stderr] suspike nt=4 ntr=3 | sushw key=dt a=1234 | suslowft
+[stderr] suplane nt=31 ntr=4 | suslowft dt=0.0015 sign=-1
+[stderr] sunull nt=37 ntr=2 | suslowft verbose=1
+[stderr] suspike nt=101 ntr=2 | suaddnoise seed=42 | suslowft sign=-1
+[stderr] suspike nt=4097 ntr=1 | suslowft dt=0.004
+[stderr] suspike nt=23 ntr=1 | suslowft sign=abc
+[stderr] suspike nt=11 ntr=1 | suslowft dt= sign=1
+[stderr] suspike nt=17 ntr=1 | sushw key=dt a=65535 | suslowft
+suspike nt=29 ntr=2 | suaddnoise seed=12 | suslowft sign=-1 | suamp mode=imag
+[stderr] suspike nt=4097 ntr=1 | suaddnoise seed=99 | suslowft sign=-1 dt=0.002
+[stderr] suplane nt=127 ntr=3 | suslowft dt=1e-20
+[stderr] suspike nt=5 ntr=1 | suslowft dt=1e20
+[stderr] suspike nt=8 ntr=1 | suslowft sign=
+[stderr] suplane nt=53 ntr=3 | sushw key=dt a=2000 b=1000 | suslowft sign=1

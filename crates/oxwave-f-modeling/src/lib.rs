@@ -67,23 +67,61 @@ pub struct Wavelet {
 }
 /// C: `int decodeReflector(char *string, float *aPtr, int *nxzPtr, float **xPtr, float **zPtr)`
 pub fn decodeReflector(string: &str) -> Option<ReflectorInput> {
-    let (a, rest) = if let Some(i) = string.find(':') {
+    // strtok skips leading delimiters but only overwrites the delimiter that
+    // ends a token. C later walks that modified buffer with strlen(s)+1,
+    // so repeated delimiters must remain attached to the following value.
+    fn strtok(buffer: &mut [u8], next: &mut usize, delimiters: &[u8]) -> Option<usize> {
+        while buffer[*next] != 0 && delimiters.contains(&buffer[*next]) {
+            *next += 1;
+        }
+        if buffer[*next] == 0 {
+            return None;
+        }
+        let start = *next;
+        while buffer[*next] != 0 && !delimiters.contains(&buffer[*next]) {
+            *next += 1;
+        }
+        if buffer[*next] != 0 {
+            buffer[*next] = 0;
+            *next += 1;
+        }
+        Some(start)
+    }
+    fn value(buffer: &[u8], start: usize) -> (f32, usize) {
+        let len = buffer[start..].iter().position(|&b| b == 0).unwrap();
+        let token = std::str::from_utf8(&buffer[start..start + len]).unwrap();
+        (atof(token) as f32, start + len + 1)
+    }
+
+    let string = string.split('\0').next().unwrap();
+    let mut buffer = string.as_bytes().to_vec();
+    buffer.push(0);
+    let mut next = 0;
+    let a = if let Some(i) = string.find(':') {
         if string.find([',', ';']).unwrap_or(string.len()) <= i {
             return None;
         }
-        (atof(&string[..i]) as f32, &string[i + 1..])
+        let start = strtok(&mut buffer, &mut next, b":")?;
+        value(&buffer, start).0
     } else {
-        (1.0, string)
+        1.0
     };
-    let tokens: Vec<_> = rest.split([',', ';']).filter(|s| !s.is_empty()).collect();
-    if tokens.len() < 4 || tokens.len() % 2 != 0 {
+    let mut start = strtok(&mut buffer, &mut next, b",;")?;
+    let mut count = 1;
+    while strtok(&mut buffer, &mut next, b",;").is_some() {
+        count += 1;
+    }
+    if count < 4 || count % 2 != 0 {
         return None;
     }
     let mut x = Vec::new();
     let mut z = Vec::new();
-    for p in tokens.chunks_exact(2) {
-        x.push(atof(p[0]) as f32);
-        z.push(atof(p[1]) as f32);
+    for _ in 0..count / 2 {
+        let (v, following) = value(&buffer, start);
+        x.push(v);
+        let (v, following) = value(&buffer, following);
+        z.push(v);
+        start = following;
     }
     Some(ReflectorInput { a, x, z })
 }
@@ -142,10 +180,12 @@ pub fn makeref(dsmax: f32, input: &[ReflectorInput]) -> Vec<Reflector> {
             zl = z[0];
             uu += duu
         }
-        let ns = (1.0 + (lengths[nuu - 1] / dsmax) as f64) as usize;
+        // Both operands of C's addition are float; round before converting
+        // to the signed int passed to ealloc1float.
+        let ns = (1.0 + lengths[nuu - 1] / dsmax) as i32;
         let ds = lengths[nuu - 1] / ns as f32;
         let fs = (0.5 * ds as f64) as f32;
-        let mut us = vec![0.0; ns];
+        let mut us = ealloc1float(ns);
         yxtoxy(duu, 0.0, &lengths, ds, fs, 0.0, (n - 1) as f32, &mut us);
         let mut rs = Vec::new();
         for v in us {
@@ -162,25 +202,33 @@ pub fn makeref(dsmax: f32, input: &[ReflectorInput]) -> Vec<Reflector> {
                 s: (-dz[0] as f64 / norm) as f32,
             })
         }
-        out.push(Reflector {
-            ns: ns as i32,
-            ds,
-            a: r.a,
-            rs,
-        })
+        out.push(Reflector { ns, ds, a: r.a, rs })
     }
     out
+}
+// C converts the signed count to size_t before allocation. Negative counts
+// therefore request an impossible allocation and fail with ENOMEM on Darwin.
+fn ealloc1float(n: i32) -> Vec<f32> {
+    let mut values = Vec::new();
+    values.try_reserve_exact(n as usize).unwrap_or_else(|_| {
+        oxwave_core::err!(
+            "ealloc.c: malloc failed (%s)",
+            oxwave_core::err::strerror(12)
+        )
+    });
+    values.resize(n as usize, 0.0);
+    values
 }
 /// C: `void makericker(float fpeak, float dt, Wavelet **w)`
 pub fn makericker(fpeak: f32, dt: f32) -> Wavelet {
     let iw = -(1.0 + 1.0 / (fpeak * dt) as f64) as i32;
     let lw = 1 - 2 * iw;
-    let mut wv = Vec::new();
+    let mut wv = ealloc1float(lw);
     let mut t = iw as f32 * dt;
-    for _ in 0..lw {
+    for sample in &mut wv {
         let mut x = (std::f64::consts::PI * fpeak as f64 * t as f64) as f32;
         x = x * x;
-        wv.push(((-(x as f64)).exp() * (1.0 - 2.0 * x as f64)) as f32);
+        *sample = ((-(x as f64)).exp() * (1.0 - 2.0 * x as f64)) as f32;
         t += dt
     }
     Wavelet { lw, iw, wv }
@@ -289,4 +337,89 @@ pub fn raylv2(
         s = tmp
     }
     (c, s, t, q)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reflector_amplitude_skips_leading_colons() {
+        for spec in [":0,1;2,1", "::350,300;550,300"] {
+            assert_eq!(decodeReflector(spec), None, "{spec}");
+        }
+        assert_eq!(
+            decodeReflector(":1:350,300;550,300"),
+            Some(ReflectorInput {
+                a: 1.0,
+                x: vec![350.0, 550.0],
+                z: vec![300.0, 300.0],
+            })
+        );
+    }
+
+    #[test]
+    fn reflector_coordinates_walk_strtok_buffer() {
+        for (spec, x, z) in [
+            ("0.5,1;;2,1", [0.5, 0.0], [1.0, 1.0]),
+            ("0,,1;2,1", [0.0, 2.0], [0.0, 1.0]),
+            ("0,1;2,,1", [0.0, 2.0], [1.0, 0.0]),
+            ("1:100,,200;900,200", [100.0, 900.0], [0.0, 200.0]),
+            ("1:100,200;;900,200", [100.0, 0.0], [200.0, 200.0]),
+            (",;0,1;2,1;", [0.0, 2.0], [1.0, 1.0]),
+        ] {
+            let r = decodeReflector(spec).unwrap();
+            assert_eq!(r.a, 1.0, "{spec}");
+            assert_eq!(r.x, x, "{spec}");
+            assert_eq!(r.z, z, "{spec}");
+        }
+    }
+
+    #[test]
+    fn reflector_segment_count_adds_in_float() {
+        let r = ReflectorInput {
+            a: 1.0,
+            x: vec![0.0, 0.99999994],
+            z: vec![1.0, 1.0],
+        };
+        let out = makeref(1.0, &[r]);
+        assert_eq!(out[0].ns, 2);
+        assert_eq!(out[0].rs.len(), 2);
+        assert_eq!(out[0].ds, 0.49999997);
+    }
+
+    #[test]
+    fn negative_allocation_counts_exit_with_c_error() {
+        const CHILD: &str = "OXWAVE_MODELING_ALLOCATION_TEST";
+        if let Ok(mode) = std::env::var(CHILD) {
+            oxwave_core::par::initargs(&["modeling-test".into()]);
+            match mode.as_str() {
+                "reflector" => {
+                    makeref(-0.1, &[decodeReflector("0,1;1,1").unwrap()]);
+                }
+                "ricker" => {
+                    makericker(5.0, -0.04);
+                }
+                _ => panic!("unknown allocation test"),
+            }
+            panic!("negative allocation count was accepted");
+        }
+        for mode in ["reflector", "ricker"] {
+            let output = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "tests::negative_allocation_counts_exit_with_c_error",
+                    "--nocapture",
+                ])
+                .env(CHILD, mode)
+                .output()
+                .unwrap();
+            assert_eq!(output.status.code(), Some(1), "{mode}");
+            assert_eq!(
+                String::from_utf8(output.stderr).unwrap(),
+                "\nmodeling-test: ealloc.c: malloc failed (Cannot allocate memory)\n",
+                "{mode}"
+            );
+        }
+    }
 }

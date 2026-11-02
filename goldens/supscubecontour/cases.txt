@@ -14,3 +14,26 @@ suplane nt=32 ntr=9 | env -u CWPROOT -u CWPBIN supscubecontour | sed -e '/^%%Cre
 [stderr] suplane nt=32 ntr=9 | supscubecontour n2=3 verbose=1 d1=-0.02 d2=0 d3=-2 f1=-1 f2=0 f3=9 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=32 ntr=9 | env CWP_TMPDIR=. supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=32 ntr=9 | supscubecontour n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | supscubecontour n2=1 n3=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=3 ntr=4 | supscubecontour n2=2 n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=4 ntr=4 | supscubecontour n2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=6 | supscubecontour n3=2 d1=.004 d2=1 d3=1 f1=0 f2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=31 ntr=6 | supscubecontour n2=3 n3=2 d1=.002 d2=2 d3=4 f1=-1 f2=20 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=23 ntr=6 | supscubecontour n2=3 n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=4097 ntr=4 | supscubecontour n2=2 n3=2 ncont=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=19 ntr=6 | supscubecontour n2=2 tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=19 ntr=6 | supscubecontour n2=2 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=6 | sushw key=ntr a=6 | supscubecontour n3=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=6 | sushw key=trid,dt,d1,delrt,f1,tracr,tracl,f2 a=1,2000,0,-125,0,0,12,0 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=6 | sushw key=trid,dt,d1,delrt,f1,tracr,tracl,f2 a=30,0,0,0,0,0,0,0 | supscubecontour n3=2 d2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=29 ntr=8 | sushw key=d1,d2,f1,f2 a=.015,2.5,-2,7 | supscubecontour n2=4 d1=.01 f2=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=41 ntr=12 | supscubecontour n2=4 n3=3 title='Spike cube' ncont=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=31 ntr=7 | supscubecontour n2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=4 | supscubecontour n2=2 n3=2 tmpdir=/nonexistent/oxwave
+suplane nt=17 ntr=4 | supscubecontour n2=999999999999999999999
+suplane nt=17 ntr=4 | supscubecontour d1=1e9999
+[stderr] suplane nt=19 ntr=6 | supscubecontour n2=2 tmpdir=./ verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=23 ntr=6 | sushw key=ntr,trid,dt,d1,delrt,f1,tracr,tracl,f2 a=6,109,0,0,-125,0,0,12,0 | supscubecontour n3=2 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=29 ntr=8 | sushw key=d1,d2,f1,f2 a=.015,2.5,-2,7 | supscubecontour n2=4 d1=.01 d1=.02 f2=4 f3=9 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=19 ntr=6 | supscubecontour n2=2 n3=3 verbose=1 tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

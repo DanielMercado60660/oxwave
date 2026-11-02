@@ -1,0 +1,13 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/tri/main/uni2tri.c:509-513 doubles nfalloc
+# only once; 972 faces grow to 2209 while capacity becomes only 2048.
+# The next maxErrorInTri call at :458-459 passes out-of-bounds e/ix/iz
+# pointers, written at :922 and :956-958.
+# Minimal fix: if -> while at :509 (and identical defect at :766), repeating
+# allocation until nf+2*iv fits. SU's exact build flags: orig exits 139 and
+# reproduces saved golden 126 stdout/program stderr; fixed exits 0, finishing
+# with 33267 faces. Shell crash diagnostics differ only in process IDs.
+# OxWave previously bounds-panicked (101); fixed both growth loops in
+# programs/uni2tri/src/main.rs. It now matches fixed C: rc 0, empty stdout,
+# and all 1503 stderr bytes exactly (sha256 920ee8413fdc119c575a68fb04d4b2c958c6dee101cfae9d4d8b34198d84595f).
+suspike nt=129 ntr=131 ix1=1 it1=1 | suaddnoise seed=17 sn=1 | sustrip outpar=/dev/null | uni2tri n1=129 n2=131 method=2 tol=0 errmax=0.001 verbose=1 > /dev/null

@@ -57,3 +57,22 @@
 [stderr] recast outpar=count verbose=1 mystery=3 </dev/null
 [stderr] recast </dev/null
 [stderr] recast outpar=/nonexistent/path/count </dev/null
+# diff-2026-11 (round 1)
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | recast outpar=count && cat count
+[exact] [stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | recast in=float out=int outpar=count && cat count
+[exact] [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | recast in=float out=char outpar=count && cat count
+[exact] [stderr] suspike nt=4 ntr=2 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | recast out=uchar outpar=count && cat count
+[exact] [stderr] suspike nt=7 ntr=3 nspk=1 ix1=2 it1=3 | sustrip outpar=/dev/null | recast out=short outpar=count && cat count
+[exact] [stderr] sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | recast in=float out=long outpar=count && cat count
+[exact] [stderr] suspike nt=11 ntr=2 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | recast out=ulong outpar=count && cat count
+[exact] [stderr] suspike nt=13 ntr=3 nspk=1 ix1=2 it1=5 | sustrip outpar=/dev/null | recast in=double out=float outpar=count && cat count
+[exact] [stderr] sunull nt=3 ntr=2 | sushw key=offset a=123 b=10 | sugethw key=offset output=binary | recast in=float out=double outpar=count && cat count
+[exact] [stderr] suspike nt=17 ntr=2 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null | recast outpar=count verbose=1 && cat count
+[exact] [stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | recast in=int out=long outpar=count && cat count
+[exact] [stderr] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | recast in=short out=double outpar=count && cat count
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | recast outpar=count in=float out=invalid
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | recast outpar=count in= out=double
+[exact] [stderr] suspike nt=5 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=-2.5 | sustrip outpar=/dev/null | recast in=float out=int outpar=count && cat count
+[exact] [stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=3 | sugain scale=32768.5 | sustrip outpar=/dev/null | recast in=float out=short outpar=count && cat count
+[exact] [stderr] suspike nt=5 ntr=2 nspk=1 ix1=1 it1=2 | sugain scale=-0.5 | sustrip outpar=/dev/null | recast in=float out=uchar outpar=count && cat count
+[exact] [stderr] suplane nt=19 ntr=3 | sustrip outpar=/dev/null | recast in=uchar out=long outpar=count && cat count

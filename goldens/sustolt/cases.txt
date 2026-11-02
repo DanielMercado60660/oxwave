@@ -109,3 +109,47 @@ suspike nt=33 ntr=5 nspk=1 ix1=3 it1=9 | sushw key=cdp a=1 b=1 | sustolt cdpmin=
 # Header validation and the appended end-time knot with dt=0.
 [stderr] sunull nt=9 ntr=1 | sushw key=dt a=0 | sustolt cdpmin=1 cdpmax=1 dxcdp=25 tmig=0 vmig=1500
 [stderr] { sunull nt=9 ntr=1; sunull nt=11 ntr=1; } | sustolt cdpmin=0 cdpmax=0 dxcdp=25 tmig=0 vmig=1500
+# diff-2026-11 (round 1)
+# Unit through four-sample traces; all optional parameters explicitly passed.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=-7 | sustolt cdpmin=-7 cdpmax=-7 dxcdp=1000 tmig=0 vmig=1500 noffmix=1 smig=1 vscale=1 fmax=125 lstaper=0 lbtaper=0 verbose=1 tmpdir=.
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=2 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0 vmig=1500
+suspike nt=3 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0 vmig=1500
+suspike nt=4 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0 vmig=1500
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=1000 tmig=0,0.002 vmig=1500,3000 smig=0.6
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=1000 tmig=0,0.002 vmig=3000,1500 smig=1.7
+# Prime, long odd, and wide dimensions exercise larger FFT factors.
+suspike nt=127 ntr=31 nspk=1 ix1=1 it1=42 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=31 dxcdp=1000 tmig=0,0.002 vmig=1500,3000 smig=0.6
+suspike nt=4097 ntr=3 nspk=1 ix1=1 it1=1365 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0 vmig=1500
+suspike nt=4097 ntr=3 nspk=1 ix1=1 it1=1365 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0,0.002 vmig=3000,1500 smig=1.7
+suspike nt=16381 ntr=3 nspk=1 ix1=1 it1=5460 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=1000 tmig=0 vmig=1500
+suspike nt=17 ntr=257 nspk=2 ix1=1 it1=1 ix2=257 it2=17 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=257 dxcdp=25 tmig=0 vmig=1500 lstaper=5 lbtaper=4
+# Additional deterministic generators: dipping planes and point scatterers.
+suplane nt=97 ntr=11 npl=3 dip1=-3 dip2=1.5 dip3=7 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=11 dxcdp=25 tmig=0 vmig=1800
+suplane nt=127 ntr=17 npl=2 dip1=-5 dip2=6 taper=1 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=17 dxcdp=15 tmig=0,0.12,0.3 vmig=1400,2100,1700 smig=0.6 fmax=65 vscale=1.1 lstaper=4 lbtaper=20
+suimp2d nt=127 nshot=1 nrec=5 x0=100 z0=150 c=2000 dgx=25 | sushw key=cdp,offset a=1,0 b=1,0 | sustolt cdpmin=1 cdpmax=5 dxcdp=12.5 tmig=0 vmig=2000
+# Default optional scalars versus explicit defaults, with velocity knots supplied.
+suplane nt=37 ntr=7 npl=1 dip1=4 | sushw key=cdp a=10 b=1 | sustolt cdpmin=10 cdpmax=16 dxcdp=30 tmig=0 vmig=1500
+suplane nt=37 ntr=7 npl=1 dip1=4 | sushw key=cdp a=10 b=1 | sustolt cdpmin=10 cdpmax=16 dxcdp=30 tmig=0 vmig=1500 noffmix=1 smig=1 vscale=1 fmax=125 lstaper=0 lbtaper=0 verbose=0 tmpdir=
+# Header-driven placement: descending, sparse, large and repeated CDPs.
+suplane nt=71 ntr=7 npl=1 dip1=5 | sushw key=cdp a=7 b=-1 | sustolt cdpmin=1 cdpmax=7 dxcdp=25 tmig=0 vmig=1700
+suspike nt=43 ntr=5 nspk=2 ix1=1 it1=7 ix2=5 it2=39 | sushw key=cdp a=-6 b=3 | sustolt cdpmin=-6 cdpmax=6 dxcdp=20 tmig=0 vmig=1600
+suspike nt=41 ntr=3 nspk=1 ix1=2 it1=19 | sushw key=cdp a=16777217 b=1 | sustolt cdpmin=16777217 cdpmax=16777219 dxcdp=30 tmig=0 vmig=1500
+suplane nt=53 ntr=6 npl=1 dip1=5 | sushw key=cdp a=1 b=1 j=3 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500
+# Offset changes include float-rounded large offsets and gaps in selected CDPs.
+[stderr] suspike nt=29 ntr=8 nspk=2 ix1=2 it1=9 ix2=7 it2=23 | sushw key=cdp,offset a=1,16777216 b=1,0 c=0,1 j=2,1 | sustolt cdpmin=1 cdpmax=2 dxcdp=25 tmig=0 vmig=1800 noffmix=2 verbose=1
+[stderr] suplane nt=59 ntr=15 npl=2 dip1=-3 dip2=5 | sushw key=cdp,offset a=0,-100 b=1,0 c=0,100 j=5,5 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0,0.1 vmig=1500,2100 smig=0.6 fmax=20 noffmix=2 verbose=1
+# Tapers beyond the data length, negative taper lengths and a zero band limit.
+suspike nt=23 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=23 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=3 dxcdp=25 tmig=0 vmig=1500 lstaper=11 lbtaper=100
+suplane nt=47 ntr=7 npl=1 dip1=3 | sushw key=cdp a=1 b=1 | sustolt cdpmin=1 cdpmax=7 dxcdp=25 tmig=0 vmig=1500 lstaper=-3 lbtaper=-5 fmax=0
+# Header dt overrides generator dt; named temporary files and environment precedence.
+[stderr] suplane nt=79 ntr=7 npl=2 | sushw key=cdp,dt,d1 a=1,7000,0.125 b=1,0,0 | CWP_TMPDIR=/oxwave-no-such-directory sustolt cdpmin=1 cdpmax=7 dxcdp=40 tmig=0,0.2 vmig=1800,2400 fmax=55 tmpdir=. verbose=1
+# Validation ordering: missing required parameters, end knot, and array counts.
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustolt cdpmax=1 dxcdp=25 tmig=0 vmig=1500
+[stderr] sunull nt=4 ntr=1 | sustolt cdpmin=0 cdpmax=0 dxcdp=25 tmig=0,0.016 vmig=1500,1800
+[stderr] sunull nt=3 ntr=1 | sustolt cdpmin=0 cdpmax=0 dxcdp=25 tmig=0,0.004 vmig=1500,1600,1700
+# Near and at the unsigned-short trace sample limit, with late impulses.
+suspike nt=32749 ntr=1 dt=0.001 nspk=1 ix1=1 it1=32748 | sushw key=cdp a=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=10000 tmig=0 vmig=1500
+suspike nt=65535 ntr=1 dt=0.001 nspk=1 ix1=1 it1=65534 | sushw key=cdp a=1 | sustolt cdpmin=1 cdpmax=1 dxcdp=10000 tmig=0 vmig=1500
+# Zero mix count and oversized final mix; later dt headers remain metadata.
+[stderr] suplane nt=17 ntr=15 npl=1 dip1=3 | sushw key=cdp,offset,dt a=0,-200,4000 b=1,0,0 c=0,100,1000 j=5,5,5 | sustolt cdpmin=1 cdpmax=4 dxcdp=50 tmig=0,0.0204,0.0476 vmig=1800,2700,1600 fmax=100 smig=1 noffmix=0 lstaper=1 lbtaper=3 verbose=1
+[stderr] suplane nt=61 ntr=9 npl=1 dip1=3 | sushw key=cdp,offset,dt a=0,-200,4000 b=1,0,0 c=0,100,1000 j=3,3,3 | sustolt cdpmin=1 cdpmax=2 dxcdp=50 tmig=0,0.0732,0.1708 vmig=1800,2700,1600 fmax=20 smig=1.8 noffmix=4 lstaper=1 lbtaper=3 verbose=1

@@ -13,3 +13,17 @@ sunull nt=53 ntr=3 | suaddnoise seed=42 | sucentsamp dt=0.004 nvals_min=2
 sucentsamp </dev/null
 sunull nt=5 ntr=1 | sucentsamp verbose=999999999999999999999
 sunull nt=5 ntr=1 | sucentsamp dt=1e999
+
+# diff-2026-11 (round 1)
+[stderr] sunull nt=2 ntr=1 | sucentsamp verbose=1
+sunull nt=3 ntr=1 | sucentsamp verbose=0 nvals_min=2 dt=0.002
+sunull nt=4 ntr=2 | sucentsamp nvals_min=0
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=2 | sucentsamp verbose=0
+suspike nt=19 ntr=2 nspk=2 ix1=1 it1=3 ix2=2 it2=10 | sushw key=dt a=2000 | sucentsamp nvals_min=1
+[stderr] sunull nt=29 ntr=1 | sushw key=dt a=0 | sucentsamp verbose=1 dt=0
+suspike nt=31 ntr=3 nspk=1 ix1=1 it1=8 | suaddnoise seed=123 sn=1 tmpdir=. | sucentsamp dt=0.002 nvals_min=2 verbose=0
+suspike nt=127 ntr=4 nspk=1 ix1=1 it1=30 | suaddnoise seed=42 sn=1 tmpdir=. | sucentsamp nvals_min=3
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2000 | suaddnoise seed=17 sn=1 tmpdir=. | sucentsamp dt=0.004 verbose=0
+suplane nt=101 ntr=8 npl=1 dip1=2 len1=8 | sucentsamp dt=0.003 nvals_min=4
+sunull nt=4 ntr=1 | sucentsamp nvals_min=99999999999999999999
+sunull nt=4 ntr=1 | sucentsamp dt=1e999

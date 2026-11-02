@@ -1,0 +1,2 @@
+# vtlvz.c:44,48 and cwp/lib/alloc.c:222-227,522-524: negative nt converts to size_t, allocation returns NULL, and fwrite receives a null buffer with a huge count. Rejecting negative nt changes exit 0 with empty output to exit 1 with the error "nt must be nonnegative"; OxWave matches fixed.
+[f32] sunull nt=1 ntr=1 | vtlvz nt=-1 dt=1 v0=1 a=1

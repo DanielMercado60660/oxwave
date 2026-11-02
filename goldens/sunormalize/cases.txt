@@ -15,3 +15,22 @@ sunull nt=9 ntr=1 | sushw key=dt a=0 | sunormalize
 sunull nt=9 ntr=1 | sushw key=dt a=0 | sunormalize dt=0.004 norm=max
 suplane nt=32 ntr=1 | sunormalize dt=0.002 ns=10 norm=max
 sunull nt=9 ntr=1 | sunormalize t0=0.020 t1=0.004
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 mag=-3 | sunormalize norm=rms t0=0 t1=0.004
+suspike nt=2 ntr=1 k1=1 mag=3 | sunormalize norm=max
+suspike nt=3 ntr=2 k1=2 mag=-2 | sunormalize norm=median
+suspike nt=4 ntr=1 k1=3 mag=4 | sunormalize norm=rms
+suplane nt=101 ntr=3 | sunormalize norm=balmed t0=0.008 t1=0.092
+suplane nt=4097 ntr=2 | sunormalize norm=max t0=0.004 t1=1.004
+sunull nt=7 ntr=2 | sushw key=dt a=0 | sunormalize dt=0.002 norm=rms t0=0 t1=0.014
+sunull nt=7 ntr=1 | sushw key=ns a=0 | sunormalize ns=7 norm=max
+[stderr] suplane nt=17 ntr=2 | sunormalize norm=rms verbose=1
+suspike nt=13 ntr=2 k1=5 mag=-5 | sunormalize norm=med t0=0.004 t1=0.040
+sunull nt=3 ntr=1 | sunormalize norm=invalid
+sunull nt=3 ntr=1 | sushw key=dt a=0 | sunormalize norm=max
+suspike nt=7 ntr=1 mag=2 | sunormalize ns=7 dt=0.004 norm=max
+suplane nt=4097 ntr=2 | suaddnoise seed=123 noise=flat sn=4 | sunormalize norm=median
+suplane nt=37 ntr=3 | suaddnoise seed=42 noise=gauss sn=2 | sunormalize norm=balmed t0=0.008 t1=0.136
+suspike nt=4 ntr=1 k1=2 mag=-2 | sunormalize norm=max t0=0.004 t1=0.004
+suplane nt=97 ntr=2 | sunormalize norm=med t0=0.004 t1=0.020

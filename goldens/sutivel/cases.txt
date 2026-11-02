@@ -21,3 +21,36 @@ sutivel option=1 np=0 nangle=3
 sutivel nangle=999999999999999999999
 sutivel option=5 nangle=3 maxangle=-30
 sutivel
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=1 | sutivel option=1 nangle=23 np=29 a=3100 b=1400 e=.25 d=.08 maxangle=72
+sunull ntr=1 nt=2 | sutivel option=2 nangle=17 maxangle=45 normalize=1
+suplane ntr=1 nt=3 | sutivel option=3 nangle=19 maxangle=35 a=2800 b=1100
+suspike ntr=1 nt=4 | sutivel option=4 nangle=21 np=31 e=.08 d=.03
+sunull ntr=1 nt=7 | sutivel option=5 nangle=13 maxangle=80 normalize=1 e=.1 d=.1
+suplane ntr=1 nt=11 | sutivel option=6 nangle=31 maxangle=67
+suspike ntr=1 nt=17 | sutivel option=7 nangle=9 verbose=0
+sunull ntr=1 nt=3 | sutivel option=8 nangle=29 maxangle=77 e=.3 d=.05
+suspike ntr=1 nt=2 | sutivel option=9 nangle=37 maxangle=55
+suplane ntr=1 nt=4 | sutivel option=10 nangle=11
+sunull ntr=1 nt=11 | sutivel option=11 nangle=41 maxangle=83
+suspike ntr=1 nt=7 | sutivel option=12 nangle=43 maxangle=71
+sunull ntr=1 nt=17 | sutivel option=13 nangle=47 maxangle=75 e=.22 d=.09
+suspike ntr=1 nt=3 | sutivel option=14 np=53 a=2400 b=900 e=.16 d=.04
+[stderr] sunull ntr=1 nt=2 | sushw key=offset a=123 | sutivel option=5 nangle=5 maxangle=30 verbose=1 normalize=1
+sunull ntr=1 nt=4097 | sutivel option=5 nangle=7 maxangle=22
+sunull ntr=1 nt=1 | sutivel option=1 nangle=13 np=7 maxangle=0
+sunull ntr=1 nt=1 | sutivel option=4 nangle=17 np=19 maxangle=-40
+sunull ntr=1 nt=1 | sutivel option=2 nangle=101 maxangle=89.5 a=2000 b=300 e=-.03 d=.06
+sunull ntr=1 nt=1 | sutivel option=14 np=17 e=.4 d=.2
+sunull ntr=1 nt=1 | sutivel a=99999999999999999999999999999999999999999999999999999999
+sunull ntr=1 nt=1 | sutivel np=9999999999999999999999999
+sunull ntr=1 nt=1 | sutivel option=1 nangle=7 np=1
+sunull ntr=1 nt=1 | sutivel option=1 nangle=7 np=2
+sunull ntr=1 nt=1 | sutivel option=4 nangle=7 np=3
+sunull ntr=1 nt=1 | sutivel option=4 nangle=7 np=4
+sunull ntr=1 nt=1 | sutivel option=1 nangle=4097 np=13 maxangle=89
+sunull ntr=1 nt=1 | sutivel option=5 nangle=101 maxangle=180 a=1500 b=500 e=.5 d=-.1
+sunull ntr=1 nt=1 | sutivel option=11 nangle=83 maxangle=89 a=2500 b=2450 e=.35 d=.2
+sunull ntr=1 nt=1 | sutivel option=14 np=37 a=1800 e=0 d=0
+sunull ntr=1 nt=1 | sutivel option=2 nangle=11 a=0 b=0 e=0 d=0
+sunull ntr=1 nt=1 | sutivel option=5 nangle=11 a=2000 b=2000 e=0 d=0

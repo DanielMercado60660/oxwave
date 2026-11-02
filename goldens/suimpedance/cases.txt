@@ -16,3 +16,16 @@ sunull nt=3 ntr=1 | suimpedance verbose=1 unknown=1
 # Empty input and invalid numeric parameter.
 suimpedance v0=1000
 suimpedance v0=1e999
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 k1=1 mag=0.25 | suimpedance v0=1500 rho0=1000000
+suspike nt=3 ntr=2 k1=1 mag=-0.75 | suimpedance v0=2100.25 rho0=998.5
+suspike nt=4 ntr=1 k1=2 mag=0.999 | suimpedance v0=1 rho0=1
+suspike nt=4 ntr=1 k1=2 mag=-0.999 | suimpedance v0=1 rho0=1
+suspike nt=17 ntr=3 k1=2,5,11 mag=0.2,-0.3,0.4 | suimpedance v0=1750 rho0=2300
+suspike nt=4097 ntr=2 k1=1,2048,4096 mag=0.1,-0.2,0.3 | suimpedance v0=1234.5 rho0=2345.6
+suplane nt=31 ntr=4 npl=1 dip1=2 | suimpedance v0=1500 rho0=1000000
+sunull nt=13 ntr=3 | sushw key=offset a=-100 b=50 | sushw key=cdp a=42 b=2 | suimpedance rho0=1.25 v0=3.5
+[stderr] sunull nt=4 ntr=1 | suimpedance verbose=1 v0=1500 rho0=1000000
+sunull nt=2 ntr=1 | suimpedance v0=3 v0=7 rho0=2
+sunull nt=3 ntr=1 | suimpedance v0= rho0=2
+suimpedance rho0=1e999

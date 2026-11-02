@@ -16,3 +16,20 @@ mkdir gathers && suplane nt=17 ntr=3 > gathers/a && sugetgthr dir=gathers vt=0 v
 # Negative values can produce a partial header or an empty write in the original.
 [exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=-1
 [exact] mkdir gathers && suplane nt=1 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=-60
+# diff-2026-11 (round 1)
+mkdir gathers && suspike nt=2 ntr=1 > gathers/a && sugetgthr dir=gathers
+mkdir gathers && suspike nt=3 ntr=4 | sushw key=cdp a=17 b=3 > gathers/a && sugetgthr dir=gathers vt=0
+mkdir gathers && sunull nt=4 ntr=2 | sushw key=offset a=-20 b=40 > gathers/a && sugetgthr dir=gathers verbose=0
+mkdir gathers && suspike nt=13 ntr=3 > gathers/a && sugetgthr dir=gathers
+mkdir gathers && sunull nt=4097 ntr=2 > gathers/a && sugetgthr dir=gathers
+[stderr] mkdir gathers && suspike nt=4 ntr=2 > gathers/a && sugetgthr dir=gathers verbose=1 vt=0
+[exact] mkdir gathers && suspike nt=2 ntr=3 > gathers/a && sugetgthr dir=gathers vt=1 ns=4
+[exact] mkdir gathers && sunull nt=4 ntr=2 > gathers/a && sugetgthr dir=gathers vt=1 ns=2 verbose=0
+[exact] mkdir gathers && suspike nt=13 ntr=1 | sushw key=cdp a=42 > gathers/a && sugetgthr dir=gathers vt=2 ns=13
+[stderr] mkdir gathers && touch gathers/a && sugetgthr dir=gathers verbose=1 vt=1 ns=2
+sugetgthr dir=missing vt=1 ns=4
+sugetgthr dir=missing vt=2 ns=
+mkdir gathers && suspike nt=5 ntr=2 > gathers/a && sunull nt=5 ntr=1 > gathers/b && sugetgthr dir=gathers
+[exact] mkdir gathers && sunull nt=256 ntr=1 > gathers/a && sugetgthr dir=gathers vt=1 ns=2
+[exact] mkdir gathers && sunull nt=1 ntr=3 > gathers/a && sugetgthr dir=gathers vt=1 ns=256
+mkdir gathers && suspike nt=3 ntr=2 | sushw key=ns a=0 > gathers/a && sugetgthr dir=gathers

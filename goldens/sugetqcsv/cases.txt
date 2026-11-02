@@ -15,3 +15,23 @@
 [stderr] sugetqcsv keys=tracl lsamp=-2
 [stderr] sugetqcsv keys=tracl
 [stderr] sunull nt=3 ntr=1 | sugetqcsv keys=tracl fsamp=2 lsamp=1
+# diff-2026-11 (round 1)
+[exact] sunull nt=2 ntr=1 | sugetqcsv keys=tracl,ns fsamp=0 lsamp=1 qout=two.csv formxy=%.2f formsv=%.3f && cat two.csv
+[exact] suspike nt=3 ntr=2 | sugetqcsv keys=tracl,ns fsamp=1 lsamp=2 && cat qhed.csv
+[exact] suspike nt=4 ntr=1 | sugetqcsv keys=tracl fsamp=3 lsamp=3 && cat qhed.csv
+[exact] suplane nt=11 ntr=3 | sugetqcsv keys=tracl,offset,dt fsamp=2 lsamp=10 formsv=%.6e && cat qhed.csv
+[exact] sunull nt=4097 ntr=1 | sugetqcsv keys=ns fsamp=4093 lsamp=5000 && cat qhed.csv
+[exact] sunull nt=4 ntr=3 | sushw key=cdp,offset,trid a=10,-7,1 b=3,5,1 | sugetqcsv keys=cdp,offset,trid verbose=1 && cat qhed.csv
+[exact] sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy,scalco a=-101,57,42,-19,-3 | sugetqcsv keys=mx,my,sx,gy formxy=%.8f && cat qhed.csv
+[exact] suspike nt=13 ntr=2 | sugetqcsv keys=tracl,ns fsamp=12 lsamp=13 && cat qhed.csv
+[exact] sunull nt=1 ntr=1 | sugetqcsv keys=tracl fsamp=8 lsamp=-1 && cat qhed.csv
+[exact] sunull nt=3 ntr=1 | sushw key=tracl,tracr,fldr,tracf,ep,cdp,cdpt,offset a=5,6,7,8,9,10,11,-12 | sugetqcsv keys=tracl,tracr,fldr,tracf,ep,cdp,cdpt,offset && cat qhed.csv
+[exact] suspike nt=17 ntr=1 | sugetqcsv keys=dt,delrt fsamp=0 lsamp=16 formxy=%+12.3f formsv=%+.2e qout=custom.csv && cat custom.csv
+[stderr] sunull nt=2 ntr=1 | sugetqcsv keys=badkey
+[stderr] sunull nt=2 ntr=1 | sugetqcsv keys=tracl fsamp=3 lsamp=2
+[stderr] sunull nt=2 ntr=1 | sugetqcsv keys=tracl lsamp=-3
+[stderr] sunull nt=2 ntr=1 | sugetqcsv keys=tracl qout=/nonexistent/dir/out.csv
+[exact] sunull nt=3 ntr=2 | sushw key=d1,f1,d2,f2,ungpow,unscale,ntr,mark a=1.25,-2.5,3.75,4.5,5.25,-6.5,22,-3 | sugetqcsv keys=d1,f1,d2,f2,ungpow,unscale,ntr,mark && cat qhed.csv
+
+# ub-2026-11 (round 1)
+[exact] sunull nt=2 ntr=1 | sugetqcsv keys=numb0 && cat qhed.csv

@@ -794,6 +794,32 @@ fn dmoapply(
     }
 }
 
+// Far extrapolated mapping times can exceed the C sinc interpolator's int
+// range or become NaN as successive extrapolations overflow. Use zero padding
+// for those times before calling the shared interpolator, retaining its
+// arithmetic for every stencil that can overlap the input.
+fn ints8c_zero(dt: f32, ft: f32, yin: &[Complex], times: &[f32], out: &mut [Complex]) {
+    let xouts = (1.0 / dt as f64) as f32;
+    let xoutb = (8.0 - (ft * xouts) as f64) as f32;
+    let zero = Complex::default();
+    let mut begin = 0;
+    for end in 0..=times.len() {
+        let padding = end < times.len() && {
+            let xoutn = xoutb + times[end] * xouts;
+            !(xoutn > 3.0) || xoutn as f64 >= yin.len() as f64 + 11.0
+        };
+        if end == times.len() || padding {
+            if begin < end {
+                ints8c(dt, ft, yin, zero, zero, &times[begin..end], &mut out[begin..end]);
+            }
+            if padding {
+                out[end] = zero;
+            }
+            begin = end + 1;
+        }
+    }
+}
+
 fn jakub1k(
     k: f32,
     _h: f32,
@@ -846,12 +872,10 @@ fn jakub1k(
             for it in 0..start {
                 qn[it] = czero;
             }
-            ints8c(
+            ints8c_zero(
                 dt,
                 ft,
                 qq,
-                czero,
-                czero,
                 &tntable[ip][..count],
                 &mut qn[start..start + count],
             );

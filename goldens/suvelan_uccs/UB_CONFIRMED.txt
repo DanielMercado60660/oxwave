@@ -1,0 +1,2 @@
+# suvelan_uccs.c:228: floating-to-unsigned-short conversion of 160000 is undefined; clamping the header interval to 65535 changes dt from 28928 to 65535. OxWave matches fixed byte for byte.
+suspike nt=31 ntr=1 | suvelan_uccs nx=1 nv=1 dtratio=40 nsmooth=0

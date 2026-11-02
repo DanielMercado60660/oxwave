@@ -28,3 +28,37 @@
 [exact] suspike nt=5 ntr=2 | suswapbytes format=1 | suswapbytes ns= swaphdr=-1 swapdata=-1
 # Native-to-foreign conversion never reads ns or calls checkpars.
 [stderr] suspike nt=1 ntr=1 | suswapbytes format=1 ns=-1 verbose=1
+# diff-2026-11 (round 1)
+# Small boundaries, separate header/data modes, and explicit/default switches.
+[exact] suspike nt=1 ntr=1 ix1=1 it1=1 | suswapbytes
+[exact] suspike nt=2 ntr=1 ix1=1 it1=2 | suswapbytes format=0 swaphdr=1 swapdata=1 ns=2
+[exact] suspike nt=3 ntr=2 | suswapbytes format=0 swaphdr=0 swapdata=0 ns=3
+[exact] suplane nt=4 ntr=3 | suswapbytes format=0 swaphdr=1 swapdata=0
+[exact] suplane nt=17 ntr=3 | suswapbytes format=0 swaphdr=0 swapdata=1 ns=17
+[exact] suplane nt=17 ntr=3 | suswapbytes format=1 swaphdr=0 swapdata=0
+[exact] suplane nt=17 ntr=3 | suswapbytes format=1 swaphdr=1 swapdata=0
+[exact] suplane nt=17 ntr=3 | suswapbytes format=1 swaphdr=0 swapdata=1
+[exact] suplane nt=17 ntr=3 | suswapbytes format=1 swaphdr=1 swapdata=1
+# Exercise signed integers, shorts, unsigned shorts and float header fields.
+[exact] suplane nt=17 ntr=3 | sushw key=offset,sx,gx,scalco,d1,f1,dt,ntr a=-32769,16909060,-1234567,-100,0.125,-2.5,65535,12345 | suswapbytes
+[exact] suspike nt=4097 ntr=3 | sushw key=cdp,offset a=123456,-54321 b=17,29 | suswapbytes format=1
+[exact] sunull nt=4097 ntr=2 | suswapbytes format=0 ns=4097
+# Supply a full payload for a zero-ns header; ns overrides framing, not the header.
+[exact] { sunull nt=0 ntr=1; suspike nt=3 ntr=1 | sustrip outpar=/dev/null; } | suswapbytes format=0 ns=3 swaphdr=0 swapdata=0
+# A deliberately changed first ns controls every raw record, including short tails.
+[exact] suspike nt=13 ntr=3 | suswapbytes ns=7 swaphdr=0
+[exact] suspike nt=13 ntr=3 | suswapbytes ns=7 swapdata=0
+# Two generator records exactly fill ONE oversized raw record:
+# 2*(240+4*32738) = 240+4*65536. No later read writes beyond C's static segy.
+[exact] sunull nt=32738 ntr=2 | suswapbytes ns=65536
+[exact] sunull nt=32738 ntr=2 | suswapbytes format=0 ns=65536 swaphdr=0 swapdata=0
+[exact] sunull nt=32767 ntr=2 | suswapbytes ns=65594 swapdata=0
+# Parameter parsing, checkpars placement, diagnostics and stable errors.
+[stderr] suspike nt=2 ntr=2 | suswapbytes format=0 ns=2 verbose=1
+[exact] suspike nt=2 ntr=2 | suswapbytes format= swaphdr= swapdata= ns=
+[exact] suplane nt=17 ntr=3 | suswapbytes format=2 swaphdr=-3 swapdata=2 ns=0
+[stderr] sunull nt=0 ntr=1 | suswapbytes
+[stderr] sunull nt=1 ntr=1 | suswapbytes ns=0
+[stderr] sunull nt=1 ntr=1 | suswapbytes ns=2147483648
+[stderr] sunull nt=1 ntr=1 | suswapbytes swaphdr=2147483648
+[stderr] sunull nt=1 ntr=1 | suswapbytes swapdata=2147483648

@@ -1,0 +1,12 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/par/lib/modeling.c:520-522,538-540.
+# Negative tn is truncated toward zero, producing a negative sinc row and a read before sinc[101][8].
+# A bounds check before the dereference changes rc=0 / 644 stdout bytes to rc=1 / empty stdout,
+# with "addsinc: sinc index out of bounds". OxWave now matches fixed stdout, stderr and rc exactly.
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 dt=0.04 ft=0.4 'ref=1:100,200;900,200'
+# Confirmed: vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynvxz.c:437,442-447,451-470.
+# At x=12.5,z=-100, ix=0,iz=-1, the six bilinear interpolations read before their allocations.
+# Checking the flat lower bound and skipping the invalid segment changes a nonzero trace
+# (sample 99 = 0.0100978902) to a zero trace; both rc=0, 1268 bytes. OxWave matches fixed exactly.
+# Existing negative-z cases whose flat offsets stay inside initialized storage remain normal tests.
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nxb=5 nt=257 dt=0.01 'ref=1:0,-100;25,-100'

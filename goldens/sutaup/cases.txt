@@ -79,3 +79,67 @@ sunull nt=31 ntr=3 dt=0.004 | suaddnoise seed=99 | sutaup option=4 npoints=63
 [stderr] sunull nt=31 ntr=3 dt=0.004 | sutaup option=4 npoints=65
 # Named scratch files must be removed after a successful transform.
 [exact] mkdir scratch; sunull nt=37 ntr=3 | sutaup option=4 npoints=7 tmpdir=./scratch > /dev/null; result=$?; find scratch -type f; exit "$result"
+
+# diff-2026-11 (round 1)
+# Short nonzero panels: each mode, with a one-point inverse rho filter.
+sunull nt=1 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=2 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=3 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=4 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=2 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2
+sunull nt=4 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2
+sunull nt=1 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=3
+sunull nt=3 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=3
+sunull nt=1 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=4 npoints=1
+sunull nt=4 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=4 npoints=1
+# Long, odd panels and the maximum trace length accepted by SU.
+sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2
+sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=3
+sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=4 npoints=71
+sunull nt=65535 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1
+sunull nt=65535 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2
+sunull nt=65535 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=3
+sunull nt=65535 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=4 npoints=71
+# Defaults against explicit parameters on a prime-length panel.
+suplane nt=113 ntr=7 | sutaup
+[stderr] suplane nt=113 ntr=7 | sutaup option=1 verbose=2 tmpdir= np=7 nx=7 pmin=0 pmax=0.006 xmin=0 dx=1 dt=0.004 fmin=3 npoints=71
+# Independently vary slopes and contributing traces, including one input trace.
+sunull nt=127 ntr=1 dt=0.004 | suaddnoise seed=579 | sutaup option=1 np=5 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+sunull nt=127 ntr=1 dt=0.004 | suaddnoise seed=579 | sutaup option=2 np=5 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+sunull nt=127 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1 np=101 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+sunull nt=127 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2 np=101 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+sunull nt=127 ntr=17 dt=0.004 | suaddnoise seed=579 | sutaup option=1 nx=11 np=3 dx=12.5 xmin=-25 pmin=-0.002 pmax=0.003
+# Negative signed nx has an empty trace loop in the T-X transform.
+sunull nt=17 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=2 nx=-1
+sunull nt=257 ntr=5 dt=0.004 | suaddnoise seed=579 | sutaup option=2 nx=-2 np=7
+# Impulses and physical synthetic data, with asymmetric spatial origins.
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sutaup option=2 np=1 pmin=0.001 pmax=0.003 xmin=1 dx=2
+suspike nt=101 ntr=7 nspk=1 ix1=4 it1=51 | sutaup option=3 dx=2.7 xmin=13.5 pmin=-0.001 pmax=0.002 fmin=0
+suimp2d nt=257 nrec=5 x0=100 z0=100 | sutaup option=1 dx=100 xmin=-200 pmin=-0.0005 pmax=0.0005 fmin=9
+suimp2d nt=257 nrec=5 x0=100 z0=100 | sutaup option=4 dx=100 xmin=-200 pmin=-0.0005 pmax=0.0005 npoints=15
+# dt comes from the first input header; other header words survive unchanged.
+sunull nt=101 ntr=5 | suaddnoise seed=881 | sushw key=dt,cdp,offset,delrt,d1,f1,d2,f2 a=1500,40,-300,-25,0.75,11,99,88 b=500,3,150,5,0,0,0,0 | sutaup option=1 dx=6.25 xmin=-12.5 pmin=-0.001 pmax=0.002
+sunull nt=101 ntr=5 | suaddnoise seed=881 | sushw key=dt a=1500 b=500 | sutaup option=4 dt=0.0025 dx=6.25 xmin=-12.5 pmin=-0.001 pmax=0.002 npoints=9
+# Named directory with spaces and full verbose diagnostics.
+[stderr] mkdir 'scratch space'; suplane nt=113 ntr=7 | sutaup option=2 verbose=1 tmpdir='scratch space' nx=5 np=9 dx=6.25 xmin=-12.5 pmin=-0.003 pmax=0.004 dt=0.002 fmin=0 npoints=9
+# access(WRITE_OK) uses the owner's permission class, not any write bit.
+[stderr] mkdir scratch; chmod 575 scratch; sunull nt=17 ntr=3 | sutaup option=2 tmpdir=./scratch
+[stderr] mkdir scratch; chmod 557 scratch; sunull nt=17 ntr=3 | CWP_TMPDIR=./scratch sutaup option=2
+# Additional parser and filter errors, preserving validation order.
+[stderr] suspike nt=17 ntr=3 | sutaup option=9 dt=0
+[stderr] sunull nt=4 ntr=3 | sutaup option=4 npoints=-2
+[stderr] sunull nt=4 ntr=3 | sutaup option=4 npoints=11
+# Signal only after both scratch files exist, while a producer holds input open.
+# Print the child status and remaining file count, avoiding random filenames.
+# A FIFO holds the producer open until the signal is sent, without a timed sleep.
+[exact] mkdir scratch; mkfifo release; { sunull nt=8 ntr=1; read -r token < release; } | sutaup option=2 tmpdir=./scratch > /dev/null & pid=$!; for i in {1..100}; do set -- scratch/*; [ "$#" -eq 2 ] && break; sleep 0.01; done; kill -TERM "$pid"; printf "done\n" > release; wait "$pid" 2>/dev/null; result=$?; printf "%s\n" "$result"; find scratch -type f | wc -l
+[exact] mkdir scratch; mkfifo release; { sunull nt=8 ntr=1; read -r token < release; } | sutaup option=2 tmpdir=./scratch > /dev/null & pid=$!; for i in {1..100}; do set -- scratch/*; [ "$#" -eq 2 ] && break; sleep 0.01; done; kill -INT "$pid"; printf "done\n" > release; wait "$pid" 2>/dev/null; result=$?; printf "%s\n" "$result"; find scratch -type f | wc -l
+[exact] mkdir scratch; mkfifo release; { sunull nt=8 ntr=1; read -r token < release; } | sutaup option=2 tmpdir=./scratch > /dev/null & pid=$!; for i in {1..100}; do set -- scratch/*; [ "$#" -eq 2 ] && break; sleep 0.01; done; kill -QUIT "$pid"; printf "done\n" > release; wait "$pid" 2>/dev/null; result=$?; printf "%s\n" "$result"; find scratch -type f | wc -l
+[exact] mkdir scratch; mkfifo release; { sunull nt=8 ntr=1; read -r token < release; } | sutaup option=2 tmpdir=./scratch > /dev/null & pid=$!; for i in {1..100}; do set -- scratch/*; [ "$#" -eq 2 ] && break; sleep 0.01; done; kill -HUP "$pid"; printf "done\n" > release; wait "$pid" 2>/dev/null; result=$?; printf "%s\n" "$result"; find scratch -type f | wc -l
+
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=17 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1 nx=0
+sunull nt=17 ntr=3 dt=0.004 | suaddnoise seed=579 | sutaup option=1 nx=-1
+sunull nt=31 ntr=1 dt=0.004 | suaddnoise seed=123 | sutaup option=4 npoints=1 pmin=0.001 pmax=0.003 xmin=1

@@ -996,10 +996,8 @@ impl<T: Default + Clone, const N: usize> Grid<T, N> {
             if n < 0 {
                 err!("ealloc.c: malloc failed (Cannot allocate memory)");
             }
-            // C's pointer tables are invalid for zero dimensions.
-            if n == 0 {
-                err!("grid dimensions must be positive");
-            }
+            // Empty output grids are valid: repairing C's zero-size pointer
+            // tables does not change their output (UB audit, November 2026).
             size = size
                 .checked_mul(n as usize)
                 .unwrap_or_else(|| err!("ealloc.c: malloc failed (Cannot allocate memory)"));
@@ -1653,10 +1651,16 @@ fn main() {
                 iyoffset = nyoffset - 1;
             }
             filter.filt(&mut tr.data, &mut gd, &mut trf);
-            let start = mig.offset([iyoffset, ixoffset, 0, 0, 0]);
             // Grid::new already checked the full product. Compute this
             // subvolume length in usize so it cannot overflow a C int.
             let len = gd.nyo as usize * gd.nxo as usize * gd.nzo as usize;
+            // C passes a pointer to an empty subvolume when any output
+            // dimension is zero. No element is read or written in that case.
+            let start = if len == 0 {
+                0
+            } else {
+                mig.offset([iyoffset, ixoffset, 0, 0, 0])
+            };
             mig3d(
                 &gd,
                 &trf,
@@ -1690,7 +1694,12 @@ fn main() {
         for ixo in 0..gd.nxo {
             for iyoffset in 0..nyoffset {
                 for ixoffset in 0..nxoffset {
-                    let start = mig.offset([iyoffset, ixoffset, iyo, ixo, 0]);
+                    // A zero-sample trace still emits its SU header.
+                    let start = if gd.nzo == 0 {
+                        0
+                    } else {
+                        mig.offset([iyoffset, ixoffset, iyo, ixo, 0])
+                    };
                     tro.data[..gd.nzo as usize]
                         .copy_from_slice(&mig.data[start..start + gd.nzo as usize]);
                     tro.offset = (fxoffset + ixoffset as f32 * dxoffset) as i32;

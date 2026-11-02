@@ -46,6 +46,9 @@ use oxwave_lib_tri::*;
 use std::ffi::{c_char, c_void};
 use std::ptr::null_mut;
 
+mod triangulate;
+use triangulate::addVertexToModel;
+
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
 const SDOC: &[&str] = &[
@@ -508,19 +511,22 @@ unsafe fn fillcoeff(m: *mut Model, sr: &[[f32; 13]]) {
 
 unsafe fn setcoeff(t: *mut Tri, a: FaceAttributes) {
     unsafe {
+        // Like the UB-fixed C visited check, consider two NaNs equal: ordinary
+        // equality would recurse forever between faces with NaN coefficients.
+        let same_coeff = |x: f32, y: f32| x == y || (x.is_nan() && y.is_nan());
         let fa = (*t).fa.cast::<FaceAttributes>();
         if !fa.is_null() {
             let f = &*fa;
-            if f.a1111 == a.a1111
-                && f.a3333 == a.a3333
-                && f.a1133 == a.a1133
-                && f.a1313 == a.a1313
-                && f.a3313 == a.a3313
-                && f.a1113 == a.a1113
-                && f.a1212 == a.a1212
-                && f.a2323 == a.a2323
-                && f.a1223 == a.a1223
-                && f.rho == a.rho
+            if same_coeff(f.a1111, a.a1111)
+                && same_coeff(f.a3333, a.a3333)
+                && same_coeff(f.a1133, a.a1133)
+                && same_coeff(f.a1313, a.a1313)
+                && same_coeff(f.a3313, a.a3313)
+                && same_coeff(f.a1113, a.a1113)
+                && same_coeff(f.a1212, a.a1212)
+                && same_coeff(f.a2323, a.a2323)
+                && same_coeff(f.a1223, a.a1223)
+                && same_coeff(f.rho, a.rho)
             {
                 return;
             }

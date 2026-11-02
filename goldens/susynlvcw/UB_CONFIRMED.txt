@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/par/lib/modeling.c:520-522,538-540 (called by vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynlvcw.c:398). Negative tn is truncated toward zero, producing negative jsinc and an out-of-bounds sinc-table read. Witness: tn=-3.03544998, jt=-3, jsinc=-3, itlo=-6, ithi=1. Minimal fix bounds-checks jsinc only for overlapping wavelets and calls err("addsinc: sinc index out of bounds"). orig matches vendor byte-for-byte (rc=0, 268-byte trace); fixed returns rc=1, no stdout, clean error. OxWave was changed to match fixed exactly (rc/stdout/stderr). Evidence and SU-flag builds: diffcamp/ubx/susynlvcw/; patch: fix.patch.
+susynlvcw nt=7 nxm=1 ft=3.9

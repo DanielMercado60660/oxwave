@@ -14,3 +14,32 @@ suazimuth cmp=1 mxkey=notakey
 suazimuth cmp=1 mykey=notakey
 suazimuth < /dev/null
 [stderr] suplane nt=1 ntr=1 | suazimuth verbose=1
+# diff-2026-11 (round 1)
+# Small traces, cardinal directions and signed offsets in both axes.
+suspike nt=2 ntr=1 | sushw key=sx,sy,gx,gy a=0,0,100,0 | suazimuth az=-1 offset=1 signedflag=1 cmp=1
+suspike nt=3 ntr=2 | sushw key=sx,sy,gx,gy a=0,100,0,-100 | suazimuth az=1 offset=1 signedflag=1
+sunull nt=4 ntr=2 | sushw key=sx,sy,gx,gy a=20,-20,-100,-20 | suazimuth az=0 offset=1 signedflag=1
+suplane nt=11 ntr=4 | sushw key=sx,sy,gx,gy a=-20,-30,60,90 b=15,20,-25,-30 | suazimuth key=d1 az=1 scale=2 sector=30 offset=1 offkey=f1 cmp=1 mxkey=f2 mykey=ungpow
+# Explicit defaults, custom integer and float fields, scalar and sector variants.
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,scalco a=9,17,-4,31,0 | suazimuth key=otrav offkey=offset mxkey=ep mykey=cdp scale=1 az=0 sector=1 offset=0 signedflag=0 cmp=0
+suspike nt=13 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=-11,-13,18,22,-4 | suazimuth key=tracf az=-1 scale=10 sector=7 offset=1 offkey=cdp signedflag=1 cmp=1 mxkey=ep mykey=tracl
+suplane nt=19 ntr=2 | sushw key=sx,sy,gx,gy,scalco a=19,-29,2,15,3 | suazimuth key=f1 az=1 sector=22.5 scale=-3 offset=1 offkey=d1 cmp=1 mxkey=f2 mykey=d2
+sunull nt=4097 ntr=1 | sushw key=sx,sy,gx,gy a=100,-1,0,2 | suazimuth az=-1 offset=1 signedflag=1 cmp=1
+# Half-integer midpoint rounding and sequential output header overwrites.
+suspike nt=5 ntr=1 | sushw key=sx,sy,gx,gy a=-4,-3,-3,-2 | suazimuth key=d1 az=1 cmp=1
+sunull nt=7 ntr=2 | sushw key=sx,sy,gx,gy a=0,0,50,100 | suazimuth key=offset offset=1 offkey=offset cmp=1 mxkey=ep mykey=ep
+suplane nt=23 ntr=1 | sushw key=sx,sy,gx,gy a=20,30,-40,70 | suazimuth key=sx az=-1 offset=1 offkey=sy cmp=1 mxkey=gx mykey=gy
+# Zero displacement and nonboolean options.
+suspike nt=3 ntr=1 | sushw key=sx,sy,gx,gy a=17,-3,17,-3 | suazimuth key=d1 az=1 offset=2 signedflag=-1 cmp=-1
+sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy a=0,0,1,-1 | suazimuth key=trid az=1 scale=0.5 sector=3
+suplane nt=31 ntr=2 | sushw key=sx,sy,gx,gy,scalco a=-100,-100,100,200,-10 | suazimuth key=d1 az=0 offset=1 offkey=f1 signedflag=1 cmp=1 mxkey=f2 mykey=d2
+[stderr] suspike nt=4 ntr=1 | sushw key=sx,sy,gx,gy a=3,4,-5,-6 | suazimuth verbose=1 key=d1 az=-1 offset=1 signedflag=1 cmp=1
+# Invalid numeric and header arguments.
+sunull nt=2 ntr=1 | suazimuth az=999999999999999999999
+sunull nt=2 ntr=1 | suazimuth key=invalid
+sunull nt=2 ntr=1 | suazimuth offset=1 offkey=invalid
+sunull nt=2 ntr=1 | suazimuth cmp=1 mykey=invalid
+# Coincident coordinates in a floating header, negative sectors and axis boundaries.
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy a=9,-5,9,-5 | suazimuth key=d1 az=0 cmp=1 offset=1 offkey=f1
+suspike nt=17 ntr=2 | sushw key=sx,sy,gx,gy a=1,0,0,0 | suazimuth key=d1 az=1 scale=3 sector=-7
+suplane nt=29 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=0,0,0,7,-32768 | suazimuth key=f1 az=-1 offset=1 offkey=d1 signedflag=1 cmp=1 mxkey=f2 mykey=d2

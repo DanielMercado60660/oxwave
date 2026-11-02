@@ -11,3 +11,32 @@ elaps < /dev/null
 elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=0 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
 elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=2 style=normal gridx=solid gridz=dot < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
 elamodel xedge=0,1 zedge=0.5,0.5 kedge=1 fill=0.5,0.25,2,1,2 fill=0.5,0.75,3,1.5,0.2,0.1,0.15,0,2 > model; elaps p=3 gedge=0.5 gtri=0.2 < model > plot; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot
+
+# diff-2026-11 (round 1)
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+[stderr] elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 gedge=0 gtri=0 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 gedge=1 gtri=1 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 gedge=-1 gtri=-1 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 gedge=1.2 gtri=1.2 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 gmin=0.25 gmax=0.75 pgmin=1 pgmax=4 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 gmin=1 gmax=0 pgmin=2 pgmax=2 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 style=normal < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 style=seismic < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 style=other gridx=unknown gridz=unknown < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 gridx=dot gridz=dash < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 gridx=solid gridz=dot dxnum=0.25 dznum=0.2 fxnum=0.1 fznum=0.1 nxtic=2 nztic=3 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 gridx=dash gridz=solid axeswidth=2 ticwidth=0.5 gridwidth=0.25 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 labelx=Distance labelz=Depth title=Elastic labelfont=Courier titlefont=Times-Bold labelsize=14 titlesize=20 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 titlecolor=red axescolor=blue gridcolor=green gridx=solid gridz=solid < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=2 xbox=1 ybox=2 wbox=5 hbox=4 xbeg=0.1 xend=0.9 zbeg=0.2 zend=0.8 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=3 xbeg=1 xend=0 zbeg=1 zend=0 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=0 verbose=1 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=1 p=3 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=4 < model
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=-1 < model
+elamodel fill=0.5,0.5,2,1,0.1,0.05,0.1,0,2 > model; elaps p=abc < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel xedge=0,1 zedge=0.3,0.7 kedge=1 fill=0.25,0.2,2,1,2 fill=0.75,0.8,3,1.4,0.2,0.1,0.15,0,2 > model; elaps p=2 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1
+elamodel xedge=0,1 zedge=0.3,0.7 kedge=1 fill=0.25,0.2,2,1,2 fill=0.75,0.8,3,1.4,0.2,0.1,0.15,0,2 > model; elaps p=3 style=normal gedge=0.2 gtri=0.8 < model > plot; rc=$?; sed -e '/^%%CreationDate/d' -e '/^%%Creator/d' plot; test "$rc" -eq 1

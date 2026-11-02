@@ -72,14 +72,23 @@ fn convolve_matches_c() {
             .collect();
         let mut expected = vec![123.0; nz];
         let mut actual = expected.clone();
+        // SU's convolve_cwp does dead loads of x[-1] (rolling on) and x[lx] (even-length middle) on the
+        // shorter operand when it is longer than 30; they SIGBUS if a buffer abuts an unmapped page.
+        // Give the C one guard element on each side of both inputs.
+        let guard = |v: &[f32]| {
+            let mut g = vec![f32::NAN; v.len() + 2];
+            g[1..=v.len()].copy_from_slice(v);
+            g
+        };
+        let (xg, yg) = (guard(&x), guard(&y));
         unsafe {
             convolve_cwp(
                 nx as i32,
                 ifx,
-                x.as_ptr(),
+                xg.as_ptr().add(1),
                 ny as i32,
                 ify,
-                y.as_ptr(),
+                yg.as_ptr().add(1),
                 nz as i32,
                 ifz,
                 expected.as_mut_ptr(),

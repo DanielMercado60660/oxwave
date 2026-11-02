@@ -16,3 +16,21 @@ suplane nt=32 ntr=1 | sudlmo vnmo=400 vnmo=500
 suplane nt=32 ntr=1 | sudlmo fnmo=0 fnmo=1
 suplane nt=32 ntr=1 | sudlmo vnmo=400,500 fnmo=0
 suplane nt=32 ntr=1 | sudlmo vnmo=400,500 fnmo=10,10
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=offset a=40 | sudlmo dt=0.004 vnmo=400 fnmo=0
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=offset a=-75 | sudlmo invert=1 vnmo=300
+suspike nt=4 ntr=2 nspk=1 ix1=1 it1=1 | sushw key=offset a=50 b=20 | sudlmo cm=1 dt=0.001
+suplane nt=17 ntr=1 | sushw key=cdp,offset a=5,120 | sudlmo cdp=10,0 vnmo=500,700 vnmo=250,350 fnmo=0,80 fnmo=0,80
+suspike nt=101 ntr=3 nspk=1 ix1=1 it1=25 | sushw key=offset a=20 b=10 | sudlmo vnmo=200,450,800 fnmo=0,10,90 invert=0
+suplane nt=4097 ntr=1 | sushw key=offset a=32 | sudlmo dt=0.002 invert=1
+sunull nt=31 ntr=3 dt=0.004 | sushw key=offset a=100 b=10 | sudlmo cm=1 vnmo=500 fnmo=0
+suspike nt=64 ntr=3 nspk=1 ix1=1 it1=16 | sushw key=offset a=99 b=0 | sudlmo vnmo=400 fnmo=0 verbose=1
+suplane nt=127 ntr=3 | sushw key=offset a=-10 b=10 | sudlmo cm=0 invert=0 vnmo=400 fnmo=0
+suspike nt=2 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=cdp,offset a=1,50 b=1,10 | sudlmo cdp=1,3 vnmo=300 vnmo=600 fnmo=0 fnmo=0
+suplane nt=32 ntr=1 | sushw key=dt a=0 | sudlmo
+suplane nt=32 ntr=1 | sudlmo vnmo=200,300,400 fnmo=0,30,20
+suplane nt=64 ntr=1 | sushw key=dt,offset a=0,80 | sudlmo dt=0.003
+suspike nt=32767 ntr=1 nspk=1 ix1=1 it1=123 | sushw key=offset a=91 | sudlmo vnmo=600 fnmo=0
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=1 | sudlmo
+suspike nt=257 ntr=1 nspk=1 ix1=1 it1=80 | sushw key=cdp,offset a=4,-125 | sudlmo cdp=2,6,10 vnmo=300 vnmo=500 vnmo=700 fnmo=0 fnmo=0 fnmo=0

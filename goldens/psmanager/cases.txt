@@ -21,3 +21,18 @@ suplane nt=32 ntr=8 | sustrip | psmovie n1=32 n2=4 n3=2 verbose=0 | psmanager pa
 printf '%%%%BoundingBox: 1.25 2.5 13.75 25.5\n%%%%Pages: (atend)\n' | psmanager | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 printf '%%%%BoundingBox: 1-2 13+25\n%%%%Pages: 2extra\n%%%%Page: 1 1\n' | psmanager | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 printf '%%%%BoundingBox: 1 2 3\n' | psmanager
+# diff-2026-11 (round 1)
+suplane nt=1 ntr=1 | sustrip outpar=/dev/null | psimage n1=1 n2=1 | psmanager papersize=0 orient=0 tray=3 manual=0 media=0
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | psimage n1=2 n2=1 | psmanager papersize=1 orient=1 tray=1 manual=0 media=1
+sunull nt=3 ntr=2 | sustrip outpar=/dev/null | psimage n1=3 n2=2 | psmanager papersize=2 orient=0 tray=2 manual=0 media=2
+suspike nt=4 ntr=3 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | psimage n1=4 n2=3 | psmanager papersize=3 orient=1 tray=3 manual=1 media=3
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | pswigb n1=7 n2=3 | psmanager media=4 verbose=1
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | psimage n1=4097 n2=1 | psmanager tray=2 media=5
+suspike nt=11 ntr=2 | sustrip outpar=/dev/null | psimage n1=11 n2=2 | psmanager media=6
+suplane nt=13 ntr=2 | sustrip outpar=/dev/null | psimage n1=13 n2=2 | psmanager media=7
+sunull nt=17 ntr=2 | sustrip outpar=/dev/null | psimage n1=17 n2=2 | psmanager media=8
+suspike nt=19 ntr=2 | sustrip outpar=/dev/null | psimage n1=19 n2=2 | psmanager media=9
+suplane nt=5 ntr=2 | sustrip outpar=/dev/null | psimage n1=5 n2=2 | awk 'BEGIN {print "%%Pages: 2\n%%Page: 1 1\n%%Page: 2 2"} {print}' | psmanager orient=1 manual=1
+sunull nt=1 ntr=1 | psmanager orient=2
+sunull nt=1 ntr=1 | psmanager papersize=-1
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | psimage n1=3 n2=1 | awk '{print} END {print "%%Pages: 2"; printf "abc%c", 0; print "discard"; print "%%Page: 7 7"}' | psmanager

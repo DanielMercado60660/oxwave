@@ -15,3 +15,20 @@ suspike nt=7 ntr=13 | suspeck1k2
 [stderr] suplane nt=16 ntr=2 | CWP_TMPDIR=. suspeck1k2 verbose=1
 suplane nt=16 ntr=2 | suspeck1k2 tmpdir=/no/such/directory
 suspeck1k2
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | suspeck1k2 d1=1 d2=1
+suspike nt=2 ntr=3 | suspeck1k2 d1=0.25 d2=2
+suspike nt=3 ntr=2 | suspeck1k2
+suspike nt=4 ntr=5 | suspeck1k2 tmpdir=.
+suplane nt=29 ntr=11 | sushw key=trid,d1,d2 a=30,0.125,7 | suspeck1k2 verbose=1
+suplane nt=53 ntr=17 | suspeck1k2 d1=3.25 d2=0.75
+suspike nt=4097 ntr=3 | suspeck1k2 d1=2 d2=5
+sunull nt=127 ntr=7 | sushw key=trid,d1,d2 a=30,3,4 | suspeck1k2
+[stderr] suspike nt=13 ntr=4 | suspeck1k2 tmpdir=. verbose=1 d1=1.5 d2=2.5
+suplane nt=11 ntr=2 | suspeck1k2 tmpdir=/nonexistent/oxwave-diff
+suplane nt=11 ntr=2 | suspeck1k2 d1=1e999
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suspeck1k2 d1=2 d2=3
+suspike nt=31 ntr=7 nspk=1 ix1=2 it1=3 | suspeck1k2
+suspike nt=257 ntr=23 nspk=4 ix1=1 it1=1 ix2=7 it2=13 ix3=19 it3=251 ix4=23 it4=257 | suspeck1k2 d1=0.3 d2=0.7
+sunull nt=65535 ntr=1 | suspeck1k2

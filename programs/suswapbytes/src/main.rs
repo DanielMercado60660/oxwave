@@ -92,10 +92,9 @@ fn main() {
         if getparint("ns", &mut ns) == 0 { ns = tr.ns as i32; }
         checkpars();
         if ns == 0 { err!("ns not set in header, set ns by hand!"); }
-        // Later traces are read into the fixed-size C segy object. Reject
-        // unsupported counts before allocation so negative/huge ns cannot
-        // fail allocation, and a second oversized trace cannot panic.
-        if ns < 0 || ns as usize > SU_NFLTS {
+        // Retain the guard against a negative count becoming a huge allocation.
+        // The first trace's separate data allocation is not limited by SU_NFLTS.
+        if ns < 0 {
             err!("ns=%d must be between 1 and %d", ns, SU_NFLTS as i32);
         }
         let databytes = ns as usize * 4;
@@ -111,6 +110,11 @@ fn main() {
         let mut raw = vec![0u8; trbytes];
         raw[..HDRBYTES].copy_from_slice(tr.hdr.as_bytes());
         while efread(&mut raw, &stdin()) != 0 {
+            // Only later traces use C's fixed-size segy object. Oversized later
+            // records overrun it in C; keep the safety guard on this path only.
+            if ns as usize > SU_NFLTS {
+                err!("ns=%d must be between 1 and %d", ns, SU_NFLTS as i32);
+            }
             tr.hdr.as_bytes_mut().copy_from_slice(&raw[..HDRBYTES]);
             if swaphdr != 0 {
                 for i in 0..SU_NKEYS { swaphval(&mut tr.hdr, i as i32); }

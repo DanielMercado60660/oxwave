@@ -13,3 +13,76 @@ sunull nt=1 ntr=3 | surange key= dim=-1
 surange < /dev/null
 surange dim=999999999999999999999 < /dev/null
 sunull nt=1 ntr=1 | surange key=bogus
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy,scalco a=11,-9,23,17,-2 | surange dim=2
+sunull nt=4 ntr=4 | sushw key=sx,sy,gx,gy,scalco a=100,-200,-50,300,10 b=-30,70,50,-90,0 | surange dim=1
+suspike nt=11 ntr=7 | sushw key=cdp,offset a=8,-40 b=-3,15 | surange key=offset,cdp dim=2
+suplane nt=13 ntr=6 | surange key=tracl,ns,dt dim=0
+sunull nt=4097 ntr=3 | sushw key=trid,delrt,cdp a=2,-10,99 b=0,5,-20 | surange
+sunull nt=3 ntr=5 | sushw key=d1,f1,d2,f2 a=0.25,-2,1.5,4 b=0.5,1,-0.25,-2 | surange key=d1,f1,d2,f2
+sunull nt=2 ntr=3 | sushw key=sx,sy,gx,gy a=-10,30,40,-50 b=10,-20,-15,25 | surange key=sx,gx dim=1
+[stderr] sunull nt=4 ntr=2 | surange key=ns,dt dim=0 verbose=1
+sunull nt=2 ntr=1 | surange dim=abc
+sunull nt=1 ntr=1 | surange dim=999999999999999999999
+sunull nt=17 ntr=6 | sushw key=ns,dt,year a=17,64000,2020 b=0,100,1 | surange key=dt,year,ns
+sunull nt=3 ntr=6 | sushw key=scalco,sx,sy,gx,gy a=-1,-100,200,40,-10 b=-1,30,-70,-20,80 | surange dim=2
+suspike nt=2 ntr=2 | sushw key=offset,cdp a=20,100 b=-40,-200 | surange key=cdp,offset,cdp
+sunull nt=1 ntr=1 | surange dim=1 key=tracl
+
+# diff-2026-11 (round 2)
+sunull nt=1 ntr=4 | sushw key=cdp,offset a=0,40 b=0,-20 | surange key=cdp,offset dim=0
+suspike nt=3 ntr=5 | sushw key=scalco,sx,sy,gx,gy a=0,10,10,-10,-10 b=0,0,-5,5,0 | surange dim=1
+suplane nt=2 ntr=3 | sushw key=trid,year,dt a=-2,2024,1000 b=1,-1,200 | surange key=year,trid,dt dim=2
+sunull nt=4097 ntr=1 | sushw key=d1,f1 a=0.125,-3.5 | surange key=d1,f1
+suspike nt=7 ntr=6 | sushw key=sx,sy,gx,gy,scalco a=-50,40,100,-20,-5 b=20,-10,-30,15,1 | surange dim=2
+[stderr] suplane nt=4 ntr=2 | surange key=tracl key=ns,dt dim=1 dim=0 verbose=1
+sunull nt=2 ntr=4 | sushw key=cdp a=4 b=-3 | surange key=cdp dim=3
+sunull nt=3 ntr=1 | surange dim=999999999999999999999999
+
+# diff-2026-11 (round 3)
+# Extreme scalco, unsigned/signed headers, and an explicitly empty dim.
+sunull nt=1 ntr=2 | sushw key=scalco,sx,sy,gx,gy a=-32768,32768,-65536,-32768,65536 b=0,32768,65536,32768,-65536 | surange
+suspike nt=2 ntr=2 | sushw key=dt,delrt,year a=65535,-32768,32767 b=-65534,32767,-32767 | surange key=year,dt,delrt dim=
+# Nonuniform midpoint spacing, six floating headers, and a fourth generator.
+suplane nt=3 ntr=5 | sushw key=sx,sy,gx,gy a=10,20,30,40 b=7,-3,9,5 | suchw key1=sx key2=tracl e=2 b=11 a=-15 | surange dim=1
+sunull nt=4 ntr=7 | sushw key=d1,f1,d2,f2,ungpow,unscale a=-0.000001,0.3333333,-0.25,1.5,2,-2 b=0.0000003,-0.125,0.5,-0.25,-0.5,0.5 | surange key=unscale,ungpow,f2,d2,f1,d1
+susynlv nt=17 nxm=3 nxo=2 fxo=-0.05 dxo=0.1 fxm=-0.1 dxm=0.075 | surange dim=2
+sunull nt=4097 ntr=2 | sushw key=cdp,offset a=-11,100 b=22,-200 | surange key=offset,cdp dim=0
+[stderr] suspike nt=1 ntr=1 | surange dim=0 key=tracl,ns,dt verbose=1
+sunull nt=2 ntr=1 | surange dim=2147483648
+sunull nt=3 ntr=1 | surange dim=-2147483649
+# Keep stdin open after complete traces; interrupt a blocked surange, not its
+# generator. Poll the read end for consumption before allowing processing time.
+sunull nt=3 ntr=4 | python3 -c 'import array,fcntl,os,signal,subprocess,sys,termios,time; data=sys.stdin.buffer.read(); r,w=os.pipe(); p=subprocess.Popen("exec surange dim=1",shell=True,stdin=r); os.write(w,data); a=array.array("i",[1]); deadline=time.monotonic()+3; exec("while a[0]:\n assert time.monotonic()<deadline\n time.sleep(0.01)\n fcntl.ioctl(r,termios.FIONREAD,a,True)"); time.sleep(0.1); p.send_signal(signal.SIGTERM); sys.exit(p.wait(timeout=3))'
+sunull nt=1 ntr=1 | sushw key=cdp,sx,gx a=-7,10,30 | python3 -c 'import array,fcntl,os,signal,subprocess,sys,termios,time; data=sys.stdin.buffer.read(); r,w=os.pipe(); p=subprocess.Popen("exec surange key=cdp,sx,gx dim=2",shell=True,stdin=r); os.write(w,data); a=array.array("i",[1]); deadline=time.monotonic()+3; exec("while a[0]:\n assert time.monotonic()<deadline\n time.sleep(0.01)\n fcntl.ioctl(r,termios.FIONREAD,a,True)"); time.sleep(0.1); p.send_signal(signal.SIGINT); sys.exit(p.wait(timeout=3))'
+
+# diff-2026-11 (round 4)
+# Boundary sizes and header fields near the end of the header table.
+sunull nt=65535 ntr=2 | sushw key=ntr,mark a=2,-1 b=0,2 | surange
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy a=5,-7,-5,7 | surange dim=2
+[stderr] suplane nt=2 ntr=4 | sushw key=mark,shortpad,ntr a=-2,3,4 b=1,-2,0 | surange key=ntr,shortpad,mark dim=0 verbose=1
+# Packed char and short traces, including an odd large sample count.
+suspike nt=3 ntr=3 | supack1 gpow=1 | surange key=ns,trid,ungpow,unscale
+suspike nt=4 ntr=3 | supack2 gpow=1 | surange dim=0
+sunull nt=4097 ntr=3 | supack2 | surange key=ns,trid,ungpow,unscale dim=1
+# IEEE floating headers: initial/later NaN and positive infinity.
+sunull nt=1 ntr=1 | sushw key=d1 a=nan | surange key=d1
+sunull nt=3 ntr=3 | sushw key=cdp a=-1 b=1 | suchw key1=d1 key2=cdp e=0.5 | surange key=d1
+sunull nt=3 ntr=3 | sushw key=cdp a=1 b=-1 | suchw key1=d1 key2=cdp e=0.5 | surange key=d1
+sunull nt=4 ntr=4 | suchw key1=d1 key2=tracl b=1 d=0 | surange key=d1
+# Another generator, prefix integer parsing, and whole verbose stderr.
+suimp2d nt=17 nshot=2 nrec=3 sxmin=-250 gxmin=-100 dsx=125 dgx=50 | surange dim=2
+[stderr] sunull nt=2 ntr=3 | surange key=tracl,dt dim=2junk verbose=1 unused=7
+# Empty input, varying ns, integer overflow, and truncated sample records.
+sunull nt=4 ntr=0 | surange dim=2
+sunull nt=3 ntr=3 | sushw key=ns a=3 b=1 | surange key=ns dim=1
+sunull nt=2 ntr=1 | surange dim=-9999999999999999999999999999999
+sunull nt=3 ntr=2 | head -c 250 | surange key=ns dim=0
+sunull nt=3 ntr=2 | head -c 492 | surange key=tracl,ns dim=2
+# Fill the C key array exactly, in reverse order; print order stays canonical.
+sunull nt=2 ntr=3 | sushw key=cdp,mark a=-9,2 b=6,-1 | surange key=shortpad,mark,ntr,unscale,ungpow,f2,d2,f1,d1,otrav,gaps,grnlof,grnofr,grnors,trwf,timbas,sec,minute,hour,day,year,hcs,lcs,hcf,lcf,nofils,nofilf,afils,afilf,tatyp,stae,stas,styp,slen,sfe,sfs,corr,igi,igc,gain,dt,ns,mute,muts,delrt,lagb,laga,tstat,gstat,sstat,gut,sut,swevel,wevel,counit,gy,gx,sy,sx,scalco,scalel,gwdep,swdep,sdel,gdel,sdepth,selev,gelev,offset,duse,nhs,nvs,trid,cdpt,cdp,ep,tracf,fldr,tracr,tracl dim=0
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=1 ntr=1 | sushw key=sx a=1000005 | surange
+sunull nt=3 ntr=3 | sushw key=sx a=0 b=2000010 | surange key=ns dim=2

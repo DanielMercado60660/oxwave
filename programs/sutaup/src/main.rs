@@ -41,6 +41,53 @@
 use oxwave_core::prelude::*;
 use oxwave_f_taup::{fwd_FK_sstack, fwd_tx_sstack, inv_FK_sstack, inv_tx_sstack};
 use oxwave_tempfile::temporary_filename;
+use std::ffi::{c_char, CString};
+use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering};
+
+unsafe extern "C" {
+    fn access(path: *const c_char, mode: i32) -> i32;
+    fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
+    fn unlink(path: *const c_char) -> i32;
+    fn _exit(status: i32) -> !;
+}
+
+// The C globals allow closefiles to remove named files on interruption.
+static INTERRUPTED: AtomicBool = AtomicBool::new(false);
+static READING_INPUT: AtomicBool = AtomicBool::new(false);
+static TRACEFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
+static HEADERFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
+
+extern "C" fn note_signal(_: i32) {
+    INTERRUPTED.store(true, Ordering::Relaxed);
+    if READING_INPUT.load(Ordering::Relaxed) {
+        // gettr may be blocked while borrowing a CFile. There is no output
+        // yet, so discard temporary buffers and use only async-signal-safe
+        // operations. The immutable CStrings live until main exits; process
+        // exit closes the descriptors after unlinking both files.
+        unsafe {
+            unlink(HEADERFILE.load(Ordering::Relaxed));
+            unlink(TRACEFILE.load(Ordering::Relaxed));
+            _exit(EXIT_FAILURE);
+        }
+    }
+}
+
+fn closefiles(headerfp: &CFile, tracefp: Option<&CFile>, headerfile: &str, tracefile: &str) {
+    if !INTERRUPTED.load(Ordering::Relaxed) {
+        return;
+    }
+    // Outside input gathering, defer stream operations until the interrupted
+    // CFile borrow has ended. Do not close an already closed trace stream.
+    efclose(headerfp);
+    if let Some(fp) = tracefp {
+        efclose(fp);
+    }
+    eremove(headerfile);
+    if !tracefile.is_empty() {
+        eremove(tracefile);
+    }
+    exit(EXIT_FAILURE);
+}
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -101,11 +148,11 @@ fn main() {
     if getparstring("tmpdir", &mut tmpdir) == 0 {
         tmpdir = std::env::var("CWP_TMPDIR").unwrap_or_default();
     }
-    // The core has no Rust access(WRITE_OK) wrapper. Metadata reproduces
-    // missing-path and read-only-mode checks, but not user/group/ACL access.
-    if !tmpdir.is_empty() && !std::fs::metadata(&tmpdir).is_ok_and(|m| !m.permissions().readonly())
-    {
-        err!("you can't write in %s (or it doesn't exist)", tmpdir);
+    if !tmpdir.is_empty() {
+        let path = CString::new(tmpdir.as_str()).unwrap();
+        if unsafe { access(path.as_ptr(), 2) } != 0 {
+            err!("you can't write in %s (or it doesn't exist)", tmpdir);
+        }
     }
 
     /* get info from first trace */
@@ -118,6 +165,8 @@ fn main() {
     /* Store traces in tmpfile while getting a count */
     let mut tracefile = String::new();
     let mut headerfile = String::new();
+    let tracepath;
+    let headerpath;
     let istmpdir = !tmpdir.is_empty();
     let (tracefp, headerfp) = if !istmpdir {
         let tracefp = etmpfile();
@@ -129,10 +178,19 @@ fn main() {
     } else {
         tracefile = temporary_filename(&tmpdir);
         headerfile = temporary_filename(&tmpdir);
+        tracepath = CString::new(tracefile.as_str()).unwrap();
+        headerpath = CString::new(headerfile.as_str()).unwrap();
+        TRACEFILE.store(tracepath.as_ptr().cast_mut(), Ordering::Relaxed);
+        HEADERFILE.store(headerpath.as_ptr().cast_mut(), Ordering::Relaxed);
+        READING_INPUT.store(true, Ordering::Relaxed);
+        // SIGINT, SIGQUIT, SIGHUP, SIGTERM, in the same order as C.
+        for sig in [2, 3, 1, 15] {
+            unsafe {
+                signal(sig, note_signal);
+            }
+        }
         let tracefp = efopen(&tracefile, "w+");
         let headerfp = efopen(&headerfile, "w+");
-        // C installs closefiles for SIGINT/SIGQUIT/SIGHUP/SIGTERM here.
-        // The available core APIs do not support signal-driven cleanup.
         if verbose != 0 {
             warn!("putting temporary files in %s", tmpdir);
         }
@@ -147,6 +205,8 @@ fn main() {
             break;
         }
     }
+    READING_INPUT.store(false, Ordering::Relaxed);
+    closefiles(&headerfp, Some(&tracefp), &headerfile, &tracefile);
 
     /* get general flags and parameters and set defaults */
     let mut np = 0i32;
@@ -206,9 +266,11 @@ fn main() {
     for ix in 0..ntr as usize {
         fread(&mut in_traces[ix], &tracefp);
     }
+    closefiles(&headerfp, Some(&tracefp), &headerfile, &tracefile);
     efclose(&tracefp);
     if istmpdir {
         eremove(&tracefile);
+        tracefile.clear();
     }
 
     /* do requested operation */
@@ -222,7 +284,9 @@ fn main() {
             pmin,
             dp,
             fmin,
-            &in_traces[..nx as usize],
+            // A negative C nx contributes no input traces. The F-K library
+            // also needs to support an empty slice for this signed count.
+            &in_traces[..if nx > 0 { nx as usize } else { 0 }],
             &mut out_traces,
         );
     } else if option == 2 {
@@ -239,7 +303,8 @@ fn main() {
             dx,
             pmin,
             stack_dp,
-            &in_traces[..nx as usize],
+            // A negative C nx runs no iterations of the input-trace loop.
+            &in_traces[..if nx > 0 { nx as usize } else { 0 }],
             &mut out_traces,
         );
     } else if option == 3 {
@@ -285,8 +350,10 @@ fn main() {
     }
 
     /* write output traces */
+    closefiles(&headerfp, None, &headerfile, &tracefile);
     erewind(&headerfp);
     for itr in 0..np as usize {
+        closefiles(&headerfp, None, &headerfile, &tracefile);
         efread(tr.hdr.as_bytes_mut(), &headerfp);
         tr.tracl = 1 + itr as i32;
         tr.tracr = 1 + itr as i32;
@@ -304,6 +371,7 @@ fn main() {
         }
         puttr(&mut tr);
     }
+    closefiles(&headerfp, None, &headerfile, &tracefile);
     efclose(&headerfp);
     if istmpdir {
         eremove(&headerfile);

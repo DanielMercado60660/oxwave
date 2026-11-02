@@ -49,3 +49,47 @@
 # on stdout, unlike the inventory cases that redirect their results.
 [exact] unif2 tfile=in.txt && sed '1,3d' in.txt | smoothint2 r=100
 [exact] unif2 tfile=in.txt && sed '1,3d' in.txt | smoothint2
+# diff-2026-11 (round 1)
+# ASCII is the sole output mode. SU headers/samples are converted to x,z
+# interfaces, always including the sentinel in npmax. Singleton and nt=2..4.
+[exact] sunull nt=1 ntr=1 | sushw key=f2,d2 a=3.25,7.5 | sugethw key=f2,d2 output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=2 r=100
+[exact] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk '{print NR-1,$1*10} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=3 r=2
+[exact] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk '{print NR-1,$1*10} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=4 r=0
+[exact] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk '{print NR-1,$1*10} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=5 r=-5.25
+# Prime length and large interfaces, using both samples and trace headers.
+[exact] suplane nt=17 ntr=1 npl=1 len1=1 cx1=0 ct1=8 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk '{print (NR-1)*0.125,$1*8} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=18 r=2
+[exact] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2053 | sustrip outpar=/dev/null | b2a n1=1 outpar=/dev/null | awk '{print (NR-1)*0.125,$1*8} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=4098 r=2
+[exact] sunull nt=1 ntr=4097 | sushw key=gx,gelev a=0,1 b=3,2 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=4098
+# Default interface count, capacity and smoothing versus explicit defaults.
+[exact] sunull nt=3 ntr=5 | sustrip outpar=/dev/null | b2a n1=3 outpar=/dev/null | awk '{for(i=1;i<=NF;i++) print i-1,$i+NR; print "1 -9999"}' | smoothint2
+[exact] sunull nt=3 ntr=5 | sustrip outpar=/dev/null | b2a n1=3 outpar=/dev/null | awk '{for(i=1;i<=NF;i++) print i-1,$i+NR; print "1 -9999"}' | smoothint2 ninf=5 npmax=101 r=0
+# Increasing, decreasing and nonmonotonic x coordinates from edited headers.
+[exact] sunull nt=3 ntr=7 | sushw key=gx a=10 b=3 | suchw key1=gelev key2=gx a=2 b=0.5 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 r=7
+[exact] sunull nt=4 ntr=7 | sushw key=gx,gelev a=30,2 b=-3,2 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 r=-7
+[exact] sunull nt=1 ntr=7 | sushw key=gx,gelev a=0,2 b=1,2 j=3,0 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 r=3
+# Interfaces shrink and grow without reusing uninitialized storage; extra
+# complete interfaces are ignored when ninf is explicitly smaller.
+[exact] sunull nt=4 ntr=3 | sustrip outpar=/dev/null | b2a n1=4 outpar=/dev/null | awk '{n=(NR==2 ? 1 : 4); for(i=1;i<=n;i++) print i-1,NR+i; print "1 -9999"}' | smoothint2 ninf=3 npmax=5 r=3
+[exact] sunull nt=2 ntr=3 | sustrip outpar=/dev/null | b2a n1=2 outpar=/dev/null | awk '{for(i=1;i<=NF;i++) print i-1,NR+i; print "1 -9999"}' | smoothint2 ninf=1
+# Decimal scientific notation, CRLF/form-feed whitespace, and no final newline.
+[exact] sunull nt=3 ntr=1 | sugethw key=tracl output=geom | awk '{printf "-0 +1.25e-3\r\n+1.5 -2.5e+1\f+3.25 +4.5e0\r\n1 -9.999e3"}' | smoothint2 ninf=1 npmax=4 r=0
+# Boundaries of sentinel recognition, below-sentinel normalization, and tiny z.
+[exact] sunull nt=1 ntr=2 | sushw key=gx,gelev a=0,-9998 b=1,-1 | sugethw key=gx,gelev output=geom | smoothint2 ninf=1 npmax=2
+[exact] sunull nt=2 ntr=2 | sushw key=gx,gelev a=0,3 b=1,-10003 | sugethw key=gx,gelev output=geom | smoothint2 ninf=1 npmax=2
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk '{print $1,"1.23456789e-40"; print "1 -9999"}' | smoothint2 ninf=1 r=0
+# Success diagnostics and unknown-argument handling remain visible.
+[exact] [stderr] sunull nt=1 ntr=3 | sushw key=gx,gelev a=0,2 b=2,1 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=4 r=5 verbose=1
+[exact] [stderr] sunull nt=1 ntr=2 | sushw key=gx,gelev a=0,2 b=2,1 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 output=binary
+# Capacity and duplicate-coordinate errors use fully initialized input.
+[stderr] sunull nt=1 ntr=3 | sushw key=gx,gelev a=0,2 b=1,1 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=3
+[stderr] sunull nt=1 ntr=2 | sushw key=gx,gelev a=4,2 b=0,1 | sugethw key=gx,gelev output=geom | awk '{print} END {print "1 -9999"}' | smoothint2 ninf=1 r=100
+[stderr] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | smoothint2 ninf=-2147483649
+[stderr] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | smoothint2 r=1e309
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] sunull nt=1 ntr=2 | sugethw key=tracl output=geom | awk '{print "0x" $1 "p0",NR+1} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=3 r=0
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk '{print $1,2; print "1 nan"}' | smoothint2 ninf=1 npmax=2
+[exact] sunull nt=1 ntr=2 | sugethw key=tracl output=geom | awk '{print $1,NR+1} END {print "1 -inf"}' | smoothint2 ninf=1 npmax=3
+[exact] sunull nt=1 ntr=2 | sugethw key=tracl output=geom | awk '{printf "%g %g%c",$1,NR+1,11} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=3
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl output=geom | awk '{print $1,2; print "1 -9999"}' | smoothint2 ninf=1 npmax=2 r=nan
+[exact] sunull nt=1 ntr=4 | sugethw key=tracl output=geom | awk '{print (NR-1)*0.3,NR+1} END {print "1 -9999"}' | smoothint2 ninf=1 npmax=5 r=2e19

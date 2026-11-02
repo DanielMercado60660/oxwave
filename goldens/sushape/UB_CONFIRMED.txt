@@ -1,0 +1,2 @@
+# vendor/su-original/src/su/main/decon_shaping/sushape.c:151-154: nshape=abc parses as 0, so autocorr[0] reads a zero-length allocation. Rejecting zero nshape changes the original error from cant shape with zero wavelet to nshape must be positive; OxWave matches the fixed error and exit status.
+suplane nt=7 ntr=1 | sushape w=1 d=1 nshape=abc

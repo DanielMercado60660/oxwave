@@ -1,0 +1,5 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/picking/sufbpickw.c:176 (cf allocation :136, start clamp :171); cwp/lib/sblas.c:161 dereferences past cf[16]. nt=17, start=16, itdv=20 reads cf[17..35]. Minimal fix is isamax(MIN(itdv,nt-it),wb,1), limiting this search to one sample. Orig matches vendor byte-for-byte, rc=0, unscale=0.14000000059604645; fixed rc=0, unscale=0.06400000303983688. OxWave matches fixed byte-for-byte. Evidence: diffcamp/ubx/sufbpickw/evidence/claims.json, case 1.
+sunull nt=17 ntr=1 | sufbpickw window=0 t=10 o=0 tdv=.04 test=0
+# vendor/su-original/src/su/main/picking/sufbpickw.c:176 (cf allocation :136, start clamp :171); cwp/lib/sblas.c:161 dereferences past cf[16]. nt=17, start=0, itdv=400 reads cf[17..399]. The same minimal fix limits this search to 17 samples. Orig matches vendor byte-for-byte, rc=0, unscale=0.14400000870227814; fixed rc=0, unscale=0.0. OxWave matches fixed byte-for-byte. Evidence: diffcamp/ubx/sufbpickw/evidence/claims.json, case 2.
+sunull nt=17 ntr=1 | sufbpickw window=0 t=.08 o=0 tdv=.8 test=0

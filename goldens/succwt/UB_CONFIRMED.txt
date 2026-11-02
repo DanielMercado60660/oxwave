@@ -1,0 +1,6 @@
+# succwt.c:198,243-244,356-370: ctmp[npad] and basis[ia][npad] are out of bounds, and ctmp[0] is uninitialized. Allocating one extra element and initializing ctmp[0] changes the original's rc 139 into normal output (256 bytes); OxWave matches fixed byte for byte.
+suspike nt=2 ntr=1 | succwt noct=1 nv=1
+# succwt.c:198,243-244,356-370: ctmp[npad] and basis[ia][npad] are out of bounds, and ctmp[0] is uninitialized. Allocating one extra element and initializing ctmp[0] changes the original's rc 139 into normal output (2176 bytes); OxWave matches fixed byte for byte.
+suspike nt=4 ntr=2 | succwt noct=2 nv=2 out=0
+# succwt.c:198,243-244,356-370: ctmp[npad] and basis[ia][npad] are out of bounds, and ctmp[0] is uninitialized. Allocating one extra element and initializing ctmp[0] changes the original's rc 139 into normal output (3392 bytes); OxWave matches fixed byte for byte.
+suspike nt=23 ntr=2 | sushw key=tracl a=42 b=3 | sushw key=dt a=2000 | succwt noct=2 nv=2

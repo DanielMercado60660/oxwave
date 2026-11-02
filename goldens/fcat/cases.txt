@@ -9,3 +9,15 @@
 [stderr] printf x > a; fcat a missing
 # Write error when standard output is a read-only descriptor.
 [stderr] printf x > a; fcat a 1<a
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 > a; fcat a
+[exact] suspike nt=3 ntr=2 | sushw key=offset a=123 b=17 > a; fcat a a
+[exact] suplane nt=4 ntr=1 > a; sunull nt=4 ntr=2 > b; fcat b a b
+[exact] suspike nt=4097 ntr=1 > a; fcat a
+[exact] sunull nt=17 ntr=3 | sushw key=cdp a=42 b=3 > 'name=1'; fcat 'name=1'
+[exact] suspike nt=2 ntr=1 > a; suplane nt=2 ntr=1 | fcat a
+[stderr] fcat
+[stderr] suspike nt=2 ntr=1 > a; fcat a .
+[exact] truncate -s 8388608 a; fcat a > /dev/null
+[stderr] truncate -s 8388609 a; fcat a
+[exact] truncate -s 4294967296 a; fcat a

@@ -40,7 +40,7 @@ use oxwave_cwp::complex::*;
 use oxwave_cwp::cwp::PI;
 use oxwave_pfa_fft::{npfar, pfa2rc};
 use oxwave_tempfile::{temporary_filename, temporary_stream};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -87,7 +87,7 @@ const SDOC: &[&str] = &[
     "\t\t\t\t\t\t\t\t\t",
 ];
 
-/* Temporary disk files are owned by main; signal cleanup runs there. */
+/* Temporary disk files are owned by main; paths are shared with the handler. */
 struct TempFiles {
     tracefile: String,
     headerfile: String,
@@ -95,11 +95,16 @@ struct TempFiles {
     headerfp: CFile,
 }
 static INTERRUPTED: AtomicBool = AtomicBool::new(false);
+static READING_TRACES: AtomicBool = AtomicBool::new(false);
+static TRACEFILE: AtomicPtr<std::ffi::c_char> = AtomicPtr::new(std::ptr::null_mut());
+static HEADERFILE: AtomicPtr<std::ffi::c_char> = AtomicPtr::new(std::ptr::null_mut());
 
 // POSIX filesystem and signal APIs; all SU numerical routines use Rust crates.
 unsafe extern "C" {
     fn access(path: *const std::ffi::c_char, mode: i32) -> i32;
     fn signal(sig: i32, handler: usize) -> usize;
+    fn unlink(path: *const std::ffi::c_char) -> i32;
+    fn _exit(status: i32) -> !;
 }
 
 fn main() {
@@ -228,6 +233,13 @@ fn main() {
     };
     let tracefp = &files.tracefp;
     let headerfp = &files.headerfp;
+    // Keep these NUL-terminated paths alive until exit. Publishing the input
+    // phase last lets the handler safely remove named files during gettr.
+    let tracepath = std::ffi::CString::new(files.tracefile.as_bytes()).unwrap();
+    let headerpath = std::ffi::CString::new(files.headerfile.as_bytes()).unwrap();
+    TRACEFILE.store(tracepath.as_ptr().cast_mut(), Ordering::Relaxed);
+    HEADERFILE.store(headerpath.as_ptr().cast_mut(), Ordering::Relaxed);
+    READING_TRACES.store(true, Ordering::Release);
     let mut nx = 0usize;
     loop {
         check_signal(&files);
@@ -239,6 +251,7 @@ fn main() {
             break;
         }
     }
+    READING_TRACES.store(false, Ordering::Release);
     check_signal(&files);
     erewind(tracefp);
     erewind(headerfp);
@@ -330,8 +343,17 @@ fn main() {
 }
 
 extern "C" fn record_signal(_sig: i32) {
-    // Lock-free atomic store only: no stream borrows, allocation or exit.
     INTERRUPTED.store(true, Ordering::Relaxed);
+    if READING_TRACES.load(Ordering::Acquire) {
+        // No output exists yet. Unlike deferred cleanup, these async-signal-
+        // safe calls also work while gettr blocks with a CFile borrow held.
+        // Process termination closes both temporary file descriptors.
+        unsafe {
+            unlink(HEADERFILE.load(Ordering::Relaxed));
+            unlink(TRACEFILE.load(Ordering::Relaxed));
+            _exit(1);
+        }
+    }
 }
 
 fn check_signal(files: &TempFiles) {

@@ -78,3 +78,28 @@ percent 42 7 verbose=1
 # Numeric prefixes stop at punctuation; stdin bytes and odd input sizes are ignored.
 [stderr] percent 1,5 2
 [stderr] printf '\001\002\003' | percent 3 8
+
+# diff-2026-11 (round 1)
+# Only positional x/y and one text output mode; no defaults or getpar options.
+# Drain stdin after percent and preserve its status to avoid upstream SIGPIPE
+# races: percent deliberately never reads traces, headers, or verbose options.
+[stderr] sunull nt=1 ntr=1 | { percent 1.7976931348623157e308 1.7976931348623157e308; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=2 ntr=1 | { percent -4.9406564584124654e-324 1; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | { percent ' +0X1.Ap+2suffix' 0x1p3; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=4 ntr=1 | sushw key=cdp,offset a=17,-1234 | { percent 17 23 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=17 ntr=2 | { percent '-nan(payload)' invalid output=binary; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] suspike nt=31 ntr=1 nspk=1 ix1=1 it1=17 | { percent 7 31; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] suplane nt=7 ntr=1 npl=1 len1=1 cx1=1 ct1=4 | { percent 0x1p-1074 0x1p-1074; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=4097 ntr=1 | sushw key=cdp a=2147483647 | { percent 1e306 1e308 verbose=0; rc=$?; cat >/dev/null; exit "$rc"; }
+# Bad numeric strings are accepted by atof; there are no defined error exits.
+# Missing operands dereference null argv entries in percent.c:20-21 (C UB),
+# so no new missing-argument cases are added.
+[stderr] sunull nt=1 ntr=1 | { percent '--help' '--version' par=missing.par; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { percent 123.456e- 1e+; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { percent -INFINITY -INFINITY; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { percent 0x1p-1075 0x1p-1074; rc=$?; cat >/dev/null; exit "$rc"; }
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=1 ntr=1 | { percent 0x1.0000000000000001p-1075 5e-324; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { percent 0x2.fffffffffffffffep-1075 5e-324; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { percent 621730.5e7 100; rc=$?; cat >/dev/null; exit "$rc"; }

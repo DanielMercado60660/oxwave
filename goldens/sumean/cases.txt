@@ -16,3 +16,18 @@ sunull nt=1 ntr=1 | sumean power=0 verbose=1 outpar=mean.txt && cat mean.txt
 [stderr] sumean outpar=mean.txt
 [stderr] suplane nt=9 ntr=1 | sumean outpar=mean.txt extra=1 && cat mean.txt
 [stderr] sumean
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 mag=-3 | sumean power=1 abs=0 verbose=1 outpar=mean.txt && cat mean.txt
+suspike nt=2 ntr=2 mag=-4 | sumean power=2 abs=1 verbose=0 outpar=mean.txt && cat mean.txt
+suspike nt=3 ntr=3 mag=3 | sumean power=3 abs=0 verbose=1 outpar=mean.txt && cat mean.txt
+suspike nt=4 ntr=2 mag=-2 | sumean power=1 abs=1 outpar=mean.txt && cat mean.txt
+suspike nt=13 ntr=4 mag=2 | suaddnoise seed=42 sn=3 | sumean power=1 abs=0 verbose=1 outpar=mean.txt && cat mean.txt
+suspike nt=4097 ntr=2 mag=3 | suaddnoise seed=19 sn=5 | sumean power=2 abs=1 outpar=mean.txt && cat mean.txt
+suplane nt=31 ntr=5 | sushw key=offset a=-100 b=50 | sumean power=1.5 abs=1 verbose=1 outpar=mean.txt && cat mean.txt
+sunull nt=4 ntr=3 | sushw key=tracl a=50 b=-2 | sumean verbose=1 abs=1 power=2 outpar=mean.txt && cat mean.txt
+suspike nt=11 ntr=1 mag=-3 | sumean power=1 abs=2 verbose=0 outpar=mean.txt && cat mean.txt
+suspike nt=17 ntr=3 mag=2 | sumean power=-2 abs=1 verbose=1 outpar=mean.txt && cat mean.txt
+suspike nt=5 ntr=2 mag=2 | sumean power= abs= verbose= outpar=mean.txt && cat mean.txt
+[stderr] sunull nt=3 ntr=1 | sumean verbose=3 outpar=mean.txt
+[stderr] sunull nt=3 ntr=1 | sumean power=1e999 outpar=mean.txt

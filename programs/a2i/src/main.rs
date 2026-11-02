@@ -65,6 +65,8 @@ fn main() {
     let argv = args();
     initargs(&argv);
     requestdoc(1, SDOC);
+    // C stdout exists before outpar is opened; register it in the same order.
+    let _ = stdout();
     match filestat(STDOUT) {
         FileType::BadFileType => { warn!("stdout is illegal filetype"); pagedoc(SDOC); }
         FileType::Tty => { warn!("stdout can't be tty"); pagedoc(SDOC); }

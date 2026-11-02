@@ -72,3 +72,28 @@
 # contain varying process IDs, so compare exit code and the standard first line.
 sunull nt=7 ntr=2 | sugroll nrot=-1
 sunull nt=7 ntr=2 | sugroll nx=3 nrot=1
+
+# diff-2026-11 (round 1)
+# Minimum lengths with nonzero spikes, rank deficiency, and both output modes.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sugroll nrot=1 nx=1 sb=0 dt=0.004 verbose=0 tmpdir=
+[stderr] suspike nt=2 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=2 | sugroll nrot=1 sb=1
+[stderr] suspike nt=3 ntr=3 nspk=3 ix1=1 it1=1 ix2=2 it2=2 ix3=3 it3=3 | sugroll nrot=2 sb=0
+[stderr] suspike nt=4 ntr=4 nspk=4 ix1=1 it1=1 ix2=2 it2=2 ix3=3 it3=3 ix4=4 it4=4 | sugroll nrot=2 sb=1
+# Long traces and seeded full-rank gathers exercise covariance accumulation.
+[stderr] suplane nt=4097 ntr=7 | suaddnoise seed=517 sn=1 | sugroll nrot=2 sb=0
+[stderr] suplane nt=4097 ntr=7 | suaddnoise seed=517 sn=1 | sugroll nrot=2 sb=1
+[stderr] suspike nt=65535 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=65535 | sugroll nrot=1 sb=1
+# Different generator, defaults versus explicit parameters, and header preservation.
+[stderr] susynlv nt=101 nxm=5 nxo=1 | sugroll
+[stderr] susynlv nt=101 nxm=5 nxo=1 | sugroll nrot=3 nx=5 dt=0.04 sb=0 verbose=0 tmpdir=
+[stderr] susynlv nt=127 nxm=5 nxo=1 | sushw key=dt,offset,cdp a=0,-40,201 b=0,20,1 | sugroll dt=0.002 nrot=2 sb=1 tmpdir=. verbose=1
+# nx limits component zeroing even when headers claim a different gather size.
+[stderr] suspike nt=17 ntr=5 nspk=3 ix1=1 it1=1 ix2=3 it2=9 ix3=5 it3=17 | sushw key=ntr,tracl a=1,20 b=0,-2 | sugroll nx=3 nrot=1 sb=-1
+[stderr] sunull nt=2 ntr=1 | sugroll tmpdir=. verbose=1 nrot=0 sb=1
+# Sampling interval validation with tiny traces and parser overflow in late parameters.
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=dt a=0 | sugroll dt= nrot=0
+[stderr] sunull nt=4 ntr=1 | sugroll nx=2147483648
+[stderr] sunull nt=3 ntr=1 | sugroll verbose=-2147483649
+# Owner lacks write access although group/other write bits are present.
+[stderr] mkdir blocked; chmod 575 blocked; sunull nt=2 ntr=1 | sugroll tmpdir=blocked; result=$?; chmod 755 blocked; exit "$result"
+[stderr] mkdir blocked; chmod 557 blocked; sunull nt=3 ntr=1 | CWP_TMPDIR=blocked sugroll verbose=1; result=$?; chmod 755 blocked; exit "$result"

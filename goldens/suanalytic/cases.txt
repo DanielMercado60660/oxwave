@@ -17,3 +17,50 @@ suspike nt=32767 ntr=2 | suanalytic
 suspike nt=32767 ntr=2 | suanalytic phaserot=0
 suspike nt=32767 ntr=2 | suanalytic phaserot=33.5
 # Larger inputs overrun the C buffer; verify their clean Rust error separately.
+
+# diff-2026-11 (round 1)
+# Explicit positions keep the single-trace impulses nonzero, including nt=1..4.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suanalytic
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suanalytic phaserot=90
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suanalytic
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suanalytic phaserot=0
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suanalytic
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | suanalytic phaserot=-90
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | suanalytic
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | suanalytic phaserot=-33.5
+# Dense seeded inputs around the convolution implementation's 30/31 and 60/61 splits.
+sunull nt=29 ntr=3 | suaddnoise seed=443 noise=flat | suanalytic
+sunull nt=30 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=90
+sunull nt=31 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=-123.75
+sunull nt=32 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=90
+sunull nt=59 ntr=3 | suaddnoise seed=443 | suanalytic
+sunull nt=60 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=90
+sunull nt=61 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=-123.75
+sunull nt=62 ntr=3 | suaddnoise seed=443 | suanalytic phaserot=90
+# Long odd traces, prime lengths, and widely different sample magnitudes.
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | suanalytic
+sunull nt=4097 ntr=3 | suaddnoise seed=918273 | suanalytic phaserot=90
+# Remove the absolute floor so the tiny-amplitude case still checks relative accuracy.
+[atol=0] sunull nt=97 ntr=3 | suaddnoise seed=443 | sugain scale=1e-35 | suanalytic phaserot=-123.75
+sunull nt=97 ntr=3 | suaddnoise seed=443 | sugain scale=1e35 | suanalytic phaserot=-123.75
+# Empty, malformed, repeated, and large phase values follow SU's getpar semantics.
+suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | suanalytic phaserot=
+suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | suanalytic phaserot=abc
+suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | suanalytic phaserot=45 phaserot=-45
+suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | suanalytic phaserot=45 phaserot=
+suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | suanalytic phaserot=1e38
+# Check only the first trace's format, warning text, and untouched header fields.
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=443 | sushw key=trid a=17 b=1 | suanalytic verbose=1
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=443 | sushw key=trid a=18 b=-1 | suanalytic phaserot=45 verbose=1
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=443 | sushw key=trid a=109 | suanalytic verbose=1
+[stderr] sunull nt=17 ntr=3 | suaddnoise seed=443 | sushw key=trid a=-1 | suanalytic phaserot=0 verbose=1
+sunull nt=67 ntr=3 | suaddnoise seed=443 | sushw key=dt,delrt,offset a=0,-50,-123 b=0,7,25 | suchw key1=cdp key2=tracl a=100 b=3 | suanalytic phaserot=270
+# Additional generators and genuinely null data.
+suplane nt=127 ntr=7 taper=1 dip2=-4 | suanalytic phaserot=270
+suimp2d nt=257 nshot=2 nrec=3 | suanalytic phaserot=33.5
+sunull nt=4 ntr=3 | suanalytic phaserot=-0
+# Error exits from the target: empty input, numeric range errors, and changed ns.
+sunull nt=4 ntr=0 | suanalytic phaserot=45
+sunull nt=17 ntr=1 | suanalytic phaserot=1e-310
+sunull nt=17 ntr=1 | suanalytic phaserot=-1e999
+{ sunull nt=4 ntr=1; sunull nt=3 ntr=1; } | suanalytic

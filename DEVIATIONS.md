@@ -6,6 +6,19 @@ a place where SU's own behaviour is undefined (it reads freed or uninitialised m
 out of bounds), so there is nothing well-defined to copy. Golden cases that depended on undefined
 behaviour are listed in `goldens/<prog>/EXCLUDE.txt`; the audits behind them are in `audits/`.
 
+Since November 2026, more such cases (146 across 108 programs) are listed in
+`goldens/<prog>/UB_CONFIRMED.txt`. Each was confirmed by rebuilding the C with SU's own flags plus a
+minimal fix (zero-initialise, bounds check, fix the use-after-free) and showing that the output changes.
+Two library-level ones worth knowing:
+
+- **`tri/lib` vertex insertion** (`addVertexToModel`, used by `elamodel`, `tri*`, `gbbeam`, `normray`,
+  `triseis` and others): an edge swap on a degenerate two-edge face leaves a face pointing at a freed
+  edge-use. SU usually gets away with it; OxWave redirects the face before the edge is freed.
+- **`cwp/lib` `convolve_cwp`** (and `xcor`, which calls it): loads one float before and after the
+  shorter operand when it is longer than 30 samples. The values are never used, so results are
+  unaffected, but the loads can fault if the buffer sits next to an unmapped page. OxWave does not read
+  outside its slices.
+
 ## Bug fixes (SU's behaviour is well-defined but wrong)
 
 | Program / library | SU behaviour | OxWave behaviour | Since |

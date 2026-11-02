@@ -36,6 +36,11 @@
 //! Copyright 2006 Exploration Software Consultants Inc.
 
 use oxwave_core::prelude::*;
+use std::ffi::{c_char, c_int, CString};
+
+unsafe extern "C" {
+    fn sscanf(s: *const c_char, format: *const c_char, ...) -> c_int;
+}
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -111,10 +116,13 @@ fn main() {
     let mut total = 0i32;
     let mut v = [0.0f32; 128];
     while let Some(buf) = fgets(1024, &stdin()) {
+        // strtok sees the first NUL as the end of the C buffer.
+        let buf = buf.split('\0').next().unwrap_or("");
         for (k, token) in buf.split(|c| c == ' ' || c == '\t' || c == '\n').filter(|s| !s.is_empty()).enumerate() {
             if k >= v.len() { break; }
-            let (value, used) = strtod(token);
-            if used != 0 { v[k] = value as f32; }
+            let token = CString::new(token).unwrap();
+            // C scans directly into float; parsing as double first can round twice.
+            unsafe { sscanf(token.as_ptr(), c"%f".as_ptr(), &mut v[k] as *mut f32); }
         }
         let mut x = v[(ix - 1) as usize];
         let mut y = v[(iy - 1) as usize];

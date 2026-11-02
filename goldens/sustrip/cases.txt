@@ -16,3 +16,19 @@ sustrip outpar=par ftn=-1
 sustrip outpar=par
 sustrip head=/nonexistent/directory/header outpar=par
 sustrip
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=1 k1=1 | sustrip outpar=par head=headers ftn=0
+[exact] suspike nt=3 ntr=2 k1=2 | sustrip outpar=par ftn=1
+[f32] sunull nt=4 ntr=3 | sustrip outpar=par
+[f32] suspike nt=4097 ntr=2 k1=4097 | sustrip outpar=par ftn=0
+[exact] suplane nt=17 ntr=3 | sushw key=dt a=1000 b=500 | sustrip head=headers outpar=par > samples; cat par
+[exact] suspike nt=11 ntr=2 | sushw key=cdp,offset a=17,-30 b=2,10 | sustrip head=headers outpar=par > samples; cat headers
+[exact] suplane nt=13 ntr=2 | supack1 | sustrip head=headers outpar=par ftn=1
+[exact] suplane nt=19 ntr=3 | supack2 | sustrip head=headers outpar=par ftn=0
+[stderr] suspike nt=3 ntr=1 | sustrip head=/dev/null outpar=par ftn=1 verbose=1 > samples
+sunull nt=2 ntr=1 | sustrip outpar=par ftn=3
+sunull nt=2 ntr=1 | sustrip head= outpar=par
+sunull nt=2 ntr=1 | sustrip outpar=/nonexistent/directory/par
+[exact] suspike nt=3 ntr=2 | sustrip head=headers outpar=headers > samples; cat headers
+[f32] suspike nt=5 ntr=1 | sustrip outpar=par ftn= ftn=0
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=par ftn=0 extra=1 > samples

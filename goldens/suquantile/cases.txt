@@ -73,3 +73,51 @@
 [stderr] suplane nt=1000 ntr=2 | suaddnoise seed=7 | suop op=sgn | suquantile panel=0
 [stderr] python3 -c 'import struct,sys; v=[float(i%7)-3 for i in range(48)]; v[5]=float("nan"); v[17]=float("inf"); v[30]=float("-inf"); v[40]=float("nan"); sys.stdout.buffer.write(struct.pack("=48f",*v))' | suaddhead ns=16 | suquantile
 [stderr] python3 -c 'import struct,sys; v=[float(i%7)-3 for i in range(48)]; v[5]=float("nan"); v[17]=float("inf"); v[30]=float("-inf"); v[40]=float("nan"); sys.stdout.buffer.write(struct.pack("=48f",*v))' | suaddhead ns=16 | suquantile panel=0 quantiles=0
+
+# diff-2026-11 (round 1)
+# Small nonzero traces exercise percentile truncation and repeated rank indices.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suquantile panel=1 quantiles=1 verbose=0 tmpdir=
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suquantile panel=0 quantiles=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | suquantile panel=0 quantiles=1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | suquantile panel=1 quantiles=0
+[stderr] sunull nt=4 ntr=1 | suaddnoise seed=274 noise=flat | suquantile panel=0
+[stderr] sunull nt=2 ntr=3 | suaddnoise seed=193 | suquantile quantiles=0
+
+# A different waveform generator, odd primes, long traces, and maximum legal ns.
+[stderr] suwaveform type=ricker1 ns=97 fpeak=27 | suquantile
+[stderr] suwaveform type=gaussd ns=101 fpeak=19 | sugain scale=-3 | suquantile panel=0 quantiles=0
+[stderr] suplane nt=4097 ntr=3 | suaddnoise seed=714 | suquantile
+[stderr] sunull nt=4097 ntr=2 | suaddnoise seed=715 noise=flat | suquantile panel=0 quantiles=0
+[stderr] sunull nt=65535 ntr=1 | suaddnoise seed=716 | suquantile panel=0 quantiles=1
+[stderr] sunull nt=65535 ntr=2 | suaddnoise seed=717 | suquantile panel=1 quantiles=0
+
+# Header arithmetic changes reported trace IDs; marks suppress only trace reports.
+[stderr] suspike nt=11 ntr=5 nspk=1 ix1=3 it1=7 | sushw key=mark a=0 b=1 j=2 | suchw key1=tracl key2=tracl a=100 b=-7 | suquantile panel=0 quantiles=0 verbose=1
+[stderr] suspike nt=11 ntr=5 nspk=1 ix1=3 it1=7 | sushw key=mark a=0 b=1 j=2 | suchw key1=tracl key2=tracl a=100 b=-7 | suquantile panel=1 quantiles=1
+[stderr] sunull nt=3 ntr=2 | sushw key=mark,tracl a=-32768,2147483647 | suquantile panel=0 quantiles=0
+
+# Packed input follows gettr's packed-byte semantics without automatic unpacking.
+[stderr] sunull nt=31 ntr=2 | suaddnoise seed=193 | supack2 | suquantile panel=0 quantiles=0
+[stderr] sunull nt=31 ntr=2 | suaddnoise seed=193 | supack2 | suquantile panel=1 quantiles=1
+[stderr] sunull nt=31 ntr=1 | suaddnoise seed=193 | supack1 | suquantile panel=0 quantiles=1
+
+# Extreme finite values stress subtraction overflow; tiny values retain their signs.
+[stderr] sunull nt=113 ntr=3 | suaddnoise seed=718 | sugain scale=1e38 | suquantile quantiles=0
+[stderr] sunull nt=23 ntr=2 | suaddnoise seed=719 | sugain scale=1e-40 | suquantile panel=0
+
+# Named temporary files, whitespace in paths, explicit precedence, and cleanup.
+[stderr] mkdir 'scratch space' && suwaveform type=ricker1 ns=103 | suquantile panel=1 quantiles=0 verbose=1 'tmpdir=scratch space' && rmdir 'scratch space'
+[stderr] mkdir scratch && sunull nt=3 ntr=2 | CWP_TMPDIR=/no/such/directory suquantile panel=1 quantiles=1 verbose=1 tmpdir=scratch/ && rmdir scratch
+[stderr] sunull nt=3 ntr=1 | CWP_TMPDIR=/no/such/directory suquantile panel=0 quantiles=0 tmpdir= verbose=1
+[stderr] sunull nt=5 ntr=2 | suquantile panel=-2147483648 quantiles=2147483647 verbose=2 tmpdir=
+[stderr] suspike nt=5 ntr=1 nspk=1 ix1=1 it1=2 | suquantile panel=0 panel= quantiles=0 quantiles= verbose=1
+
+# Input errors, truncated records, and exact integer overflow boundaries.
+[stderr] sunull nt=7 ntr=1 | dd bs=1 count=240 2>/dev/null | suquantile panel=0
+[stderr] suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 | dd bs=1 count=516 2>/dev/null | suquantile panel=0 quantiles=0
+[stderr] sunull nt=7 ntr=1 | suquantile panel=2147483648
+[stderr] sunull nt=7 ntr=1 | suquantile quantiles=-2147483649
+[stderr] sunull nt=7 ntr=1 | suquantile verbose=2147483648
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=7 ntr=1 | TMPDIR= suquantile panel=1 quantiles=1 verbose=1 tmpdir=

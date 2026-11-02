@@ -76,3 +76,52 @@ sunull nt=1 ntr=399 | sushw key=tracl a=1700 b=1 | sugethw key=tracl output=bina
 # Excessive curvature exits from the supplied eikpex library; compare its
 # entire multiline diagnostic as well as the exit status and empty stdout.
 [stderr] sunull nt=1 ntr=399 | sushw key=tracl a=1500 b=1000 | sugethw key=tracl output=binary | susynvxzcs nx=21 nz=19 nt=193 nxg=1 fxg=300 fxs=300 nxb=5 nxd=1
+
+# diff-2026-11 (round 1)
+# Short traces with a shallow reflector produce nonzero samples even at nt=1.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=1 'ref=1:442,2;448,2'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=2 'ref=1:442,2;448,2'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=3 'ref=1:442,2;448,2'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=4 'ref=1:442,2;448,2'
+# Odd, prime, convolution-boundary, and long traces with reflected energy.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=17 'ref=1:435,10;455,10'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=31 'ref=1:435,10;455,10'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=41 'ref=1:435,10;455,10'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=43 'ref=1:435,10;455,10'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=127 'ref=1:350,300;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=257 'ref=1:350,300;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=4097 'ref=1:350,300;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=65535 'ref=1:350,300;550,300'
+# Explicit parameters, static cable, reversed acquisition, smooth signed reflector.
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 nt=211 dt=0.003 ft=-0.012 fpeak=35 nxg=5 dxg=-20 fxg=500 nxd=3 nxs=3 dxs=-25 fxs=475 dx=50 fx=0 dz=50 nxb=4 nxc=2 nzc=3 ls=1 pert=0 tmin=0.025 ndpfz=7 smooth=1 cable=0 verbose=1 'ref=-0.7:350,200;450,325;550,250'
+# Multiple SU generators supply positive, weakly heterogeneous velocity models.
+suplane nt=19 ntr=21 npl=1 dip1=0 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=191 nxg=4 dxg=12.5 nxd=2 'ref=1:350,250;550,300'
+suspike nt=19 ntr=21 nspk=1 ix1=10 it1=9 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=191 nxg=3 dxg=-12.5 nxd=1 ls=1 'ref=1:350,250;550,300'
+# Header-derived column/depth ramp, using both sushw and suchw.
+sunull nt=1 ntr=399 | sushw key=tracl a=0 b=1 | suchw key1=d1 key2=tracl a=1800 b=0.75 | sugethw key=d1 output=binary | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=223 nxg=6 dxg=15 nxd=4 nxs=2 dxs=12.5 cable=1 nxc=3 nzc=5 'ref=0.5:300,275;600,325'
+sunull nt=1 ntr=399 | sushw key=tracl a=0 b=1 | suchw key1=d1 key2=tracl a=1800 b=0.75 | sugethw key=d1 output=binary > vel.bin && sunull nt=1 ntr=399 | sushw key=d1 a=-0.000005 b=0.00000003 | sugethw key=d1 output=binary > pert.bin && susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=223 nxg=4 dxg=17.5 nxd=2 ls=1 pert=1 vpfile=pert.bin smooth=1 'ref=0.5:300,275;450,325;600,300' < vel.bin
+# Default optional values versus explicit defaults on a larger horizontal model.
+sunull nt=9 ntr=33 | sugain bias=1800 | sustrip outpar=/dev/null | susynvxzcs nx=33 nz=9
+sunull nt=9 ntr=33 | sugain bias=1800 | sustrip outpar=/dev/null | susynvxzcs nx=33 nz=9 nt=501 dt=0.004 ft=0 fpeak=50 nxg=101 dxg=15 fxg=0 nxd=5 nxs=1 dxs=50 fxs=0 dx=50 fx=0 dz=50 nxb=16 nxc=0 nzc=0 ls=0 pert=0 tmin=0.04 ndpfz=5 smooth=0 cable=1 verbose=0
+# Smallest safe two-by-two medium; reflectors outside aperture produce zero output.
+sunull nt=2 ntr=2 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=2 nz=2 nt=3 nxg=1 nxd=1 nxb=1 fxs=0 fxg=0 'ref=1:100,100;150,100'
+# Receiver skipping beyond the gather, zero receiver spacing, non-1 cable.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=181 nxg=4 nxd=7 dxg=10 'ref=1:350,250;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=181 nxg=3 dxg=0 nxd=2 nxs=2 dxs=0 cable=2 'ref=1:350,250;550,300'
+# Nonzero origin and sub-grid positions; a narrow receiver band.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 nt=197 dx=37.5 dz=25 fx=100.25 fxs=435.5 fxg=442.75 nxg=3 dxg=3.25 nxb=1 nxd=2 'ref=0.5:432,175;462,200'
+# Empty values select defaults; repeated numeric parameters select the last value.
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt= nt=181 dt= fpeak= nxs=1 nxs=2 dxs=10 'ref=1:350,250;550,300'
+# Stable early errors, with generator input and full stderr comparison.
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nz=19 nxg=1
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nxg=1
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 nt=65537
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=1001 nxg=1
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 nxg=2 fxg=1 dxg=-2
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=31 'ref=:350,300;550,300'
+[stderr] sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=31 'ref=::350,300;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=181 'ref=1:350,,300;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=181 'ref=1:350,300;;550,300'
+sunull nt=19 ntr=21 | sugain bias=1700 | sustrip outpar=/dev/null | susynvxzcs nx=21 nz=19 fxs=445 fxg=445 nxg=1 nxb=4 nxd=1 nt=181 'ref=:1:350,300;550,300'

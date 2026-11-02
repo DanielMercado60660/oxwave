@@ -15,3 +15,35 @@ suspike nt=5 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=3 outpar=/dev/null
 [stderr] z2xyz n1=1 outpar=/dev/null unused=1 </dev/null
 z2xyz n1=abc outpar=rows </dev/null; cat rows
 z2xyz n1=1 outpar=/nonexistent/path
+
+# diff-2026-11 (round 1)
+[exact] suspike nt=2 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=2 outpar=rows; cat rows
+[exact] suspike nt=4 ntr=3 | sustrip outpar=/dev/null | z2xyz n1=4 outpar=rows; cat rows
+[exact] suspike nt=7 ntr=5 | sustrip outpar=/dev/null | z2xyz n1=5 outpar=rows; cat rows
+[exact] sunull nt=11 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=11 outpar=rows; cat rows
+[exact] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=4097 outpar=/dev/null
+[exact] suplane nt=13 ntr=4 | sustrip outpar=/dev/null | z2xyz n1=13 outpar=rows; cat rows
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=4 outpar=/dev/null verbose=1
+suspike nt=7 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=4 outpar=/dev/null
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | z2xyz outpar=/dev/null
+[exact] suspike nt=3 ntr=1 | z2xyz n1=1 outpar=/dev/null
+[exact] suspike nt=3 ntr=2 | sushw key=tracl a=23 b=7 | sustrip outpar=/dev/null | z2xyz n1=2 outpar=rows; cat rows
+[exact] suspike nt=17 ntr=3 nspk=2 ix1=1 it1=2 ix2=3 it2=13 | sugain scale=-0.000012345 | sustrip outpar=/dev/null | z2xyz n1=17 outpar=rows; cat rows
+[exact] suspike nt=13 ntr=2 | suaddnoise seed=42 sn=1 | sustrip outpar=/dev/null | z2xyz n1=13 outpar=/dev/null
+[exact] suspike nt=4 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=1 outpar=rows; cat rows
+[exact] suspike nt=3 ntr=1 | sushw key=tracl a=23 | z2xyz n1=3 outpar=rows && cat rows
+
+# diff-2026-11 (round 2)
+[exact] sunull nt=1 ntr=3 | sustrip outpar=/dev/null | z2xyz n1=1 outpar=rows && cat rows
+[exact] suplane nt=3 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=3 outpar=rows && cat rows
+[exact] suspike nt=4 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=8 outpar=rows && cat rows
+[exact] sunull nt=17 ntr=3 | sustrip outpar=/dev/null | z2xyz n1=3 outpar=rows && cat rows
+[exact] suspike nt=11 ntr=2 | sugain scale=-2.5 | sustrip outpar=/dev/null | z2xyz n1=11 outpar=rows && cat rows
+[exact] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=1 outpar=rows && cat rows
+[exact] suplane nt=7 ntr=3 | sushw key=offset a=42 b=9 | sustrip outpar=/dev/null | z2xyz n1=7 outpar=rows && cat rows
+[stderr] suspike nt=2 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=2 outpar=rows verbose=1 && cat rows
+suspike nt=3 ntr=2 | sustrip outpar=/dev/null | z2xyz n1=4 outpar=/dev/null
+suspike nt=4 ntr=1 | sustrip outpar=/dev/null | z2xyz n1=2147483648 outpar=/dev/null
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] suspike nt=3 ntr=2 | sushw key=tracl a=23 b=7 | sustrip outpar=/dev/null | z2xyz n1=2 outpar=/dev/stdout

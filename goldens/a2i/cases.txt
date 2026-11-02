@@ -12,3 +12,30 @@
 [stderr] a2i </dev/null
 [stderr] printf '1 2\n' | a2i outpar=/dev/null verbose=1 > /dev/null
 [stderr] printf '1 2\n' | a2i outpar=/dev/null unknown=1 > /dev/null
+# diff-2026-11 (round 1)
+[exact] sunull nt=1 ntr=1 | sugethw key=ns,tracl output=geom | a2i outpar=count > data; cat data count
+[exact] sunull nt=2 ntr=3 | sushw key=offset,sx a=-3,5 b=2,7 | sugethw key=offset,sx output=geom | a2i n1=2 outpar=count > data; cat data count
+[exact] suspike nt=3 ntr=4 | sugethw key=tracl output=geom | a2i n1=1 outpar=/dev/null
+[exact] suplane nt=4 ntr=2 | sugethw key=ns,tracl,offset output=geom | a2i n1=3 outpar=/dev/null
+[exact] sunull nt=7 ntr=5 | sushw key=offset a=-5 b=3 | sugethw key=offset output=geom | awk '{printf "%.2f\t%.2f\n", $1+0.5, $1-0.5}' | a2i outpar=/dev/null
+[exact] suspike nt=4097 ntr=1 | sugethw key=ns output=geom | a2i n1=1 outpar=count > data; cat data count
+[exact] sunull nt=1 ntr=3 | sugethw key=tracl output=geom | a2i n1=0 outpar=count > data; cat data count
+[stderr] sunull nt=3 ntr=2 | sugethw key=ns output=geom | a2i n1=2 outpar=/dev/null
+[stderr] sunull nt=2 ntr=1 | sugethw key=ns output=geom | awk '{print "bad", $1}' | a2i n1=1 outpar=/dev/null
+[stderr] sunull nt=2 ntr=1 | sugethw key=ns output=geom | a2i n1=1 outpar=/dev/null verbose=1 > /dev/null
+[exact] sunull nt=1 ntr=1 | sugethw key=ns output=geom | awk '{printf "1e2\t-2.5 extra\n"}' | a2i n1=2 outpar=/dev/null
+[exact] sunull nt=1 ntr=1 | sugethw key=ns output=geom | awk '{printf "  1 "; for(i=0;i<131060;i++) printf " "; printf "2\n"}' | a2i n1=2 outpar=count > data; cat data count
+[exact] sunull nt=1 ntr=1 | sugethw key=ns output=geom | a2i n1=1 outpar=/dev/stdout
+[exact] sunull nt=1 ntr=1 | sugethw key=ns output=geom | awk '{for(i=0;i<131071;i++) printf "1"; printf "\n"}' | a2i n1=0 outpar=count > data; cat data count
+[exact] sunull nt=1 ntr=1 | sugethw key=ns output=geom | awk '{printf "0x1p2 2.5foo\n"}' | a2i n1=2 outpar=/dev/null
+
+# diff-2026-11 (round 2)
+[exact] sunull nt=1 ntr=1 | sugethw key=ns,tracl output=geom | a2i n1=2 outpar=count > data; cat data count
+[exact] suspike nt=2 ntr=3 | sushw key=offset a=-9 b=4 | sugethw key=offset,tracl output=geom | a2i outpar=count > data; cat data count
+[exact] suplane nt=3 ntr=2 | sugethw key=ns,tracl output=geom | awk '{printf "%.6f %.6f\n", $1+0.499999, -$2-0.5}' | a2i n1=2 outpar=/dev/null
+[exact] sunull nt=4 ntr=3 | sugethw key=ns,tracl output=geom | awk '{printf "%s %s\n\n", $1, $2}' | a2i n1=0 outpar=count > data; cat data count
+[exact] suspike nt=4097 ntr=1 | sugethw key=ns output=geom | awk '{printf "%s\t-0.5 1.5 2.5\n", $1}' | a2i n1=4 outpar=count > data; cat data count
+[exact] suplane nt=7 ntr=3 | sugethw key=ns,tracl output=geom | awk '{printf "  %s\t%s extra\n", $1, $2}' | a2i n1=2 outpar=/dev/null
+[stderr] sunull nt=1 ntr=1 | sugethw key=ns output=geom | a2i n1=2 outpar=/dev/null
+[stderr] suspike nt=3 ntr=1 | sugethw key=ns output=geom | a2i n1=1 outpar=/dev/null verbose=1 > /dev/null
+[exact] sunull nt=2 ntr=2 | sugethw key=tracl output=geom | awk '{printf "%s\r\n", $1}' | a2i n1=1 outpar=count > data; cat data count

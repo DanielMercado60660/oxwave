@@ -84,10 +84,13 @@ fn main() {
         npairs = npairs.wrapping_add(1);
     }
     let mut outpar = String::new();
-    if getparstring("outpar", &mut outpar) != 0 {
+    let fp = if getparstring("outpar", &mut outpar) != 0 {
         let fp = efopen(&outpar, "w");
         fprintf!(fp, "n=%d\n", npairs);
-    }
+        Some(fp)
+    } else { None };
     checkpars();
+    // C leaves the parameter stream open until exit flushes all streams.
+    let _ = &fp;
     exit(CWP_Exit());
 }

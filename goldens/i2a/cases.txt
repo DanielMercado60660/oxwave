@@ -18,3 +18,29 @@ python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=2i", 1, 2) 
 [stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=2i", 9, -9))' | i2a n1=1 n1=2 outpar=count verbose=1 extra=7
 # Eight integers per line, matching the inventory's wider output mode.
 python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=8i", *range(-4, 4)))' | i2a n1=8 outpar=count; cat count
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=1 | sustrip outpar=/dev/null | i2a n1=1 outpar=count; cat count
+suspike ntr=1 nt=2 | sustrip outpar=/dev/null | i2a outpar=count; cat count
+suspike ntr=1 nt=3 | sustrip outpar=/dev/null | i2a n1=3 outpar=count; cat count
+sunull ntr=1 nt=4 | sustrip outpar=/dev/null | i2a n1=2 outpar=count; cat count
+suplane ntr=2 nt=7 | sustrip outpar=/dev/null | i2a n1=7 outpar=count; cat count
+suspike ntr=1 nt=4097 | sustrip outpar=/dev/null | i2a n1=4097 outpar=count; cat count
+sunull ntr=3 nt=3 | sushw key=cdp a=-12 b=5 | sugethw key=cdp output=binary | i2a n1=1 outpar=count; cat count
+[stderr] suspike ntr=1 nt=4 | sustrip outpar=/dev/null | i2a n1=4 outpar=count verbose=1; cat count
+[stderr] suspike ntr=1 nt=3 | sustrip outpar=/dev/null | i2a n1=2 outpar=count
+[stderr] sunull ntr=1 nt=1 | sustrip outpar=/dev/null | i2a n1=1
+[stderr] sunull ntr=1 nt=1 | sustrip outpar=/dev/null | i2a n1=bogus outpar=count; cat count
+[stderr] sunull ntr=2 nt=2 | sustrip outpar=/dev/null | i2a n1=2 outpar=/dev/stderr
+# diff-2026-11 (round 2)
+sunull ntr=1 nt=1 | sustrip outpar=/dev/null | i2a n1=1 outpar=count; cat count
+suspike ntr=3 nt=5 | sustrip outpar=/dev/null | i2a n1=5 outpar=count; cat count
+suplane ntr=1 nt=11 | sustrip outpar=/dev/null | i2a n1=11 outpar=count; cat count
+sunull ntr=4 nt=2 | sushw key=offset a=-100 b=37 | sugethw key=offset output=binary | i2a n1=2 outpar=count; cat count
+suspike ntr=2 nt=3 | sustrip outpar=/dev/null | i2a n1=2 outpar=count; cat count
+[stderr] sunull ntr=2 nt=4 | sustrip outpar=/dev/null | i2a n1=4 outpar=count verbose=1; cat count
+sunull ntr=1 nt=3 | sustrip outpar=/dev/null | i2a n1=0 outpar=count; cat count
+[stderr] suspike ntr=1 nt=3 | sustrip outpar=/dev/null | i2a n1=4 outpar=count
+suspike ntr=1 nt=4 | sustrip outpar=/dev/null | i2a n1=2 outpar=/dev/null
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+suspike ntr=1 nt=2 | sustrip outpar=/dev/null | i2a outpar=/dev/stdout

@@ -26,3 +26,31 @@ sustackup keep=2
 sustackup maxstack=0
 sustackup
 suplane nt=5 ntr=3 | sushw key=cdp a=1 b=1 | sustackup maxstack=1
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | sustackup keyloc=cdp keep=1 maxstack=10
+suplane nt=3 ntr=8 | sushw key=cdp,offset a=3,-35 b=-1,10 j=2,1 | sustackup keyloc=cdp maxstack=20
+suplane nt=4 ntr=9 | sushw key=cdp,offset a=1,-40 b=1,10 j=3,1 | sustackup keyloc=cdp,offset
+suspike nt=31 ntr=12 | sushw key=cdp,offset a=2,-12 b=1,2 j=4,1 | sustackup keyloc=cdp
+sunull nt=4097 ntr=4 | sushw key=cdp,offset a=2,-3 b=-1,2 | sustackup keyloc=cdp keep=1
+suplane nt=4097 ntr=4 | sushw key=cdp,offset a=1,-3 b=0,2 | sustackup
+suspike nt=13 ntr=8 | sushw key=cdp,offset a=0,-4 b=0,1 | sustackup keyabs=offset minabs=2 maxabs=4 keep=1
+suspike nt=13 ntr=8 | sushw key=cdp,offset a=0,-4 b=0,1 | sustackup keyabs=offset minabs=2 maxabs=4 keep=0
+suplane nt=19 ntr=9 | sushw key=cdp,offset a=1,-4 b=1,1 j=3,1 | sustackup keyabs=offset keyabs2=cdp minabs=2 maxabs=6 keep=1
+suplane nt=19 ntr=9 | sushw key=cdp,offset a=1,-4 b=1,1 j=3,1 | sustackup keysign=offset keysign2=cdp minsign=-4 maxsign=1 keep=0
+suplane nt=11 ntr=7 | sushw key=cdp,offset a=1,-3 b=0,1 | sustackup keysign=offset minsign=2 maxsign=-2 keep=1
+suplane nt=11 ntr=7 | sushw key=cdp,offset a=1,-3 b=0,1 | sustackup keyabs=offset minabs=2 maxabs=2 keysign=offset minsign=0 maxsign=0
+suplane nt=7 ntr=10 | sushw key=cdp,offset a=0,-9 b=1,2 j=3,1 | sustackup keyloc=offset,cdp keyabs=offset minabs=1 maxabs=8 keysign=offset minsign=-5 maxsign=7 keep=1 maxstack=30
+sunull nt=3 ntr=6 | sushw key=cdp,offset a=7,-10 b=0,4 | sustackup keyabs=offset minabs=100 keep=1
+sunull nt=3 ntr=6 | sushw key=cdp,offset a=7,-10 b=0,4 | sustackup keyabs=offset minabs=100 keep=0
+[stderr] suspike nt=5 ntr=4 | sushw key=cdp,offset a=2,-2 b=-1,1 | sustackup keyloc=cdp verbose=1
+suplane nt=23 ntr=12 | sushw key=cdp,offset,tracl a=2,-30,100 b=1,5,1 j=4,1,1 | sustackup keyloc=cdp
+suplane nt=29 ntr=12 | sushw key=fldr,tracf,offset a=3,2,-12 b=-1,1,2 j=3,4,1 | sustackup keyloc=fldr,tracf maxstack=30
+suspike nt=37 ntr=7 | sustackup keyloc=tracl keyabs=tracl keyabs2=tracr minabs=0 maxabs=2 keysign=tracl keysign2=tracr minsign=-1 maxsign=1 keep=1 maxstack=20
+suplane nt=3 ntr=4 | sustackup keyloc=cdp,notakey
+suplane nt=3 ntr=4 | sustackup keep=3
+suplane nt=3 ntr=4 | sustackup keyabs2=cdp
+suplane nt=3 ntr=4 | sustackup maxstack=-2
+sunull nt=1 ntr=32770 | sustackup keyloc=cdp
+suspike nt=17 ntr=12 ix1=1 it1=2 ix2=2 it2=2 ix3=3 it3=8 ix4=4 it4=8 | sushw key=cdp,offset a=0,-6 b=0,1 | sustackup keysign=offset minsign=-6 maxsign=-2 keep=1
+suplane nt=13 ntr=10 | sushw key=d1,f1,offset a=0.5,-1.5,-5 b=0.25,0.5,1 j=3,4,0 | sustackup keyloc=d1,f1 keyabs=d1 keyabs2=f1 minabs=0.5 maxabs=2.5
+suplane nt=13 ntr=10 | sushw key=cdp,offset a=1,-5 b=0,1 | sustackup keysign=offset minsign=-5 maxsign=-2 keep=1

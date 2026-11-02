@@ -44,3 +44,44 @@ farith op=cartprod in2=1
 printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 1 | a2b n1=1 | farith op=cartprod in2=second n=2
 printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 1 2 | a2b n1=1 | farith op=mul in2=second
 printf '%s\n' 1 | a2b n1=1 > second; printf '%s\n' 0 | a2b n1=1 | farith op=slowp in2=second
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | farith op=bias bias=2.5
+[f32] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | farith op=scale scale=-3
+[f32] suspike nt=3 ntr=1 k1=2 mag=2 | sustrip outpar=/dev/null | farith op=signum isig=1
+[f32] suspike nt=4 ntr=1 k1=2 mag=-4 | sustrip outpar=/dev/null | farith op=sqrt
+[f32] suspike nt=7 ntr=3 k1=3 mag=2 | sustrip outpar=/dev/null | farith op=add in2=-1.25
+[f32] suspike nt=4097 ntr=1 k1=2049 mag=3 | sustrip outpar=/dev/null | farith op=pinvsqr
+[f32] sunull nt=5 ntr=2 | sustrip outpar=/dev/null | farith op=bias
+[f32] suspike nt=7 ntr=2 k1=4 mag=3 | sustrip outpar=/dev/null | farith op=scale
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null > first; farith in=first out=result op=bias bias=1.25; cat result
+[f32] suspike nt=3 ntr=1 k1=2 mag=2 | sustrip outpar=/dev/null > second; suspike nt=4 ntr=1 k1=1 mag=3 | sustrip outpar=/dev/null | farith op=cartprod in2=second n=4
+[f32] suspike nt=7 ntr=2 k1=3 mag=-2 | sustrip outpar=/dev/null > second; suspike nt=7 ntr=2 k1=4 mag=3 | sustrip outpar=/dev/null | farith op=mul in2=second
+[f32] sunull nt=4 ntr=3 | sushw key=offset a=10 b=5 | sugethw key=offset output=binary | farith op=raddeg
+[f32] suplane nt=17 ntr=4 | sustrip outpar=/dev/null | farith op=sin
+[f32] suspike nt=17 ntr=1 k1=4 mag=-2 | sustrip outpar=/dev/null | farith op=pinvsqrt
+[f32] suspike nt=3 ntr=1 k1=2 mag=2 | sustrip outpar=/dev/null | farith op=div in2=2tail
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | farith op=sloth verbose=1
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=exp
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=cos
+[f32] suspike nt=3 ntr=1 k1=2 mag=4 | sustrip outpar=/dev/null | farith op=sqr
+[f32] suspike nt=3 ntr=1 k1=2 mag=4 | sustrip outpar=/dev/null | farith op=pinv
+[f32] suspike nt=3 ntr=1 k1=2 mag=4 | sustrip outpar=/dev/null | farith op=degrad
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=add in2=2
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=sub in2=2
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=noop
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null > first; farith in=first op=signum
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null > first; farith in=first op=cartprod in2=first
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null > first; farith in=first op=div in2=0
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null > first; farith in=first op=unknown
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=3 b=7 | sugethw key=offset output=binary > second; sunull nt=1 ntr=19 | sushw key=offset a=5 b=11 | sugethw key=offset output=binary | farith op=slothp in2=second
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=3 b=7 | sugethw key=offset output=binary > second; sunull nt=1 ntr=19 | sushw key=offset a=5 b=11 | sugethw key=offset output=binary | farith op=slowp in2=second
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=3 b=7 | sugethw key=offset output=binary | farith op=log
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=-30 b=7 | sugethw key=offset output=binary | farith op=abs
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=-30 b=7 | sugethw key=offset output=binary | farith op=neg
+[f32] sunull nt=1 ntr=19 | sushw key=offset a=3 b=7 | sugethw key=offset output=binary | farith op=sloth
+[f32] suspike nt=7 ntr=1 k1=3 mag=2 | sustrip outpar=/dev/null | head -c 27 | farith op=neg
+[f32] suspike nt=7 ntr=1 k1=3 mag=2 | sustrip outpar=/dev/null | farith op=signum isig=7
+[f32] suspike nt=7 ntr=1 k1=3 mag=2 | sustrip outpar=/dev/null | farith op=signum isig=0
+[f32] sunull nt=1 ntr=3 | sushw key=offset a=1 b=1 | sugethw key=offset output=binary > second; sunull nt=1 ntr=3 | sushw key=offset a=4 b=1 | sugethw key=offset output=binary | farith op=div in2=second
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null > second; sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=cartprod n=4 in2=second
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null > second; sunull nt=3 ntr=1 | sustrip outpar=/dev/null | farith op=add in2=second

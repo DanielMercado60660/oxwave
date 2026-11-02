@@ -74,3 +74,74 @@ sunull nt=1 ntr=1 | sushw key=trid a=111 | suop op=cnorm
 suplane nt=65534 ntr=1 | sushw key=trid a=111 | suop op=cnorm
 # Undefined C accesses (despike nw>nt; cnorm ns=65535) are checked manually
 # for clean SU errors, because the original has no defined output to record.
+
+# diff-2026-11 (round 1)
+# Short traces, signed data, explicit/default op and nw, and all scalar modes.
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop op=abs nw=21
+sunull nt=2 ntr=1 | sugain bias=-2.5 | suop op=ssqrt
+sunull nt=3 ntr=1 | sugain bias=-2.5 | suop op=sqr
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=ssqr
+sunull nt=2 ntr=1 | suop op=sgn
+sunull nt=3 ntr=1 | sugain bias=-2.5 | suop op=exp
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=sexp
+sunull nt=1 ntr=1 | sugain bias=-0.25 | suop op=slog
+sunull nt=2 ntr=1 | sugain bias=-0.25 | suop op=slog2
+sunull nt=3 ntr=1 | sugain bias=-0.25 | suop op=slog10
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=cos
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop op=sin
+sunull nt=2 ntr=1 | sugain bias=-2.5 | suop op=tan
+sunull nt=3 ntr=1 | sugain bias=-2.5 | suop op=cosh
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=sinh
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop op=tanh
+sunull nt=2 ntr=1 | sugain bias=-2.5 | suop op=norm
+sunull nt=3 ntr=1 | sugain bias=-0.25 | suop op=db
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=neg
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop op=nop
+sunull nt=2 ntr=1 | sugain bias=-2.5 | suop op=posonly
+sunull nt=3 ntr=1 | sugain bias=2.5 | suop op=negonly
+sunull nt=4 ntr=1 | sugain bias=-20 | suop op=mod2pi
+sunull nt=1 ntr=1 | sugain bias=-2.5 | suop op=inv
+sunull nt=2 ntr=1 | sugain bias=-2.5 | suop op=s2v
+sunull nt=3 ntr=1 | sugain bias=-2.5 | suop op=s2vm
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=d2m
+# Prime and large traces; a third generator supplies isolated impulses.
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=4097 | suop op=sum
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=1 | suop op=integ
+suplane nt=65535 ntr=1 | suaddnoise seed=123 | suop op=avg
+suplane nt=4097 ntr=2 | suaddnoise seed=123 | suop op=rmsamp
+suspike nt=13 ntr=2 nspk=1 ix1=1 it1=7 | suop op=refl
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suop op=diff
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | suop op=diff
+suplane nt=4097 ntr=2 | suaddnoise seed=123 | suop op=diff
+# dt is taken from the first trace; later dt values and unrelated headers survive.
+suspike nt=13 ntr=3 nspk=1 ix1=1 it1=7 | sushw key=dt,delrt,offset a=1000,-17,-100 b=2000,3,100 | suop op=diff
+suspike nt=7 ntr=2 nspk=1 ix1=1 it1=4 | sushw key=dt a=0 b=4000 | suop op=diff
+[stderr] sunull nt=4 ntr=3 | sushw key=trid a=111 b=-1 | suop op=cnorm verbose=1
+suplane nt=4097 ntr=2 | suaddnoise seed=123 | sushw key=trid a=111 | suop op=cnorm
+# Window boundary conditions, rounding even nw up, and default/empty values.
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=mean nw=0
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=mean nw=1
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=var nw=2
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=var nw=3
+sunull nt=4 ntr=1 | sugain bias=-2.5 | suop op=std nw=1
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=std nw=30
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=despike nw=30
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=despike nw=31
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=despike nw=1
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=despike nw=
+suplane nt=31 ntr=2 | suaddnoise seed=123 | suop op=despike nw=21
+[stderr] suplane nt=31 ntr=1 | suop op=mean nw=2 nw=4 verbose=1
+# Tiny values underflow in cnorm's float modulus; large values overflow in sqr.
+sunull nt=4 ntr=1 | sugain bias=1e-30 | sushw key=trid a=111 | suop op=cnorm
+sunull nt=4 ntr=1 | sugain bias=1e30 | suop op=sqr
+# Signed zeros also pass through the private median comparator.
+suplane nt=31 ntr=2 | suaddnoise seed=123 | sugain scale=-0 | suop op=despike nw=7
+# Invalid/empty operations, numeric range errors, unknown args, and empty input.
+[stderr] sunull nt=1 ntr=1 | suop op=
+[stderr] sunull nt=1 ntr=1 | suop op=ABS
+[stderr] sunull nt=1 ntr=1 | suop op=mean nw=2147483648
+[stderr] sunull nt=1 ntr=1 | suop op=mean nw=-2147483649
+[stderr] sunull nt=1 ntr=1 | suop op=nop unused=1 verbose=1
+[stderr] sunull nt=1 ntr=0 | suop op=abs
+# The oversized median probe is recorded in PENDING_UB.txt.

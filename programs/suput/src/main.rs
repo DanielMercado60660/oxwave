@@ -36,11 +36,11 @@
 //! Credits: John Anderson (visiting scholar from Mobil), July 1994.
 
 use oxwave_core::prelude::*;
-use std::io::Write;
 use std::os::fd::FromRawFd;
 
 unsafe extern "C" {
     fn dup(fd: std::os::raw::c_int) -> std::os::raw::c_int;
+    fn fcntl(fd: std::os::raw::c_int, cmd: std::os::raw::c_int, ...) -> std::os::raw::c_int;
 }
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
@@ -77,15 +77,20 @@ fn main() {
     if getparint("verbose", &mut verbose) == 0 { verbose = 0; }
     checkpars();
 
-    if fd < 0 { err!("Bad file descriptor \n"); }
+    // fdopen(fd, "w") checks the descriptor's access mode without writing.
+    // A zero-byte write can fail on a valid writable descriptor (for example,
+    // an unconnected datagram socket), which fdopen must still accept.
+    // F_GETFL and O_ACCMODE are 3, and O_RDONLY is 0, on macOS and Linux.
+    // SAFETY: F_GETFL takes only an integer descriptor and no pointer argument.
+    let flags = unsafe { fcntl(fd, 3) };
+    if flags < 0 || flags & 3 == 0 { err!("Bad file descriptor \n"); }
     // dup accepts invalid descriptors and reports failure without creating a
     // Rust descriptor whose safety contract would require fd to be valid.
     // SAFETY: dup takes any integer descriptor and has no pointer arguments.
     let output_fd = unsafe { dup(fd) };
     if output_fd < 0 { err!("Bad file descriptor \n"); }
     // SAFETY: a successful dup returns a valid, newly owned descriptor.
-    let mut file = unsafe { std::fs::File::from_raw_fd(output_fd) };
-    if file.write(&[]).is_err() { err!("Bad file descriptor \n"); }
+    let file = unsafe { std::fs::File::from_raw_fd(output_fd) };
     let fp = CFile::from_file(file);
 
     if gettr(&mut tr) == 0 { err!("Can't get first trace \n"); }

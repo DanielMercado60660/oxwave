@@ -87,3 +87,115 @@ makevel nx=150 nz=100 dvdx=.2 dvdz=.5 dx=.01 dz=.01 | transp n1=150 > vfile; sus
 # permission. Check explicit and environment paths, before checkpars diagnostics.
 [stderr] sunull nt=7 ntr=1 | sushw key=d2 a=10 | sumigpspi nz=3 dz=10 vfile=missing tmpdir=/
 [stderr] sunull nt=7 ntr=1 | sushw key=d2 a=10 | CWP_TMPDIR=/ sumigpspi nz=3 dz=10 vfile=missing verbose=1 unknown=7
+
+# diff-2026-11 (round 1)
+# Small real FFTs, one midpoint, and output deeper than the input trace.
+# makevel's dimensions below are deliberately swapped: depth rows, x fastest.
+makevel nx=9 nz=1 v000=1877.5 dvdx=7.25 >v; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpspi nz=9 dz=7.25 vfile=v
+[stderr] mkdir tmp; makevel nx=9 nz=1 v000=1877.5 dvdx=7.25 >v; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sumigpspi nz=9 dz=7.25 vfile=v dt=.0037 dx=17.5 verbose=1 tmpdir=tmp
+makevel nx=9 nz=1 v000=1877.5 dvdx=7.25 >v; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sumigpspi nz=9 dz=7.25 vfile=v dx=17.5
+makevel nx=9 nz=17 v000=1877.5 dvdz=37.5 dvdx=7.25 >v; suspike nt=4 ntr=17 nspk=1 ix1=9 it1=2 | sumigpspi nz=9 dz=7.25 vfile=v dt=.0037 dx=17.5
+# Prime lengths, long traces, spatial padding, and the largest valid output ns.
+makevel nx=23 nz=13 v000=1877.5 dvdz=37.5 dvdx=7.25 >v; suspike nt=97 ntr=13 nspk=1 ix1=7 it1=33 | sumigpspi nz=23 dz=7.25 vfile=v dt=.0037 dx=17.5
+makevel nx=8 nz=7 v000=1877.5 dvdx=7.25 >v; suspike nt=4097 ntr=7 nspk=1 ix1=4 it1=1366 | sumigpspi nz=8 dz=7.25 vfile=v dt=.0037 dx=17.5
+makevel nx=8 nz=17 v000=1877.5 dvdz=37.5 dvdx=7.25 >v; suspike nt=4097 ntr=17 nspk=1 ix1=9 it1=1366 | suaddnoise seed=20261102 | sumigpspi nz=8 dz=7.25 vfile=v dt=.0037 dx=17.5
+makevel nx=3 nz=1 v000=1877.5 dvdx=7.25 >v; suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=21841 | sumigpspi nz=3 dz=7.25 vfile=v dt=.0037 dx=17.5
+makevel nx=65535 nz=1 v000=2000 >v; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sumigpspi nz=65535 dz=0 vfile=v dx=10
+# First-trace dt/d2 control sampling; later headers and descending tracl survive.
+makevel nx=31 nz=23 v000=2000 dvdz=33 dvdx=2 >v; suplane nt=101 ntr=23 | sushw key=dt,d2,delrt,cdp,tracl a=1333,17.5,-23,100,17 b=17,.5,2,3,-1 | sumigpspi nz=31 dz=2.125 vfile=v
+[stderr] makevel nx=7 nz=11 v000=2000 >v; suplane nt=103 ntr=11 | sushw key=dt,d2 a=0,0 | sumigpspi nz=7 dz=3.5 vfile=v
+makevel nx=31 nz=23 v000=2000 dvdz=33 dvdx=2 >v; suplane nt=101 ntr=23 | sushw key=dt,d2 a=500,100 | sumigpspi nz=31 dz=2.125 vfile=v dt=.001333 dx=17.5
+# Independent modeled generators, with complete deterministic velocity grids.
+makevel nx=17 nz=7 v000=2000 dvdz=40 >v; suimp2d nt=127 nrec=7 c=2000 x0=60 z0=80 dgx=20 | sumigpspi nz=17 dz=5 vfile=v dx=20
+makevel nx=17 nz=7 v000=2 dvdz=.04 >v; susynlv nt=127 dt=.004 nxm=7 dxm=.02 fxm=0 v00=2 ref="1:0,.08;.12,.1" | sumigpspi nz=17 dz=.005 vfile=v
+# Alternate the constant-velocity and interpolation branches at successive depths.
+python3 -c 'import struct;v=[1800.0+(0 if z%3==0 else 50*x if z%3==1 else 2*x) for z in range(31) for x in range(23)];open("v","wb").write(struct.pack("=713f",*v))'; suplane nt=257 ntr=23 | suaddnoise seed=2718 | sumigpspi nz=31 dz=5 vfile=v dt=.001333 dx=25.123
+makevel nx=12 nz=23 v000=2000 dvdz=.90909 >v; suspike nt=31 ntr=23 nspk=1 ix1=12 it1=16 | sumigpspi nz=12 dz=3 vfile=v dx=50
+makevel nx=12 nz=23 v000=2000 dvdz=.9091 >v; suspike nt=31 ntr=23 nspk=1 ix1=12 it1=16 | sumigpspi nz=12 dz=3 vfile=v dx=50
+# Named temporary files are removed on success, including a trailing slash.
+[stderr] mkdir tmp; makevel nx=7 nz=5 v000=2000 >v; suplane nt=31 ntr=5 | sumigpspi nz=7 dz=5 vfile=v tmpdir=tmp/ verbose=2 && ls -A tmp
+[stderr] mkdir tmp; makevel nx=7 nz=5 v000=2000 >v; suplane nt=31 ntr=5 | CWP_TMPDIR=tmp sumigpspi nz=7 dz=5 vfile=v verbose=-1 && ls -A tmp
+# On ordinary errors C leaves the two named files behind. Preserve the program
+# status and compare their sorted byte counts, without comparing random names.
+[stderr] mkdir tmp; sunull nt=4 ntr=2 | sumigpspi nz=2 dz=10 vfile=missing tmpdir=tmp dx=10; status=$?; python3 -c 'from pathlib import Path;print(sorted(p.stat().st_size for p in Path("tmp").iterdir()))'; exit "$status"
+[stderr] mkdir tmp; sunull nt=4 ntr=2 | CWP_TMPDIR=tmp sumigpspi nz=2 dz=10 vfile=missing dx=10; status=$?; python3 -c 'from pathlib import Path;print(sorted(p.stat().st_size for p in Path("tmp").iterdir()))'; exit "$status"
+[stderr] mkdir tmp; sunull nt=4 ntr=2 | sushw key=ns a=4 b=1 | sumigpspi nz=2 dz=10 vfile=missing tmpdir=tmp dx=10; status=$?; python3 -c 'from pathlib import Path;print(sorted(p.stat().st_size for p in Path("tmp").iterdir()))'; exit "$status"
+# Required-value and stream-read errors after successful header sampling.
+[stderr] sunull nt=4 ntr=1 | sushw key=d2 a=10 | sumigpspi nz=2 dz=10 dt=.002
+[stderr] mkdir v; sunull nt=4 ntr=2 | sumigpspi nz=2 dz=10 vfile=v dx=10
+
+# diff-2026-11 (round 2)
+# Nonzero short traces, multiple depths, and explicit/default time sampling.
+makevel nx=13 nz=1 v000=2111 dvdx=3.25 >v; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpspi nz=13 dz=2.75 vfile=v dx=19
+makevel nx=13 nz=1 v000=2111 dvdx=3.25 >v; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sumigpspi nz=13 dz=2.75 vfile=v dt=.00125 dx=19
+makevel nx=13 nz=5 v000=2111 dvdz=40 dvdx=3.25 >v; suspike nt=3 ntr=5 nspk=2 ix1=1 it1=1 ix2=5 it2=3 | sumigpspi nz=13 dz=2.75 vfile=v dx=19
+makevel nx=13 nz=5 v000=2111 dvdz=40 dvdx=3.25 >v; suspike nt=4 ntr=5 nspk=2 ix1=1 it1=2 ix2=5 it2=4 | sumigpspi nz=13 dz=2.75 vfile=v dt=.00125 dx=19
+# Prime spatial dimensions, lateral interpolation, and late long-trace spikes.
+makevel nx=53 nz=43 v000=2345.678 dvdz=.5 dvdx=.017 >v; suspike nt=251 ntr=43 nspk=1 ix1=22 it1=126 | suaddnoise seed=20261102 | sumigpspi nz=53 dz=4.125 vfile=v dt=.001333 dx=17.333
+makevel nx=9 nz=5 v000=1800 dvdz=150 dvdx=5 >v; suspike nt=4097 ntr=5 nspk=2 ix1=1 it1=1025 ix2=5 it2=3073 | sumigpspi nz=9 dz=3.125 vfile=v dt=.0025 dx=22.5
+makevel nx=4 nz=1 v000=1999 dvdx=1 >v; suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65001 | sumigpspi nz=4 dz=1.125 vfile=v dt=.00025 dx=10
+# Thousands of continuation steps; a spatial FFT padded beyond 257 midpoints.
+makevel nx=4097 nz=1 v000=1877.5 dvdx=.002 >v; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sumigpspi nz=4097 dz=.0005 vfile=v dt=.002 dx=17.5
+makevel nx=7 nz=257 v000=1800 dvdz=2 >v; suspike nt=19 ntr=257 nspk=2 ix1=1 it1=2 ix2=257 it2=18 | sumigpspi nz=7 dz=3.125 vfile=v dx=20
+# Maximum unsigned dt, negative d2, descending trace IDs, and preserved headers.
+makevel nx=9 nz=5 v000=1900 dvdz=50 >v; suplane nt=127 ntr=5 npl=1 ct1=37 cx1=2 len1=5 | sushw key=dt,d2,tracl,cdp,delrt,f1,f2 a=65535,-25,-100,500,-123,1.25,-70 b=-1,3,-7,2,1,.25,2 | sumigpspi nz=9 dz=7.75 vfile=v
+makevel nx=9 nz=5 v000=1900 dvdz=50 >v; suplane nt=127 ntr=5 npl=1 ct1=37 cx1=2 len1=5 | sushw key=dt,d2,tracl,cdp,delrt,f1,f2 a=65535,-25,-100,500,-123,1.25,-70 b=-1,3,-7,2,1,.25,2 | sumigpspi nz=9 dz=7.75 vfile=v dt=.0025 dx=25
+[stderr] makevel nx=9 nz=5 v000=1900 >v; suspike nt=11 ntr=5 nspk=1 ix1=3 it1=6 | sushw key=dt,d2 a=0,0 | sumigpspi nz=9 dz=2.5 vfile=v verbose=1
+# Independent Kirchhoff/Born synthetics and a transposed layered velocity grid.
+makevel nx=11 nz=21 v000=2000 >model; makevel nx=19 nz=5 v000=2000 dvdz=50 >v; susynvxz <model nx=11 nz=21 dx=20 dz=10 nt=131 dt=.004 nxm=5 dxm=20 fxm=50 ref="1:20,80;180,100" | sumigpspi nz=19 dz=5 vfile=v dx=20
+printf '0 0\n200 0\n1 -99999\n0 50\n200 75\n1 -99999\n' | unif2 ninf=1 nx=9 nz=17 dx=25 dz=5 v00=1800,2300 dvdx=1,2 >vz; transp n1=17 n2=9 <vz >v; suimp2d nt=193 nrec=9 c=2000 x0=100 z0=75 dgx=25 | sumigpspi nz=17 dz=5 vfile=v dx=25
+# Quoted temporary paths and environment selection, with exact diagnostics.
+[stderr] mkdir 'tmp space'; makevel nx=11 nz=5 v000=2000 >v; suspike nt=4 ntr=5 nspk=1 ix1=3 it1=2 | sumigpspi nz=11 dz=4.5 vfile=v dt=.0025 dx=22.5 verbose=1 tmpdir='tmp space/' && ls -A 'tmp space'
+[stderr] mkdir 'env space'; makevel nx=11 nz=5 v000=2000 >v; suspike nt=4 ntr=5 nspk=1 ix1=3 it1=2 | CWP_TMPDIR='env space' sumigpspi nz=11 dz=4.5 vfile=v dt=.0025 dx=22.5 verbose=2 && ls -A 'env space'
+# Packed-short input retains its original trid and output storage convention.
+makevel nx=5 nz=2 v000=2000 >v; suspike nt=13 ntr=2 nspk=1 ix1=1 it1=4 | supack2 | sumigpspi nz=5 dz=5 vfile=v dx=10
+# Zero input samples, required-value errors, overflow, and anonymous-temp failure.
+[stderr] makevel nx=5 nz=1 v000=2000 >v; sunull nt=0 ntr=1 | sumigpspi nz=5 dz=5 vfile=v dx=10
+[stderr] sunull nt=3 ntr=1 | sushw key=dt,d2 a=2500,25 | sumigpspi dz=5 vfile=missing
+[stderr] sunull nt=3 ntr=1 | sumigpspi nz=2 vfile=missing dt=.0025 dx=25
+[stderr] sunull nt=3 ntr=1 | sumigpspi nz=2 dz=5 dt=.0025 dx=25
+[stderr] sunull nt=3 ntr=1 | sumigpspi nz=2 dz=5 vfile=missing dx=3.5e38
+[stderr] sunull nt=3 ntr=1 | sumigpspi nz=2 dz=5 vfile=missing verbose=-2147483649
+[stderr] makevel nx=5 nz=1 v000=2000 >v; sunull nt=4 ntr=1 | (ulimit -n 4; sumigpspi nz=5 dz=5 vfile=v dx=10)
+
+# diff-2026-11 (round 3)
+# Nonzero nt=1..4, one midpoint, a last-sample spike at nt=4097, and prime grids.
+makevel nx=17 nz=1 v000=1777 dvdz=70 dvdx=2.5 >v; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpspi nz=17 dz=1.375 vfile=v dt=.000875 dx=13.125
+makevel nx=17 nz=7 v000=1777 dvdz=70 dvdx=2.5 >v; suspike nt=2 ntr=7 nspk=1 ix1=4 it1=2 | sumigpspi nz=17 dz=1.375 vfile=v dt=.000875 dx=13.125
+makevel nx=17 nz=7 v000=1777 dvdz=70 dvdx=2.5 >v; suspike nt=3 ntr=7 nspk=1 ix1=4 it1=3 | sumigpspi nz=17 dz=1.375 vfile=v dt=.000875 dx=13.125
+makevel nx=17 nz=7 v000=1777 dvdz=70 dvdx=2.5 >v; suspike nt=4 ntr=7 nspk=1 ix1=4 it1=4 | sumigpspi nz=17 dz=1.375 vfile=v dt=.000875 dx=13.125
+makevel nx=13 nz=7 v000=2345 dvdz=3 >v; suspike nt=4097 ntr=7 nspk=2 ix1=1 it1=4097 ix2=7 it2=2049 | sumigpspi nz=13 dz=1.375 vfile=v dx=13.125
+makevel nx=29 nz=47 v000=1800 dvdz=25 >v; suplane nt=509 ntr=47 npl=1 ct1=127 cx1=24 len1=47 | sumigpspi nz=29 dz=2.125 vfile=v dx=30
+# Preserve both byte-packed and short-packed input/output conventions.
+makevel nx=13 nz=3 v000=2000 >v; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | supack1 gpow=1 | sumigpspi nz=13 dz=1.5 vfile=v dx=12.5
+makevel nx=13 nz=3 v000=2000 >v; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | supack2 gpow=1 | sumigpspi nz=13 dz=1.5 vfile=v dx=12.5
+# Header defaults, derived sampling, empty numeric values, and numeric suffixes.
+[stderr] makevel nx=13 nz=3 v000=2000 >v; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 | sushw key=dt,d2,trid,ns a=0,0,11,17 | sumigpspi nz=13 dz=1.5 vfile=v verbose=1
+[stderr] mkdir tmp; makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sumigpspi nz=13 dz=1.5 vfile=v tmpdir=tmp/. verbose=1 dt=.000875 dx=13.125 && ls -A tmp
+[stderr] makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sushw key=dt,d2 a=875,13.125 b=17,-1 | sumigpspi nz=13 dz=1.5 vfile=v dt= dx= verbose=
+[stderr] makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sumigpspi nz=+13junk dz=1.5meters vfile=v dt=.000875sec dx=13.125m verbose=0foo
+# Signed zero and nonfinite sampling; dt=inf is rejected by eatof.
+[stderr] makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sumigpspi nz=13 dz=1.5 vfile=v dt=inf dx=13.125
+makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sumigpspi nz=13 dz=1.5 vfile=v dt=.000875 dx=nan
+makevel nx=13 nz=3 v000=2000 >v; suplane nt=67 ntr=3 | sumigpspi nz=13 dz=-0 vfile=v dt=.000875 dx=13.125
+# Match physical units over widely separated but finite velocity scales.
+makevel nx=7 nz=5 v000=2e-15 dvdz=1e-16 >v; suspike nt=31 ntr=5 nspk=1 ix1=3 it1=8 | sumigpspi nz=7 dz=1e-18 vfile=v dx=1e-16
+makevel nx=7 nz=5 v000=2e15 dvdz=1e14 >v; suspike nt=31 ntr=5 nspk=1 ix1=3 it1=8 | sumigpspi nz=7 dz=1e12 vfile=v dx=1e14
+# Invalid temporary destination and scalar overflows/underflow.
+[stderr] sunull nt=2 ntr=1 | sumigpspi nz=3 dz=2.5 vfile=missing dt=.004 dx=10 tmpdir=/dev/null
+[stderr] sunull nt=2 ntr=1 | sumigpspi nz=-2147483649 dz=2.5 vfile=missing dt=.004 dx=10
+[stderr] sunull nt=2 ntr=1 | sumigpspi nz=3 dz=2.5 vfile=missing dt=3.5e38 dx=10
+[stderr] sunull nt=2 ntr=1 | sumigpspi nz=3 dz=2.5 vfile=missing dt=.004 dx=-1e-310
+# Skewed velocity histograms, alternating branches, and a velocity-file suffix.
+python3 -c 'import struct;v=[2000.0+(1000.0 if x==23 else 0.0)+z*.125 for z in range(23) for x in range(47)];open("v","wb").write(struct.pack("=1081f",*v))'; suplane nt=257 ntr=47 npl=1 ct1=71 cx1=24 len1=47 | suaddnoise seed=20261103 | sumigpspi nz=23 dz=2.125 vfile=v dx=30
+python3 -c 'import struct;v=[2000.0+z if z%2==0 else 1200.0+(x%10)*150.0 for z in range(19) for x in range(41)];open("v","wb").write(struct.pack("=779f",*v))'; suspike nt=127 ntr=41 nspk=2 ix1=1 it1=31 ix2=41 it2=97 | sumigpspi nz=19 dz=1.375 vfile=v dt=.001337 dx=17.123
+makevel nx=23 nz=9 v000=1900 dvdz=35 >v; printf 'unused trailing bytes' >>v; suimp2d nt=257 nrec=9 c=1900 x0=100 z0=90 dgx=25 | sushw key=dt,gx,sx a=1500,50,0 b=13,100,90 | suchw key1=d2 key2=gx key3=sx b=1 c=-1 d=2 | sumigpspi nz=23 dz=4.25 vfile=v
+# Header I/O is one HDRBYTES-sized item, so a failed write reports 0 of 1.
+# Ignore SIGXFSZ to compare the deterministic efwrite diagnostic without PIDs.
+[stderr] makevel nx=3 nz=300 v000=2000 >v; sunull nt=1 ntr=300 | (trap '' XFSZ; ulimit -f 1; sumigpspi nz=3 dz=5 vfile=v dx=10)
+[stderr] makevel nx=3 nz=300 v000=2000 >v; sunull nt=1 ntr=300 | (trap '' XFSZ; ulimit -f 0; sumigpspi nz=3 dz=5 vfile=v dx=10)
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] makevel nx=3 nz=100 v000=2000 >v; sunull nt=1 ntr=100 | (trap '' XFSZ; ulimit -f 1; sumigpspi nz=3 dz=5 vfile=v dx=10)
+[stderr] makevel nx=3 nz=3 v000=2000 >v; sunull nt=4097 ntr=3 | (trap '' XFSZ; ulimit -f 1; sumigpspi nz=3 dz=5 vfile=v dx=10)
+[stderr] makevel nx=3 nz=3 v000=2000 >v; sunull nt=32769 ntr=3 | (trap '' XFSZ; ulimit -f 1; sumigpspi nz=3 dz=5 vfile=v dx=10)

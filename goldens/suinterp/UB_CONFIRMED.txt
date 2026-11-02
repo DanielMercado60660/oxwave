@@ -1,0 +1,4 @@
+# ub-2026-11 (round 1): Confirmed. vendor/su-original/src/cwp/lib/inttable8.c:177 (intt8r): out-of-range float-to-int conversion; su/main/interp_extrap/suinterp.c:468,479,484,486,491 supplies times from dip picks as large as -154958692352 samples/trace.
+# Minimal fix: check xoutn against INT_MIN+11..INT_MAX before conversion (also protects the subtraction at inttable8.c:178), then err on invalid values. Built with SU's recorded flags and the patched library object before -lsu -lpar -lcwp.
+# Unmodified orig matches vendor exactly: rc=0, stdout=2304 bytes, SHA256=b2fceb7054a4504d4a48b386cf557d58f9b20d6741d22ab95af05e65721150ff. Fixed: rc=1, empty stdout, stderr='suinterp: interpolation time exceeds sinc index range'. OxWave matches fixed exactly; no port changes needed. Evidence and fix.patch: diffcamp/ubx/suinterp/.
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | suinterp lagc=0 lent=1 ninterp=3

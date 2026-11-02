@@ -81,3 +81,55 @@ suspike nt=33 ntr=1 nspk=1 ix1=1 it1=17 dt=0.004 | subfilt npoleslo=1 npoleshi=1
 [stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt f3dblo=1e-310 f3dbhi=1e-310 unknown=1 verbose=1
 # Last occurrence wins; any nonzero mode flag enables that mode.
 [stderr] suspike nt=101 ntr=1 nspk=1 ix1=1 it1=51 dt=0.004 | subfilt zerophase=0 zerophase=-1 locut=-1 hicut=2 npoleslo=2 npoleshi=3 f3dblo=5 f3dblo=17 verbose=-1
+
+# diff-2026-11 (round 1)
+# Nonzero impulses at nt=1..4: both reversal endpoints and causal sections.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 dt=0.002 | subfilt npoleslo=2 npoleshi=3 f3dblo=25 f3dbhi=95 verbose=1
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 dt=0.004 | subfilt locut=0 zerophase=0 npoleshi=2 verbose=1
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 dt=0.004 | subfilt hicut=0 npoleslo=5 verbose=1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 dt=0.004 | subfilt zerophase=0 npoleslo=4 npoleshi=5 verbose=1
+# Paired implicit/explicit defaults on a prime-length, nonzero trace.
+[stderr] suspike nt=67 ntr=1 nspk=1 ix1=1 it1=34 dt=0.004 | subfilt
+[stderr] suspike nt=67 ntr=1 nspk=1 ix1=1 it1=34 dt=0.004 | subfilt dt=0.004 verbose=0 zerophase=1 locut=1 hicut=1 fstoplo=12.5 fpasslo=18.75 fpasshi=50 fstophi=68.75 astoplo=0.05 apasslo=0.95 apasshi=0.95 astophi=0.05
+# Long nonzero inputs, maximum SU length, and a spike at the final sample.
+[stderr] sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=1102 | subfilt verbose=1
+[stderr] sunull nt=4097 ntr=2 dt=0.004 | suaddnoise seed=1102 | subfilt zerophase=0 npoleslo=7 npoleshi=8 f3dblo=8 f3dbhi=80 verbose=1
+[stderr] suspike nt=16381 ntr=1 nspk=1 ix1=1 it1=8191 dt=0.004 | subfilt hicut=0 fstoplo=1 fpasslo=3 verbose=1
+[stderr] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=32768 dt=0.001 | subfilt npoleslo=9 npoleshi=10 f3dblo=35 f3dbhi=200 verbose=1
+[stderr] suspike nt=32769 ntr=1 nspk=1 ix1=1 it1=32769 dt=0.004 | subfilt locut=0 npoleshi=6 f3dbhi=110 verbose=1
+# Independent traces and different generators with nontrivial sample content.
+[stderr] suplane nt=257 ntr=7 taper=1 dip1=-2 dip2=3 dip3=11 dt=0.002 | subfilt zerophase=0 fstoplo=5 fpasslo=15 fpasshi=90 fstophi=120 verbose=1
+[stderr] suimp2d nt=509 nshot=1 nrec=3 dt=0.004 | subfilt npoleslo=3 npoleshi=5 f3dblo=10 f3dbhi=55 verbose=1
+[stderr] suimp2d nt=509 nshot=1 nrec=2 dt=0.004 | subfilt hicut=0 zerophase=0 verbose=1
+# Header intervals at both u16 boundaries and changes after the first trace.
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | sushw key=dt a=1 | subfilt verbose=1
+[stderr] sunull nt=257 ntr=2 dt=0.004 | suaddnoise seed=7301 | sushw key=dt a=65535 | subfilt verbose=1
+[stderr] suspike nt=127 ntr=3 nspk=3 ix1=1 it1=32 ix2=2 it2=64 ix3=3 it3=96 dt=0.004 | sushw key=dt a=4000 b=-2000 | subfilt verbose=1
+[stderr] suspike nt=127 ntr=3 nspk=3 ix1=1 it1=32 ix2=2 it2=64 ix3=3 it3=96 dt=0.004 | sushw key=trid a=1 b=109 | subfilt verbose=1
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | sushw key=trid a=110 | subfilt verbose=1
+[stderr] suspike nt=127 ntr=2 nspk=2 ix1=1 it1=32 ix2=2 it2=96 dt=0.004 | suchw key1=dt key2=dt a=500 b=0.5 | subfilt verbose=1
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | sushw key=dt a=0 | subfilt dt=0.0025 verbose=1 zerophase=0 locut=1 hicut=1 fstoplo=4 fpasslo=12 fpasshi=70 fstophi=95 astoplo=0.08 apasslo=0.92 apasshi=0.85 astophi=0.15 npoleslo=3 npoleshi=6 f3dblo=9 f3dbhi=80
+# Disabled sides skip frequency validation; complete bypass preserves bytes.
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt locut=0 fstoplo=-9 fpasslo=-12 npoleslo=5 f3dblo=7 verbose=1
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt hicut=0 fpasshi=300 fstophi=150 npoleshi=7 f3dbhi=180 verbose=1
+[exact] [stderr] sunull nt=4097 ntr=2 dt=0.004 | suaddnoise seed=713 | subfilt locut=0 hicut=0 verbose=1 dt=-0.002
+# Zero pole count, higher orders, and explicit versus designed Nyquist edges.
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt npoleslo=0 npoleshi=6 verbose=1
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt npoleslo=32 npoleshi=31 f3dblo=18 f3dbhi=70 verbose=1
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt npoleslo=2 npoleshi=3 f3dblo=125 f3dbhi=125 verbose=1
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt fpasshi=115 fstophi=125 verbose=1
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt fstoplo=18 fpasslo=20 fpasshi=60 fstophi=63 astoplo=0.01 apasslo=0.99 apasshi=0.99 astophi=0.01 verbose=1
+[stderr] suspike nt=251 ntr=1 nspk=1 ix1=1 it1=126 dt=0.004 | subfilt zerophase=0 astoplo=0.4 apasslo=0.6 apasshi=0.7 astophi=0.3 verbose=1
+# Parser behavior: duplicate values, hexadecimal floats, and empty defaults.
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt dt=0 dt=0.004 zerophase=1 zerophase=0 locut=0 locut=1 hicut=1 hicut=0 npoleslo=6 npoleslo=3 f3dblo=20 verbose=1
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt dt=0x1p-8 npoleslo=3 npoleshi=4 f3dblo=0x1.4p+4 f3dbhi=0x1.8p+5 verbose=1
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt dt=0 dt= zerophase=0 zerophase= verbose=1 npoleslo=3 f3dblo= npoleshi=4 f3dbhi=
+# Error precedence and numeric range failures; compare full stderr as well.
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt dt=garbage
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt dt=1e-50
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt npoleshi=-2147483649
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt npoleslo=2 f3dblo=1e40
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt fpasshi=100 fstophi=90 astoplo=0.9 apasslo=0.1
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | subfilt locut=0 hicut=0 apasshi=0.2 astophi=0.8
+[stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 dt=0.004 | sushw key=dt,trid a=0,130 | subfilt
+[stderr] suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 dt=0.004 | subfilt ignored=1 f3dblo=1e40 f3dbhi=1e40 verbose=1

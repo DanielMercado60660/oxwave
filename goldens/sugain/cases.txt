@@ -36,3 +36,44 @@ suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain gpow=0.5 pbal=1 mbal=1
 suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sushw key=mark a=0 b=1 | sugain mark=1 jon=1
 suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sushw key=offset a=-300 b=200 | sugain vred=2000 tpow=2 epow=1.5 etpow=1 gpow=1.5 qbal=1 qclip=0.8
 suplane nt=64 ntr=4 | suaddnoise seed=3 sn=4 | sugain panel=1 agc=1 wagc=0.1 qbal=1 qclip=0.95
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sugain bias=1 scale=2 norm=4
+suspike nt=3 ntr=1 | sugain gpow=0.5 bias=-0.5
+suspike nt=4 ntr=1 | sugain qbal=1 qclip=0.75
+suspike nt=1 ntr=1 | sugain pbal=1 mbal=1 maxbal=1
+sunull nt=17 ntr=3 | sugain bias=-2 pclip=0.5 nclip=-1 scale=0.5
+suplane nt=4097 ntr=1 | sugain tpow=0.7 epow=-0.5 etpow=1.5
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain gpow=1.7
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain gpow=2 trap=0.8
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain clip=0.25 pclip=0.1 nclip=-0.2
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain qclip=0.37
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain qclip=0.91 qbal=1
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain pbal=1
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain mbal=1
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain maxbal=1
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain agc=1 wagc=0.012
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain gagc=1 wagc=0.012
+suplane nt=101 ntr=3 | suaddnoise seed=7 sn=2 | sugain agc=1 gagc=1 wagc=0.024
+suplane nt=31 ntr=3 | sushw key=delrt a=200 | sugain tpow=-0.5 epow=0.8 etpow=2
+suplane nt=31 ntr=3 | sushw key=offset a=-400 b=300 | sugain tpow=1.5 vred=1800 bias=0.1
+suplane nt=31 ntr=3 | sushw key=mark a=0 b=1 | sugain mark=0 bias=1
+suplane nt=31 ntr=3 | sushw key=mark a=0 b=1 | sugain mark=1 bias=1
+suplane nt=31 ntr=3 | sushw key=mark a=0 b=1 | sugain panel=1 mark=1 bias=1 qbal=1
+[stderr] suplane nt=31 ntr=2 | sugain panel=1 tmpdir=/tmp verbose=1 scale=2
+[stderr] suplane nt=31 ntr=2 | sugain panel=1 verbose=1 jon=1
+sunull nt=7 ntr=2 | sushw key=dt a=0 | sugain dt=0.002 tpow=1 bias=2
+suplane nt=37 ntr=2 | sugain tpow=0 epow=0 etpow=1 gpow=1 vred=0 trap=0 clip=0 qclip=1 scale=1 norm=0 bias=0 agc=0 gagc=0 pbal=0 qbal=0 mbal=0 panel=0 jon=0 verbose=0 maxbal=0 mark=0
+suplane nt=31 ntr=2 | sugain qclip=-0.1
+suplane nt=31 ntr=2 | sugain agc=1 wagc=-1
+suplane nt=31 ntr=2 | sugain gagc=1 wagc=1
+suplane nt=31 ntr=2 | sugain dt=0.002 bias=0.5
+suspike nt=4 ntr=1 | sugain agc=1 wagc=0.004 bias=1
+suplane nt=61 ntr=2 | suaddnoise seed=11 sn=1 | sugain panel=1 qclip=0.6 qbal=1 pbal=1
+suplane nt=31 ntr=2 | sugain panel=1 tmpdir= scale=2
+suplane nt=31 ntr=2 | sugain tmpdir=. bias=1
+suspike nt=1 ntr=1 | sugain agc=1 wagc=0.004
+suspike nt=2 ntr=1 | sugain gagc=1 wagc=0.004 bias=1
+suplane nt=4097 ntr=1 | suaddnoise seed=19 sn=3 | sugain agc=1 wagc=0.04
+suplane nt=127 ntr=2 | suaddnoise seed=9 sn=1 | sugain qclip=0.9999 qbal=1
+[stderr] suplane nt=31 ntr=2 | sugain panel=1 tmpdir=. verbose=1 scale=2

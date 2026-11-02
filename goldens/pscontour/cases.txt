@@ -9,3 +9,36 @@ suplane nt=7 ntr=3 | sustrip outpar=/dev/null | pscontour n1=7 n2=3 d1=-1 d2=-1 
 [stderr] pscontour n2=3
 [stderr] pscontour n1=3 n2=3
 [stderr] printf 'abc' | pscontour n1=3
+
+# diff-2026-11 (round 1)
+suplane nt=11 ntr=7 | sustrip outpar=/dev/null | pscontour n1=11 n2=7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=5 | sustrip outpar=/dev/null | pscontour n1=13 n2=5 d1=0.25 f1=-1 d2=2 f2=-2 nc=4 dc=0.1 fc=-0.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=17 ntr=9 k1=8 k2=4 | sustrip outpar=/dev/null | pscontour x1=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 x2=0,1,2,3,4,5,6,7,8 c=0.1,0.5,0.9 cwidth=1,2 cgray=0.1,0.7 cdash=3,0 ccolor=red,blue labelcf=2 labelcper=2 nlabelc=1 labelcsize=9 labelcfont=Courier labelccolor=green nplaces=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=7 | sustrip outpar=/dev/null | pscontour n1=17 n2=7 xbox=1 ybox=2 wbox=4 hbox=3 x1beg=2 x1end=16 d1num=2 f1num=2 n1tic=2 grid1=dot label1=Time x2beg=1 x2end=6 d2num=1 f2num=1 n2tic=3 grid2=dash label2=Distance labelfont=Courier labelsize=12 title=Example titlefont=Times-Bold titlesize=16 titlecolor=red axescolor=blue gridcolor=green axeswidth=2 ticwidth=0.5 gridwidth=0.8 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=2 ntr=2 | sustrip outpar=/dev/null | pscontour n1=2 n2=2 c=0 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=3 k1=2 k2=2 | sustrip outpar=/dev/null | pscontour n1=3 n2=3 c=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=4 k1=2 k2=2 | sustrip outpar=/dev/null | pscontour n1=4 n2=4 c=0.25,0.5,0.75 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=4097 ntr=2 | sustrip outpar=/dev/null | pscontour n1=4097 n2=2 nc=1 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=19 ntr=1 | sustrip outpar=/dev/null | pscontour n1=19 n2=1 x2end=2 nc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=7 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | pscontour n1=23 n2=7 style=seismic grid1=solid grid2=solid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=5 | sustrip outpar=/dev/null > grid.bin; pscontour n1=9 verbose=1 < grid.bin | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=21 ntr=11 k1=10 k2=5 | sustrip outpar=/dev/null | pscontour n1=21 n2=11 c=0.1,0.3,0.5,0.7,0.9 labelcf=2 labelcper=2 nlabelc=2 cwidth=2 cdash=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=5 | sustrip outpar=/dev/null | pscontour n1=11 n2=5 d1=-0.5 f1=4 d2=-2 f2=10 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=5 | sustrip outpar=/dev/null | pscontour n1=11 n2=5 x1beg=10 x1end=2 x2beg=5 x2end=1 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=7 | sustrip outpar=/dev/null | pscontour n1=13 n2=7 nc=3 fc=-1 dc=1 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=15 ntr=7 k1=7 k2=3 | sustrip outpar=/dev/null | pscontour n1=15 n2=7 c=0.2,0.4,0.6 ccolor=none,red cgray=0.3,0.6 cdash=1,2,3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=3 | sustrip outpar=/dev/null | pscontour n1=7 n2=3 grid1=invalid grid2=invalid style=other | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=5 | sustrip outpar=/dev/null | pscontour n1=13 n2=5 label1=Axis1 label2=Axis2 title=Plot grid1=dash grid2=dot | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=31 ntr=13 k1=15 k2=6 | sustrip outpar=/dev/null | pscontour n1=31 n2=13 nc=7 labelcper=3 labelcf=2 nplaces=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=3 | sustrip outpar=/dev/null | pscontour n1=5 n2=3 c=-1,0,1 cwidth=0.5,1,2 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=29 ntr=11 | sustrip outpar=/dev/null | pscontour n1=29 n2=11 nc=0 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=5 | sustrip outpar=/dev/null | pscontour x1=7,6,5,4,3,2,1 x2=5,4,3,2,1 c=0 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=9 ntr=5 k1=4 k2=2 | sustrip outpar=/dev/null | pscontour n1=9 n2=5 c=0.5 axescolor=#255 gridcolor=#f00 titlecolor=#0f0 grid1=solid grid2=solid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=3 ntr=2 | sustrip outpar=/dev/null | pscontour n1=3
+[stderr] sunull nt=2 ntr=2 | sustrip outpar=/dev/null | pscontour n1=3 n2=3
+makevel nx=17 nz=31 dvdx=0.03 dvdz=0.02 | pscontour n1=31 n2=17 nc=7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+makevel nx=21 nz=23 dvdx=-0.1 dvdz=0.05 | pscontour n1=23 n2=21 c=1,1.5,2,2.5 style=normal nplaces=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+makevel nx=25 nz=29 vlens=1 tlens=12 dlens=18 | pscontour n1=29 n2=25 nc=8 labelcper=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+makevel nx=19 nz=37 dvdx=0.02 dvdz=0.03 | pscontour n1=37 n2=19 dc=0.1 fc=2.1 nc=10 labelcf=3 nlabelc=3 cwidth=1,2,3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+makevel nx=13 nz=17 dvdx=0.1 dvdz=-0.08 | pscontour n1=17 n2=13 d1=0.125 f1=-0.5 d2=1.5 f2=-3 style=normal grid1=dot grid2=solid | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+makevel nx=15 nz=19 dvdx=0.07 dvdz=0.04 | pscontour n1=19 n2=15 c=2.2,2.4,2.6,2.8 ccolor=red,none,blue cgray=0.5 cdash=2,4 labelcsize=10 labelccolor=blue | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

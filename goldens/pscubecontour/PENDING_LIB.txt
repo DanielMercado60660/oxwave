@@ -1,0 +1,2 @@
+suplane nt=2 ntr=2 | sustrip outpar=/dev/null | pscubecontour n1=2 n2=1 n3=2 x2beg=-1 c=.5 nlabelc=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# oxwave-f-pscontour, psContour/connect: tracing a one-column face starts at cell -1, accessing the previous face in C's contiguous z allocation; the Rust face slice and unsigned index cannot represent that access and panic.

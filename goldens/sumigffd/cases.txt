@@ -54,3 +54,41 @@ sunull nt=4 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null > vel.bin && sun
 # Releasing the producer lets deferred cleanup run after the blocking read.
 # Require exit 1, no output/diagnostics, and removal of both temporary files.
 [stderr] for sig in INT QUIT HUP TERM; do mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s "$sig" "$worker" || exit 1; printf '\n' > gate; wait "$producer"; wait "$worker"; status=$?; test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)" || exit 1; rm input gate output errors; rmdir tmp; done
+
+# diff-2026-11 (round 1)
+# Boundary time lengths, long traces, prime spatial sizes and deep continuation.
+# Seeded nonconstant velocities exercise the correction and tridiagonal solve.
+sunull nt=3 ntr=6 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=1 ntr=3 | suaddnoise seed=19 | sumigffd nz=6 dz=13 dx=17 vfile=vel.bin
+sunull nt=3 ntr=5 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=2 ntr=3 | suaddnoise seed=19 | sumigffd nz=5 dz=13 dx=17 vfile=vel.bin
+sunull nt=4 ntr=5 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=3 ntr=4 | suaddnoise seed=19 | sumigffd nz=5 dz=13 dx=17 vfile=vel.bin
+sunull nt=5 ntr=5 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=4 ntr=5 | suaddnoise seed=19 | sumigffd nz=5 dz=13 dx=17 vfile=vel.bin
+sunull nt=7 ntr=7 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=4097 ntr=7 | suaddnoise seed=19 | sumigffd nz=7 dz=13 dx=17 vfile=vel.bin
+sunull nt=11 ntr=3 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=65535 ntr=11 | suaddnoise seed=19 | sumigffd nz=3 dz=13 dx=17 vfile=vel.bin
+sunull nt=19 ntr=101 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=127 ntr=19 | suaddnoise seed=19 | sumigffd nz=101 dz=13 dx=17 vfile=vel.bin
+sunull nt=23 ntr=47 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=257 ntr=23 | suaddnoise seed=19 | sumigffd nz=47 dz=13 dx=17 vfile=vel.bin
+sunull nt=31 ntr=32 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=509 ntr=31 | suaddnoise seed=19 | sumigffd nz=32 dz=13 dx=17 vfile=vel.bin
+sunull nt=37 ntr=20 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=1021 ntr=37 | suaddnoise seed=19 | sumigffd nz=20 dz=13 dx=17 vfile=vel.bin
+sunull nt=53 ntr=15 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=1009 ntr=53 | suaddnoise seed=19 | sumigffd nz=15 dz=13 dx=17 vfile=vel.bin
+sunull nt=101 ntr=17 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=113 ntr=101 | suaddnoise seed=19 | sumigffd nz=17 dz=13 dx=17 vfile=vel.bin
+sunull nt=257 ntr=13 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=67 ntr=257 | suaddnoise seed=19 | sumigffd nz=13 dz=13 dx=17 vfile=vel.bin
+sunull nt=5 ntr=500 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=31 ntr=5 | suaddnoise seed=19 | sumigffd nz=500 dz=13 dx=17 vfile=vel.bin
+sunull nt=3 ntr=900 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=7 ntr=3 | suaddnoise seed=19 | sumigffd nz=900 dz=13 dx=17 vfile=vel.bin
+sunull nt=17 ntr=100 | sugain bias=2000 | suaddnoise seed=74 sn=5 | sustrip outpar=/dev/null > vel.bin && sunull nt=257 ntr=17 | suaddnoise seed=19 | sumigffd nz=100 dz=13 dx=17 vfile=vel.bin
+# First trace sets sampling; varying later headers must survive migration.
+[stderr] sunull nt=7 ntr=11 | sugain bias=1900 | sustrip outpar=/dev/null > vel.bin && suspike nt=71 ntr=11 | sushw key=dt,d2,delrt,cdp,offset,tracl a=2500,19,-7,900,-500,70 b=100,2,3,-2,100,-1 | sumigffd nz=7 dz=6 vfile=vel.bin
+# Explicit defaults on the same headers; all parameters passed to sumigffd.
+[stderr] mkdir scratch && sunull nt=7 ntr=11 | sugain bias=1900 | sustrip outpar=/dev/null > vel.bin && suspike nt=71 ntr=11 | sushw key=dt,d2,delrt,cdp,offset,tracl a=2500,19,-7,900,-500,70 b=100,2,3,-2,100,-1 | sumigffd nz=7 dz=6 dt=0.0025 dx=19 ft=0 fz=0 vfile=vel.bin verbose=1 tmpdir=scratch && test -z "$(ls -A scratch)"
+# Additional physical generators, including header-derived dx from susynlv.
+sunull nt=11 ntr=9 | sugain bias=2200 | sustrip outpar=/dev/null > vel.bin && susynlv nt=127 dt=0.008 nxm=11 dxm=0.02 fxm=1 v00=2.2 ref="1:0,0.3;2,0.3" | sumigffd nz=9 dz=12 ft=0.03 fz=9 vfile=vel.bin
+sunull nt=13 ntr=11 | sugain bias=2500 | sustrip outpar=/dev/null > vel.bin && suimp2d nt=257 nrec=13 c=2500 x0=200 z0=400 dgx=30 | sumigffd nz=11 dz=20 dx=30 vfile=vel.bin
+# Bad numeric sampling and verbose integer overflow.
+[stderr] sunull nt=13 ntr=3 | sumigffd nz=5 dz=10 dx=1e-310 vfile=missing
+[stderr] sunull nt=13 ntr=3 | sumigffd nz=5 dz=10 dt=1e-310 vfile=missing
+[stderr] sunull nt=13 ntr=3 | sumigffd nz=5 dz=10 verbose=999999999999999999999 vfile=missing
+# Regression: cleanup must happen while the input FIFO remains open.
+# Wait for both files before sending each signal; only release the producer
+# after observing removal (or a bounded failure), so deferred cleanup fails.
+[stderr] mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s INT "$worker" || exit 1; immediate=0; for attempt in {1..100}; do if test -z "$(ls -A tmp)"; then immediate=1; break; fi; sleep 0.01; done; printf "\n" > gate; wait "$producer"; wait "$worker"; status=$?; test "$immediate" -eq 1 && test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)"
+[stderr] mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s QUIT "$worker" || exit 1; immediate=0; for attempt in {1..100}; do if test -z "$(ls -A tmp)"; then immediate=1; break; fi; sleep 0.01; done; printf "\n" > gate; wait "$producer"; wait "$worker"; status=$?; test "$immediate" -eq 1 && test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)"
+[stderr] mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s HUP "$worker" || exit 1; immediate=0; for attempt in {1..100}; do if test -z "$(ls -A tmp)"; then immediate=1; break; fi; sleep 0.01; done; printf "\n" > gate; wait "$producer"; wait "$worker"; status=$?; test "$immediate" -eq 1 && test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)"
+[stderr] mkdir tmp && mkfifo input gate || exit 1; (sunull nt=7 ntr=3; read -r release < gate) > input & producer=$!; sumigffd nz=3 dz=10 dx=10 vfile=unused tmpdir=tmp < input > output 2> errors & worker=$!; for attempt in {1..200}; do test "$(ls -A tmp | wc -l)" -eq 2 && break; sleep 0.01; done; sleep 0.02; kill -s TERM "$worker" || exit 1; immediate=0; for attempt in {1..100}; do if test -z "$(ls -A tmp)"; then immediate=1; break; fi; sleep 0.01; done; printf "\n" > gate; wait "$producer"; wait "$worker"; status=$?; test "$immediate" -eq 1 && test "$status" -eq 1 && test ! -s output && test ! -s errors && test -z "$(ls -A tmp)"

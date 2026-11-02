@@ -56,10 +56,14 @@
 
 pub use oxwave_cwp::complex::Complex;
 
+mod float;
 mod kernels;
 mod table;
 
+use float::{Double, Single};
 use table::NCTAB;
+#[cfg(test)]
+mod nan_tests;
 const PI: f64 = 3.141592653589793;
 
 /// Smallest admissible complex length, saturated at 720720.
@@ -199,15 +203,15 @@ pub fn pfacr(isign: i32, cz: &[Complex], rz: &mut [f32]) {
         // C also writes rz[1], outside its documented array[n]. That slot is
         // never read again (the length-zero kernel does no work). Preserve
         // the sole in-bounds result without writing beyond the Rust slice.
-        rz[0] = z[0] + z[1];
+        rz[0] = (Single(z[0]) + Single(z[1])).0;
         return;
     }
     // Copy input to output and fix DC and Nyquist.
     for i in 2..n {
         rz[i] = z[i];
     }
-    rz[1] = z[0] - z[n];
-    rz[0] = z[0] + z[n];
+    rz[1] = (Single(z[0]) - Single(z[n])).0;
+    rz[0] = (Single(z[0]) + Single(z[n])).0;
     let z = rz;
     let mut theta = 2.0 * PI / n as f64;
     if isign > 0 {
@@ -221,16 +225,16 @@ pub fn pfacr(isign: i32, cz: &[Complex], rz: &mut [f32]) {
     let no2 = n / 2;
     let (mut ir, mut ii, mut jr, mut ji) = (2, 3, n - 2, n - 1);
     while ir <= no2 {
-        let sumr = z[ir] + z[jr];
-        let sumi = z[ii] + z[ji];
-        let difr = z[ir] - z[jr];
-        let difi = z[ii] - z[ji];
-        let tempr = (wi * difr as f64 - wr * sumi as f64) as f32;
-        let tempi = (wi * sumi as f64 + wr * difr as f64) as f32;
-        z[ir] = sumr + tempr;
-        z[ii] = difi + tempi;
-        z[jr] = sumr - tempr;
-        z[ji] = tempi - difi;
+        let sumr = Single(z[ir]) + Single(z[jr]);
+        let sumi = Single(z[ii]) + Single(z[ji]);
+        let difr = Single(z[ir]) - Single(z[jr]);
+        let difi = Single(z[ii]) - Single(z[ji]);
+        let tempr = (Double(wi) * difr.wide() - Double(wr) * sumi.wide()).narrow();
+        let tempi = (Double(wi) * sumi.wide() + Double(wr) * difr.wide()).narrow();
+        z[ir] = (sumr + tempr).0;
+        z[ii] = (difi + tempi).0;
+        z[jr] = (sumr - tempr).0;
+        z[ji] = (tempi - difi).0;
         wtemp = wr;
         wr += wr * wpr - wi * wpi;
         wi += wi * wpr + wtemp * wpi;
@@ -256,11 +260,11 @@ pub fn pfarc(isign: i32, rz: &[f32], cz: &mut [Complex]) {
     }
     let z = floats_mut(cz);
     for i in 0..n {
-        z[i] = (0.5 * rz[i] as f64) as f32;
+        z[i] = ((Double(0.5) * Single(rz[i]).wide()).narrow()).0;
     }
     kernels::pfacc(isign, (n / 2) as i32, z);
-    z[n] = (2.0 * (z[0] - z[1]) as f64) as f32;
-    z[0] = (2.0 * (z[0] + z[1]) as f64) as f32;
+    z[n] = ((Double(2.0) * (Single(z[0]) - Single(z[1])).wide()).narrow()).0;
+    z[0] = ((Double(2.0) * (Single(z[0]) + Single(z[1])).wide()).narrow()).0;
     z[n + 1] = 0.0;
     z[1] = 0.0;
     let mut theta = 2.0 * PI / n as f64;
@@ -276,16 +280,16 @@ pub fn pfarc(isign: i32, rz: &[f32], cz: &mut [Complex]) {
     // For n=1 C's jr is -1, but the twiddle loop has no iterations.
     let (mut ir, mut ii, mut jr, mut ji) = (2, 3, n.saturating_sub(2), n - 1);
     while ir <= no2 {
-        let sumr = z[ir] + z[jr];
-        let sumi = z[ii] + z[ji];
-        let difr = z[ir] - z[jr];
-        let difi = z[ii] - z[ji];
-        let tempr = (wi * difr as f64 + wr * sumi as f64) as f32;
-        let tempi = (wi * sumi as f64 - wr * difr as f64) as f32;
-        z[ir] = sumr + tempr;
-        z[ii] = difi + tempi;
-        z[jr] = sumr - tempr;
-        z[ji] = tempi - difi;
+        let sumr = Single(z[ir]) + Single(z[jr]);
+        let sumi = Single(z[ii]) + Single(z[ji]);
+        let difr = Single(z[ir]) - Single(z[jr]);
+        let difi = Single(z[ii]) - Single(z[ji]);
+        let tempr = (Double(wi) * difr.wide() + Double(wr) * sumi.wide()).narrow();
+        let tempi = (Double(wi) * sumi.wide() - Double(wr) * difr.wide()).narrow();
+        z[ir] = (sumr + tempr).0;
+        z[ii] = (difi + tempi).0;
+        z[jr] = (sumr - tempr).0;
+        z[ji] = (tempi - difi).0;
         wtemp = wr;
         wr += wr * wpr - wi * wpi;
         wi += wi * wpr + wtemp * wpi;
@@ -312,8 +316,8 @@ pub fn pfa2cr(isign: i32, idim: i32, n1: i32, n2: i32, cz: &[Complex], rz: &mut 
     if idim == 1 {
         let (mut jt, mut kt) = (0, 0);
         for _i2 in 0..n2 {
-            rz[jt + 1] = input[kt] - input[kt + n1];
-            rz[jt] = input[kt] + input[kt + n1];
+            rz[jt + 1] = (Single(input[kt]) - Single(input[kt + n1])).0;
+            rz[jt] = (Single(input[kt]) + Single(input[kt + n1])).0;
             let (mut j, mut k) = (jt + 2, kt + 2);
             for _i1 in 2..n1 {
                 rz[j] = input[k];
@@ -337,8 +341,8 @@ pub fn pfa2cr(isign: i32, idim: i32, n1: i32, n2: i32, cz: &[Complex], rz: &mut 
         }
         let mut j = n1 * n2;
         for i1 in (0..n1 * 2).step_by(2) {
-            rz[i1 + 1] = input[i1] - input[j];
-            rz[i1] = input[i1] + input[j];
+            rz[i1 + 1] = (Single(input[i1]) - Single(input[j])).0;
+            rz[i1] = (Single(input[i1]) + Single(input[j])).0;
             j += 2;
         }
         n = n2;
@@ -362,16 +366,16 @@ pub fn pfa2cr(isign: i32, idim: i32, n1: i32, n2: i32, cz: &[Complex], rz: &mut 
         let mut jt = j * itmul;
         let mut kt = k * itmul;
         for _it in 0..nt {
-            let sumr = z[jt] + z[kt];
-            let sumi = z[jt + 1] + z[kt + 1];
-            let difr = z[jt] - z[kt];
-            let difi = z[jt + 1] - z[kt + 1];
-            let tempr = (wi * difr as f64 - wr * sumi as f64) as f32;
-            let tempi = (wi * sumi as f64 + wr * difr as f64) as f32;
-            z[jt] = sumr + tempr;
-            z[jt + 1] = difi + tempi;
-            z[kt] = sumr - tempr;
-            z[kt + 1] = tempi - difi;
+            let sumr = Single(z[jt]) + Single(z[kt]);
+            let sumi = Single(z[jt + 1]) + Single(z[kt + 1]);
+            let difr = Single(z[jt]) - Single(z[kt]);
+            let difi = Single(z[jt + 1]) - Single(z[kt + 1]);
+            let tempr = (Double(wi) * difr.wide() - Double(wr) * sumi.wide()).narrow();
+            let tempi = (Double(wi) * sumi.wide() + Double(wr) * difr.wide()).narrow();
+            z[jt] = (sumr + tempr).0;
+            z[jt + 1] = (difi + tempi).0;
+            z[kt] = (sumr - tempr).0;
+            z[kt + 1] = (tempi - difi).0;
             jt += itinc;
             kt += itinc;
         }
@@ -423,7 +427,7 @@ pub fn pfa2rc(isign: i32, idim: i32, n1: i32, n2: i32, rz: &[f32], cz: &mut [Com
     let mut j = 0;
     for _i2 in 0..n2 {
         for _i1 in 0..n1 {
-            z[j] = (0.5 * rz[j] as f64) as f32;
+            z[j] = ((Double(0.5) * Single(rz[j]).wide()).narrow()).0;
             j += 1;
         }
     }
@@ -475,8 +479,8 @@ pub fn pfa2rc(isign: i32, idim: i32, n1: i32, n2: i32, rz: &[f32], cz: &mut [Com
     }
     let (mut j, mut k) = (0, n * itmul);
     for _it in 0..nt {
-        z[k] = (2.0 * (z[j] - z[j + 1]) as f64) as f32;
-        z[j] = (2.0 * (z[j] + z[j + 1]) as f64) as f32;
+        z[k] = ((Double(2.0) * (Single(z[j]) - Single(z[j + 1])).wide()).narrow()).0;
+        z[j] = ((Double(2.0) * (Single(z[j]) + Single(z[j + 1])).wide()).narrow()).0;
         z[k + 1] = 0.0;
         z[j + 1] = 0.0;
         j += itinc;
@@ -497,16 +501,16 @@ pub fn pfa2rc(isign: i32, idim: i32, n1: i32, n2: i32, rz: &[f32], cz: &mut [Com
         let mut jt = j * itmul;
         let mut kt = k * itmul;
         for _it in 0..nt {
-            let sumr = z[jt] + z[kt];
-            let sumi = z[jt + 1] + z[kt + 1];
-            let difr = z[jt] - z[kt];
-            let difi = z[jt + 1] - z[kt + 1];
-            let tempr = (wi * difr as f64 + wr * sumi as f64) as f32;
-            let tempi = (wi * sumi as f64 - wr * difr as f64) as f32;
-            z[jt] = sumr + tempr;
-            z[jt + 1] = difi + tempi;
-            z[kt] = sumr - tempr;
-            z[kt + 1] = tempi - difi;
+            let sumr = Single(z[jt]) + Single(z[kt]);
+            let sumi = Single(z[jt + 1]) + Single(z[kt + 1]);
+            let difr = Single(z[jt]) - Single(z[kt]);
+            let difi = Single(z[jt + 1]) - Single(z[kt + 1]);
+            let tempr = (Double(wi) * difr.wide() + Double(wr) * sumi.wide()).narrow();
+            let tempi = (Double(wi) * sumi.wide() - Double(wr) * difr.wide()).narrow();
+            z[jt] = (sumr + tempr).0;
+            z[jt + 1] = (difi + tempi).0;
+            z[kt] = (sumr - tempr).0;
+            z[kt + 1] = (tempi - difi).0;
             jt += itinc;
             kt += itinc;
         }

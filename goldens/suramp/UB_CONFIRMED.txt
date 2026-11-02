@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/tapering/suramp.c:100: ntaper2=8 with nt=7 accesses tr.data[-1], outside the array. Minimal fix: reject ntaper2 > nt before allocating/applying weights. orig matches retained 66.out/66.err and live vendor: rc=0, 268 stdout bytes. fixed: rc=1, empty stdout, "suramp: ending taper length 8 exceeds trace length 7". OxWave matches fixed byte for byte, including stderr. Patch/builds/evidence: diffcamp/ubx/suramp/.
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmax=-0.008

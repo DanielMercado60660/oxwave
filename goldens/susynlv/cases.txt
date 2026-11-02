@@ -77,3 +77,73 @@ susynlv nt=151 nxm=1 fxm=1.5 fpeak=0.5 'ref=0,1;3,1'
 [stderr] susynlv nxm=0 ref=
 # This program has no checkpars call, so unknown parameters remain silent.
 [stderr] susynlv nt=11 nxm=1 unused=1
+
+# diff-2026-11 (round 1)
+# Explicit defaults, independently of default-sized output above.
+susynlv nt=103 dt=0.04 ft=0 kilounits=1 nxm=2 dxm=0.05 fxm=0 nxo=1 dxo=0.05 fxo=0 x0=0 z0=0 v00=2 dvdx=0 dvdz=0 fpeak=5 ls=0 er=0 ob=1 tmin=0.4 ndpfz=5 smooth=0 verbose=0 'ref=1:1,2;4,2'
+# Short traces have an actual shallow event, including clipped sinc support.
+susynlv nt=1 nxm=1 fxm=0 ndpfz=1 'ref=-0.02,0.02;0.02,0.02'
+susynlv nt=2 nxm=1 fxm=0 ndpfz=1 'ref=-0.02,0.02;0.02,0.02'
+susynlv nt=3 nxm=1 fxm=0 ndpfz=1 'ref=-0.02,0.02;0.02,0.02'
+susynlv nt=4 nxm=1 fxm=0 ndpfz=1 'ref=-0.02,0.02;0.02,0.02'
+susynlv nt=17 nxm=1 dt=0.007 fpeak=20 ndpfz=2 'ref=-0.1,0.03;0.1,0.03'
+susynlv nt=4097 dt=0.001 nxm=2 fxm=0 dxm=0.2 fpeak=30 'ref=-1,1;1,1'
+susynlv nt=65535 dt=0.001 nxm=1 fpeak=30 ndpfz=1 'ref=-0.1,1;0.1,1'
+# All eight combinations of amplitude and obliquity modes at prime nt.
+susynlv nt=61 nxm=1 fxm=0 ls=0 er=0 ob=0 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=0 er=0 ob=1 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=0 er=1 ob=0 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=0 er=1 ob=1 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=1 er=0 ob=0 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=1 er=0 ob=1 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=1 er=1 ob=0 'ref=-1,1;1,1'
+susynlv nt=61 nxm=1 fxm=0 ls=1 er=1 ob=1 'ref=-1,1;1,1'
+# Signed/repeated/nonuniform offsets and shifted velocity origin.
+susynlv nt=107 nxm=3 fxm=-0.5 dxm=-0.25 xo=0.3,-0.1,0.3,0 kilounits=0 x0=-0.3 z0=0.2 v00=2.4 dvdx=-0.2 dvdz=0.3 fpeak=7 tmin=0.2 ndpfz=3 'ref=-2,1;2,1'
+susynlv nt=109 nxs=2 dxs=0 fxs=-0.25 nxo=3 dxo=-0.2 fxo=0.2 kilounits=1 dvdx=0.1 dvdz=-0.1 'ref=-1,0.5;1,0.8'
+susynlv nt=113 nxs=3 dxs=0.25 fxs=-0.5 nxo=2 dxo=0.125 fxo=-0.125 kilounits=0 v00=2.1 dvdx=-0.1 dvdz=0 ls=1
+susynlv nt=127 nxm=1 fxm=0 dvdx=0 dvdz=-0.5 'ref=-1,1;1,1'
+susynlv nt=131 nxm=2 fxm=0 dxm=0.00001 dvdx=0 dvdz=0.5 'ref=-0.001,1;0.001,1'
+# Curved and vertical reflectors; all nonzero flag values are true.
+[stderr] susynlv nt=137 nxm=2 fxm=0 dxm=0.2 smooth=1 verbose=1 'ref=0.5:-1,0.7;0,1.2;1,0.6;2,1' 'ref=-0.2:-1,1.5;2,1.5'
+[stderr] susynlv nt=139 nxs=1 fxs=0 nxo=1 smooth=0 verbose=-1 ls=-1 er=2 ob=-1 'ref=-1,1;0,1.2;1,1'
+susynlv nt=149 nxm=1 fxm=0.4 smooth=1 ob=0 'ref=0,0.3;0,1.2'
+susynlv nt=151 nxm=1 fxm=0.2 smooth=0 ob=1 'ref=0,1;0,0.3'
+susynlv nt=157 nxm=1 dt=0.003 ft=-0.2 fpeak=0.5 ndpfz=1 'ref=-0.05,0.05;0.05,0.05'
+# susynlv is a generator: upstream samples and headers must be ignored.
+# Drain after generation while retaining susynlv's status; this keeps the
+# unused input pipe open and avoids scheduling-dependent upstream SIGPIPE.
+sunull nt=4 ntr=1 | sushw key=dt,delrt,sx,gx,offset a=1234,-200,5000,-6000,11000 | { susynlv nt=43 nxm=1 fxm=0.5 dt=0.02; status=$?; cat >/dev/null; exit "$status"; }
+suplane nt=8 ntr=1 npl=0 | suchw key1=cdp key2=tracl a=123 b=7 | { susynlv nt=47 nxs=1 fxs=-0.4 nxo=2 dxo=-0.2 fxo=0.1; status=$?; cat >/dev/null; exit "$status"; }
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | { susynlv nt=53 nxm=1 fxm=0.2 xo=0,-0.2; status=$?; cat >/dev/null; exit "$status"; }
+# dt uses an unsigned integer conversion before narrowing to the header.
+susynlv nt=2 nxm=1 dt=2147 fpeak=0.0001
+susynlv nt=2 nxm=1 dt=2148 fpeak=0.0001
+susynlv nt=2 nxm=1 dt=3000 fpeak=0.0001
+susynlv nt=3 nxm=1 dt=4096 fpeak=0.0001
+susynlv nt=4 nxm=1 dt=4294 fpeak=0.0001
+susynlv nt=2 nxm=1 dt=5000 fpeak=0.0001
+# Allocation failure must precede geometry validation for negative nxo.
+[stderr] susynlv nxo=-1 nxm=1
+[stderr] susynlv nxo=-2 nxm=0
+[stderr] susynlv nxo=-1 nxs=1 nxm=1
+# Negative nt fails only once a trace workspace is requested.
+[stderr] susynlv nt=-1 nxm=1
+[stderr] susynlv nt=-2 nxs=1 verbose=1
+susynlv nt=-1 nxm=0
+susynlv nt=-1 nxm=1 nxo=0
+[stderr] susynlv nt=-1 nxm=1 ref=bad
+# Bad/missing reflector coordinates and argument conversion/order.
+[stderr] susynlv nt=19 nxm=1 ref=1:
+[stderr] susynlv nt=19 nxm=1 'ref=0,1;2'
+[stderr] susynlv nt=19 nxm=1 'ref=0,1:2,1'
+[stderr] susynlv nt=19 nxs=0 fxm=0
+[stderr] susynlv nt=19 nxm=1 dt=1e-310
+[stderr] susynlv nt=19 nxm=1 xo=0,1e-310
+susynlv nt=23 nt=29 nxm=1 dt=0.04 dt=0.02 xo= xo=0,-0.1
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] susynlv nt=2 nxm=1 'ref=:0,1;2,1'
+[stderr] susynlv nt=1 nxm=1 ndpfz=-1
+[stderr] susynlv nt=1 nxm=1 v00=-2
+[stderr] susynlv nt=101 nxm=1 ndpfz=1 fpeak=1 tmin=1 v00=2 verbose=1 'ref=0,1;0.99999994,1'

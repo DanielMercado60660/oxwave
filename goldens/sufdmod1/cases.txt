@@ -72,3 +72,53 @@ sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 
 sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=13 zd=2 wfile=both sfile=both < vel && cat both
 # Zero decimation follows the original arm64 division/remainder behavior.
 sunull nt=9 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; sufdmod1 nz=9 tmax=0.01 sz=30 rz=40 dz=10 nt=7 td=0 zd=0 wfile=wave sfile=seis < vel && cat seis
+# diff-2026-11 (round 1)
+# Raw model generator: defaults versus all explicit defaults.
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.013 sz=3
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.013 sz=3 nt=0 styp=0 dz=1 fz=0 rz=0 freq=15 abs=0,1 td=1 zd=1 press=1 verbose=0
+# One-, two-, and three-knot models, with nt=1..4.
+makevel nx=1 nz=1 v000=1800 | sufdmod1 nz=1 tmax=0.002 sz=0 rz=0 nt=1 abs=0,0 press=0
+makevel nx=1 nz=1 v000=1800 | sufdmod1 nz=1 tmax=0.002 sz=0 rz=0 nt=2 abs=1,1 press=1
+makevel nx=1 nz=2 v000=1800 dvdz=300 | sufdmod1 nz=2 tmax=0.002 sz=1 rz=1 nt=3 abs=1,1 press=0
+makevel nx=1 nz=3 v000=1800 dvdz=300 | sufdmod1 nz=3 tmax=0.002 sz=1 rz=2 nt=4 styp=1 abs=1,0
+# Long odd/prime output and the exact maximum allowed receiver length.
+makevel nx=1 nz=17 v000=1600 dvdz=37 | sufdmod1 nz=17 tmax=0.08 sz=5 rz=9 nt=4097 styp=1 abs=1,1
+sunull nt=19 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; makevel nx=1 nz=19 v000=2200 dvdz=40 > den; sufdmod1 nz=19 tmax=0.09 sz=5 rz=12 nt=4097 styp=2 abs=1,1 press=0 velfile=vel dfile=den sfile=seis && cat seis
+makevel nx=1 nz=3 v000=1800 | sufdmod1 nz=3 tmax=0.002 sz=1 rz=1 nt=65534 freq=0 abs=1,1
+makevel nx=1 nz=3 v000=1800 | sufdmod1 nz=3 tmax=0.002 sz=1 rz=1 nt=65535 freq=0 td=2 abs=1,1 press=0
+makevel nx=1 nz=3 v000=1800 | sufdmod1 nz=3 tmax=0.002 sz=1 rz=1 nt=131068 freq=0 td=2 abs=1,1
+# Decimation may exceed the model or the number of iterations.
+makevel nx=1 nz=5 v000=1800 | sufdmod1 nz=5 tmax=0.01 sz=2 rz=2 nt=7 td=19
+sunull nt=5 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null > vel; sufdmod1 nz=5 tmax=0.01 sz=2 rz=2 nt=7 td=19 zd=11 wfile=wave sfile=seis < vel && cat wave seis
+# Coordinate ties and adjacent values exercise NINT after float arithmetic.
+[stderr] makevel nx=1 nz=7 v000=1800 | sufdmod1 nz=7 tmax=0.01 sz=2.5 rz=3.5 nt=17 verbose=1 abs=1,1
+[stderr] makevel nx=1 nz=7 v000=1800 | sufdmod1 nz=7 tmax=0.01 sz=2.4999 rz=3.4999 nt=17 verbose=1 abs=1,1
+[stderr] makevel nx=1 nz=7 v000=1800 | sufdmod1 nz=7 tmax=0.01 sz=-6.625 rz=-6.125 fz=-7.25 dz=0.25 nt=17 styp=2 verbose=1 abs=1,1
+# Sources on either endpoint, each receiver field, and noncanonical flags.
+makevel nx=1 nz=11 v000=1800 dvdz=30 | sufdmod1 nz=11 tmax=0.015 sz=10 rz=10 nt=101 abs=1,1 styp=2
+makevel nx=1 nz=11 v000=1800 dvdz=30 | sufdmod1 nz=11 tmax=0.015 sz=0 rz=0 nt=101 abs=1,1 styp=2
+makevel nx=1 nz=11 v000=1800 dvdz=30 | sufdmod1 nz=11 tmax=0.015 sz=0 rz=0 nt=101 abs=1,1 styp=2 press=0
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.015 sz=3 rz=5 nt=101 abs=2,-1
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.015 sz=3 rz=5 nt=101 styp=-1
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.015 sz=3 rz=5 nt=101 styp=1 freq=-25 press=0
+# Other deterministic SU generators provide nonconstant raw velocity models.
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sugain scale=900 bias=1500 | sustrip outpar=/dev/null | sufdmod1 nz=17 tmax=0.025 sz=4 rz=12 nt=257 styp=2 abs=1,0
+suplane nt=31 ntr=3 npl=1 ct1=15 cx1=2 len1=3 dip1=0 | sugain scale=600 bias=1700 | sustrip outpar=/dev/null | sufdmod1 nz=31 tmax=0.025 sz=4 rz=15 nt=257 styp=1 abs=0,0 press=0
+# This program reads raw floats, not SU headers. Strip deliberately altered headers.
+sunull nt=13 ntr=1 | sushw key=dt,delrt,d1,f1,offset,sdepth a=8000,-123,37,-900,-777,1000 | suchw key1=offset key2=offset key3=tracl a=13 b=2 c=3 | sugain bias=1900 | sustrip outpar=/dev/null | sufdmod1 nz=13 tmax=0.02 sz=4 rz=7 nt=127 dz=1 fz=0
+# Trailing model traces are ignored after nz floats have been read.
+sunull nt=13 ntr=4 | sugain bias=1900 | sustrip outpar=/dev/null | sufdmod1 nz=13 tmax=0.02 sz=4 rz=7 nt=127
+# Both output modes with density interpolation and all named files, full diagnostics.
+[stderr] sunull nt=13 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; makevel nx=1 nz=13 v000=2100 dvdz=35 > den; sufdmod1 nz=13 tmax=0.03 sz=4 rz=8 nt=17 styp=2 press=0 abs=1,1 td=2 zd=2 dz=1 fz=0 freq=23 verbose=1 velfile=vel dfile=den sfile=seis wfile=wave && cat wave seis
+sunull nt=13 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null > vel; makevel nx=1 nz=13 v000=2100 dvdz=35 > den; sufdmod1 nz=13 tmax=0.03 sz=4 rz=8 nt=17 styp=2 press=1 abs=1,1 td=2 zd=2 velfile=vel dfile=den wfile=wave > /dev/null && cat wave
+# Empty optional values restore defaults; last duplicate numeric argument wins.
+makevel nx=1 nz=11 v000=1800 | sufdmod1 nz=11 tmax=0.013 sz=3 nt=0 nt=29 rz=0 rz=4 dz= dz=1 abs=0,1 freq= styp= press= td= zd= velfile= dfile= sfile= wfile=
+# Error paths: missing/empty required arguments, overflow, short density, and limits.
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | sufdmod1 nz= tmax=0.01 sz=0
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | sufdmod1 nz=1 tmax= sz=0
+[stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | sufdmod1 nz=1 tmax=0.01 sz=
+[stderr] makevel nx=1 nz=5 v000=1800 | sufdmod1 nz=5 tmax=0.01 sz=2 press=99
+[stderr] makevel nx=1 nz=5 v000=1800 | sufdmod1 nz=5 tmax=0.01 sz=2 nt=2147483648
+[stderr] sunull nt=5 ntr=1 | sugain bias=1800 | sustrip outpar=/dev/null > vel; makevel nx=1 nz=4 v000=2200 > den; sufdmod1 nz=5 tmax=0.01 sz=2 dfile=den velfile=vel
+[stderr] makevel nx=1 nz=5 v000=1800 | sufdmod1 nz=5 tmax=0.01 sz=2 nt=131069 td=2
+[stderr] makevel nx=1 nz=5 v000=1800 | sufdmod1 nz=5 tmax=0.01 sz=2 velfile=absent/model

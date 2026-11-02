@@ -13,3 +13,24 @@ sunull nt=3 ntr=1 > a && : > b && sumixgathers a b ntr=1
 sumixgathers missing other ntr=1
 # Nonzero negative scaling and unknown argument.
 [stderr] susorty nt=5 nshot=1 noff=1 | sushw key=offset a=1000 > a && susorty nt=5 nshot=1 noff=1 | sushw key=offset a=2000 > b && sumixgathers a b ntr=1 scaling=-1 extra=1
+# diff-2026-11 (round 1)
+# Positive offsets just inside and on the strict matching boundaries.
+[stderr] sunull nt=2 ntr=1 | sushw key=offset,ntr a=1000,1 > a && sunull nt=2 ntr=5 | sushw key=offset a=998 b=1 > b && sumixgathers a b scaling=0 verbose=1
+# Negative offsets use a wider strict window; scale unmatched traces.
+[stderr] sunull nt=3 ntr=1 | sushw key=offset a=-1000 > a && sunull nt=3 ntr=5 | sushw key=offset a=-1011 b=5 > b && sumixgathers a b ntr=1 scaling=1
+# Equal zero offsets do not match, including when scaling is requested.
+sunull nt=4 ntr=1 > a && sunull nt=4 ntr=2 > b && sumixgathers a b ntr=1 scaling=1
+# Prime sample count, several first-file headers, and mixed offsets.
+suplane nt=17 ntr=4 | sushw key=offset,ntr a=100,4 b=100,0 > a && suplane nt=17 ntr=6 | sushw key=offset a=50 b=50 > b && sumixgathers a b
+# Long traces and nonzero amplitudes test the complete sample loop.
+[stderr] suspike nt=4097 ntr=2 | sushw key=offset a=1000 b=1000 > a && suspike nt=4097 ntr=3 | sushw key=offset a=1500 b=1000 > b && sumixgathers a b ntr=2 scaling=1
+# Explicit trace count larger than the first gather.
+sunull nt=11 ntr=2 | sushw key=ntr,offset a=2,-400 b=0,800 > a && suspike nt=11 ntr=3 | sushw key=offset a=-405 b=405 > b && sumixgathers a b ntr=5 scaling=0
+# Empty second gather retains the original headers and samples.
+suspike nt=13 ntr=3 | sushw key=ntr a=3 > a && : > b && sumixgathers a b scaling=1
+# Invalid numeric trace count is parsed as zero.
+suspike nt=5 ntr=1 > a && suspike nt=5 ntr=1 > b && sumixgathers a b ntr=abc
+# Differing sample counts between the two input files.
+[stderr] suspike nt=7 ntr=4 | sushw key=offset a=1000 > a && suspike nt=11 ntr=4 | sushw key=offset a=2000 > b && sumixgathers a b ntr=4 scaling=1
+# First input longer than the second input.
+[stderr] suspike nt=11 ntr=4 | sushw key=offset a=1000 > a && suspike nt=7 ntr=4 | sushw key=offset a=2000 > b && sumixgathers a b ntr=4 scaling=1

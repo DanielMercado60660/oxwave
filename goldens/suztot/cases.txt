@@ -15,3 +15,24 @@ suztot
 # Regression: negative allocation size and microsecond interval beyond 16 bits.
 suspike nt=17 ntr=1 | suztot dz=3 nt=-1
 suspike nt=17 ntr=1 | suztot dz=3 dt=0.1 nt=3
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suztot dz=3 dt=0.004 nt=2
+suspike nt=3 ntr=1 | suztot dz=3 dt=0.004 nt=3
+suspike nt=4 ntr=1 | suztot dz=3 dt=0.004 nt=4
+suspike nt=13 ntr=3 | suztot dz=2 dt=0.002 nt=11 v=1700
+suplane nt=37 ntr=3 | suztot dz=4 dt=0.003 nt=31 z=0,40,144 v=1500,1900,2200
+sunull nt=29 ntr=2 | sushw key=d1 a=5 | suztot
+suspike nt=4097 ntr=1 | suztot dz=2 dt=0.002 nt=4097
+suspike nt=101 ntr=2 | sushw key=d1,delrt,dt a=4,12,3000 | suztot dt=0.003 nt=83
+suspike nt=41 ntr=1 | suztot dz=3 dt=0.003 ft=0.01 fz=6 nt=25 z=0,60,120 v=1600,1800,2100
+[stderr] suplane nt=31 ntr=2 | suztot dz=2 dt=0.002 nt=25 verbose=1
+suspike nt=19 ntr=1 | suztot dz=3 dt=0.004 nt=13 z=0,10,50 v=2000,1700,1500
+suspike nt=53 ntr=1 | suztot dz=1.5 dt=0.001 nt=47 ft=-0.001 v=1800
+suspike nt=17 ntr=1 | suztot dz=3 z=0,10,10 v=1500,1600,1700
+suspike nt=17 ntr=1 | suztot dz=3 z=0,10,20 v=1500,1600
+suspike nt=17 ntr=1 | suztot dz=3 nt=65537
+python3 -c 'import struct;open("vel","wb").write(struct.pack("=13f",*[1500+i*20 for i in range(13)]))' && suspike nt=13 ntr=1 | suztot dz=3 vfile=vel dt=0.004 nt=11
+suspike nt=11 ntr=1 | suztot dz=3 dt=0.004 nt=1
+suplane nt=127 ntr=4 | suztot dz=2.5 z=0,80,300 v=1400,2000,2400
+suspike nt=31 ntr=2 | suztot dz=3 dt=0.004 nt=37 v=1500
+suspike nt=71 ntr=1 | suztot dz=2.7 dt=0.0017 ft=0.003 fz=1 nt=67 z=0,25,100,200 v=1300,1550,1800,2100

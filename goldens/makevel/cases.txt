@@ -15,3 +15,36 @@ makevel nz=3
 makevel nx=3
 makevel nx=2 nz=3 vzfile=missing.bin
 makevel nx=1 nz=1 > short.bin && makevel nx=2 nz=3 vzfile=short.bin
+# diff-2026-11 (round 1)
+[f32] makevel nx=1 nz=2
+[f32] makevel nx=1 nz=3
+[f32] makevel nx=1 nz=4
+[f32] makevel nx=1 nz=4097 dvdz=0.001
+[f32] makevel nx=7 ny=3 nz=17 dx=0.3 dy=1.7 dz=0.2 fx=-1 fy=2 fz=-0.4 v000=1.5 dvdx=-0.25 dvdy=0.35 dvdz=0.75
+[f32] makevel nx=2 ny=2 nz=5 dx=1 dy=1 dz=1 fx=0 fy=0 fz=0 v000=2 dvdx=0 dvdy=0 dvdz=0
+[f32] makevel nx=4 ny=3 nz=19 fx=-2 fy=-1 fz=-4 dx=0.7 dy=0.8 dz=0.45 xlens=0.2 ylens=-0.3 zlens=0.7 vlens=-5 dlens=3 tlens=2 lambda=0.4
+[f32] makevel nx=2 ny=2 nz=11 vlens=3 dlens=0.1 tlens=0.2 lambda=10
+[f32] makevel nx=1 nz=31 dz=0.25 vzc=2 z1c=0.5 z2c=6 l1c=0.7 l2c=2.5 exc=0.5
+[f32] makevel nx=2 nz=37 dz=0.3 fz=-2 vzc=-4 z1c=-1 z2c=8 l1c=3 l2c=0.8 exc=2
+[f32] makevel nx=2 ny=2 nz=23 vran=1.25 vzran=0
+[f32] makevel nx=3 ny=2 nz=23 vran=0 vzran=0.75
+[f32] makevel nx=3 ny=2 nz=29 vran=-0.5 vzran=0.25 vzc=2 l1c=4 l2c=8
+[f32] makevel nx=1 nz=9 dvdz=0.3 > profile.bin && makevel nx=2 ny=2 nz=9 vzfile=profile.bin v000=-1 dvdx=0.2
+[f32] suspike ntr=1 nt=7 k1=3 | sustrip outpar=/dev/null > profile.bin && makevel nx=2 nz=7 vzfile=profile.bin dvdz=0.2
+[f32] suplane ntr=2 nt=13 | sushw key=offset a=100 b=20 | sustrip outpar=/dev/null > profile.bin && makevel nx=1 nz=13 vzfile=profile.bin
+[f32] makevel nx=1 nz=5 nx=3 nz=7 dvdz=0.25
+[f32] makevel nx=1 nz=7 dx= dy= dz= v000= dvdz=
+[f32] makevel nx=3 ny=-1 nz=5
+[f32] makevel nx=2 ny=2 nz=1 fz=2 z1c=0 z2c=3 l1c=2 l2c=4 vzc=1
+[f32] makevel nx=2 nz=13 fz=5 dz=-0.5 z1c=0 z2c=5 l1c=1 l2c=3 vzc=2 exc=3
+[stderr] [f32] makevel nx=2 nz=4 verbose=1 dx=0.5
+makevel nx= nz=2
+makevel nx=2 nz=
+makevel nx=2 nz=4 vzfile=does-not-exist
+[f32] makevel nx=1 nz=3 > tiny.bin && makevel nx=1 nz=4 vzfile=tiny.bin
+[f32] makevel nx=2 ny=3 nz=101 dx=0.125 dy=-0.25 dz=0.125 fx=1 fy=-2 fz=-3 v000=0 dvdx=0.125 dvdy=0.25 dvdz=0.5 vlens=0.3 dlens=2 tlens=3 xlens=1 ylens=-2 zlens=0 lambda=3
+[f32] makevel nx=2 nz=101 dz=0.05 fz=-1 vzc=10 z1c=-1.1 z2c=4 l1c=0.11 l2c=0.2 exc=1.25
+[f32] makevel nx=1 nz=4097 v000=0 vran=1 vzran=1
+[f32] makevel nx=4 ny=3 nz=7 vlens=8 dlens=-4 tlens=-2 lambda=0.7
+[f32] makevel nx=3 nz=17 v000=-2 dvdz=0.25 vzc=1 z1c=-2 z2c=20 l1c=4 l2c=4 exc=0
+[f32] makevel nx=1 nz=7 vzfile=

@@ -267,7 +267,7 @@ pub fn ray_theoretic_beta(
 /// C prototype: `void eiktam(float xs, float zs, int nz, float dz, float fz, int nx, float dx, float fx, float **vel, float **time, float **angle, float **sig, float **bet);`
 ///
 /// Dimensions come from `vel`; all four output grids must have the same shape.
-/// Grids are indexed [x][z], with both dimensions at least two and positive spacing.
+/// Grids are indexed [x][z], with both dimensions at least two and nonzero spacing.
 /// The source must lie within the grid. Smooth positive velocities describe the
 /// physical problem; singular values propagate IEEE infinities and NaNs as in C.
 /// Revisor: Zhenyue Liu, Colorado School of Mines, 7/8/92.
@@ -289,7 +289,7 @@ pub fn eiktam(
     let nx = vel.len();
     assert!(nx >= 2);
     let nz = vel[0].len();
-    assert!(nz >= 2 && dx > 0. && dz > 0.);
+    assert!(nz >= 2 && dx != 0. && dz != 0.);
     assert!(vel.iter().all(|x| x.len() == nz));
     for grid in [&*time, &*angle, &*sig, &*bet] {
         assert!(grid.len() == nx && grid.iter().all(|x| x.len() == nz));
@@ -491,4 +491,35 @@ pub fn eiktam(
         fx,
         bet,
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn eiktam_accepts_negative_depth_spacing() {
+        let vel = vec![vec![2000.0; 9]; 11];
+        let mut time = vec![vec![0.0; 9]; 11];
+        let mut angle = time.clone();
+        let mut sig = time.clone();
+        let mut bet = time.clone();
+        eiktam(
+            500.0,
+            0.0,
+            -100.0,
+            0.0,
+            100.0,
+            0.0,
+            &vel.iter().map(Vec::as_slice).collect::<Vec<_>>(),
+            &mut time.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
+            &mut angle.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
+            &mut sig.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
+            &mut bet.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
+        );
+        assert_eq!(time[5][0], 0.0);
+        for grid in [&time, &angle, &sig, &bet] {
+            assert!(grid.iter().flatten().all(|v| v.is_finite()));
+        }
+    }
 }

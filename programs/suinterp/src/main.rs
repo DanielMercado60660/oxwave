@@ -125,10 +125,12 @@ const SDOC: &[&str] = &[
 
 // VNDtempname owns a VND allocation, which must be freed with VNDfree.
 fn v2dop(lwmax: i64, nt: usize, nx: i64) -> VND {
-    if nt == 0 || nx <= 0 {
-        // Nonpositive dimensions make the C VND geometry undefined.
+    if nt == 0 || nx == 0 {
+        // Zero dimensions lead to division by zero in C's VNDrw.
         err!("invalid VND dimensions");
     }
+    // Negative dimensions can reach VND's key validation without invalid
+    // memory accesses. Preserve that library diagnostic and abort, as in C.
     let file = VNDtempname("suinterp");
     // SAFETY: VNDtempname returns a live, NUL-terminated allocation.
     let name = unsafe { CStr::from_ptr(file.cast()) }
@@ -451,7 +453,7 @@ fn main() {
     let mut vndorig = v2dop(1000000, nt, nxmax as i64);
     let nout = 1i64 + (nxmax as i64 - 1) * (ninterp as i64 + 1);
     // The C expression uses int arithmetic before conversion to long.
-    if nout > i32::MAX as i64 || nout <= 0 || ninterp == i32::MAX {
+    if nout > i32::MAX as i64 || nout < i32::MIN as i64 || ninterp == i32::MAX {
         err!("invalid VND dimensions");
     }
     let mut vndinterp = v2dop(1000000, nt, nout);

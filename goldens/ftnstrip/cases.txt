@@ -10,3 +10,17 @@
 [stderr] python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",-1))' | ftnstrip
 # Round trip raw float samples through Fortran records.
 [exact] suspike nt=7 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=7 outpar=/dev/null | ftnstrip
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | ftnunstrip outpar=/dev/null | ftnstrip
+[exact] suspike nt=2 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=/dev/null | ftnstrip verbose=1
+[exact] sunull nt=3 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=/dev/null | ftnstrip
+[exact] suplane nt=4 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=4 outpar=/dev/null | ftnstrip
+[exact] suspike nt=11 ntr=5 | sushw key=tracl a=20 b=3 | sustrip outpar=/dev/null | ftnunstrip n1=11 outpar=/dev/null | ftnstrip unused=7
+[exact] sunull nt=4097 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=4097 outpar=/dev/null | ftnstrip
+[exact] suplane nt=17 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=1 outpar=/dev/null | ftnstrip
+[exact] suspike nt=5 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=5 outpar=/dev/null | python3 -c 'import sys,struct; b=bytearray(sys.stdin.buffer.read()); b[24:28]=struct.pack("=i",12345); sys.stdout.buffer.write(b)' | ftnstrip
+[exact] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=/dev/null | python3 -c 'import sys; b=sys.stdin.buffer.read(); sys.stdout.buffer.write(b[:-2])' | ftnstrip
+[exact] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=/dev/null | python3 -c 'import sys; sys.stdout.buffer.write(sys.stdin.buffer.read()+b"\x03\x00")' | ftnstrip
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=1 outpar=/dev/null | python3 -c 'import sys,struct; sys.stdout.buffer.write(struct.pack("=i",0)+sys.stdin.buffer.read())' | ftnstrip
+[exact] suspike nt=17 ntr=1 | sustrip outpar=/dev/null | python3 -c 'import sys,struct; b=sys.stdin.buffer.read(); o=sys.stdout.buffer; [(o.write(struct.pack("=i",n)),o.write(b[:n]),o.write(struct.pack("=i",n))) for n in (1,3,7,13)]' | ftnstrip
+[exact] sunull nt=4097 ntr=2 | sustrip outpar=/dev/null | python3 -c 'import sys,struct; b=sys.stdin.buffer.read()[:16389]; sys.stdout.buffer.write(struct.pack("=i",len(b))+b+struct.pack("=i",len(b)))' | ftnstrip

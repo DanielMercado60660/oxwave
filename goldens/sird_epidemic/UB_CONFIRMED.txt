@@ -1,0 +1,9 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/par/main/ordinary_differential_equations/sird_epidemic.c:245
+# (also :248, :275, :310): signed int overflow in 4*stepmax for INT_MIN.
+# Minimal fix: check INT_MIN/4 <= stepmax <= INT_MAX/4 before allocation.
+# orig matches vendor/golden behaviour: rc=0, empty stdout and stderr.
+# fixed: rc=1, empty stdout, stderr="\nsird_epidemic: stepmax*4 overflows int\n".
+# OxWave previously panicked (rc=101); the port now matches fixed exactly.
+# Evidence: diffcamp/ubx/sird_epidemic/{fix.patch,build-commands.json,comparison.json}.
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=-2147483648; rc=$?; cat >/dev/null; exit "$rc"; }

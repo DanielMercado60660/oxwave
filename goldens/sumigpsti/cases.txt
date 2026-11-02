@@ -79,3 +79,52 @@ sunull nt=17 ntr=2 | suaddnoise seed=460 noise=gauss | sumigpsti dx=25 nxpad=-2
 # against controlled Rust diagnostics; they cannot have portable SU goldens.
 # Original Post_stack/Sumigpsti demo: layered reflector data and gradient velocity file.
 vtlvz dt=.01 nt=401 v0=1500 a=.6 >vt.F; susynlvfti angxs=0 er=1 ob=0 v00=1.5 delta=0.0 epsilon=0.2 fpeak=10 dvdx=0 dxm=.04 nxm=201 dt=.01 nt=401 dvdz=.6 smooth=1 ref="1:0.0,.5;1.0,.5;2.,2.0;3.0,2.0;4.0,3.0;5.0,2.0;6.0,2.0" | sumigpsti vnfile=vt.F vfile=vt.F dx=40 tmig=0. etamig=.2
+# diff-2026-11 (round 1)
+# Nonzero samples at every tiny time size; both time and space padding vary.
+suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sumigpsti dx=100 np=47
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | sumigpsti dx=100 np=47
+suspike nt=3 ntr=3 nspk=1 ix1=2 it1=1 | sumigpsti dx=100 np=47
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=2 | sumigpsti dx=100 np=47
+# Prime and long traces, including the maximum SU ns with a narrow filter.
+suspike nt=251 ntr=3 nspk=1 ix1=2 it1=125 | sumigpsti dx=100 np=47
+suspike nt=1021 ntr=3 nspk=1 ix1=2 it1=510 | sumigpsti dx=100 np=47
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=2048 | sumigpsti dx=100 np=47
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=5 | sumigpsti dx=25 np=3 ffil=0,0,1,2
+# Defaults versus every explicit scalar/array default on a different generator.
+[stderr] suplane nt=113 ntr=9 | sumigpsti
+suplane nt=113 ntr=9 | sumigpsti dt=0.004 dx=1 ffil=0,0,125,125 nxpad=0 ltaper=0 verbose=0 np=200 ntflag=1 tmig=0 vnmig=1500 vmig=1500 etamig=0
+# All image modes, including unused bits, with nonzero plane data.
+suplane nt=127 ntr=11 | sumigpsti dx=25 nxpad=5 ltaper=2 ntflag=1
+suplane nt=127 ntr=11 | sumigpsti dx=25 nxpad=5 ltaper=2 ntflag=2
+suplane nt=127 ntr=11 | sumigpsti dx=25 nxpad=5 ltaper=2 ntflag=3
+suplane nt=127 ntr=11 | sumigpsti dx=25 nxpad=5 ltaper=2 ntflag=0
+suplane nt=113 ntr=9 | sumigpsti dx=50 ntflag=4
+suplane nt=113 ntr=9 | sumigpsti dx=50 ntflag=7
+# Both filter ramps, coincident corners, reversed corners, and above Nyquist.
+suplane nt=113 ntr=9 | sumigpsti dx=50 dt=0.003 ffil=5,15,80,120
+suplane nt=113 ntr=9 | sumigpsti dx=50 ffil=25,25,25,25
+suplane nt=113 ntr=9 | sumigpsti dx=50 ffil=100,25,75,0
+suplane nt=113 ntr=9 | sumigpsti dx=50 ffil=200,300,400,500
+# Nonstandard sampling and taper overlap; verbose reports many wavenumbers.
+suplane nt=113 ntr=9 | sumigpsti dx=50 dt=0.000013
+[stderr] suplane nt=113 ntr=9 | sumigpsti dx=50 nxpad=101 ltaper=100 np=13 verbose=1
+# First-trace dt/d2 control sampling; decreasing cdp and changing later headers.
+sunull nt=151 ntr=17 | suaddnoise seed=100 noise=flat | sushw key=cdp,dt,d2,delrt a=100,3000,-37.5,-500 b=-1,10,0.5,1 | sumigpsti np=37
+[stderr] suplane nt=67 ntr=7 | sushw key=dt,d2 a=0,0 | sumigpsti verbose=1
+suplane nt=67 ntr=7 | sushw key=dt,d2,delrt a=8000,40,300 | sumigpsti dt=0.002 dx=25
+# One trace, coarse slope tables, and interpolation across negative model times.
+sunull nt=151 ntr=1 | suaddnoise seed=101 noise=gauss | sumigpsti dx=37.5 np=3
+sunull nt=97 ntr=7 | suaddnoise seed=341 noise=gauss | sumigpsti dx=250 np=3 tmig=0,0.384 vnmig=1300,2500 vmig=1200,2300 etamig=0.1,0.3 ntflag=3
+suplane nt=113 ntr=9 | sumigpsti dx=50 tmig=-0.05,0.025,0.1 vnmig=1337,1887,2997 vmig=1277,1777,2887 etamig=.02,.13,.27
+# Independent deterministic native-float files exercise all three model paths.
+makevel nx=1 nz=41 v000=1700 dvdz=3 >vn; makevel nx=1 nz=41 v000=1600 dvdz=2 >v; makevel nx=1 nz=41 v000=0.12 dvdz=0.001 >eta; suplane nt=41 ntr=7 | sumigpsti dx=75 vnfile=vn vfile=v etafile=eta ntflag=3
+# With all files present, even nonmonotonic parameter models are ignored.
+[stderr] makevel nx=1 nz=37 v000=1500 >vn; makevel nx=1 nz=37 v000=1400 >v; makevel nx=1 nz=37 v000=0.1 >eta; suplane nt=37 ntr=5 | sumigpsti dx=50 vnfile=vn vfile=v etafile=eta tmig=1,0 vnmig=1,2 vmig=3,4 etamig=5,6 verbose=1
+# Scattering and reflector generators give different amplitudes and headers.
+suimp2d nt=257 nrec=7 c=1500 x0=100 z0=150 dgx=25 | sumigpsti dx=25 vnmig=1500
+susynlv nt=129 dt=.004 nxm=7 dxm=.025 v00=1.5 ref="1:-1,0.2;1,0.2" | sumigpsti dx=25 vnmig=1500
+# Errors before numerical migration: malformed arrays and a short model file.
+[stderr] sunull nt=4 ntr=1 | sumigpsti dx=25 ffil=0,100
+[stderr] sunull nt=4 ntr=1 | sumigpsti dx=25 tmig=0,0.1 vnmig=1500,1600 etamig=0
+[stderr] printf '1500\n1600\n1700\n' | a2b n1=1 >vn; sunull nt=4 ntr=1 | sumigpsti dx=25 vnfile=vn
+[stderr] { sunull nt=4 ntr=1; sunull nt=5 ntr=1; } | sumigpsti dx=25

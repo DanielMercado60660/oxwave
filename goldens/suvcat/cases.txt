@@ -34,3 +34,47 @@ suspike nt=1 ntr=1 > a && suspike nt=1 ntr=1 > b && suvcat a b taplen=0 taptype=
 sunull nt=5 ntr=1 > a && sunull nt=5 ntr=1 > b && suvcat a b taplen=-65535
 # Negative/oversized overlaps that reach indexing are undefined in C;
 # exercise the Rust error exits separately.
+
+# diff-2026-11 (round 1)
+# Real spike positions and signed amplitudes; defaults and explicit defaults.
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > b && suvcat a b
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > b && suvcat a b taplen=0 taptype=0
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sugain scale=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=-3 > b && suvcat a b taplen=2 taptype=0
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sugain scale=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=-3 > b && suvcat a b taplen=2 taptype=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sugain scale=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=-3 > b && suvcat a b taplen=2 taptype=2
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sugain scale=2 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=-3 > b && suvcat a b taplen=2 taptype=3
+# Equal magnitudes select data2, including its sign.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 > a && suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=-1 > b && suvcat a b taplen=1 taptype=1
+# Dense seeded data exposes the cosine's integer-division step and all methods.
+sunull nt=17 ntr=3 | suaddnoise seed=193 sn=1 > a && sunull nt=19 ntr=3 | suaddnoise seed=719 sn=1 > b && suvcat a b taplen=11 taptype=0
+sunull nt=17 ntr=3 | suaddnoise seed=193 sn=1 > a && sunull nt=19 ntr=3 | suaddnoise seed=719 sn=1 > b && suvcat a b taplen=11 taptype=1
+sunull nt=17 ntr=3 | suaddnoise seed=193 sn=1 > a && sunull nt=19 ntr=3 | suaddnoise seed=719 sn=1 > b && suvcat a b taplen=11 taptype=2
+sunull nt=17 ntr=3 | suaddnoise seed=193 sn=1 > a && sunull nt=19 ntr=3 | suaddnoise seed=719 sn=1 > b && suvcat a b taplen=11 taptype=3
+# Large odd and prime sample counts, plus both sides of the exact sample limit.
+suplane nt=4097 ntr=3 npl=1 ct1=4090 cx1=2 len1=3 > a && suspike nt=4099 ntr=3 nspk=1 ix1=2 it1=4 > b && suvcat a b taplen=7 taptype=2
+sunull nt=32768 ntr=1 > a && suspike nt=32767 ntr=1 nspk=1 ix1=1 it1=32767 > b && suvcat a b taplen=0 taptype=3
+sunull nt=32768 ntr=1 > a && sunull nt=32768 ntr=1 > b && suvcat a b taplen=0 taptype=0
+suspike nt=65535 ntr=2 nspk=1 ix1=1 it1=65535 > a && sunull nt=65535 ntr=2 > b && suvcat a b taplen=65535 taptype=3
+# Only data1's header is retained; lengths come from the actual input headers.
+suplane nt=17 ntr=3 npl=1 ct1=8 cx1=2 len1=3 | sushw key=cdp,dt,delrt,scalco a=71,2000,-13,-10 b=3,0,0,0 | suchw key1=offset key2=cdp a=-100 b=2 > a && suspike nt=19 ntr=3 nspk=1 ix1=2 it1=3 | sushw key=cdp,dt,delrt,scalco a=900,8000,200,100 > b && suvcat a b taplen=4 taptype=0
+sunull nt=17 ntr=2 | sushw key=ns a=3 > a && suspike nt=7 ntr=2 nspk=1 ix1=1 it1=2 | sushw key=ns a=4 > b && suvcat a b taplen=1 taptype=3
+# Varying ns within a file must fail at the same trace, in either input.
+sunull nt=5 ntr=2 | sushw key=ns a=3 b=1 > a && sunull nt=5 ntr=2 > b && suvcat a b
+sunull nt=5 ntr=2 > a && sunull nt=5 ntr=2 | sushw key=ns a=3 b=1 > b && suvcat a b
+# Verbose and EOF diagnostics, with data in the overlap.
+[stderr] suspike nt=7 ntr=4 nspk=1 ix1=1 it1=7 > a && suspike nt=5 ntr=2 nspk=1 ix1=1 it1=1 > b && suvcat a b taplen=2 taptype=3 verbose=1
+[stderr] suspike nt=7 ntr=2 nspk=1 ix1=1 it1=7 > a && suspike nt=5 ntr=4 nspk=1 ix1=1 it1=1 > b && suvcat a b taplen=2 taptype=1 verbose=1
+# Empty values, repeated values, bad types, and missing positional arguments.
+sunull nt=3 ntr=1 > a && sunull nt=4 ntr=1 > b && suvcat a b taplen= taptype=
+sunull nt=3 ntr=1 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > b && suvcat a b taplen=1 taplen=2 taptype=0 taptype=3
+sunull nt=3 ntr=1 > a && sunull nt=4 ntr=1 > b && suvcat a b taptype=4
+sunull nt=3 ntr=1 > a && sunull nt=4 ntr=1 > b && suvcat a b taplen=2147483648
+sunull nt=3 ntr=1 | suvcat missing
+# Negative taptype skips every sample loop when taplen >= nt1+nt2.
+# No uninitialized output is read: ns is converted to unsigned short and
+# the original globally initialized data1 buffer is passed directly to puttr.
+[exact] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 > a && sunull nt=4 ntr=2 > b && suvcat a b taplen=7 taptype=-1
+sunull nt=3 ntr=1 > a && suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 > b && suvcat a b taplen=7 taptype=-2147483648
+suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 > a && sunull nt=4 ntr=2 > b && suvcat a b taplen=8 taptype=-1
+[exact] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 > a && sunull nt=4 ntr=2 > b && suvcat a b taplen=65543 taptype=-1
+[stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 > a && sunull nt=4 ntr=1 > b && suvcat a b taplen=2147483647 taptype=-1 verbose=1

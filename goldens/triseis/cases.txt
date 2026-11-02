@@ -88,3 +88,78 @@
 
 # Seven receivers spanning x=0..4, with a small ray fan for a stable C reference.
 [stderr] [f32] python3 -c 'import struct,sys;sys.stdout.buffer.write(struct.pack("4f",1,1,1,1))' | uni2tri n1=2 n2=2 d1=2 d2=4 verbose=0 | triseis xs=0.2,3.8 zs=0,0 xg=0,4 zg=2,2 krecord=-1 ng=7 nt=101 dt=0.025 nangle=7 fangle=-65 langle=65
+
+# diff-2026-11 (round 1)
+# Triangulated sloth inputs; stdout is native float32, with default tolerance.
+# Header variations occur upstream: triseis consumes models, not SU headers.
+# generator-defaults
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95
+# explicit-defaults
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 ns=1 ds=0 fs=0 ng=101 dg=0 fg=0 dgds=0 krecord=1 prim=2147483647 kreflect=-1 bw=0 nt=251 dt=0.004 ft=0 fpeak=25 nangle=101 fangle=-45 langle=45 reftrans=0 atten=0 aperture=3.402823466e38 lscale=3.402823466e38
+# short-nt-1
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=1 ng=1 nangle=1 fangle=0 langle=0 ft=0.845
+# short-nt-2
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=2 ng=1 nangle=1 fangle=0 langle=0 ft=0.845
+# short-nt-3
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=3 ng=1 nangle=1 fangle=0 langle=0 ft=0.845
+# short-nt-4
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=4 ng=1 nangle=1 fangle=0 langle=0 ft=0.845
+# prime-nt
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=509 fpeak=12.5 lscale=0.4 aperture=30
+# long-4097
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=4097 fpeak=20
+# long-4097-causal
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=4097 atten=2
+# long-4097-shifted
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=4097 ft=-2 bw=0.08
+# moving-spread
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 ns=3 ds=0.1 fs=0.02 dg=0.2 fg=0.05 dgds=0.5
+# reverse-spread
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 ns=3 ds=-0.1 fs=0.35 dg=-0.2 fg=0.7 dgds=-0.5
+# unrecorded-index
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 krecord=99 prim=1
+# fixed-beam
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 bw=0.13 reftrans=1
+# negative-beam
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 bw=-0.13 fpeak=9
+# noncausal
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 atten=1 ft=0.2
+# causal
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 atten=2 ft=-0.1
+# restricted-extrapolation
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 lscale=0.05 aperture=0
+# upgoing
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 fangle=150 langle=210 xg=0,1 zg=0,0
+# single-location
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 xs=0.4 zs=0.2 xg=0.5 zg=0.8 ng=1
+# outside-model
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 xs=-0.3,-0.1 zs=0,0 ns=2
+# verbose-alias
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 verbose=1 fpeak=30
+# headered-null
+[stderr] [f32] sunull nt=2 ntr=2 | sushw key=dt,offset,sx,gx a=8000,-200,10,30 | suchw key1=cdp key2=sx key3=gx a=0 b=1 c=1 d=2 | suop op=exp | sustrip outpar=/dev/null | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 ns=2 ds=0.2
+# single-input-trace
+[stderr] [f32] sunull nt=4 ntr=1 | suop op=exp | sustrip outpar=/dev/null | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=101
+# plane-input
+[stderr] [f32] suplane nt=2 ntr=2 npl=0 | suop op=exp | sustrip outpar=/dev/null | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=127
+# spike-gradient
+[stderr] [f32] suspike nt=2 ntr=2 nspk=1 ix1=1 it1=1 | suop op=exp | sustrip outpar=/dev/null | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 nt=509 bw=0.1 reftrans=1
+# depth-lateral-gradients
+[stderr] [f32] makevel nx=3 nz=3 v000=1 dvdx=0.3 dvdz=0.7 | uni2tri n1=3 n2=3 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 ns=2 reftrans=1 atten=2
+# reflected-primary
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | python3 -c 'exec("import sys,struct,math\nb=sys.stdin.buffer.read(); i=0; records=[]; ats=[0]*6\nsizes=[120,56,56,24,40,32]; offsets=[112,48,48,16,32,24]\ndef q(b,o=0): return struct.unpack_from(\"<Q\",b,o)[0]\nwhile i<len(b):\n k,a=struct.unpack_from(\"<iQ\",b,i); i+=12\n r=bytearray(b[i:i+sizes[k]]); i+=sizes[k]\n if k==0: ats=list(struct.unpack_from(\"<6Q\",r,32))\n n=ats[k] if q(r,offsets[k]) else 0\n attr=b[i:i+n]; i+=n\n records.append([k,a,r,attr])\nmaps=[{a:r for k,a,r,at in records if k==j} for j in range(6)]\ndef vertex(eu):\n vu=q(maps[2][eu],8)\n v=q(maps[4][vu],24)\n z,x=struct.unpack_from(\"<ff\",maps[5][v],12)\n return x,z\nj=0\nfor item in records:\n k,a,r,at=item\n if k==0:\n  struct.pack_into(\"<Q\",r,48,12);struct.pack_into(\"<Q\",r,56,4)\n elif k==1:\n  s=1.0 if j==0 else float(sys.argv[1])\n  item[3]=struct.pack(\"<5f\",s,0.0,0.0,1.0+j,50.0)\n  j+=1\n elif k==2:\n  x,z=vertex(a);xx,zz=vertex(q(r,16));dx=xx-x;dz=zz-z;d=math.hypot(dx,dz)\n  struct.pack_into(\"<Q\",r,48,1)\n  item[3]=struct.pack(\"<3f\",dx/d,dz/d,float(sys.argv[2])* (1 if dx>=0 else -1))\n elif k==3:\n  eu=q(r); mate=q(maps[2][eu],16)\n  internal=bool(q(maps[2][eu])) and bool(q(maps[2][mate]))\n  struct.pack_into(\"<Q\",r,16,1)\n  item[3]=struct.pack(\"<i\",2 if internal else 1)\nsys.stdout.buffer.write(b\"\".join(struct.pack(\"<iQ\",k,a)+r+at for k,a,r,at in records))\n")' 2 0.2 | triseis xs=0.2,0.8 zs=0,0 xg=0,1 zg=0.5,0.5 ng=3 nt=509 dt=0.01 nangle=19 fangle=-60 langle=60 krecord=1 kreflect=2 prim=1 reftrans=1 atten=1
+# total-internal-reflection
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | python3 -c 'exec("import sys,struct,math\nb=sys.stdin.buffer.read(); i=0; records=[]; ats=[0]*6\nsizes=[120,56,56,24,40,32]; offsets=[112,48,48,16,32,24]\ndef q(b,o=0): return struct.unpack_from(\"<Q\",b,o)[0]\nwhile i<len(b):\n k,a=struct.unpack_from(\"<iQ\",b,i); i+=12\n r=bytearray(b[i:i+sizes[k]]); i+=sizes[k]\n if k==0: ats=list(struct.unpack_from(\"<6Q\",r,32))\n n=ats[k] if q(r,offsets[k]) else 0\n attr=b[i:i+n]; i+=n\n records.append([k,a,r,attr])\nmaps=[{a:r for k,a,r,at in records if k==j} for j in range(6)]\ndef vertex(eu):\n vu=q(maps[2][eu],8)\n v=q(maps[4][vu],24)\n z,x=struct.unpack_from(\"<ff\",maps[5][v],12)\n return x,z\nj=0\nfor item in records:\n k,a,r,at=item\n if k==0:\n  struct.pack_into(\"<Q\",r,48,12);struct.pack_into(\"<Q\",r,56,4)\n elif k==1:\n  s=1.0 if j==0 else float(sys.argv[1])\n  item[3]=struct.pack(\"<5f\",s,0.0,0.0,1.0+j,50.0)\n  j+=1\n elif k==2:\n  x,z=vertex(a);xx,zz=vertex(q(r,16));dx=xx-x;dz=zz-z;d=math.hypot(dx,dz)\n  struct.pack_into(\"<Q\",r,48,1)\n  item[3]=struct.pack(\"<3f\",dx/d,dz/d,float(sys.argv[2])* (1 if dx>=0 else -1))\n elif k==3:\n  eu=q(r); mate=q(maps[2][eu],16)\n  internal=bool(q(maps[2][eu])) and bool(q(maps[2][mate]))\n  struct.pack_into(\"<Q\",r,16,1)\n  item[3]=struct.pack(\"<i\",2 if internal else 1)\nsys.stdout.buffer.write(b\"\".join(struct.pack(\"<iQ\",k,a)+r+at for k,a,r,at in records))\n")' 0.25 0 | triseis xs=0.2,0.8 zs=0,0 xg=0,1 zg=0.5,0.5 ng=3 nt=509 dt=0.01 nangle=19 fangle=-60 langle=60 krecord=1 kreflect=2 prim=1 reftrans=1 atten=2
+# indexed-direct-causal
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | python3 -c 'exec("import sys,struct,math\nb=sys.stdin.buffer.read(); i=0; records=[]; ats=[0]*6\nsizes=[120,56,56,24,40,32]; offsets=[112,48,48,16,32,24]\ndef q(b,o=0): return struct.unpack_from(\"<Q\",b,o)[0]\nwhile i<len(b):\n k,a=struct.unpack_from(\"<iQ\",b,i); i+=12\n r=bytearray(b[i:i+sizes[k]]); i+=sizes[k]\n if k==0: ats=list(struct.unpack_from(\"<6Q\",r,32))\n n=ats[k] if q(r,offsets[k]) else 0\n attr=b[i:i+n]; i+=n\n records.append([k,a,r,attr])\nmaps=[{a:r for k,a,r,at in records if k==j} for j in range(6)]\ndef vertex(eu):\n vu=q(maps[2][eu],8)\n v=q(maps[4][vu],24)\n z,x=struct.unpack_from(\"<ff\",maps[5][v],12)\n return x,z\nj=0\nfor item in records:\n k,a,r,at=item\n if k==0:\n  struct.pack_into(\"<Q\",r,48,12);struct.pack_into(\"<Q\",r,56,4)\n elif k==1:\n  s=1.0 if j==0 else float(sys.argv[1])\n  item[3]=struct.pack(\"<5f\",s,0.0,0.0,1.0+j,50.0)\n  j+=1\n elif k==2:\n  x,z=vertex(a);xx,zz=vertex(q(r,16));dx=xx-x;dz=zz-z;d=math.hypot(dx,dz)\n  struct.pack_into(\"<Q\",r,48,1)\n  item[3]=struct.pack(\"<3f\",dx/d,dz/d,float(sys.argv[2])* (1 if dx>=0 else -1))\n elif k==3:\n  eu=q(r); mate=q(maps[2][eu],16)\n  internal=bool(q(maps[2][eu])) and bool(q(maps[2][mate]))\n  struct.pack_into(\"<Q\",r,16,1)\n  item[3]=struct.pack(\"<i\",2 if internal else 1)\nsys.stdout.buffer.write(b\"\".join(struct.pack(\"<iQ\",k,a)+r+at for k,a,r,at in records))\n")' 2 0 | triseis xs=0.2,0.8 zs=0,0 xg=0,1 zg=0.5,0.5 ng=3 nt=509 dt=0.01 nangle=19 fangle=-60 langle=60 krecord=1 prim=0 reftrans=1 atten=2
+# indexed-curved-transmission
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | python3 -c 'exec("import sys,struct,math\nb=sys.stdin.buffer.read(); i=0; records=[]; ats=[0]*6\nsizes=[120,56,56,24,40,32]; offsets=[112,48,48,16,32,24]\ndef q(b,o=0): return struct.unpack_from(\"<Q\",b,o)[0]\nwhile i<len(b):\n k,a=struct.unpack_from(\"<iQ\",b,i); i+=12\n r=bytearray(b[i:i+sizes[k]]); i+=sizes[k]\n if k==0: ats=list(struct.unpack_from(\"<6Q\",r,32))\n n=ats[k] if q(r,offsets[k]) else 0\n attr=b[i:i+n]; i+=n\n records.append([k,a,r,attr])\nmaps=[{a:r for k,a,r,at in records if k==j} for j in range(6)]\ndef vertex(eu):\n vu=q(maps[2][eu],8)\n v=q(maps[4][vu],24)\n z,x=struct.unpack_from(\"<ff\",maps[5][v],12)\n return x,z\nj=0\nfor item in records:\n k,a,r,at=item\n if k==0:\n  struct.pack_into(\"<Q\",r,48,12);struct.pack_into(\"<Q\",r,56,4)\n elif k==1:\n  s=1.0 if j==0 else float(sys.argv[1])\n  item[3]=struct.pack(\"<5f\",s,0.0,0.0,1.0+j,50.0)\n  j+=1\n elif k==2:\n  x,z=vertex(a);xx,zz=vertex(q(r,16));dx=xx-x;dz=zz-z;d=math.hypot(dx,dz)\n  struct.pack_into(\"<Q\",r,48,1)\n  item[3]=struct.pack(\"<3f\",dx/d,dz/d,float(sys.argv[2])* (1 if dx>=0 else -1))\n elif k==3:\n  eu=q(r); mate=q(maps[2][eu],16)\n  internal=bool(q(maps[2][eu])) and bool(q(maps[2][mate]))\n  struct.pack_into(\"<Q\",r,16,1)\n  item[3]=struct.pack(\"<i\",2 if internal else 1)\nsys.stdout.buffer.write(b\"\".join(struct.pack(\"<iQ\",k,a)+r+at for k,a,r,at in records))\n")' 0.5 0.4 | triseis xs=0.2,0.8 zs=0,0 xg=0,1 zg=0.5,0.5 ng=3 nt=509 dt=0.01 nangle=19 fangle=-60 langle=60 krecord=1 prim=0 reftrans=1 bw=0.1
+# missing-zs
+[stderr] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7
+# mismatch-receivers
+[stderr] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0,0 xg=0,0.5,1 zg=1,1
+# overflow-ns
+[stderr] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 ns=2147483648
+# underflow-dt
+[stderr] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 dt=1e-310
+

@@ -20,3 +20,21 @@ suspike nt=32 | sugabor fmin=40 fmax=20 band=10
 suspike nt=64 | sugabor fmin=-10 fmax=30 band=10
 # Many filters with a small bandwidth in the default output mode.
 suspike nt=1 ntr=1 | sugabor dt=0.004 fmax=1 band=0.001
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sugabor dt=0.004 fmax=100 band=25
+suspike nt=3 ntr=1 | sugabor dt=0.004 fmax=100 band=25
+suspike nt=4 ntr=1 | sugabor dt=0.004 fmax=100 band=25
+suspike nt=4097 ntr=1 | sugabor fmin=5 fmax=45 band=10
+suplane nt=101 ntr=3 | sugabor fmin=5 fmax=55 band=10 beta=1.5
+sunull nt=37 ntr=2 | sugabor dt=0.002 fmax=100 band=20 alpha=0.01
+suspike nt=97 ntr=2 | sushw key=dt,tracl,ntr a=2000,7,8 b=0,2,0 | sugabor fmin=7 fmax=77 band=14
+[stderr] suplane nt=64 ntr=1 | sushw key=trid a=2 | sugabor verbose=1 fmax=100 band=25
+suspike nt=31 ntr=1 | sugabor fmin=10 fmax=50 band=10 beta=5
+suspike nt=31 ntr=1 | sugabor fmin=10 fmax=50 band=10 alpha=0.025
+suspike nt=64 ntr=1 | sugabor dt=0.004 fmin=0 fmax=125 band=6.25 beta=3
+suspike nt=48 ntr=1 | sugabor fmin=200 fmax=220 band=10
+suspike nt=64 ntr=1 | sugabor holder=7 fmax=100 band=20
+suspike nt=32 ntr=1 | sushw key=dt a=0 | sugabor dt=0.003 fmax=60 band=15
+suspike nt=83 ntr=1 | sugabor holder=0 fmin=4 fmax=64 band=10
+suspike nt=65535 ntr=1 | sugabor
+suspike nt=16 ntr=1 | sugabor dt=1e999

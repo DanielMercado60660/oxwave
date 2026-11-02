@@ -53,3 +53,32 @@
 # Parameter files and command-line precedence; unknown arguments with data.
 [exact] printf 'n1=2 error=0.1\n' > params; printf '0\n1\n' | a2b n1=1 | wpc1comp2 par=params error=0.01
 [stderr] sunull nt=17 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17 unknown=1
+
+# diff-2026-11 (round 1)
+# Small traces with explicit in-range spike positions (the generator defaults
+# select no trace when ntr=1). Compare the compressed stream byte for byte.
+[exact] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=1 error=0.01
+[exact] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | wpc1comp2 n1=2
+[exact] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | wpc1comp2 n1=3
+[exact] [stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null | wpc1comp2 n1=4 error=0.01 verbose=1
+# Headers are removed before compression: n1 alone sets the raw record size.
+[exact] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=dt,offset,trid a=2000,-120,1 | sustrip outpar=/dev/null | wpc1comp2 n1=3 error=0.01
+# Negative means, multiple records, prime lengths, and quantizer warnings.
+[exact] makevel nz=2 nx=2 v000=-2 dvdz=0.125 dvdx=0.75 | wpc1comp2 n1=2 error=0.01
+[exact] [stderr] makevel nz=17 nx=2 v000=-2 dvdz=0.125 dvdx=0.75 | wpc1comp2 n1=17 error=0.00001
+[exact] [stderr] makevel nz=127 nx=2 v000=-2 dvdz=0.125 dvdx=0.75 | wpc1comp2 n1=127 error=0.00001
+# Long records: full tiles plus a short tail, and padded tails.
+[exact] sunull nt=4097 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=4097 error=0.5
+[exact] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=32767 | sustrip outpar=/dev/null | wpc1comp2 n1=65535
+[exact] suspike nt=65535 ntr=2 nspk=1 ix1=1 it1=1 | suaddnoise seed=12345 sn=1 | sustrip outpar=/dev/null | wpc1comp2 n1=65535 error=0.1
+[exact] makevel nz=65535 nx=2 v000=-2 dvdz=0.125 dvdx=0.75 | wpc1comp2 n1=65535 error=0.01
+[exact] suplane nt=65535 ntr=3 | sustrip outpar=/dev/null | wpc1comp2 n1=65535 error=0.05
+# Complete raw records are emitted; incomplete final records are discarded.
+[exact] makevel nz=3 nx=1 v000=0 dvdz=1 | wpc1comp2 n1=2
+[exact] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=17
+# Numeric-prefix parsing, float underflow, integer overflow, missing par file.
+[exact] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=3junk error=0.01
+[stderr] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=4 error=1e-310
+[stderr] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=2147483648
+[stderr] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpc1comp2 n1=4 par=missing.par
+

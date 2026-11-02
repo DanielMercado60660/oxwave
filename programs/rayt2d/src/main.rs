@@ -299,17 +299,22 @@ fn main() {
     } else {
         let fp = if let Some(fp) = fopen(&tfile, "r") {
             fclose(&fp);
-            open_c(&tfile, "r+")
+            fopen(&tfile, "r+")
         } else {
-            open_c(&tfile, "w")
+            fopen(&tfile, "w")
         };
         let fp = if restart.starts_with('y') {
+            let fp = fp.unwrap_or_else(|| null_file());
             efseeko(&fp, 0, SEEK_END);
             isize = (eftello(&fp) / 4 / (nsize as i64)) as i32;
             ixs0 = isize;
             fp
         } else {
-            efclose(&fp);
+            // rayt2d.c:291 can close NULL after an unchecked fopen failure.
+            // Match the minimal C fix: skip that close, then use efopen's error.
+            if let Some(fp) = fp {
+                efclose(&fp);
+            }
             efopen(&tfile, "w")
         };
         efseeko(&fp, (isize * nsize) as i64 * 4, SEEK_SET);
@@ -506,11 +511,6 @@ fn main() {
     fclose(&vfp);
     fclose(&jpfp);
     exit(CWP_Exit());
-}
-
-// C leaves fopen unchecked. Reproduce its null-FILE signal without a null dereference.
-fn open_c(name: &str, mode: &str) -> CFile {
-    fopen(name, mode).unwrap_or_else(|| null_file())
 }
 
 fn null_file() -> ! {

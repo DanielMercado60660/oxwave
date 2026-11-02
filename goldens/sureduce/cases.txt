@@ -15,3 +15,15 @@ sureduce rv=0
 sureduce rv=-1
 sureduce rv=abc
 sureduce rv=8
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 k1=2 | sushw key=offset a=16 | sureduce rv=8
+suspike nt=3 ntr=1 k1=3 | sushw key=offset a=32 | sureduce rv=8
+suspike nt=4 ntr=3 k1=4 | sushw key=offset a=-32 b=32 | sureduce
+suspike nt=101 ntr=5 k1=80 | sushw key=dt,offset a=1000,-9 b=0,5 | sureduce rv=3
+suspike nt=4097 ntr=2 k1=4000 | sushw key=offset a=16000 b=-32000 | sureduce rv=4
+sunull nt=17 ntr=3 dt=0.002 | sushw key=offset a=0 b=20 | sureduce rv=5 dt=0.01
+suplane nt=67 ntr=4 | sushw key=dt,offset a=2000,-20 b=0,10 | sureduce rv=2.5
+[stderr] suspike nt=7 ntr=2 k1=5 | sushw key=dt,offset a=4000,8 b=0,8 | sureduce rv=4 verbose=1
+suspike nt=13 ntr=2 k1=9 | sushw key=dt,offset a=1000,3 b=2000,3 | sureduce dt=0.002 rv=8
+suspike nt=13 ntr=1 | sureduce rv=-0.5
+suspike nt=13 ntr=1 | sushw key=dt a=0 | sureduce dt=

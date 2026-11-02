@@ -82,3 +82,67 @@ susynlvcw nxm=1 fxm=1.5 ref=0:0,1\;3,1 sp=0
 [stderr] susynlvcw nt=87 nxs=2 fxs=1 dxs=-0.2 gamma=0.8 ls=-1 er=2 ob=2 sp=-1 smooth=2 verbose=2
 # Unknown parameters are silently ignored: this C program never calls checkpars.
 [stderr] susynlvcw nxm=1 nt=31 unknown=1 verbose=1
+
+# diff-2026-11 (round 1)
+# This generator never reads stdin. Small upstream streams verify that neither
+# input samples nor input headers change its defaults or generated headers.
+sunull nt=1 ntr=1 | susynlvcw
+suplane nt=16 ntr=1 npl=1 len1=1 ct1=8 cx1=1 | sushw key=dt,delrt,sx,gx,offset,cdp a=2000,-250,-900,700,1600,99 | susynlvcw nt=131 nxm=1 fxm=1.5
+suspike nt=8 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=sx,offset a=400,-700 | suchw key1=gx key2=sx key3=offset b=1 c=1 | susynlvcw nt=131 nxs=1 fxs=1.5 xo=-0.25,0.25
+# Every documented parameter is explicitly exercised in a successful new case.
+susynlvcw nt=103 dt=0.04 ft=0 nxo=2 dxo=0.05 fxo=0 nxm=2 dxm=0.05 fxm=0 x0=0 z0=0 v00=2 gamma=1 dvdx=0 dvdz=0 fpeak=5 ref=1:1,2\;4,2 ls=0 er=0 ob=1 sp=1 tmin=0.4 ndpfz=5 smooth=0 verbose=0
+# Short windows overlap the arrival, exercising clipped sinc and convolution.
+susynlvcw nt=1 nxm=1 fxm=1.5 ft=1.98
+susynlvcw nt=2 nxm=1 fxm=1.5 ft=1.98
+susynlvcw nt=3 nxm=1 fxm=1.5 ft=1.98
+susynlvcw nt=4 nxm=1 fxm=1.5 ft=1.98
+susynlvcw nt=13 nxm=1 fxm=1.5 dt=0.02 ft=1.8 gamma=1.1
+susynlvcw nt=127 nxm=2 fxm=1 dxm=0.125 xo=-0.75,0,0.4 gamma=0.8
+# Long traces and the largest supported sample count, both with real arrivals.
+susynlvcw nt=4097 dt=0.001 nxm=1 fxm=1.5 tmin=0.1 gamma=0.7
+susynlvcw nt=65535 dt=0.0001 nxs=1 fxs=1.5 tmin=1 ndpfz=1 gamma=1.7
+# Both gather modes, signed/zero spacing, irregular and overridden offsets.
+susynlvcw nt=139 nxs=3 dxs=-0.125 fxs=2 xo=-1,0,0.375 gamma=1.6 ls=1
+susynlvcw nt=139 nxm=2 dxm=0 fxm=1.25 nxo=3 dxo=-0.25 fxo=0.5
+susynlvcw nt=139 nxm=1 fxm=1.25 xo=0.3,-0.1,0.3 nxo=-7 dxo=bad fxo=bad
+susynlvcw nt=149 nxm=2 fxm=1 dxm=0.2 xo=-0.3,0.2 x0=0.6 z0=0.4 v00=2.6 gamma=0.55 dvdx=0.15 dvdz=0.25
+susynlvcw nt=149 nxm=1 fxm=1.5 dvdz=0.0001 gamma=1.3
+susynlvcw nt=149 nxm=1 fxm=1.5 dvdx=0.2 dvdz=0 gamma=0.75
+# Vertical, curved, broken, multiple, and negative-amplitude reflectors.
+susynlvcw nt=151 nxm=1 fxm=0 ref=1,0.5\;1,2 ob=0 sp=0
+[stderr] susynlvcw nt=157 nxm=2 fxm=0.5 dxm=0.75 ref=-1,1.4\;0,0.9\;1,1.6\;3,1.2 smooth=1 gamma=0.9 ndpfz=9 verbose=1
+susynlvcw nt=157 nxm=2 fxm=0.5 dxm=0.75 ref=-1,1.4\;0,0.9\;1,1.6\;3,1.2 smooth=0 gamma=0.9 ndpfz=9
+susynlvcw nt=163 nxm=1 fxm=1 ref=0.7:-1,0.8\;3,1.3 ref=-0.4:-1,1.8\;3,2.3 gamma=1.8 er=0 ls=0
+susynlvcw nt=167 nxm=1 fxm=1.5 gamma=0.45 ls=1 er=0 sp=1 ob=0
+susynlvcw nt=167 nxm=1 fxm=1.5 gamma=1.9 ls=0 er=1 sp=1 ob=1
+susynlvcw nt=167 nxm=1 fxm=1.5 ref=-3:0,1\;3,1 gamma=0.9 ls=1 er=1 sp=0 ob=0
+# Ricker lengths on both sides of the convolution special cases.
+susynlvcw nt=509 dt=0.002 fpeak=2 nxm=1 fxm=1.5 ref=0,0.6\;3,0.6
+susynlvcw nt=41 dt=0.004 fpeak=250 nxm=1 fxm=1.5 ref=0,0.04\;3,0.04
+susynlvcw nt=43 dt=0.004 fpeak=500 nxm=1 fxm=1.5 ref=0,0.04\;3,0.04
+susynlvcw nt=181 dt=0.025 ft=-0.5 nxm=1 fxm=1.5 gamma=0.8
+susynlvcw nt=137 nxs=2 fxs=-0.0005 dxs=-0.001 xo=-0.001,0,0.001
+# Last occurrences win; empty numeric values select defaults.
+susynlvcw nt=13 nt=137 nxm=1 gamma=0.5 gamma=1.25 xo=0 xo=-0.2,0.2
+susynlvcw nt= nxm=1 dt= ft= nxo= dxo= fxo= gamma= ls= er= ob= sp= tmin= ndpfz= smooth= verbose=
+[stderr] susynlvcw nt=139 nxm=1 ndpfz=0 tmin=-100 ft=0.2 verbose=1
+# Zero and negative gather counts, with verbose work before the empty loop.
+[stderr] susynlvcw nt=4097 nxm=0 gamma=0.7 verbose=1
+susynlvcw nt=3 nxs=-2 xo=-0.1,0.2
+# No required parameters exist. Explicit invalid/overflow and malformed ref errors.
+[stderr] susynlvcw nt=2147483648 nxm=1
+[stderr] susynlvcw nt=65537 nxm=1
+[stderr] susynlvcw nxm=1 nxs=0
+[stderr] susynlvcw nxm=1 dt=1e-310
+[stderr] susynlvcw nxm=1 v00=1e-310
+[stderr] susynlvcw nxm=1 ref=
+[stderr] susynlvcw nxm=1 ref=1:0,1\;2
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] susynlvcw nxm=1 nt=131 tmin=0.4 fpeak=7.281776428222656 verbose=1
+[stderr] susynlvcw nt=31 nxm=1 dt=-0.04 fpeak=5 tmin=0.4
+[stderr] susynlvcw nt=31 nxm=1 ndpfz=-1
+[stderr] susynlvcw nt=151 nxm=1 ref=:0,1\;2,1
+susynlvcw nt=151 nxm=1 ref=0.5,1\;\;2,1
+susynlvcw nt=151 nxm=1 ref=0,,1\;2,1
+susynlvcw nt=151 nxm=1 ref=0,1\;2,,1

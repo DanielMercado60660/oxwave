@@ -84,3 +84,45 @@ tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=16
 tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnrays=-1 < model.txt
 [stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray maxnsegs=-2147483648 < model.txt
 tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin > model.txt && sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 maxnsegs=16 < model.txt
+
+# diff-2026-11 (round 1)
+# Text tetrahedral model input: SU trace nt/header inputs do not apply.
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray verbose=1 shootupward=1 jpfile=job.txt takeoff=25 irefseq=0,1 nxgd=7 fxgd=0 dxgd=0.333333 nygd=7 fygd=0 dygd=0.333333 rayfile=rays.txt wffile=wf.txt ifwf2dump=2 nwf2dump=2 crfile=cr.bin sttfile=surf.txt maxntris=300 maxnrays=200 maxnsegs=100 edgemax=3 fsx=1 fsy=1 nsx=1 nsy=1 nsz=1 nxt=5 nyt=5 dsx=0.333333 dsy=0.333333 dsz=0.25 fsz=0.4 ntakeoff=2 nazimuth=7 tmax=2 dtwf=0.04 ntwf=35
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=2 nygd=2 nxt=1 nyt=1 ntakeoff=1 nazimuth=3
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxt=2 nyt=2
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=11 nygd=13 nxt=7 nyt=11
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=4097 nygd=3 nxt=4097 nyt=1 ntakeoff=1 nazimuth=3 edgemax=10000 wffile=wf.txt ntwf=30
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=3 nygd=4097 nxt=1 nyt=4097 ntakeoff=1 nazimuth=3 edgemax=10000 wffile=wf.txt ntwf=30
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=2 ifwf2dump=1 rayfile=rays.txt > tt.su && cat rays.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=3 ifwf2dump=1 > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=4 ifwf2dump=1 nwf2dump=3 > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=1 ifwf2dump=3 nwf2dump=2 > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=1 nazimuth=3 tmax=0.09 dtwf=0.03 wffile=wf.txt > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray verbose=0 shootupward=1 takeoff=30 ntakeoff=5 nazimuth=15 maxntris=1000 maxnrays=600 maxnsegs=100 tmax=10 dtwf=0.05 edgemax=4 nsx=1 nsy=1 nsz=1 wffile=wf.txt ifwf2dump=20 nwf2dump=1
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=9 nygd=9 nxt=3 nyt=3 fsx=0.61 fsy=0.88 nsx=2 nsy=2 dsx=0.49 dsy=0.51 fsz=0.2
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nsz=3 fsz=0.2 dsz=0.2 rayfile=rays.txt > tt.su && cat rays.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=7 nygd=7 nxt=3 nyt=3 fsx=0.8 fsy=0.8 nsx=2 nsy=2 dsx=-0.1 dsy=0
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 verbose=1 jpfile=job.txt takeoff=-15 irefseq=2,1,0 > tt.su && cat job.txt
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 verbose=1 maxntris=30 maxnrays=80 edgemax=0.08
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=9 nygd=9 nxt=7 nyt=7 ntakeoff=2 nazimuth=7 takeoff=45 edgemax=0.25 ifwf2dump=3 nwf2dump=3 > tt.su && cat wf.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntakeoff=2 nazimuth=5 takeoff=10 rayfile=rays.txt > tt.su && cat rays.txt
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=9 nygd=9 nxt=7 nyt=7 ntakeoff=2 nazimuth=7 takeoff=40 sttfile=surf.txt > tt.su && cat surf.txt
+[f32] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=9 nygd=9 nxt=7 nyt=7 ntakeoff=2 nazimuth=7 takeoff=40 crfile=cr.bin > tt.su && cat cr.bin
+tetramod nxhz=4 nyhz=5 nhz=2 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 shootupward=-1 fsz=0.2 irefseq=1,0 takeoff=15 rayfile=rays.txt > tt.su && cat rays.txt
+[f32] tetramod nxhz=4 nyhz=5 nhz=2 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 shootupward=1 fsz=0.9 takeoff=20 crfile=cr.bin > tt.su && cat cr.bin
+makevel nx=4 nz=3 v000=0 dvdx=0.01 dvdz=0.02 > z.bin && tetramod nxhz=4 nyhz=3 nhz=1 hzfile=hz.bin z0file=z.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 takeoff=20 rayfile=rays.txt > tt.su && cat rays.txt
+[f32] makevel nx=4 nz=3 v000=0.2 dvdx=0.01 dvdz=0.02 > v.bin && tetramod nxhz=4 nyhz=3 nhz=1 hzfile=hz.bin v0file=v.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=0.4 takeoff=20 crfile=cr.bin > tt.su && cat cr.bin
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | awk '{printf "%s%c\n", $0, 13}' | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | tr ' ' '	' | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sed 's/^2.000000=xmax/+2.000000=xmax/' | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=-3
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxgd=abc
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 dxgd=0.6
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 ntwf=2000 ifwf2dump=2000 nwf2dump=1
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 nxt=7 nsx=0
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 fsz=-0.2
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 wffile=
+[stderr] tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 ntakeoff=3 nazimuth=8 ntwf=30 wffile=wf.txt ifwf2dump=2 nwf2dump=1 maxnsegs=2147483648
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+tetramod nxhz=3 nyhz=3 nhz=1 hzfile=hz.bin 2>/dev/null | sed 's/^2.000000=xmax/0x1p+1=xmax/' | sutetraray nxgd=5 nygd=5 nxt=3 nyt=3 wffile=wf.txt ntwf=30

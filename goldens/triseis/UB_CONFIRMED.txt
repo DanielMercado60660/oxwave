@@ -1,0 +1,5 @@
+# ub-2026-11 (round 1): four-knot source surface — Confirmed.
+# vendor/su-original/src/tri/main/triseis.c:275: makexzs starts iuu=0 at line 270, reading s[iuu-1] one float before the allocation at line 266. Minimal fix: use 0.0f instead of s[-1] on the first iteration only; all SU build flags retained (diffcamp/ubx/triseis/fix.patch).
+# Rebuilt orig matches vendor SU exactly (rc=0, stdout 9252 bytes, SHA256 9b06618c2447f892e20880a579658e0a7cda90cee18ccc48ea004475623f35e7, identical stderr). Orig shots: x=0.1,0.1,0.1. Fixed shots: x=0.1,0.5,0.9; rc=0, stdout 9252 bytes, SHA256 f0e83df04848cda7eef8281dfe57d5ee61e17c11d2c1d923ca39b4c7c0ad738c. Samples differ beyond harness tolerance (sample 1101: -3.15817306e-05 vs 3.39518261).
+# OxWave release stdout and stderr both match fixed C byte for byte; no port changes required. Reproduce with diffcamp/ubx/triseis/build.py and verify_claim.py; results saved in claim-results.json.
+[stderr] [f32] makevel nx=2 nz=2 v000=1 | uni2tri n1=2 n2=2 verbose=0 | triseis xs=0.3,0.7 zs=0.1,0.1 xg=0.1,0.9 zg=0.95,0.95 krecord=-1 ns=1 ng=3 nt=257 dt=0.01 nangle=7 xs=0.1,0.3,0.7,0.9 zs=0,0.2,0.2,0 ns=3

@@ -21,3 +21,25 @@ suspike nt=16 ntr=1 | succwt nv=0 fs=3
 suspike nt=16 ntr=1 | succwt noct=999999999999999999999
 # Negative scale count fails allocation in the original
 [stderr] suspike nt=16 ntr=1 | succwt noct=1 nv=-1
+# diff-2026-11 (round 1)
+suspike nt=3 ntr=1 | succwt noct=1 nv=2 k=2
+suspike nt=17 ntr=2 | succwt noct=2 nv=3 p=0.75 c=0.05 dt=0.002 fmax=90
+suspike nt=31 ntr=1 | succwt noct=1 nv=3 fs=2 fmax=9.5 df=2 k=2
+suspike nt=127 ntr=1 | succwt noct=2 nv=2 k=1
+suspike nt=4097 ntr=1 | succwt noct=1 nv=2 k=2
+suplane nt=101 ntr=3 | succwt noct=1 nv=3 p=-1
+suspike nt=64 ntr=1 | succwt noct=1 nv=3 fs=3 out=2
+suspike nt=13 ntr=1 | succwt noct=1 nv=2 verbose=1
+suspike nt=32 ntr=1 | succwt noct=1 nv=4 fs=2 fmax=12 df=3 p=0 c=0.03 dt=0.004 k=1 out=1
+suspike nt=16 ntr=1 | succwt noct=0 nv=3 out=-1
+suspike nt=29 ntr=1 | succwt noct=3 nv=1 dt=0.008 fmax=25
+suspike nt=32 ntr=1 | succwt noct=1 nv=2 k=0
+suspike nt=32 ntr=1 | succwt noct=abc nv=2
+suspike nt=32 ntr=1 | succwt nv=99999999999999999999
+suspike nt=32 ntr=1 | succwt fmax=1e999
+suspike nt=2 ntr=1 | succwt noct=0
+suspike nt=4 ntr=1 | succwt nv=0 out=0
+sunull nt=64 ntr=2 dt=0.002 | succwt noct=1 nv=3
+suspike nt=64 ntr=2 | sushw key=tracl a=42 b=3 | sushw key=dt a=2000 | succwt noct=2 nv=2
+suspike nt=257 ntr=1 | succwt noct=1 nv=3 p=1.2 dt=0.002 fmax=35 c=0.04
+suplane nt=64 ntr=2 | succwt fs=2 fmax=10 df=2 k=2

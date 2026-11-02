@@ -25,3 +25,30 @@ sunull nt=1 ntr=1 | suchw key1=dt a=65537 b=0
 sunull nt=1 ntr=1 | sushw key=d1 a=2.5 | suchw key1=f1 key2=d1 key3=d1 a=1 b=2 c=-1 e=2 f=1 d=2
 sunull nt=1 ntr=1 | suchw a=5 a=-2
 [stderr] sunull nt=1 ntr=1 | suchw unknown=1
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | suchw key1=cdp key2=cdp key3=cdp a=0 b=1 c=0 d=1 e=1 f=1
+sunull nt=3 ntr=2 | suchw key1=tracl key2=tracl a=10 b=-2
+sunull nt=4 ntr=4 | sushw key=offset a=-9 b=3 | suchw key1=cdp key2=offset key3=tracl a=3 b=2 c=4 d=2 e=2 f=1
+suspike nt=17 ntr=3 | suchw key1=gx key2=tracl key3=tracr a=-1 b=3 c=2 d=2 e=2 f=2
+suplane nt=4097 ntr=1 | suchw key1=tracr key2=tracl a=9
+sunull nt=7 ntr=5 | sushw key=cdp a=2 b=2 | suchw key1=d1 key2=cdp key3=tracl a=0.25 b=1.5 c=-0.25 d=2 e=0.5 f=2
+sunull nt=11 ntr=3 | suchw key1=tracl,tracr,cdp key2=tracl,tracl,tracr key3=cdp,cdp,cdp a=2,3,4 b=2,3,4 c=0,0,0 d=1,1,1 e=1,1,1 f=1,1,1
+sunull nt=3 ntr=2 | suchw key1=delrt a=-32768 b=0
+sunull nt=3 ntr=2 | suchw key1=dt a=65535 b=0
+sunull nt=3 ntr=2 | suchw key1=dt a=0 b=0
+sunull nt=3 ntr=2 | sushw key=d1 a=-2 b=1 | suchw key1=f1 key2=d1 key3=tracl a=1 b=2 c=3 d=-2 e=3 f=2
+sunull nt=2 ntr=1 | suchw key1=trid a=2.9 b=0
+sunull nt=2 ntr=1 | suchw key1=tracl a=-2.9 b=0
+sunull nt=2 ntr=1 | suchw key1=d1 key2=tracl e=-1 b=4
+[stderr] suspike nt=4 ntr=2 | suchw key1=offset key2=tracl a=3 verbose=1
+sunull nt=2 ntr=1 | suchw key2=badkey
+sunull nt=2 ntr=1 | suchw key3=badkey
+sunull nt=2 ntr=1 | suchw key1=tracl,tracr key2=cdp,cdp key3=cdp,cdp a=1
+sunull nt=2 ntr=1 | suchw key1=tracl,tracr key2=cdp,cdp key3=cdp,cdp b=1,2,3
+sunull nt=2 ntr=1 | suchw key1=cdp a=1e999
+sunull nt=5 ntr=2 | suchw key1=tracl a=2147483647 b=0
+sunull nt=5 ntr=2 | suchw key1=tracl a=-2147483648 b=0
+sunull nt=5 ntr=2 | suchw key1=cdp a=16777217 b=0
+sunull nt=5 ntr=2 | suchw key1=tracl,tracr key2=cdp,cdp key3=cdp,cdp
+sunull nt=5 ntr=2 | sushw key=cdp a=4 b=3 | suchw key1=offset key2=cdp key3=cdp a=0.75 b=0.5 c=0.25 d=1 e=0 f=0
+sunull nt=5 ntr=2 | suchw key1=f1 key2=cdp key3=cdp a=0.125 b=0 c=0 d=1 e=0 f=0

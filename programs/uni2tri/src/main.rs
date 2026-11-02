@@ -508,7 +508,9 @@ unsafe fn makeMod2(
             if iv == 0 && emax > errmax {
                 err!("added 0 vertices!");
             }
-            if nf + 2 * iv > nfalloc {
+            // C uni2tri.c:509 doubles only once, allowing the next face scan
+            // to overrun these arrays. Repeat until the face bound fits.
+            while nf + 2 * iv > nfalloc {
                 nfalloc *= 2;
                 e = vec![0.0; nfalloc];
                 ix = vec![0; nfalloc];
@@ -636,7 +638,8 @@ unsafe fn makeMod3(
             if iv == 0 && emax > errmax {
                 err!("added 0 vertices!");
             }
-            if nf + 2 * iv > nfalloc {
+            // Same capacity defect as makeMod2 (C uni2tri.c:766).
+            while nf + 2 * iv > nfalloc {
                 nfalloc *= 2;
                 e = vec![0.0; nfalloc];
                 ix = vec![0; nfalloc];

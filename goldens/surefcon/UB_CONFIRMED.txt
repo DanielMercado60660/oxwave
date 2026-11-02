@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/su/main/convolution_correlation/surefcon.c:120,129-131 requests 65536 output floats in outtrace.data[65535] (su/include/segy.h:29,581); cwp/lib/convolution.c:1484 writes data[65535] out of bounds. surefcon.c:135 then converts ns to zero (defined unsigned narrowing). Minimal bounds check after line 120 changes orig rc=0, 240-byte ns=0 header to fixed rc=1, empty stdout, clean output-length error. OxWave now matches fixed stdout/stderr/rc exactly; replaced its slice panic with the same guard. Evidence: diffcamp/ubx/surefcon/evidence.json and fix.patch.
+sunull nt=65535 ntr=1 > forward.su && suspike nt=2 ntr=1 k1=1 | surefcon sufile=forward.su

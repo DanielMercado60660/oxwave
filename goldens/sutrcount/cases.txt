@@ -12,3 +12,24 @@ sunull nt=3 ntr=7 | sutrcount outpar=count.txt && cat count.txt
 sutrcount </dev/null
 sunull nt=1 ntr=1 | sutrcount outpar=/nonexistent-directory/count
 sunull nt=1 ntr=1 | sutrcount outpar=
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sutrcount
+sunull nt=1 ntr=1 | sutrcount outpar=count && cat count
+sunull nt=2 ntr=1 | sutrcount outpar=count && cat count
+sunull nt=4 ntr=13 | sutrcount outpar=/dev/stdout
+sunull nt=4 ntr=13 | sutrcount outpar=count && cat count
+sunull nt=4097 ntr=3 | sutrcount
+sunull nt=4097 ntr=3 | sutrcount outpar=count && cat count
+suplane nt=11 ntr=17 | sutrcount
+suplane nt=11 ntr=17 | sutrcount outpar=count && cat count
+suspike nt=3 ntr=7 nspk=1 k1=1 k2=1 | sutrcount outpar=result && cat result
+sunull nt=17 ntr=23 | sushw key=ntr,tracl a=0,100 b=0,-1 | sutrcount
+sunull nt=17 ntr=23 | sushw key=ntr,tracl a=0,100 b=0,-1 | sutrcount outpar=count && cat count
+[stderr] suplane nt=13 ntr=2 | sutrcount outpar=/dev/stdout verbose=1
+[stderr] suplane nt=13 ntr=2 | sutrcount outpar=count verbose=1 && cat count
+sunull nt=4 ntr=12 | sutrcount outpar=first outpar=second && cat second
+sunull nt=2 ntr=1 | sutrcount outpar=/dev/null
+sunull nt=3 ntr=1 | head -c 100 | sutrcount
+sunull nt=4 ntr=1 | head -c 248 | sutrcount
+( sunull nt=2 ntr=1; sunull nt=3 ntr=1 ) | sutrcount outpar=count
+( sunull nt=4 ntr=1; sunull nt=4 ntr=1 | head -c 248 ) | sutrcount outpar=count && cat count

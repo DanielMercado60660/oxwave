@@ -111,7 +111,7 @@ fn main() {
         err!("ealloc.c: malloc failed (Cannot allocate memory)");
     }
     // The C loops write outside tau for these values of ntmin.
-    if ntmin < 0 || ntmin > nt {
+    if ntmin < 0 || (ntmin > nt && nt != 0) {
         err!("ntmin must be between 0 and nt");
     }
     let n = nt as usize;
@@ -120,7 +120,7 @@ fn main() {
     let mut w = vec![0.0f32; nw * n];
     let mut buf = vec![0.0f32; n];
 
-    for it in 0..ntmin { tau[it as usize] = -1.0; }
+    for it in 0..ntmin.min(nt) { tau[it as usize] = -1.0; }
     for it in ntmin..nt {
         let ratio = it as f32 / ntmin as f32;
         tau[it as usize] = ((ratio as f64).ln() / dtau as f64) as f32;
@@ -131,7 +131,9 @@ fn main() {
         stretch(&mut buf, &tr.data, &w, &itau, n, nw);
         tr.data[..n].copy_from_slice(&buf);
         tr.ns = nt as u16;
-        tr.dt = dt as u16;
+        // The SU build converts a large positive float to an integer first,
+        // then retains the low 16 bits when storing the header.
+        tr.dt = if dt >= 65536.0 { (dt as u32) as u16 } else { dt as u16 };
         puttr(&mut tr);
         if gettr(&mut tr) == 0 { break; }
     }

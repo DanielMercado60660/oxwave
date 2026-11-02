@@ -32,3 +32,28 @@ suspike nt=5 ntr=1 k1=1,3 mag=-4,2 | sumax output=segy mode=abs outpar=stats
 suspike nt=5 ntr=2 k1=2 mag=3 | sumax outpar=stats mode=max verbose=2; cat stats
 suspike nt=5 ntr=1 k1=2 mag=3 | sumax outpar=stats mode=thd verbose=1; cat stats
 [stderr] sumax outpar=/no-such-directory/stats
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sumax output=ascii mode=maxmin verbose=1 outpar=stats; cat stats
+suspike nt=2 ntr=1 k1=2 mag=-5 | sumax mode=min verbose=1 outpar=stats; cat stats
+suspike nt=3 ntr=2 k1=2 mag=4 | sumax output=segy mode=max outpar=stats
+suspike nt=4 ntr=1 k1=2,4 mag=2,7 | sumax mode=thd threshamp=1 threshtime=0.003 dt=0.002 verbose=1 outpar=stats; cat stats
+suspike nt=17 ntr=3 k1=1,4,13 mag=-2,5,-8 | sumax output=ascii mode=abs verbose=1 dt=0.001 outpar=stats; cat stats
+suspike nt=4097 ntr=2 k1=4097 mag=3 | sumax output=segy mode=maxmin outpar=stats
+suspike nt=4097 ntr=1 k1=4096 mag=-3 | sumax mode=rms verbose=1 outpar=stats; cat stats
+sunull nt=13 ntr=3 | sushw key=fldr,ep a=10,20 b=2,3 | sumax verbose=2 key1=fldr key2=ep mode=max outpar=stats; cat stats
+suspike nt=11 ntr=2 k1=3,6,9 mag=2,0,4 | sumax mode=thd threshamp=1 threshtime=0 dt=0.004 verbose=1 outpar=stats; cat stats
+[f32] suspike nt=3 ntr=1 k1=3 mag=-4 | sumax output=binary mode=rms outpar=stats
+[f32] sunull nt=4 ntr=2 | sumax output=binary mode=thd threshamp=-1 threshtime=1 dt=0.004 outpar=stats
+suplane nt=31 ntr=4 | sumax output=ascii mode=maxmin outpar=stats; cat stats
+suplane nt=31 ntr=4 | sumax output=segy mode=abs outpar=stats
+suspike nt=5 ntr=3 k1=1,2 mag=3,-2 | sushw key=tracl,tracr a=7,50 b=3,-2 | sumax verbose=2 key1=tracl key2=tracr mode=min outpar=stats; cat stats
+suspike nt=7 ntr=2 k1=3 mag=2 | sumax output=binary mode=max verbose=1 outpar=stats > /dev/null; cat stats
+[stderr] sunull nt=2 ntr=1 | sumax output=bad outpar=stats
+[stderr] sunull nt=2 ntr=1 | sumax mode=bad outpar=stats
+[stderr] sunull nt=2 ntr=1 | sumax output=segy mode=rms outpar=stats
+suspike nt=127 ntr=7 k1=1,64 mag=2,-4 | suaddnoise seed=42 sn=2 | sumax mode=rms verbose=1 outpar=stats; cat stats
+suspike nt=127 ntr=7 k1=1,64 mag=2,-4 | suaddnoise seed=42 sn=2 | sumax mode=maxmin verbose=1 outpar=stats; cat stats
+suspike nt=127 ntr=7 k1=1,64 mag=2,-4 | suaddnoise seed=42 sn=2 | sumax output=segy mode=thd threshamp=0.1 threshtime=0.03 dt=0.004 outpar=stats
+[f32] suspike nt=127 ntr=7 k1=1,64 mag=2,-4 | suaddnoise seed=42 sn=2 | sumax output=binary mode=abs outpar=stats
+suspike nt=5 ntr=3 k1=2,3 mag=4,4 | sumax mode=max verbose=1 outpar=stats; cat stats
+sunull nt=3 ntr=2 | sushw key=d1,f1 a=2.5,-4.25 b=1,2 | sumax verbose=2 key1=d1 key2=f1 mode=rms outpar=stats; cat stats

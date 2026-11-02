@@ -18,3 +18,24 @@ suplane nt=251 ntr=5 | sushw key=offset a=100 b=100 | sunmo_a invert=1 smute=3 l
 suspike ntr=1 nt=33 | sunmo_a vnmo=1500,1600 tnmo=0,1 anis1=0
 suspike ntr=1 nt=33 | sunmo_a vnmo=1500,1600 tnmo=0,1 anis2=0
 suspike ntr=1 nt=33 | sunmo_a vnmo=1500 vnmo=2000
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=2 dt=0.004 | sunmo_a lmute=0 sscale=0
+suspike ntr=1 nt=3 dt=0.004 | sunmo_a lmute=0 sscale=0
+suspike ntr=1 nt=4 dt=0.004 | sunmo_a invert=1 sscale=0
+suspike ntr=1 nt=4097 dt=0.002 | sushw key=offset a=400 | sunmo_a vnmo=1800 smute=2 lmute=0
+suplane nt=257 ntr=7 | sushw key=cdp,offset a=5,100 b=5,75 | sunmo_a cdp=30,10,20 vnmo=2300,2500 vnmo=1400,1700 vnmo=1800,2100 tnmo=0,1 tnmo=0,1 tnmo=0,1 anis1=1e-16,2e-16 anis1=0,1e-16 anis1=2e-16,3e-16 anis2=1e-9,2e-9 anis2=0,1e-9 anis2=2e-9,3e-9 smute=3 lmute=3
+suplane nt=257 ntr=6 | sushw key=offset a=-300 b=120 | sunmo_a vnmo=1400,2500 tnmo=0,1 upward=1 smute=2 lmute=4 sscale=0
+suplane nt=257 ntr=6 | sushw key=offset a=0 b=100 | sunmo_a invert=1 sscale=1 smute=2
+suplane nt=257 ntr=6 | sushw key=offset a=0 b=100 | sunmo_a invert=1 upward=1 sscale=0 smute=2
+suspike ntr=3 nt=101 dt=0.002 | sushw key=delrt,offset a=100,200 b=0,100 | sunmo_a vnmo=1500,1900,2400 tnmo=0,0.2,0.6 lmute=1
+sunull ntr=2 nt=103 dt=0.004 | sushw key=cdp,offset a=7,100 b=1,50 | sunmo_a cdp=7,8 vnmo=1500 vnmo=2000 tnmo=0 tnmo=0 anis1=0 anis1=0 anis2=0 anis2=0
+suspike ntr=4 nt=127 dt=0.004 | sushw key=offset,scalel a=200,-10 b=0,5 | sunmo_a smute=1.5 lmute=25 sscale=1 invert=0 upward=0 vnmo=1500
+[stderr] suplane nt=103 ntr=2 | sushw key=offset a=200 b=100 | sunmo_a verbose=1 smute=2
+suplane nt=131 ntr=3 | sushw key=offset a=200 b=0 | sunmo_a vnmo=2200,1300 tnmo=0,0.5 upward=1 lmute=0
+suspike ntr=1 nt=33 | sunmo_a cdp=1,2 vnmo=1500 vnmo=2000 tnmo=0 tnmo=0 anis1=0
+suspike ntr=1 nt=33 | sunmo_a vnmo=1500,2000 tnmo=0
+suspike ntr=1 nt=33 | sunmo_a tnmo=0 tnmo=1
+suspike ntr=1 nt=33 | sunmo_a smute=-1
+suplane nt=251 ntr=4 | sushw key=offset a=250 b=0 | sunmo_a invert=1 lmute=0 smute=4 vnmo=2000
+suplane nt=401 ntr=5 | sushw key=delrt,offset a=-100,50 b=0,80 | sunmo_a vnmo=1600,2300 tnmo=0,1 smute=3 lmute=5
+suplane nt=401 ntr=5 | sushw key=cdp,offset a=40,250 b=-7,0 | sunmo_a cdp=10,20,30 vnmo=1300 vnmo=1900 vnmo=2500 tnmo=0 tnmo=0 tnmo=0 smute=3 lmute=0

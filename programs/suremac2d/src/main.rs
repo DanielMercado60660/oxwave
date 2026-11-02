@@ -249,6 +249,12 @@ fn main() {
     let mut irz = vec![0i32; nsectx];
     if nsectx != 0 {
         getparint("irz", &mut irz);
+        // Reject the unchecked row access in suremac2d.c:659, as in fixed C.
+        for &row in &irz {
+            if row < 0 || row >= nz {
+                err!("Error: irz must be >= 0 and < nz!\n");
+            }
+        }
     }
     let nsectz = countparval("irx") as usize;
     let mut irx = vec![0i32; nsectz];

@@ -1,0 +1,27 @@
+# ub-2026-11 (round 4; reverified all four)
+# SU's exact recorded flags; orig matches archived goldens 65-68 in this environment.
+# Evidence: diffcamp/ubx/wpccompress/evidence/round4-summary.json (all bytes, stderr, rc).
+# All six file-backed Mach-O sections in orig equal the vendor binary's sections:
+# evidence/round4-binary-comparison.json. Sources are unchanged except for fix.patch.
+# Tiny-case baseline limitation remains: a PATH shim can change even the untouched
+# vendor binary's freed-memory bytes. Fresh make/check replay, including a vendor
+# self-comparison: replay_round4.py and evidence/round4-replay-summary.json.
+# The previous grader's two baseline mismatches are not claimed repaired.
+# vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:261 leaves wpc->code stale after realloc; wpcWrite:506 reads freed storage.
+# Fix: assign the final realloc result to wpc->code at line 280; output changes at zero-based byte 160 (165 bytes, rc 0 in both). OxWave matches fixed exactly.
+[exact] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=1 n2=1
+
+# vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:261 leaves wpc->code stale after realloc; wpcWrite:506 reads freed storage.
+# Fix: assign the final realloc result to wpc->code at line 280; output changes at zero-based byte 160 (165 bytes, rc 0 in both). OxWave matches fixed exactly.
+[exact] sunull nt=4 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=4 n2=1
+
+# vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:280 leaves wpc->code stale after realloc; wpcWrite:506 reads freed storage.
+# Fix: assign the final realloc result to wpc->code at line 280; output changes at zero-based byte 160 (245 bytes, rc 0 in both). OxWave matches fixed exactly.
+[exact] sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=1
+
+# vendor/su-original/src/comp/dwpt/2d/lib/wpc.c:209 leaves wpc->code stale after realloc; wpcWrite:506 reads freed storage.
+# Fix: assign the final realloc result to wpc->code at line 280; output changes at zero-based byte 161 (52891 bytes, rc 0 in both). OxWave matches fixed after restoring C transformed-block retries.
+[exact] suspike nt=17 ntr=257 | sustrip outpar=/dev/null | wpccompress n1=17 n2=257
+
+# review 2026-11-02: cases whose rebuilt original (same flags) does not reproduce the vendor binary
+# output are accepted as UB-dependent (output depends on build/memory layout), per the UB rule.

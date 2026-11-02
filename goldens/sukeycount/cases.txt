@@ -19,3 +19,16 @@ sunull nt=3 ntr=6 | sushw key=cdp a=1 b=1 j=2 | sukeycount key=cdp
 # Verbose diagnostics with an explicit key, and legacy output after the key.
 [stderr] sunull nt=1 ntr=1 | sukeycount key=cdp verbose=1
 sunull nt=1 ntr=1 | sukeycount cdp output=ascii
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=8 | sushw key=cdp a=3 b=0 c=1 j=2 | sukeycount key=cdp verbose=0
+sunull nt=4 ntr=7 | sushw key=trid a=-3 b=1 | sukeycount key=trid
+sunull nt=11 ntr=5 | sushw key=dt a=1000 b=250 | sukeycount key=dt
+sunull nt=4097 ntr=3 | sushw key=f1 a=-1.5 b=0.75 | sukeycount key=f1
+suspike nt=17 ntr=6 nspk=1 | sushw key=fldr a=2 b=1 j=2 | sukeycount key=fldr
+suplane nt=64 ntr=8 | sukeycount key=tracl
+[stderr] suspike nt=4 ntr=3 nspk=1 | sukeycount key=tracl verbose=1
+sunull nt=3 ntr=5 | sushw key=cdp a=9 b=-1 j=2 | sukeycount cdp
+sunull nt=2 ntr=2 | sukeycount key=cdp key=tracl
+sunull nt=2 ntr=2 | sukeycount output=ascii cdp
+sunull nt=2 ntr=2 | sukeycount key=cdp,tracl verbose=1

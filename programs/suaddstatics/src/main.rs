@@ -134,13 +134,21 @@ fn main() {
     let mut icmp = -1i32;
     let mut cmp_last = 0;
     while fgettr(&fp, &mut tr) != 0 {
-        if tr.cdp != cmp_last {
+        // The first gather must start even for CDP zero (C otherwise uses pointer[-1]).
+        if icmp < 0 || tr.cdp != cmp_last {
             if icmp >= 0 {
                 foldcmp[icmp as usize] = itrace as i32;
             }
             icmp += 1;
             itrace = 0;
             cmp_last = tr.cdp;
+        }
+        // Match the minimal C bounds fixes instead of panicking on undersized input geometry.
+        if icmp >= ncmp {
+            err!("number of CMP gathers exceeds cmps=%d", ncmp);
+        }
+        if itrace as i32 >= maxfold {
+            err!("CMP fold exceeds maxfold=%d", maxfold);
         }
         let c = icmp as usize;
         pointer[c][itrace] = [tr.sx, tr.gx];

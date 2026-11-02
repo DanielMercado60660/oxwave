@@ -39,11 +39,13 @@ use oxwave_core::prelude::*;
 use oxwave_cwp::complex::{cmplx, cmul, cneg, crmul, cwp_cexp, Complex};
 use oxwave_cwp::cwp::PI;
 use oxwave_pfa_fft::{npfa, npfar, pfa2cc, pfa2rc};
-use oxwave_tempfile::temporary_stream;
+use oxwave_tempfile::temporary_filename;
 use std::ffi::{c_char, CString};
+use std::sync::atomic::{AtomicPtr, Ordering};
 
 unsafe extern "C" {
     fn access(path: *const c_char, mode: i32) -> i32;
+    fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
 }
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
@@ -89,6 +91,17 @@ const SDOC: &[&str] = &[
     "\t\t\t\t\t\t\t\t\t",
     "\t\t\t\t\t\t\t\t\t",
 ];
+
+/* Globals (so can trap signal) defining temporary disk files */
+#[derive(Default)]
+struct TempFiles {
+    tracefile: String,
+    headerfile: String,
+    tracefp: Option<CFile>,
+    headerfp: Option<CFile>,
+}
+
+static FILES: AtomicPtr<TempFiles> = AtomicPtr::new(std::ptr::null_mut());
 
 // Preserve C loop variables even where their values are unused.
 #[allow(non_snake_case, unused_variables, unused_assignments)]
@@ -157,34 +170,36 @@ fn main() {
     checkpars();
 
     /* store traces and headers in tempfiles while getting a count */
-    let tracefp;
-    let headerfp;
+    let files = Box::leak(Box::new(TempFiles::default()));
+    FILES.store(files as *mut TempFiles, Ordering::Relaxed);
+    let mut istmpdir = false;
     if tmpdir.is_empty() {
-        tracefp = etmpfile();
-        headerfp = etmpfile();
+        files.tracefp = Some(etmpfile());
+        files.headerfp = Some(etmpfile());
         if verbose != 0 {
             warn!("using tmpfile() call");
         }
     } else {
-        // The existing library's stream API creates the files in tmpdir and
-        // unlinks them immediately. This also removes them on interruption,
-        // without calling C signal handlers from the program.
-        tracefp = match temporary_stream(Some(&tmpdir)) {
-            Some(file) => CFile::from_file(file),
-            None => err!("%s: efopen: fopen failed", "subcalls.c"),
-        };
-        headerfp = match temporary_stream(Some(&tmpdir)) {
-            Some(file) => CFile::from_file(file),
-            None => err!("%s: efopen: fopen failed", "subcalls.c"),
-        };
+        files.tracefile = temporary_filename(&tmpdir);
+        files.headerfile = temporary_filename(&tmpdir);
+        /* Trap signals so can remove temp files */
+        for sig in [2, 3, 1, 15] {
+            unsafe { signal(sig, closefiles) };
+        }
+        files.tracefp = Some(efopen(&files.tracefile, "w+"));
+        files.headerfp = Some(efopen(&files.headerfile, "w+"));
+        istmpdir = true;
         if verbose != 0 {
             warn!("putting temporary files in %s", tmpdir);
         }
     }
+    let tracefp = files.tracefp.as_ref().unwrap().clone();
+    let headerfp = files.headerfp.as_ref().unwrap().clone();
     let mut nx = 0usize;
     loop {
         nx += 1;
-        efwrite(tr.hdr.as_bytes(), &headerfp);
+        // C writes one HDRBYTES-sized item; preserve efwrite's error counts.
+        efwrite(std::slice::from_ref(&tr.hdr), &headerfp);
         efwrite(&tr.data[..nt], &tracefp);
         if gettr(&mut tr) == 0 {
             break;
@@ -474,7 +489,7 @@ fn main() {
 
     /* restore header fields and write output */
     for ix in 0..nx {
-        efread(tr.hdr.as_bytes_mut(), &headerfp);
+        efread(std::slice::from_mut(&mut tr.hdr), &headerfp);
         tr.ns = nz as u16;
         tr.d1 = dz;
         tr.data[..nz].copy_from_slice(&cresult[ix * nz..(ix + 1) * nz]);
@@ -482,6 +497,26 @@ fn main() {
     }
     /* Clean up */
     efclose(&headerfp);
+    if istmpdir {
+        eremove(&files.headerfile);
+    }
+    if istmpdir {
+        eremove(&files.tracefile);
+    }
     let _ = tz;
     exit(CWP_Exit());
+}
+
+extern "C" fn closefiles(_sig: i32) {
+    // main installs the handlers only after publishing the leaked file state.
+    let files = unsafe { &*FILES.load(Ordering::Relaxed) };
+    if let Some(fp) = &files.headerfp {
+        efclose(fp);
+    }
+    if let Some(fp) = &files.tracefp {
+        efclose(fp);
+    }
+    eremove(&files.headerfile);
+    eremove(&files.tracefile);
+    exit(EXIT_FAILURE);
 }

@@ -31,3 +31,32 @@ subinbigcsv igiout=1,2,1 reigi=0
 subinbigcsv igiout=1,2,1 igcext=0
 subinbigcsv igiout=1,2,1 igclist=1
 printf 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g\nC_SU_NAMES\nC_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,30,0,0,100,0,0,80,10,10\n' > in.csv; suplane nt=3 ntr=2 | subinbigcsv rfile=in.csv igiout=1,4,3 igcout=1,4,3 intype=2
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=8 | sushw key=cdp a=-3 b=1 | subinbigcsv intype=-2 igiout=-2,4,3 igiext=1,0 recdp=1
+sunull nt=3 ntr=9 | sushw key=cdp a=0 b=1 | subinbigcsv igilist=7,1,4 igiext=0,1 recdp=0
+suplane nt=4 ntr=11 | sushw key=cdp a=0 b=1 | subinbigcsv igiout=2,8,3 igiext=0,1
+suspike nt=4097 ntr=2 | sushw key=cdp a=3 b=2 | subinbigcsv igilist=3,5
+sunull nt=13 ntr=1 | sushw key=cdp a=100 | subinbigcsv igiout=1,9,2
+[stderr] suspike nt=1 ntr=1 | sushw key=cdp a=2 | subinbigcsv igiout=1,4,2 igiext=0,1 verbose=1
+[exact] sunull nt=2 ntr=1 | subinbigcsv igilist=9,1,5 qout=q.csv > /dev/null; cat q.csv
+suspike nt=3 ntr=8 | sushw key=igi,igc a=1,2 b=1,0 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igiout=2,8,3 igcout=2,8,3 igiext=1,1 igcext=0,1 reigi=1 reigc=1 recdp=1
+sunull nt=4 ntr=8 | sushw key=igi,igc a=1,3 b=1,0 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igilist=8,2,5 igclist=4,1 igiext=1,0 igcext=1,0 reigi=0 reigc=1 recdp=0
+suplane nt=17 ntr=10 | sushw key=cdp a=1 b=11 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=2 igilist=1,4,7 igcout=1,10,3 igcext=1 reigi=1 reigc=0
+suspike nt=7 ntr=3 | sushw key=sx,sy,gx,gy,scalco a=20,30,40,50,-2 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=3 igiout=1,10,1 igcout=1,10,1
+suspike nt=5 ntr=2 | sushw key=sx,sy,gx,gy,scalco a=5,10,5,10,2 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 igiout=1,10,1 igcout=1,10,1 check=0
+[stderr] sunull nt=1 ntr=1 | sushw key=igi,igc a=2,2 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=20 grid_yb=0 grid_xc=0 grid_yc=20 grid_wb=10 grid_wc=10 intype=1 igiout=1,3,1 igcout=1,3,1 check=1 verbose=1
+[exact] suspike nt=1 ntr=1 | sushw key=igi,igc a=1,1 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igilist=7,1,4 igclist=6,2 qout=q.csv > /dev/null; cat q.csv
+printf 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g\nC_SU_NAMES\nC_SU_ID,bintype,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,30,0,0,100,0,0,80,10,10\n' > in.csv; suspike nt=2 ntr=3 | sushw key=cdp a=1 b=1 | subinbigcsv rfile=in.csv intype=2 igiout=1,10,2 igcout=1,8,2 check=0
+suplane nt=1 ntr=1 | sushw key=cdp a=3 | subinbigcsv igiout=1,3,1 igiext=0 recdp=1
+sunull nt=19 ntr=6 | sushw key=cdp a=8 b=-1 | subinbigcsv igilist=2,5,8 igiext=1,0
+subinbigcsv igilist=1 igiext=0,0,0
+subinbigcsv igiout=1,2,1 reigc=1
+subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igiout=1,5,1 igcout=1,5,1 reigi=2
+subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igiout=1,5,1 igcout=1,5,1 reigc=-1
+subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igilist=1 igclist=1,2 igcext=2
+suspike nt=2 ntr=1 | sushw key=cdp a=0 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=2 igiout=1,10,1 igcout=1,10,1
+sunull nt=2 ntr=3 | sushw key=cdp a=-11 b=1 | subinbigcsv igiout=-10,-4,3 igiext=1,1
+suspike nt=3 ntr=3 | sushw key=igi,igc a=10,10 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igiout=1,999,3 igcout=1,999,3 igiext=0,1 igcext=0,1
+[stderr] subinbigcsv igiout=1,2,1 qout=missing/out.csv
+[stderr] suspike nt=2 ntr=1 | sushw key=igi,igc a=0,1 | subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 intype=1 igiout=1,10,1 igcout=1,10,1
+[stderr] subinbigcsv grid_xa=0 grid_ya=0 grid_xb=100 grid_yb=0 grid_xc=0 grid_yc=100 grid_wb=10 grid_wc=10 igiout=1,5,1 igcout=1,5,1 igclist=1

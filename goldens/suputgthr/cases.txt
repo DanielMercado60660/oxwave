@@ -11,3 +11,20 @@ suputgthr dir=.
 sunull nt=1 ntr=1 | suputgthr
 sunull nt=1 ntr=1 | suputgthr dir=. key=invalid
 sunull nt=1 ntr=1 | suputgthr dir=. suffix=/missing/file
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | suputgthr dir=. key=ep suffix=.hsu numlength=7 verbose=0 && cat ep=0000000.hsu
+sunull nt=4 ntr=7 | sushw key=ep a=4 b=-1 j=2 | suputgthr dir=. key=ep numlength=2 suffix=.dat && cat ep=*.dat
+sunull nt=4097 ntr=3 | sushw key=cdp a=10 b=1 j=2 | suputgthr dir=. key=cdp suffix=.su && cat cdp=*.su
+suspike nt=17 ntr=4 nspk=1 it=3 ix=2 | suputgthr dir=. key=tracl numlength=2 suffix=.sp && cat tracl=*.sp
+suplane nt=31 ntr=5 | sushw key=fldr a=-12 b=7 | suputgthr dir=. key=fldr numlength=4 suffix=.g && cat fldr=*.g
+sunull nt=3 ntr=8 | sushw key=ep a=1 b=1 c=-2 j=2 k=4 | suputgthr dir=. suffix=.repeat numlength=1 && cat ep=*.repeat
+sunull nt=2 ntr=5 | sushw key=trid a=-2 b=1 | suputgthr dir=. key=trid suffix=.short numlength=3 && cat trid=*.short
+sunull nt=4 ntr=4 | sushw key=dt a=60000 b=1000 | suputgthr dir=. key=dt suffix=.unsigned numlength=2 && cat dt=*.unsigned
+sunull nt=5 ntr=5 | sushw key=d1 a=-1.5 b=0.5 | suputgthr dir=. key=d1 suffix=.float numlength=3 && cat d1=*.float
+[exact] sunull nt=1 ntr=4 | sushw key=cdp a=-2 b=3 | suputgthr dir=. key=cdp numlength=4 suffix=.xyz && ls cdp=*.xyz
+[exact] sunull nt=1 ntr=2 | suputgthr dir=. key=tracl numlength=0 suffix= && ls tracl=*
+[exact] sunull nt=2 ntr=3 | suputgthr dir=. key=tracl verbose=1 numlength=3 suffix=.v 2> messages && sed -E 's/cmgui[[:alnum:]]{6}/cmguiXXXXXX/g' messages
+sunull nt=13 ntr=1 | suputgthr dir=. key=offset suffix=.one numlength=9 && cat offset=*.one
+mkdir gathers && suspike nt=11 ntr=3 nspk=1 it=2 ix=1 | suputgthr dir=gathers key=tracl suffix=.su numlength=2 && cat gathers/tracl=*.su
+sunull nt=3 ntr=1 | suputgthr dir=. numlength=99999999999999999999
+sunull nt=3 ntr=1 | suputgthr dir=. key=not_a_header

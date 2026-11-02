@@ -88,3 +88,52 @@ sunull nt=47 ntr=2 | sufft verbose=0 | suamp mode=ouphase smooth=1
 # Empty numeric values retain defaults; no-argument nonterminal input is empty.
 sunull nt=17 ntr=1 | suaddnoise seed=722 | sufft verbose=0 | suamp mode=suphase unwrap= trend= zeromean= smooth=1 r= jack= verbose=
 [stderr] suamp
+
+# diff-2026-11 (round 1)
+# Direct complex headers cover tiny, odd, prime and large interleaved lengths.
+sunull nt=1 ntr=1 | sushw key=trid a=111 | suamp mode=real
+sunull nt=2 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=imag
+sunull nt=3 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=amp jack=1
+sunull nt=4 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=phase
+sunull nt=5 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=logamp jack=-2
+sunull nt=101 ntr=3 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=real
+sunull nt=4097 ntr=2 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=imag
+sunull nt=4097 ntr=2 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=suphase trend=1 zeromean=1 unwrap=0.75 smooth=1 r=5.19
+sunull nt=4097 ntr=2 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=ouphase trend=1 zeromean=1 unwrap=1 smooth=1 r=99
+
+# Large FFT inputs, default mode and explicitly supplied defaults.
+sunull nt=4097 ntr=2 | suaddnoise seed=771 | sufft verbose=0 | suamp
+[stderr] sunull nt=4097 ntr=2 | suaddnoise seed=771 | sufft verbose=0 | suamp mode=amp verbose=0 jack=0 smooth=0 r=10
+sunull nt=4097 ntr=1 | suaddnoise seed=771 | sufft verbose=0 | suamp mode=logamp jack=1
+sunull nt=4097 ntr=1 | suaddnoise seed=771 | sufft verbose=0 | suamp mode=suphase trend=0 zeromean=0 unwrap=-1
+sunull nt=4097 ntr=1 | suaddnoise seed=771 | sufft verbose=0 | suamp mode=ouphase trend=0 zeromean=0 unwrap=0
+
+# Additional generators and nonzero one-trace impulses at boundary lengths.
+suplane nt=127 ntr=5 npl=2 dip1=3 dip2=-5 | sufft verbose=0 | suamp mode=phase
+suplane nt=127 ntr=5 npl=2 dip1=3 dip2=-5 | sufft verbose=0 | suamp mode=ouphase trend=0 smooth=1 r=0.1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sufft verbose=0 | suamp mode=imag
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sufft verbose=0 | suamp mode=real
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | sufft verbose=0 | suamp mode=logamp
+
+# Only the first trace determines frequency spacing and input-type validation.
+sunull nt=67 ntr=3 | suaddnoise seed=781 | sushw key=trid,d1,dt a=111,0,1000 b=-1,0.25,1000 | suamp mode=ouphase trend=0
+sunull nt=67 ntr=3 | suaddnoise seed=781 | sushw key=trid,d1,dt a=111,-0.125,0 b=-1,0.25,1000 | suamp mode=ouphase trend=0
+[stderr] sunull nt=67 ntr=2 | suaddnoise seed=781 | sushw key=trid,d1,dt a=111,0,0 | suamp mode=suphase trend=0 verbose=-1
+[stderr] sunull nt=67 ntr=2 | suaddnoise seed=781 | sushw key=trid,d1,dt a=111,0,0 | suamp mode=ouphase trend=0 verbose=1
+
+# Underflow, logarithms of small nonzero amplitudes and overflow remain defined.
+sunull nt=67 ntr=1 | suaddnoise seed=731 | sugain scale=1e-30 | sushw key=trid a=111 | suamp mode=phase
+sunull nt=67 ntr=1 | suaddnoise seed=731 | sugain scale=1e-20 | sushw key=trid a=111 | suamp mode=logamp
+sunull nt=67 ntr=1 | suaddnoise seed=731 | sugain scale=1e20 | sushw key=trid a=111 | suamp mode=amp jack=1
+
+# Parameter precedence, accepted special floats, diagnostics and invalid values.
+sunull nt=17 ntr=2 | suaddnoise seed=781 | sushw key=trid a=111 | suamp mode=real mode=imag jack=1 jack=0
+sunull nt=17 ntr=2 | suaddnoise seed=781 | sushw key=trid a=111 | suamp mode=suphase unwrap=nan trend=-1 zeromean=-1
+[stderr] sunull nt=8 ntr=1 | sushw key=trid a=111 | suamp mode=real unused=1 verbose=1
+[stderr] sunull nt=8 ntr=1 | sushw key=trid a=111 | suamp mode=amplitude
+[stderr] sunull nt=8 ntr=1 | sushw key=trid a=112 | suamp mode=amp
+[stderr] sunull nt=8 ntr=1 | sushw key=trid a=111 | suamp mode=suphase trend=2147483648
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=4 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=suphase smooth=1 r=2e19 trend=0
+sunull nt=4 ntr=1 | suaddnoise seed=761 | sushw key=trid a=111 | suamp mode=ouphase smooth=1 r=2e19 trend=0

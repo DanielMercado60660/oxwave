@@ -104,6 +104,10 @@ fn main() {
         amax = -amax;
     }
     let tmax = (n1.wrapping_sub(1) as f32) * dt;
+    // Reject an overflowing time range before the C header/index conversions.
+    if tmax > f32::MAX || tmax < -f32::MAX {
+        err!("time range overflow");
+    }
 
     // Set output header words.
     // The C build converts to an unsigned register before storing its low
@@ -115,6 +119,9 @@ fn main() {
     for itr in 0..n2 {
         if mode == 1 || (mode == 2 && itr == 0) {
             // Zero trace.
+            if n1 < 0 || n1 as usize > tr.data.len() {
+                err!("n1 outside trace capacity");
+            }
             tr.data[..n1 as usize].fill(0.0);
 
             // Loop over spikes.

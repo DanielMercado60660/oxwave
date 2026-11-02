@@ -9,3 +9,24 @@
 [stderr] xy2z npairs=2 nx2=2
 [stderr] xy2z npairs=bad nx1=2
 [stderr] xy2z npairs=2 x1pad=4 nx1=4 verbose=1 extra=1
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=4 | sushw key=sx,gx a=-3,9 b=2,-3 | sugethw key=sx,gx output=binary | xy2z npairs=4
+[f32] sunull nt=2 ntr=5 | sushw key=sx,gx a=-4,8 b=3,-2 | sugethw key=sx,gx output=binary | xy2z npairs=5 nx1=13 nx2=9 x1pad=1 x2pad=2 yx=1 scale=-3.25
+[f32] sunull nt=3 ntr=7 | sushw key=sx,gx a=2,-6 b=5,3 | sugethw key=sx,gx output=binary | xy2z npairs=7 nx1=11 nx2=13 x1pad=3 x2pad=4 yx=0 scale=0.125
+[f32] sunull nt=4 ntr=8 | sushw key=sx,gx a=5,20 b=-1,-4 | sugethw key=sx,gx output=binary | xy2z npairs=8 nx1=6 nx2=7 x1pad=4 x2pad=5 scale=2
+[f32] suspike nt=7 ntr=11 | sushw key=sx,gx a=-10,15 b=2,-1 | sugethw key=sx,gx output=binary | xy2z npairs=11 nx1=17 nx2=19 x1pad=1 x2pad=1 yx=-1
+[f32] suspike nt=4097 ntr=3 | sushw key=sx,gx a=0,10 b=7,-3 | sugethw key=sx,gx output=binary | xy2z npairs=3 nx1=101 nx2=11 x1pad=2 x2pad=1 scale=1
+[f32] suplane nt=17 ntr=6 | sushw key=sx,gx a=1,-8 b=3,5 | sugethw key=sx,gx output=binary | xy2z npairs=6 nx1=10 nx2=12 x1pad=2 x2pad=2 yx=1 verbose=1
+[f32] sunull nt=5 ntr=9 | sushw key=sx,gx a=1,4 b=2,-1 j=3,4 | sugethw key=sx,gx output=binary | xy2z npairs=9 nx1=23 nx2=11 x1pad=1 x2pad=1 scale=0
+[f32] sunull nt=2 ntr=2 | sushw key=sx,gx a=-1,-2 b=2,4 | sugethw key=sx,gx output=binary | xy2z npairs=2 nx1=3 nx2=3 x1pad=1 x2pad=1 scale=4 yx=1
+[f32] suspike nt=3 ntr=5 | sushw key=sx,gx a=-20,50 b=10,-8 | sugethw key=sx,gx output=binary | xy2z npairs=5 nx1=100 nx2=100 x1pad=2 x2pad=2 scale=1 yx=0
+[f32] sunull nt=13 ntr=13 | sushw key=sx,gx a=0,25 b=1,-2 | sugethw key=gx,sx output=binary | xy2z npairs=13 nx1=31 nx2=29 x1pad=7 x2pad=8 scale=-0.5 yx=1
+[f32] suplane nt=31 ntr=10 | sushw key=sx,gx a=12,-13 b=-3,4 | sugethw key=sx,gx output=binary | xy2z npairs=10 nx1=8 nx2=9 x1pad=3 x2pad=4 scale=8
+[stderr] sunull nt=2 ntr=2 | sugethw key=tracl,tracr output=binary | xy2z nx1=4
+[stderr] sunull nt=2 ntr=2 | sugethw key=tracl,tracr output=binary | xy2z npairs=2 nx1=3 x1pad=3
+[stderr] sunull nt=2 ntr=2 | sugethw key=tracl,tracr output=binary | xy2z npairs=2 nx2=3 x2pad=4
+[stderr] sunull nt=2 ntr=2 | sugethw key=tracl,tracr output=binary | xy2z npairs=3
+[f32] suspike nt=4 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | sustrip outpar=/dev/null | xy2z npairs=2 nx1=7 nx2=9 x1pad=1 x2pad=1 scale=3 yx=1
+[f32] suspike nt=5 ntr=1 nspk=2 ix1=1 it1=2 ix2=1 it2=3 | sustrip outpar=/dev/null | xy2z npairs=2 nx1=11 nx2=7 x1pad=2 x2pad=1 yx=0
+[f32] suspike nt=13 ntr=1 nspk=3 ix1=1 it1=1 ix2=1 it2=4 ix3=1 it3=7 | sustrip outpar=/dev/null | xy2z npairs=6 nx1=15 nx2=17 x1pad=1 x2pad=2 scale=-1
+[f32] suspike nt=4097 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | sustrip outpar=/dev/null | xy2z npairs=2048 nx1=9 nx2=11 x1pad=1 x2pad=1 yx=1

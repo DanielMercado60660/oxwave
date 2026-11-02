@@ -17,3 +17,34 @@ psgraph n=1 nplot=5001
 python3 -c 'import math,struct,sys; sys.stdout.buffer.write(b"".join(struct.pack("2f",i*0.5,math.sin(i)*3+k) for k,n in enumerate((4,5,6)) for i in range(n)))' | psgraph nplot=3 n=4,5,6 mark=0,2,5 marksize=4 linecolor=red,green,blue x1beg=0.2 x1end=2 x2beg=-2 x2end=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("10f",-3,-120,-1,40,0.5,-7,2,300,4.25,-55))' | psgraph n=5 style=normal reverse=1 grid1=dot grid2=none | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("7f",12345,23000,9000.5,-4000,15000,250000,-125000))' | psgraph nplot=2 n=4,3 pairs=0 d1=0.25,2 f1=100,90 linewidth=0,1 mark=3,6 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=1 d1=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | psgraph n=2 d1=0.25 f1=-2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d2=-1 f2=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=1 | sustrip outpar=/dev/null | psgraph n=2 pairs=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=1 | sustrip outpar=/dev/null | psgraph n=2 pairs=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=1 | sustrip outpar=/dev/null | psgraph n=7 d1=0.1 f1=1 mark=1 marksize=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=1 | sustrip outpar=/dev/null | psgraph n=11 d1=-0.5 f1=5 grid1=dot grid2=dash | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | psgraph n=4097 d1=1 linewidth=0 marksize=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=9 ntr=2 | sustrip outpar=/dev/null | psgraph n=9,9 d1=1,2 f1=0,-2 reverse=1 mark=2,3 marksize=3,5 linecolor=red,blue | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=8 ntr=1 | sushw key=offset a=100 | sustrip outpar=/dev/null | psgraph n=4 nplot=2 d1=1 mark=4,5 marksize=2 linewidth=1,2 lineon=2,3 lineoff=1,2 linegray=0.2,0.7 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=6 ntr=1 | sustrip outpar=/dev/null | psgraph n1=3 n2=2 d2=1,2 f2=-1,1 reverse=0 mark=6,7 marksize=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=6 ntr=1 | sustrip outpar=/dev/null | psgraph n=2,2 pairs=1,0 d1=0,1 d2=0,0 mark=8 marksize=3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4 ntr=1 | sustrip outpar=/dev/null | psgraph n=4 d1=1 style=seismic label1=Distance label2=Amplitude title=Plot labelfont=Courier titlefont=Times-Bold labelsize=12 titlesize=16 titlecolor=red axescolor=blue gridcolor=green | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | psgraph n=5 d1=1 xbox=2 ybox=1 wbox=4 hbox=3 x1beg=4 x1end=0 x2beg=2 x2end=-2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | psgraph n=5 d1=1 d1num=1 f1num=0 n1tic=2 grid1=solid d2num=0.5 f2num=0 n2tic=2 grid2=solid axeswidth=2 ticwidth=1 gridwidth=0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=2 d2=-1 f1=4 f2=8 style=normal verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=1 | sustrip outpar=/dev/null | psgraph n=13 d1=0.5 linecolor=none linegray=0.5 linewidth=2 lineon=4 lineoff=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=8 ntr=1 | sustrip outpar=/dev/null | psgraph n=4,4 d1=1,1 linewidth=0 mark=1,8 marksize=5,6 linecolor=green | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 axescolor=gray titlecolor=blue gridcolor=red grid1=dash grid2=dot | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=17 ntr=1 | sustrip outpar=/dev/null | psgraph n=17 d2=0.25 f2=-2 x1beg=-1 x1end=2 x2beg=-2 x2end=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4 ntr=1 | sustrip outpar=/dev/null | psgraph n=4 d1=1 style=seismic label1='A(B)' label2='C\\D' title='Plot (test)' | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=10 ntr=1 | sustrip outpar=/dev/null | psgraph n=2,3,5 nplot=3 d1=1,0.5,2 f1=1,2,3 reverse=1 mark=1,4,7 marksize=3 linecolor=red,blue,green | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=2
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph nplot=1
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=1 nplot=5001
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=-1 d1=1 d2=1
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=1 nplot=-1 d1=1 d2=1
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | psgraph n=4097 d1=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

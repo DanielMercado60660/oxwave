@@ -17,3 +17,21 @@ suplane nt=5 ntr=2 | suhtmath op=mult scale=0 const=0
 suplane nt=5 ntr=2 | suhtmath op=div scale=0 const=0
 [stderr] suplane nt=3 ntr=1 | suhtmath op=add verbose=1
 [stderr] suhtmath op=invalid verbose=1
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | suhtmath op=add key=tracl scale=1 const=0
+sunull nt=3 ntr=4 | sushw key=offset a=-5 b=3 | suhtmath op=add key=offset scale=0.25 const=1.5
+sunull nt=4 ntr=3 | sushw key=trid a=-3 b=2 | suhtmath op=mult key=trid scale=2 const=1
+suspike nt=17 ntr=3 k1=2 k2=1 | suhtmath op=div key=tracl scale=2 const=1
+suspike nt=4097 ntr=2 k1=4097 k2=1 | suhtmath op=add key=ns scale=0.001 const=-3
+suplane nt=11 ntr=5 | sushw key=d2 a=-1.25 b=0.5 | suhtmath op=mult key=d2 scale=-2 const=0.25
+suplane nt=13 ntr=3 | sushw key=dt a=60000 b=1000 | suhtmath op=div key=dt scale=0.001 const=2
+suplane nt=2 ntr=2 | suhtmath op=add key=tracl scale=1 const=0
+suplane nt=4 ntr=1 | suhtmath op=mult scale=0 const=-3
+[stderr] sunull nt=3 ntr=2 | suhtmath op=add key=ns scale=0.5 const=-1 verbose=1
+suplane nt=3 ntr=1 | suhtmath op=
+suplane nt=3 ntr=1 | suhtmath op=ADD
+suhtmath op=add key=
+suhtmath op=add scale=1e999
+sunull nt=1 ntr=1 | sushw key=offset a=1234567 | suhtmath op=add key=offset scale=0.1234567 const=-152415.7
+suspike nt=31 ntr=2 k1=1 k2=1 | suhtmath op=add op=mult key=tracl scale=2 scale=-0.5 const=3
+sunull nt=4 ntr=2 | sushw key=delrt a=-32768 b=65535 | suhtmath op=add key=delrt scale=0.5 const=0.125

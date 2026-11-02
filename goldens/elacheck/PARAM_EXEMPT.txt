@@ -1,0 +1,1 @@
+file  # elacheck returns 1 unconditionally even after a completed model check (elacheck.c:126).

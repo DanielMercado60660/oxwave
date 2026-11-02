@@ -90,30 +90,38 @@ fn tparse(text: &str, d: char) -> Vec<String> {
         .collect()
 }
 
+// fgets overwrites only the new line and its terminating NUL. getCSV can
+// continue beyond that NUL, so retain the initialized tail between reads.
+fn save_record(text: &mut [u8], raw: &str) {
+    let len = raw.len().min(text.len() - 1);
+    text[..len].copy_from_slice(&raw.as_bytes()[..len]);
+    text[len] = 0;
+}
+
 // The same record selection is used by countRec and the read-in pass.
-fn data_records<'a>(
-    fp: &'a CFile,
-    rid: &'a str,
+fn data_record(
+    fp: &CFile,
+    text: &mut [u8],
+    rid: &str,
     lenid: usize,
     nicerecord: i32,
-) -> impl Iterator<Item = (i32, String)> + 'a {
-    let mut ncount = 0;
-    let mut nextrow = false;
-    std::iter::from_fn(move || {
-        while let Some(raw) = fgets(10001, fp) {
-            ncount += 1;
-            if ncount < nicerecord {
-                continue;
-            }
-            let front = raw.to_ascii_lowercase();
-            if front.starts_with("c_su") || nextrow {
-                nextrow = front.starts_with("c_su_names") || front.starts_with("c_su_forms");
-            } else if lenid == 0 || raw.as_bytes().starts_with(&rid.as_bytes()[..lenid]) {
-                return Some((ncount, raw));
-            }
+    ncount: &mut i32,
+    nextrow: &mut bool,
+) -> Option<String> {
+    while let Some(raw) = fgets(10001, fp) {
+        save_record(text, &raw);
+        *ncount += 1;
+        if *ncount < nicerecord {
+            continue;
         }
-        None
-    })
+        let front = raw.to_ascii_lowercase();
+        if front.starts_with("c_su") || *nextrow {
+            *nextrow = front.starts_with("c_su_names") || front.starts_with("c_su_forms");
+        } else if lenid == 0 || raw.as_bytes().starts_with(&rid.as_bytes()[..lenid]) {
+            return Some(raw);
+        }
+    }
+    None
 }
 
 #[derive(Default)]
@@ -127,7 +135,7 @@ struct ReadErrors {
 }
 
 fn get_csv(
-    raw: &str,
+    text: &[u8],
     rdel: u8,
     dfield: &mut [f64],
     nspot: &[usize],
@@ -137,10 +145,6 @@ fn get_csv(
     let mut nbeg: i32 = -1;
     let mut nfield = 0;
     let mut ineed = 0;
-    // C scans the entire zero-filled work buffer even after a short record.
-    let mut text = vec![0u8; 10001];
-    let len = raw.len().min(10000);
-    text[..len].copy_from_slice(&raw.as_bytes()[..len]);
     for n in 0..10001 {
         let ch = text[n];
         if ch == rdel || ch == 0 || ch == b'\n' || ch == b'\r' {
@@ -452,6 +456,7 @@ fn main() {
         err!("**** A required parameter has not been specified. See previous messages.");
     }
     let mut names_more = false;
+    let mut textraw = vec![0u8; 10001];
     if names.is_empty() || matches.is_empty() || lenid == 0 {
         let in_names = names.len();
         let in_match = matches.len();
@@ -461,6 +466,7 @@ fn main() {
         let mut num_setid = 0;
         let mut read_names = 0;
         while let Some(raw) = fgets(10001, &fpu) {
+            save_record(&mut textraw, &raw);
             if (in_names > 0 || read_names == -2) && !matches.is_empty() && lenid > 0 {
                 break;
             }
@@ -816,7 +822,21 @@ fn main() {
     }
 
     if num_r < 1 {
-        num_r = data_records(&fpr, &rid, lenid, nicerecord).count() as i32;
+        let mut ncount = 0;
+        let mut nextrow = false;
+        while data_record(
+            &fpr,
+            &mut textraw,
+            &rid,
+            lenid,
+            nicerecord,
+            &mut ncount,
+            &mut nextrow,
+        )
+        .is_some()
+        {
+            num_r += 1;
+        }
         fseeko(&fpr, 0, SEEK_SET);
         warn!("Counted %d data records.", num_r);
         if num_r == 0 {
@@ -827,7 +847,17 @@ fn main() {
     let mut e = ReadErrors::default();
     let mut ur = Unrepeat::new(1);
     let mut count = 0;
-    for (ncount, mut raw) in data_records(&fpr, &rid, lenid, nicerecord) {
+    let mut ncount = 0;
+    let mut nextrow = false;
+    while let Some(raw) = data_record(
+        &fpr,
+        &mut textraw,
+        &rid,
+        lenid,
+        nicerecord,
+        &mut ncount,
+        &mut nextrow,
+    ) {
         count += 1;
         if count > num_r {
             continue;
@@ -837,7 +867,13 @@ fn main() {
             lfield: vec![0; num_to_sort_by],
         };
         if !irtype {
-            let bytes = raw.as_bytes();
+            // C uses strlen(textraw), so embedded NULs end fixed records.
+            let lenraw = raw
+                .as_bytes()
+                .iter()
+                .position(|&c| c == 0)
+                .unwrap_or(raw.len());
+            let bytes = &raw.as_bytes()[..lenraw];
             let mut textbeg = Vec::new();
             for ineed in 0..numcases {
                 if itrail[ineed] as usize >= bytes.len() {
@@ -857,9 +893,11 @@ fn main() {
                     .extend_from_slice(&bytes[(ilead[ineed] - 1) as usize..itrail[ineed] as usize]);
                 textbeg.push(rdel);
             }
-            raw = String::from_utf8_lossy(&textbeg).into_owned();
+            let len = textbeg.len();
+            textraw[..len].copy_from_slice(&textbeg);
+            textraw[len] = 0;
         }
-        get_csv(&raw, rdel, &mut rec.dfield, &nspot, ncount, &mut e);
+        get_csv(&textraw, rdel, &mut rec.dfield, &nspot, ncount, &mut e);
         for j in 0..numcases {
             let d = rec.dfield[j];
             if d < 1.0e308 && (d > valmx[j] || 0.0 - d > valmx[j]) {

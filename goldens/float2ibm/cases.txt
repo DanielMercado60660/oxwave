@@ -12,3 +12,18 @@
 float2ibm </dev/null
 float2ibm outpar=/nonexistent-directory/count </dev/null
 float2ibm endian=999999999999999999999 outpar=/dev/null </dev/null
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 mag=-2 | sustrip outpar=/dev/null | float2ibm outpar=count
+[exact] suspike nt=2 ntr=2 mag=3 | sustrip outpar=/dev/null | float2ibm endian=1 outpar=count
+[exact] suspike nt=3 ntr=3 mag=-0.125 | sustrip outpar=/dev/null | float2ibm endian=0 outpar=count
+[exact] suspike nt=4 ntr=1 mag=123.5 | sustrip outpar=/dev/null | float2ibm endian=2 outpar=count
+[exact] sunull nt=17 ntr=3 | sustrip outpar=/dev/null | float2ibm endian=-1 outpar=count
+[exact] suplane nt=127 ntr=4 | sustrip outpar=/dev/null | float2ibm outpar=count
+[exact] suspike nt=4097 ntr=2 mag=0.25 | sustrip outpar=/dev/null | float2ibm endian=0 outpar=count
+[exact] suspike nt=7 ntr=3 | sushw key=cdp a=12 b=3 | sustrip outpar=/dev/null | float2ibm endian=1 outpar=count
+[exact] sunull nt=11 ntr=2 | sustrip outpar=/dev/null | float2ibm outpar=count >data && cat count
+[stderr] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | float2ibm endian=0 outpar=/dev/stderr verbose=1
+[exact] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | float2ibm endian= outpar=count
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | float2ibm outpar=/nonexistent-directory/count
+[stderr] suplane nt=31 ntr=2 | sustrip outpar=/dev/null | float2ibm endian=1 outpar=count verbose=1
+[exact] suspike nt=13 ntr=2 mag=-7.25 | sustrip outpar=/dev/null | float2ibm endian=1 endian=0 outpar=count

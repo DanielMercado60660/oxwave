@@ -15,3 +15,25 @@ suweight key=notakey
 suweight key2=notakey
 suweight inv=999999999999999999999
 suweight a=1
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suweight key=offset a=1 b=.0005 inv=0
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=offset a=-1000 | suweight a=1.25 b=.001
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=cdp a=4 | suweight key=cdp a=-2 b=.75 inv=1
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sushw key=trid a=-3 | suweight key=trid a=0 b=2
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=4097 | sushw key=offset a=200 b=300 | suweight a=.5 b=.002 inv=-2
+suplane nt=31 ntr=7 npl=1 | sushw key=cdp a=2000 b=1000 | suweight key2=cdp scale=.001
+suplane nt=37 ntr=8 npl=1 | sushw key=trid a=2 b=1 | suweight key2=trid scale=-.25 inv=1
+suplane nt=41 ntr=8 npl=1 | sushw key=d1 a=1.25 b=.5 | suweight key=d1 a=.75 b=-.125
+suplane nt=43 ntr=8 npl=1 | sushw key=d1 a=.5 b=.25 | suweight key2=d1 scale=2 inv=1
+sunull nt=2 ntr=3 | sushw key=offset a=-20 b=20 | suweight key=offset a=0 b=1
+[stderr] suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | suweight key2=tracl scale=2 verbose=1
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 | suweight key=invalid_header
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 | suweight key2=invalid_header
+suweight b=1e999
+suweight inv=999999999999999999999999999
+suplane nt=53 ntr=6 npl=1 | sushw key=offset a=16777215 b=2 | suweight key=offset a=-8388.5 b=.0005
+suplane nt=59 ntr=6 npl=1 | sushw key=dt a=60000 b=1000 | suweight key=dt a=.125 b=.00003 inv=1
+suplane nt=61 ntr=6 npl=1 | sushw key=cdp a=3 b=1 | suweight key=offset a=100 b=100 key2=cdp scale=.5 inv=0
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 | suweight key=tracl a=2 b=3
+[stderr] suspike nt=11 ntr=1 nspk=1 ix1=1 it1=1 | suweight a=2 a=3 b=0 verbose=1
+suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | suweight key2=

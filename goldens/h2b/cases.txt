@@ -17,3 +17,12 @@ h2b outpar=/no/such/directory/count < /dev/null
 [f32] python3 -c 'print("ab" * 700)' | h2b outpar=count
 [exact] h2b outpar=count </dev/null >/dev/null && cat count
 [f32] printf '0\nff\n' | h2b outpar=count
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 64 | h2b outpar=count
+[f32] suspike nt=2 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 80 | h2b outpar=count
+[f32] suplane nt=3 ntr=2 | sushw key=offset a=123 b=7 | od -An -v -tx1 | tr -d " \n" | fold -w 128 | h2b outpar=count
+[exact] sunull nt=4 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 72 | h2b outpar=count >/dev/null && cat count
+[f32] suspike nt=17 ntr=3 | od -An -v -tx1 | tr -d " \n" | fold -w 1022 | h2b outpar=count
+[f32] sunull nt=4097 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 1022 | h2b outpar=count
+[stderr] suplane nt=7 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 64 | h2b outpar=count verbose=1 >/dev/null
+sunull nt=1 ntr=1 | od -An -v -tx1 | tr -d " \n" | fold -w 64 | h2b outpar=/no/such/directory/count

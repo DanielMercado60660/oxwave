@@ -40,3 +40,48 @@ suplane nt=2051 ntr=131 | suinterp nxmax=131 iopt=2 xopt=1 lent=9 lenx=3
 # Explicit defaults and negative smoothing lengths (C treats them as copies).
 suplane nt=35 ntr=4 | suinterp ninterp=1 nxmax=500 freq1=4 freq2=20 deriv=0 linear=0 lent=5 lenx=1 lagc=400 xopt=0 iopt=0 verbose=0 tmpdir=
 suplane nt=35 ntr=4 | suinterp lagc=-1 lent=-3 lenx=-3
+# diff-2026-11 (round 1)
+# Short nonzero traces, including derivative padding and both temporal interpolators.
+suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | suinterp iopt=1 lagc=0 freq1=0 freq2=10 lent=1 lenx=1 nxmax=3 xopt=1 ninterp=1 deriv=0 linear=0 verbose=0 tmpdir=
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | suinterp lagc=0 lent=1 deriv=1 linear=1
+suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | suinterp lagc=0 lent=2 lenx=2 iopt=2
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | suinterp lagc=0 lent=1 ninterp=3 linear=1
+# FFT spatial derivative switches at 16 input traces; prime lengths pad in time.
+suplane nt=97 ntr=15 dip2=-7 dip3=11 | suinterp xopt=0 freq1=0 freq2=17.3 lagc=13 lent=3 lenx=3
+suplane nt=97 ntr=16 dip2=-7 dip3=11 | suinterp xopt=0 freq1=0 freq2=17.3 lagc=13 lent=3 lenx=3
+suplane nt=101 ntr=17 | suinterp xopt=1 deriv=1 linear=1 ninterp=3 lagc=40 lent=4 lenx=4
+# A wavelet generator, zero data, and a long odd trace.
+susynlv nt=257 dt=0.004 nxm=5 fxm=1 dxm=0.05 ref="1:0,0.25;3,0.35" | suinterp freq1=2 freq2=35 ninterp=2 linear=1
+sunull nt=4097 ntr=3 dt=0.002 | suinterp iopt=2 lagc=20 lent=9 lenx=3
+suplane nt=4097 ntr=5 | suinterp ninterp=2 freq1=0 freq2=35 deriv=1
+# Headers are copied from the preceding input, and only the first dt controls picking.
+suplane nt=127 ntr=5 | sushw key=tracl,cdp,offset,sx,gx,delrt a=10,100,-50,200,150,-40 b=3,7,25,20,45,10 | suinterp ninterp=2
+suplane nt=127 ntr=5 | sushw key=dt a=2000 b=1000 | suinterp freq1=0 freq2=25 iopt=1
+suplane nt=127 ntr=5 | sushw key=d1,f1,d2,f2 a=0.002,-0.1,25,-50 | suinterp iopt=2 deriv=1
+# nxmax truncates before reading the next header; zero interpolation still supports QC modes.
+suplane nt=43 ntr=7 | suinterp nxmax=3 ninterp=2
+suspike nt=43 ntr=7 nspk=2 ix1=2 it1=7 ix2=5 it2=31 | suinterp ninterp=0 iopt=1 freq1=-1 freq2=30
+suspike nt=43 ntr=7 nspk=2 ix1=2 it1=7 ix2=5 it2=31 | suinterp ninterp=0 iopt=2 xopt=1
+# Empty optional numbers select the defaults, including a negative smoothing no-op.
+suplane nt=41 ntr=5 | suinterp ninterp= lagc= freq1= freq2= lent= lenx= nxmax= xopt= iopt= deriv= linear= verbose= tmpdir=
+suplane nt=41 ntr=5 | suinterp lagc=-4 lent=-2 lenx=-2 freq1=-2 freq2=30 linear=1
+[stderr] suspike nt=67 ntr=4 nspk=1 ix1=2 it1=20 | suinterp verbose=1 tmpdir=. iopt=1
+[stderr] sunull nt=7 ntr=3 | suinterp verbose=1 tmpdir= iopt=2
+# Invalid numeric values and missing input: no required named parameters exist.
+sunull nt=1 ntr=1 | suinterp tmpdir=/diff-suinterp-no-such-directory
+sunull nt=7 ntr=2 | suinterp ninterp=2147483648
+sunull nt=7 ntr=2 | suinterp freq2=1e999
+sunull nt=7 ntr=2 | suinterp freq1=1e-310
+sunull nt=7 ntr=0 | suinterp verbose=1
+# Negative dimensions reach VND's own key validation before any sample access.
+suplane nt=37 ntr=5 | suinterp nxmax=-1
+sunull nt=7 ntr=2 | suinterp nxmax=-2
+sunull nt=7 ntr=2 | suinterp nxmax=-2 ninterp=-2
+# Explicit defaults, dense seeded data, and large legal SU traces.
+suplane nt=59 ntr=5 | suinterp lagc=400 freq1=4 freq2=20 lent=5 lenx=1 nxmax=500 xopt=0 ninterp=1 iopt=0 deriv=0 linear=0 verbose=0 tmpdir=
+suplane nt=257 ntr=19 | suaddnoise seed=31 | suinterp ninterp=2 xopt=0 lagc=13 lent=3 lenx=3 freq1=0 freq2=17.3 deriv=1
+suplane nt=1021 ntr=15 | suaddnoise seed=1280 | suinterp freq1=-1 freq2=40 lagc=13 lent=9 lenx=3 xopt=0 iopt=2
+suspike nt=16381 ntr=3 nspk=1 ix1=2 it1=8190 | suinterp ninterp=2 xopt=0 lagc=0 lent=3 lenx=3
+suspike nt=65535 ntr=2 nspk=1 ix1=2 it1=32767 | suinterp iopt=1 deriv=1
+# A later ns header disagrees with the first trace; gettr must report it.
+suplane nt=17 ntr=3 | sushw key=ns a=17 b=1 | suinterp

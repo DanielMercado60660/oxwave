@@ -8,3 +8,14 @@
 [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=7i2f",1,4,4,11,11,1,1,0.,1.)+b"\0")' | wptuncomp
 # A small noisy section overflows the compressor's bounded output buffer (nsize=-1).
 [stderr] sunull nt=128 ntr=1 | suaddnoise seed=129 | sugain scale=1000 | sustrip outpar=/dev/null | wptcomp n1=128 n2=1 error=0.001 > compressed 2>/dev/null; exec wptuncomp < compressed
+# diff-2026-11 (round 1)
+[f32] sunull nt=2 ntr=32 | sustrip outpar=/dev/null | wptcomp n1=2 n2=32 | wptuncomp
+[f32] sunull nt=3 ntr=32 | sustrip outpar=/dev/null | wptcomp n1=3 n2=32 | wptuncomp
+[f32] suspike nt=4 ntr=32 | sustrip outpar=/dev/null | wptcomp n1=4 n2=32 | wptuncomp
+[f32] suplane nt=37 ntr=7 | sushw key=offset a=123 b=7 | sustrip outpar=/dev/null | wptcomp n1=37 n2=7 nfilter1=6 nfilter2=4 nstage1=1 nstage2=1 error=0.05 | wptuncomp verbose=1
+[f32] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | wptcomp n1=4097 n2=1 | wptuncomp
+[f32] sunull nt=127 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=127 n2=8 nstage1=0 nstage2=0 | wptuncomp
+[f32] suplane nt=65 ntr=17 | sustrip outpar=/dev/null | wptcomp n1=65 n2=17 nfilter1=4 nfilter2=6 nstage1=2 nstage2=3 error=0.02 | wptuncomp
+[f32] suspike nt=31 ntr=13 | sustrip outpar=/dev/null | wptcomp n1=31 n2=13 nfilter1=6 nfilter2=4 nstage1=0 nstage2=0 error=0.1 | wptuncomp ignored=123
+[f32] suplane nt=19 ntr=3 | sustrip outpar=/dev/null | wptcomp n1=19 n2=3 nstage1=0 nstage2=0 error=0.1 | wptuncomp
+[f32] sunull nt=64 ntr=16 | suaddnoise seed=42 | sustrip outpar=/dev/null | wptcomp n1=64 n2=16 error=0.1 | wptuncomp

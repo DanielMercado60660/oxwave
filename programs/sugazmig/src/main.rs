@@ -43,7 +43,7 @@ use oxwave_linear_interp::intlin;
 use oxwave_pfa_fft::{npfa, npfar, pfa2cr, pfa2rc, pfacc};
 use oxwave_tempfile::temporary_filename;
 use std::ffi::{c_char, CString};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -88,9 +88,13 @@ const SDOC: &[&str] = &[
     " Caveat: Adding Q is a first attempt to address GPR issues.\t\t",
 ];
 
-// Signals only set this lock-free flag. Stream operations and cleanup must
-// run in normal execution, after any CFile borrows have been released.
+// Defer stream operations until CFile borrows have been released. While
+// gathering input, gettr may block indefinitely: closefiles must still remove
+// the named files and exit, without borrowing the interrupted stream registry.
 static INTERRUPTED: AtomicBool = AtomicBool::new(false);
+static READING_INPUT: AtomicBool = AtomicBool::new(false);
+static INPUT_TRACEFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
+static INPUT_HEADERFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
 
 struct TempFiles {
     tracefp: CFile,
@@ -102,10 +106,23 @@ unsafe extern "C" {
     fn access(path: *const c_char, mode: i32) -> i32;
     fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
     fn raise(sig: i32) -> i32;
+    fn unlink(path: *const c_char) -> i32;
+    fn _exit(status: i32) -> !;
 }
 
 extern "C" fn record_signal(_: i32) {
     INTERRUPTED.store(true, Ordering::Relaxed);
+    if READING_INPUT.load(Ordering::Relaxed) {
+        // SAFETY: both immutable CStrings are published before READING_INPUT
+        // becomes true and live until main exits. unlink and _exit are
+        // async-signal-safe. No output exists yet, and temporary file buffers
+        // can be discarded; process exit closes their descriptors.
+        unsafe {
+            unlink(INPUT_HEADERFILE.load(Ordering::Relaxed));
+            unlink(INPUT_TRACEFILE.load(Ordering::Relaxed));
+            _exit(EXIT_FAILURE);
+        }
+    }
 }
 
 impl TempFiles {
@@ -238,14 +255,21 @@ fn main() {
         tracefile: tracefile.clone(),
         headerfile: headerfile.clone(),
     };
+    let signal_tracefile = CString::new(tracefile.as_str()).unwrap();
+    let signal_headerfile = CString::new(headerfile.as_str()).unwrap();
+    INPUT_TRACEFILE.store(signal_tracefile.as_ptr().cast_mut(), Ordering::Relaxed);
+    INPUT_HEADERFILE.store(signal_headerfile.as_ptr().cast_mut(), Ordering::Relaxed);
     let mut nx = 0i32;
     loop {
         tempfiles.check_signal();
         nx += 1;
         efwrite(std::slice::from_ref(&tr.hdr), &headerfp);
         efwrite(&tr.data[..nt as usize], &tracefp);
+        READING_INPUT.store(true, Ordering::Relaxed);
         tempfiles.check_signal();
-        if gettr(&mut tr) == 0 {
+        let nread = gettr(&mut tr);
+        READING_INPUT.store(false, Ordering::Relaxed);
+        if nread == 0 {
             break;
         }
     }
@@ -424,8 +448,10 @@ fn gazdagvt(
     pfacc(1, &mut pp);
 
     // Preserve the C loop's comparison of an integer index with ftau.
+    // Bound the velocity read as in the minimal C fix: ftau can exceed
+    // ntau. For nt=3, ftau=4, both original and fixed C output zero samples.
     let mut itau = 0usize;
-    while (itau as f32) < ftau {
+    while (itau as f32) < ftau && itau < ntau as usize {
         tempfiles.check_signal();
         let mut w = fw;
         for iw in 0..nw as usize {

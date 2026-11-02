@@ -38,8 +38,26 @@ use oxwave_cwp::complex::rcabs;
 use oxwave_pfa_fft::{npfa, npfar, pfa2rc, pfa2cc, Complex};
 use oxwave_tempfile::temporary_filename;
 use std::ffi::CString;
+use std::sync::atomic::{AtomicPtr, Ordering};
 unsafe extern "C" {
     fn access(path: *const i8, mode: i32) -> i32;
+    fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
+    fn unlink(path: *const i8) -> i32;
+    fn _exit(status: i32) -> !;
+}
+
+// The CString in main owns this path for the lifetime of the signal handlers.
+static TRACEFILE: AtomicPtr<i8> = AtomicPtr::new(std::ptr::null_mut());
+
+/* for graceful interrupt termination */
+extern "C" fn closefiles(_: i32) {
+    let tracefile = TRACEFILE.load(Ordering::Relaxed);
+    unsafe {
+        if !tracefile.is_null() { unlink(tracefile); }
+        // Termination closes the removed temporary file. Avoid buffered Rust
+        // I/O here: the signal may have interrupted a borrow of that stream.
+        _exit(1);
+    }
 }
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
@@ -113,12 +131,19 @@ fn main() {
     }
     checkpars();
     let mut tracefile = String::new();
+    let signal_path;
     let tracefp = if tmpdir.is_empty() {
         let fp = etmpfile();
         if verbose != 0 { warn!("using tmpfile() call"); }
         fp
     } else {
         tracefile = temporary_filename(&tmpdir);
+        signal_path = CString::new(tracefile.as_str()).unwrap();
+        TRACEFILE.store(signal_path.as_ptr().cast_mut(), Ordering::Relaxed);
+        /* Trap signals so can remove temp files */
+        unsafe {
+            for sig in [2, 3, 1, 15] { signal(sig, closefiles); }
+        }
         let fp = efopen(&tracefile, "w+");
         if verbose != 0 { warn!("putting temporary files in %s", tmpdir); }
         fp

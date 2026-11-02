@@ -51,3 +51,43 @@
 # dctcomp n1=1 n2=1 blocksize1=0
 # dctcomp n1=1 n2=1 blocksize2=0
 # dctcomp n1=0 n2=0 blocksize1=1 blocksize2=1
+
+# diff-2026-11 (round 1)
+# Tiny inputs: specify valid spike coordinates instead of defaults that can
+# put the spike before sample zero. Small Huffman buffers may report nsize=-1
+# while dctcomp itself still exits 0; compare that representation and stderr.
+[exact] [stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1
+[exact] [stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | dctcomp n1=2 n2=1 blocksize1=2 blocksize2=1 error=0.01
+[exact] [stderr] suspike nt=3 ntr=2 nspk=1 ix1=2 it1=3 | sustrip outpar=/dev/null | dctcomp n1=3 n2=2 blocksize1=3 blocksize2=2 error=0.05
+[exact] [stderr] suspike nt=4 ntr=3 nspk=1 ix1=3 it1=4 | sustrip outpar=/dev/null | dctcomp n1=4 n2=3 blocksize1=2 blocksize2=3 error=0.1
+# Prime dimensions, unequal blocks, a partial final block, and long traces.
+[exact] [stderr] suplane nt=101 ntr=11 | sustrip outpar=/dev/null | dctcomp n1=101 n2=11 blocksize1=17 blocksize2=7 error=0.02
+[exact] [stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | sustrip outpar=/dev/null | dctcomp n1=4097 n2=1
+[exact] [stderr] suspike nt=4097 ntr=3 nspk=1 ix1=3 it1=4097 | sustrip outpar=/dev/null | dctcomp n1=4097 n2=3 blocksize1=31 blocksize2=2 error=0.001
+# Zero runs cross the RLE maximum run length of 255.
+[exact] [stderr] sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=4097 n2=1 blocksize1=1 blocksize2=1
+[exact] [stderr] sunull nt=29 ntr=17 | suaddnoise seed=20261102 | sustrip outpar=/dev/null | dctcomp n1=29 n2=17 blocksize1=5 blocksize2=11 error=0.0001
+# Raw velocity grids and a physical synthetic broaden the input distributions.
+[exact] [stderr] makevel nz=37 nx=13 v000=2 dvdz=0.125 dvdx=-0.0625 | dctcomp n1=37 n2=13 blocksize1=8 blocksize2=3 error=0.005
+[exact] [stderr] suimp2d nt=127 nrec=5 | sustrip outpar=/dev/null | dctcomp n1=127 n2=5 blocksize1=7 blocksize2=3 error=0.05
+# dctcomp reads raw floats: altered headers are stripped before compression.
+# verbose=1 controls checkpars diagnostics, not a separate output format.
+[exact] [stderr] suspike nt=23 ntr=5 nspk=1 ix1=5 it1=23 | sushw key=tracl,cdp,dt,delrt a=100,777,2000,-12 b=-1,3,0,0 | suchw key1=offset key2=tracl key3=cdp a=5 b=2 c=-1 | sustrip outpar=/dev/null | dctcomp n1=23 n2=5 verbose=1
+# Default block sizes versus the same sizes explicitly supplied.
+[exact] [stderr] sunull nt=17 ntr=3 | suaddnoise seed=2026 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 error=0.1
+[exact] [stderr] sunull nt=17 ntr=3 | suaddnoise seed=2026 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 blocksize1=16 blocksize2=16 error=0.1
+# Verify decoded floats as well as the sole native compressed output format.
+[f32] [stderr] makevel nz=37 nx=13 v000=2 dvdz=0.125 dvdx=-0.0625 | dctcomp n1=37 n2=13 blocksize1=8 blocksize2=3 error=0.005 | dctuncomp
+[f32] [stderr] suspike nt=4097 ntr=3 nspk=1 ix1=3 it1=4097 | sustrip outpar=/dev/null | dctcomp n1=4097 n2=3 blocksize1=31 blocksize2=2 error=0.001 | dctuncomp
+# Missing required parameters and numeric overflows, with generator input.
+[exact] [stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | dctcomp n2=1
+[exact] [stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=2
+[exact] [stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=2 n2=1 error=1e309
+[exact] [stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=2 n2=1 blocksize2=2147483648
+# Oversized blocks and signed/fine quantization exercise bounded coding paths.
+[exact] [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | dctcomp n1=3 n2=1 blocksize1=32 blocksize2=17 error=0.01
+[exact] [stderr] sunull nt=31 ntr=5 | suaddnoise seed=721 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=4 blocksize2=2 error=-0.02
+[exact] [stderr] sunull nt=31 ntr=5 | suaddnoise seed=721 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=4 blocksize2=2 error=0.000001
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | dctcomp n1=0 n2=3 blocksize1=1 blocksize2=3

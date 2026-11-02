@@ -37,8 +37,40 @@
 use oxwave_core::prelude::*;
 use oxwave_cwp::cwp::nint;
 use oxwave_linear_interp::intlin;
-use oxwave_tempfile::temporary_stream;
+use oxwave_tempfile::temporary_filename;
+use std::ffi::{c_char, c_int, CString};
 use std::io::{BufReader, Read};
+use std::sync::atomic::{AtomicPtr, Ordering};
+
+extern "C" {
+    fn access(path: *const c_char, mode: c_int) -> c_int;
+    fn signal(sig: c_int, handler: extern "C" fn(c_int)) -> usize;
+}
+
+// Globals in C, so closefiles can remove the named files on interruption.
+#[derive(Default)]
+struct TempFiles {
+    tracefile: String,
+    headerfile: String,
+    tracefp: Option<CFile>,
+    headerfp: Option<CFile>,
+}
+
+static FILES: AtomicPtr<TempFiles> = AtomicPtr::new(std::ptr::null_mut());
+
+extern "C" fn closefiles(_sig: c_int) {
+    // main retains this allocation for the lifetime of the handlers.
+    let files = unsafe { &*FILES.load(Ordering::Relaxed) };
+    if let Some(fp) = &files.headerfp {
+        efclose(fp);
+    }
+    if let Some(fp) = &files.tracefp {
+        efclose(fp);
+    }
+    eremove(&files.headerfile);
+    eremove(&files.tracefile);
+    exit(EXIT_FAILURE);
+}
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -221,7 +253,10 @@ fn main() {
         tmpdir = std::env::var("CWP_TMPDIR").unwrap_or_default();
     }
     if !tmpdir.is_empty() {
-        if temporary_stream(Some(&tmpdir)).is_none() {
+        let path = CString::new(tmpdir.as_str()).unwrap();
+        // WRITE_OK is W_OK (2): test access before reading the first trace,
+        // but defer opening the temporary files until after that read.
+        if unsafe { access(path.as_ptr(), 2) } != 0 {
             err!("you can't write in %s (or it doesn't exist)", tmpdir);
         }
     }
@@ -242,14 +277,30 @@ fn main() {
     let dt = (tr.dt as f64 / 1000000.0) as f32;
     let nt = tr.ns as usize;
     let databytes = 4 * nt;
+    let mut tracefile = String::new();
+    let mut headerfile = String::new();
     let (tracefp, headerfp) = if tmpdir.is_empty() {
         (etmpfile(), etmpfile())
     } else {
-        let tracefile = temporary_stream(Some(&tmpdir))
-            .unwrap_or_else(|| err!("you can't write in %s (or it doesn't exist)", tmpdir));
-        let headerfile = temporary_stream(Some(&tmpdir))
-            .unwrap_or_else(|| err!("you can't write in %s (or it doesn't exist)", tmpdir));
-        (CFile::from_file(tracefile), CFile::from_file(headerfile))
+        tracefile = temporary_filename(&tmpdir);
+        headerfile = temporary_filename(&tmpdir);
+        let files = Box::leak(Box::new(TempFiles {
+            tracefile: tracefile.clone(),
+            headerfile: headerfile.clone(),
+            ..TempFiles::default()
+        }));
+        FILES.store(files, Ordering::Relaxed);
+        // SIGINT, SIGQUIT, SIGHUP and SIGTERM, as in C.
+        for sig in [2, 3, 1, 15] {
+            unsafe {
+                signal(sig, closefiles);
+            }
+        }
+        let tracefp = efopen(&tracefile, "w+");
+        files.tracefp = Some(tracefp.clone());
+        let headerfp = efopen(&headerfile, "w+");
+        files.headerfp = Some(headerfp.clone());
+        (tracefp, headerfp)
     };
     if verbose != 0 {
         if tmpdir.is_empty() {
@@ -319,13 +370,11 @@ fn main() {
     if ntdshift < 0 || (median != 0 && nmed < 0) {
         err!("ealloc.c: malloc failed (Cannot allocate memory)");
     }
-    // The C loop reads temp[0..nt] even when every shift is negative and
-    // nt + shiftmax is smaller than nt. That is outside its allocations;
-    // fail cleanly rather than indexing these undersized arrays.
-    if shiftmax < 0 {
-        err!("negative shifts make the filtering buffer shorter than nt");
-    }
-    let ntd = ntdshift as usize;
+    // The C loop processes nt samples even when every shift is negative
+    // and nt + shiftmax is smaller than nt. Allocate the full loop extent:
+    // the minimal C allocation fix leaves the negative-shift null panel's
+    // output unchanged (ub-2026-11, round 1), so it must remain supported.
+    let ntd = nt.max(ntdshift as usize);
     let mut data = vec![vec![0.0f32; ntd]; nmix];
     let mut temp = vec![0.0f32; ntd];
     let mut dtemp = vec![0.0f32; nt];
@@ -416,6 +465,12 @@ fn main() {
         warn!("filtered data subtracted from input");
     }
     efclose(&headerfp);
+    if !tmpdir.is_empty() {
+        eremove(&headerfile);
+    }
     efclose(&tracefp);
+    if !tmpdir.is_empty() {
+        eremove(&tracefile);
+    }
     exit(CWP_Exit());
 }

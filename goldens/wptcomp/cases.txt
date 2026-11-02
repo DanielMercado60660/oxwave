@@ -80,3 +80,45 @@
 [stderr] wptcomp n1=16 n2=8 nstage1=-2147483649
 [stderr] wptcomp n1=16 n2=8 nstage2=-2147483649
 [stderr] wptcomp n1=16 n2=8 nstage2=2147483648
+
+# diff-2026-11 (round 1)
+# Raw native float input and one compressed binary output mode: exact bytes,
+# including matrix/filter/stage metadata and all quantizer/coder diagnostics.
+# Nonzero boundary signals avoid the all-zero cases already covered above.
+[exact] [stderr] suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sustrip outpar=/dev/null | wptcomp n1=1 n2=3
+[exact] [stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | wptcomp n1=2 n2=1 error=0.2
+[exact] [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | wptcomp n1=3 n2=1 nfilter1=14 nstage1=2 nstage2=0
+[exact] [stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null | wptcomp n1=4 n2=1 nfilter1=0 nfilter2=14 nstage1=2 nstage2=0 error=0.125
+# Larger prime dimensions, both padding directions, and maximum legal stages.
+[exact] [stderr] sunull nt=4097 ntr=1 | suaddnoise seed=101 | sustrip outpar=/dev/null | wptcomp n1=4097 n2=1
+[exact] [stderr] sunull nt=4097 ntr=3 | suaddnoise seed=102 | sustrip outpar=/dev/null | wptcomp n1=4097 n2=3 nfilter1=0 nfilter2=14 nstage1=13 nstage2=2 error=0.025
+[exact] [stderr] sunull nt=4 ntr=4097 | suaddnoise seed=103 | sustrip outpar=/dev/null | wptcomp n1=4 n2=4097 nfilter1=14 nfilter2=0 nstage1=2 nstage2=13 error=0.025
+[exact] [stderr] sunull nt=257 ntr=127 | suaddnoise seed=104 | sustrip outpar=/dev/null | wptcomp n1=257 n2=127 nfilter1=13 nfilter2=12 nstage1=5 nstage2=7 error=0.003
+# Independent defaults versus explicit defaults on a dense, asymmetric matrix.
+[exact] [stderr] sunull nt=37 ntr=11 | suaddnoise seed=105 | sustrip outpar=/dev/null | wptcomp n1=37 n2=11
+[exact] [stderr] sunull nt=37 ntr=11 | suaddnoise seed=105 | sustrip outpar=/dev/null | wptcomp n1=37 n2=11 nfilter1=11 nfilter2=11 nstage1=3 nstage2=2 error=0.01
+# A raw matrix has no SU headers. Change several headers before stripping;
+# n1/n2 remain explicit and independent of dt, ntr, d1/d2 and trace numbering.
+[exact] [stderr] suplane nt=37 ntr=11 | sushw key=dt,tracl,ntr,d1,d2 a=2000,100,999,0.125,25 b=0,-1,0,0,0 | suchw key1=offset key2=tracl key3=tracl a=25 b=3 c=0 | sustrip outpar=/dev/null | wptcomp n1=37 n2=11 verbose=1
+# Raw velocity grids exercise a nonzero mean and gradients without SU headers.
+[exact] [stderr] makevel nz=17 nx=7 v000=1500 dvdx=15 dvdz=7 | wptcomp n1=17 n2=7
+[exact] [stderr] makevel nz=17 nx=7 v000=1500 dvdx=15 dvdz=7 | wptcomp n1=17 n2=7 nfilter1=11 nfilter2=11 nstage1=3 nstage2=2 error=0.01
+[exact] [stderr] makevel nz=19 nx=5 v000=-20 dvdx=3 dvdz=2 | wptcomp n1=19 n2=5 nstage1=0 nstage2=0 error=0.01
+[exact] [stderr] makevel nz=67 nx=13 v000=20 dvdz=0.1 vzc=3 l1c=4 l2c=19 | wptcomp n1=67 n2=13 nfilter1=9 nfilter2=3 nstage1=7 nstage2=1 error=0.05
+# A modeled reflection gather, full packet decomposition in both directions.
+[exact] [stderr] susynlv nt=101 nxm=7 nxo=1 | sustrip outpar=/dev/null | wptcomp n1=101 n2=7 nfilter1=4 nfilter2=10 nstage1=7 nstage2=3 error=0.02
+# Finite high/low amplitudes and prefix-code clipping/truncation at tiny error.
+[exact] [stderr] makevel nz=31 nx=7 v000=1e18 dvdx=1e16 dvdz=-2e16 | wptcomp n1=31 n2=7 nfilter1=1 nfilter2=2 error=0.2
+[exact] [stderr] makevel nz=31 nx=7 v000=1e-10 dvdx=1e-12 dvdz=-2e-12 | wptcomp n1=31 n2=7 nfilter1=2 nfilter2=1 error=0.2
+[exact] [stderr] sunull nt=64 ntr=16 | suaddnoise seed=106 | sustrip outpar=/dev/null | wptcomp n1=64 n2=16 nstage1=0 nstage2=0 error=0.000001
+[exact] [stderr] suspike nt=1021 ntr=13 nspk=2 ix1=1 it1=1 ix2=13 it2=1021 | sustrip outpar=/dev/null | wptcomp n1=1021 n2=13 nfilter1=0 nfilter2=0 error=0.1
+# The raw matrix dimensions may reshape a complete generator output, or read
+# only its prefix; neither operation relies on an uninitialized short read.
+[exact] [stderr] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=8 n2=16 nstage1=3 nstage2=4
+[exact] [stderr] suplane nt=32 ntr=4 | sustrip outpar=/dev/null | wptcomp n1=13 n2=7 nstage1=4 nstage2=3 error=0.1
+# Error parsing is reached with generator input; compare exit and full stderr.
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | wptcomp n2=2
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | wptcomp n1=4
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | wptcomp n1=4 n2=2 nfilter1=2147483648
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | wptcomp n1=4 n2=2 nfilter2=-2147483649
+[stderr] sunull nt=4 ntr=2 | sustrip outpar=/dev/null | wptcomp n1=4 n2=2 error=1e100

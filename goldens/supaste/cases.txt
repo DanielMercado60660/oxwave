@@ -44,3 +44,39 @@ suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par ftn=1 > data && head 
 # Stream errors preserve efread's requested count, including its sign.
 [stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=-1 < .
 [stderr] suplane nt=3 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=65536 < .
+# diff-2026-11 (round 1)
+# Small sizes, explicit defaults, and both record formats.
+[stderr] sunull nt=1 ntr=1 | sustrip head=headers outpar=strip.par > data && supaste ns=1 ftn=0 verbose=0 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=2 ntr=3 | sustrip head=headers outpar=strip.par > data && supaste ns=2 verbose=1 < data
+[stderr] sunull nt=3 ntr=2 | sustrip head=hdr outpar=strip.par ftn=1 > data && supaste ns=3 head=hdr ftn=1 verbose=1 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=4 head=hdr ftn=0 verbose=0 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=17 ntr=5 | sustrip head=hdr outpar=strip.par ftn=1 > data && supaste ns=17 head=hdr ftn=1 verbose=-1 < data
+[stderr] suplane nt=4097 ntr=3 | sustrip head=hdr outpar=strip.par > data && supaste ns=4097 head=hdr verbose=1 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4097 ntr=2 | sustrip head=hdr outpar=strip.par ftn=1 > data && supaste ns=4097 head=hdr ftn=1 verbose=1 < data
+# Preserve signed, scaled, and floating header fields; ns overrides saved ns.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=11 ntr=3 | sushw key=cdp,offset,scalco,sx,dt,d1,f1 a=900,-123,-100,4567,2000,0.125,-2.5 b=-7,42,0,11,0,0.25,1 | sustrip head=hdr outpar=strip.par > data && supaste ns=11 head=hdr verbose=1 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=3 ntr=2 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head=hdr verbose=1 < data
+# A short final data record retains samples from the preceding trace.
+[stderr] suspike nspk=1 ix1=1 it1=4 nt=4 ntr=3 | sustrip head=hdr outpar=strip.par > data && head -c 24 data | supaste ns=4 head=hdr verbose=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sustrip head=hdr outpar=strip.par > data && supaste ns=11 head=hdr verbose=1 < data
+# Excess headers/data and partial header tails determine termination.
+[stderr] sunull nt=2 ntr=3 | sustrip head=hdr outpar=strip.par > data && head -c 240 hdr > headers && supaste ns=2 verbose=1 < data
+[stderr] sunull nt=2 ntr=3 | sustrip head=hdr outpar=strip.par > data && head -c 479 hdr > headers && supaste ns=2 verbose=1 < data
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=2 ntr=3 | sustrip head=hdr outpar=strip.par > data && head -c 8 data | supaste ns=2 head=hdr verbose=1
+# The Fortran markers are skipped without validating their length value.
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sustrip head=hdr outpar=strip.par ftn=1 > data && head -c 44 data | supaste ns=4 head=hdr ftn=1 verbose=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sustrip head=hdr outpar=strip.par ftn=1 > data && head -c 46 data | supaste ns=4 head=hdr ftn=1 verbose=1
+[stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head=hdr ftn=1 verbose=1 < data
+# Missing/invalid values and stream errors (header and Fortran marker item sizes).
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste head=hdr < data
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns= head=hdr < data
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head=hdr ftn=3 < data
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head= < data
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head=. < data
+[stderr] sunull nt=2 ntr=1 | sustrip head=hdr outpar=strip.par > data && supaste ns=2 head=hdr ftn=1 < .
+# Packed headers select output byte widths even though input data are floats.
+[exact] [stderr] suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sushw key=trid a=202 | sustrip head=hdr outpar=strip.par > packed && suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sustrip outpar=strip.par | supaste ns=4 head=hdr verbose=1
+[exact] [stderr] sunull nt=4 ntr=2 | sushw key=trid a=201 | sustrip head=hdr outpar=strip.par > packed && suspike nspk=1 ix1=1 it1=1 nt=4 ntr=2 | sustrip outpar=strip.par | supaste ns=4 head=hdr verbose=1
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] [stderr] sunull nt=4 ntr=1 | sushw key=trid a=202 | sustrip head=h1 outpar=strip.par > packed && sunull nt=4 ntr=1 | sustrip head=h2 outpar=strip.par > data && cat h1 h2 > hdr && cat data data | supaste ns=4 head=hdr verbose=1

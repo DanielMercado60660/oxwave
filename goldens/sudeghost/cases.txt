@@ -18,3 +18,28 @@ suspike nt=16 ntr=1 | sudeghost h=1e999
 # High slowness clamps the angular term; oversized FFT is rejected
 suspike nt=65 ntr=2 | sushw key=f2,d2 a=0.001,0.0001 | sudeghost h=10 pnoise=0.1
 sunull nt=65535 ntr=1 | sudeghost h=10
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sudeghost h=8
+suspike nt=3 ntr=2 | sudeghost h=8 deghost=0
+suspike nt=4 ntr=1 | sudeghost h=8 lambert=0 r=0.75
+suspike nt=17 ntr=3 | sudeghost h=10 r=0.5 v=1500 deghost=1 lambert=1 pnoise=1e-9 verbose=0
+suspike nt=4097 ntr=1 | sudeghost h=20 r=0.8
+suplane nt=127 ntr=5 | sudeghost h=12 deghost=0 lambert=0 r=0.4 v=1480
+sunull nt=53 ntr=2 | sudeghost h=7
+suspike nt=101 ntr=4 | sushw key=f2,d2 a=-0.0002,0.00008 | sudeghost h=13 r=0.6 v=1550 pnoise=0.05
+suspike nt=37 ntr=1 | sushw key=dt a=0 | sudeghost h=6 dt=0.0015
+[stderr] suspike nt=9 ntr=1 | sudeghost h=10 verbose=2 deghost=0
+[stderr] suspike nt=63 ntr=2 | sushw key=trid,d1,dt a=18,0.002,4000 | sudeghost h=9 verbose=1
+[stderr] suspike nt=63 ntr=2 | sushw key=trid,d1,dt a=109,0.002,4000 | sudeghost h=9 verbose=1
+suspike nt=41 ntr=1 | sudeghost h=
+suspike nt=41 ntr=1 | sudeghost h=2 r=1e999
+suspike nt=67 ntr=3 | sushw key=f2,d2 a=0.00065,0.00002 | sudeghost h=20 lambert=1 pnoise=0.1
+suspike nt=257 ntr=2 | sudeghost h=35 r=0.95 lambert=0 pnoise=0.01
+suspike nt=503 ntr=3 | sushw key=f2,d2 a=-0.0001,0.00003 | sudeghost h=250 r=0.8 v=1475
+suspike nt=1021 ntr=2 | sudeghost h=1000 r=0.99 lambert=0
+[stderr] suspike nt=13 ntr=2 | sushw key=dt a=0 | sudeghost h=23 dt=0.0005 r=0.7 v=1430 deghost=1 lambert=1 pnoise=0.02 verbose=2
+suplane nt=199 ntr=6 dt=0.002 | sushw key=f2,d2 a=0.0001,-0.00005 | sudeghost h=18 r=0.7 lambert=0 deghost=0
+suspike nt=97 ntr=2 | sudeghost h=10 lambert=2
+[stderr] suspike nt=23 ntr=1 | sushw key=trid,d1,dt a=17,0.002,4000 | sudeghost h=10 dt=0.001 verbose=1
+[stderr] suspike nt=23 ntr=1 | sushw key=trid,d1,dt a=30,0,4000 | sudeghost h=10 dt=0.001 verbose=1

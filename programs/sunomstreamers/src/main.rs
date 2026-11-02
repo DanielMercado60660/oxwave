@@ -695,15 +695,16 @@ fn main() {
         let y = sx[source];
         let gx = ti[streamer] + reference + dist[streamer] * (beg[streamer] - ch) as f64;
         let gy = tx[streamer];
+        // lrint returns a C long before assignment narrows it to the header type.
         if offpi > 1 {
             tr.offset = ((x - gx) * (x - gx) + (y - gy) * (y - gy))
                 .sqrt()
-                .round_ties_even() as i32;
+                .round_ties_even() as i64 as i32;
         } else if offpi == 1 {
-            tr.offset = (x - gx).abs().round_ties_even() as i32;
+            tr.offset = (x - gx).abs().round_ties_even() as i64 as i32;
         }
         if cdp != 0.0 {
-            tr.cdp = ((x + gx) * 0.5 / cdp).round_ties_even() as i32;
+            tr.cdp = ((x + gx) * 0.5 / cdp).round_ties_even() as i64 as i32;
         }
         if linelocs > 0 {
             tr.grnofr = (source + 1) as i16;
@@ -712,10 +713,10 @@ fn main() {
             tr.gaps = (gx / cdp).round_ties_even() as i64 as i16;
         }
         if scalco != 0 {
-            tr.sx = ((x + 100000.0) * scale).round_ties_even() as i32;
-            tr.sy = ((y + 10000.0) * scale).round_ties_even() as i32;
-            tr.gx = ((gx + 100000.0) * scale).round_ties_even() as i32;
-            tr.gy = ((gy + 10000.0) * scale).round_ties_even() as i32;
+            tr.sx = ((x + 100000.0) * scale).round_ties_even() as i64 as i32;
+            tr.sy = ((y + 10000.0) * scale).round_ties_even() as i64 as i32;
+            tr.gx = ((gx + 100000.0) * scale).round_ties_even() as i64 as i32;
+            tr.gy = ((gy + 10000.0) * scale).round_ties_even() as i64 as i32;
             tr.scalco = scalco as i16;
             tr.counit = 1;
         }

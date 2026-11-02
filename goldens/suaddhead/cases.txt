@@ -21,3 +21,22 @@ python3 -c 'import sys; sys.stdout.buffer.write(bytes(17))' | suaddhead ns=21474
 suaddhead </dev/null
 suaddhead ns=3 ftn=2 </dev/null
 suaddhead ns=3 ftn=-1 </dev/null
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | suaddhead n1=1
+sunull nt=2 ntr=3 | sustrip outpar=/dev/null | suaddhead nt=2 ftn=0 tsort=1 ntrpr=2
+sunull nt=3 ntr=2 | sustrip outpar=/dev/null | suaddhead ns=3 tsort=4 ntrpr=7
+suspike nt=4 ntr=2 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null | suaddhead ns=4
+suspike nt=13 ntr=5 nspk=1 ix1=3 it1=7 | sustrip outpar=/dev/null | suaddhead n1=13 head=unused
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=4097 | sustrip outpar=/dev/null | suaddhead nt=4097
+suplane nt=17 ntr=3 | sushw key=tracl,cdp,offset a=44,20,-50 b=2,1,10 | sustrip outpar=/dev/null | suaddhead ns=17
+sunull nt=4 ntr=3 | sustrip outpar=/dev/null | suaddhead ns=3
+sunull nt=3 ntr=2 | sustrip outpar=/dev/null | suaddhead ns=4
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | suaddhead ns=2 verbose=1
+sunull nt=4 ntr=2 | sustrip outpar=/dev/null | python3 -c 'import sys,struct; d=sys.stdin.buffer.read(); m=struct.pack("=i",16); sys.stdout.buffer.write(m+d[:16]+m+m+d[16:]+m+m)' | suaddhead ns=4 ftn=1
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null | python3 -c 'import sys,struct; d=sys.stdin.buffer.read(); sys.stdout.buffer.write(struct.pack("=i",8)+d)' | suaddhead n1=2 ftn=1
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | suaddhead ftn=0
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | suaddhead ns=3 ftn=3
+sunull nt=3 ntr=2 | sustrip outpar=/dev/null | suaddhead n1=3 n1=2
+sunull nt=3 ntr=2 | sustrip outpar=/dev/null | suaddhead ns=3 head=/dev/null tsort=2 ntrpr=5
+sunull nt=65535 ntr=1 | sustrip outpar=/dev/null | suaddhead ns=65535
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | python3 -c 'import sys,struct; d=sys.stdin.buffer.read(); sys.stdout.buffer.write(struct.pack("=i",999)+d+struct.pack("=ii",-2,0))' | suaddhead nt=5 ftn=1

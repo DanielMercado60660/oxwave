@@ -15,3 +15,26 @@ printf a | transp3d n1=1 n2=1 n3=1 nbpe=1 scratchdir=. perm=999
 printf a | transp3d n1=1 n2=1 scratchdir=.
 [exact] transp3d n1=1 n2=1 n3=0 scratchdir=.
 [exact] transp3d n1=2 n2=2 n3=-1 scratchdir=.
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=1 n2=1 n3=1 perm=123 scratchdir=.
+[exact] suspike nt=2 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=2 n2=2 n3=1 perm=213 nbpe=4 scratchdir=.
+[exact] suspike nt=3 ntr=6 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=3 n2=2 n3=3 perm=132 scratchdir=. scratchstem=roundone
+[exact] suspike nt=4 ntr=6 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=4 n2=3 n3=2 perm=231 scratchdir=.
+[exact] suplane nt=17 ntr=6 | sustrip outpar=/dev/null | transp3d n1=17 n2=2 n3=3 perm=312 scratchdir=.
+[exact] suplane nt=31 ntr=6 | sustrip outpar=/dev/null | transp3d n1=31 n2=3 n3=2 perm=321 scratchdir=.
+[exact] suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=4097 n2=2 n3=1 perm=213 scratchdir=.
+[exact] suspike nt=7 ntr=6 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=7 n2=2 n3=3 scratchdir=.
+[exact] suspike nt=7 ntr=6 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null > input; transp3d n1=7 n2=2 perm=321 < input scratchdir=.
+[exact] sunull nt=3 ntr=4 | sushw key=cdp a=100 b=5 | transp3d n1=252 n2=2 n3=2 nbpe=1 perm=132 scratchdir=.
+[exact] suspike nt=5 ntr=4 nspk=1 ix1=1 it1=1 | sushw key=offset a=-30 b=20 | transp3d n1=65 n2=2 n3=2 nbpe=4 perm=312 scratchdir=.
+[exact] suplane nt=13 ntr=6 | sustrip outpar=/dev/null | transp3d n1=13 n2=3 n3=2 nbpe=4 perm=123 scratchdir=.,. scratchstem=multi
+[exact] suspike nt=11 ntr=4 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=11 n2=2 n3=2 nbpe=2 perm=321 scratchdir=.
+[stderr] [exact] suspike nt=5 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=5 n2=2 n3=1 perm=231 verbose=1 scratchdir=.
+[exact] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | transp3d n1=1 n2=1 n3=1 nbpe=4 perm=321 verbose=0 scratchdir=.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n2=1 n3=1 scratchdir=.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=1 n3=1 scratchdir=.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=3 n2=1 scratchdir=.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=3 n2=2 n3=1 scratchdir=.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | transp3d n1=3 n2=1 n3=1 perm=999 scratchdir=.
+[exact] suspike nt=23 ntr=12 nspk=4 ix1=1 it1=1 ix2=5 it2=9 ix3=8 it3=17 ix4=12 it4=23 | sustrip outpar=/dev/null | transp3d n1=23 n2=4 n3=3 perm=321 scratchdir=.
+[exact] suspike nt=19 ntr=15 nspk=4 ix1=1 it1=2 ix2=6 it2=7 ix3=10 it3=12 ix4=15 it4=19 | sustrip outpar=/dev/null | transp3d n1=19 n2=3 n3=5 perm=231 nbpe=4 scratchdir=.

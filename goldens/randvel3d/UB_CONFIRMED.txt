@@ -1,0 +1,5 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/par/main/velocity_model_building/randvel3d.c:185,189,193 uses an empty input allocation when n3=0; vendor/su-original/src/cwp/lib/alloc.c:279,283 writes zero-sized pointer tables.
+# Minimal fix validates n3>0 immediately after parsing (as for n1/n2), before allocation/access: orig rc=0, empty stdout/stderr; fixed rc=1, empty stdout, stderr "randvel3d: sample number of 3rd dimension invalid".
+# OxWave was fixed to match fixed C exactly (exit status, stdout and full stderr); original and fixed binaries use SU build.log flags.
+[f32] makevel nz=20 nx=4 ny=4 v000=1700 > in.bin && randvel3d n1=20 n2=4 n3=0 seed=3 < in.bin

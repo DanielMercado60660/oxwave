@@ -35,3 +35,42 @@ suwaveform type=berlage fpeak=20 dt=0.004 ns=128 ampl=2 tn=3 decay=70 ipa=30
 suwaveform type=ricker2 dt=0.004 half=0.04 period=0.03 distort=0.2 ampl=1.5 ns=19
 suwaveform type=spike dt=0.004 tspike=0.04 nt=64
 suwaveform type=ricker2
+
+# diff-2026-11 (round 1)
+suwaveform type=akb ns=1 dt=0.003 fpeak=17
+suwaveform type=akb ns=2 dt=0.0025 fpeak=41
+suwaveform type=gauss ns=3 dt=0.001 fpeak=50
+suwaveform type=gaussd nt=4 dt=0.003 fpeak=12
+suwaveform type=ricker1 ns=4097 dt=0.0005 fpeak=8
+suwaveform type=unit nt=4097 half=0.12
+suwaveform type=spike nt=17 dt=0.002 tspike=0.032
+suwaveform type=spike dt=0.003 tspike=0.013
+suwaveform type=berlage ns=127 dt=0.002 fpeak=14 ampl=-2 tn=1.5 decay=13 ipa=45
+suwaveform type=berlage dt=0.003 fpeak=13 tn=1 decay=0 ipa=0 ampl=0.5
+suwaveform type=ricker2 dt=0.005 half=0.025 period=0.04 ampl=-2 distort=-0.4 ns=9
+suwaveform type=ricker2 dt=0.004 half=0.016 period=0.025 ampl=3 distort=0 ns=7
+suwaveform type=ricker dt=0.002 fpeak=27 nt=31
+suwaveform type=unit dt=0.002 half=0.013
+[stderr] suwaveform type=berlage dt=0.002 fpeak=24 tn=2 decay=60 ipa=90 ampl=1 verbose=1 ns=33
+[stderr] suwaveform type=gauss dt=0.001 fpeak=17 nt=2 verbose=1
+suwaveform type=unit ns=3 nt=9
+suwaveform type=spike ns=4 dt=0.004 tspike=0.006
+sunull nt=4 ntr=1 | sushw key=dt,delrt a=2000,-23 | suwaveform type=gauss ns=13 dt=0.003 fpeak=23
+suspike nt=3 ntr=1 | suwaveform type=unit ns=2
+suplane nt=4 ntr=1 | suwaveform type=akb nt=3
+suwaveform dt=-0.002 type=unit
+suwaveform fpeak=-10 type=gauss
+suwaveform half=-0.1 type=ricker2
+suwaveform period=0 type=ricker2
+suwaveform tspike=-0.001 type=spike
+suwaveform tn=-0.01 type=berlage
+suwaveform decay=-0.01 type=berlage
+suwaveform type=unknown nt=2
+suwaveform type=unit dt=0.1 half=0.25
+suwaveform type=unit dt=0.004 half=0.01
+suwaveform type=spike dt=0.004 tspike=0.01
+suwaveform type=ricker2 dt=0.01 half=0.004 ns=1 period=0.02 distort=1 ampl=0.5
+suwaveform type=berlage ns=31 tn=0 decay=0 ipa=180 ampl=2 fpeak=10
+suwaveform type=gaussd dt=0.0002 fpeak=100 nt=4097
+suwaveform type=unit ns=5 fpeak=0.00001 tspike=100000
+suwaveform type=ricker1 ns=19 dt=0.08 fpeak=1000

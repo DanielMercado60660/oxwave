@@ -96,7 +96,7 @@ fn main() {
             else { printf!(",%g", x1); }
             efwrite(&[x2], &datafp);
         } else {
-            err!("line #%d: scan failed:\n%s", n2 + 1, buf);
+            err!("line #%d: scan failed:\n%s", n2 + 1, buf.split('\0').next().unwrap_or(""));
         }
         n2 += 1;
         match fgets(1024, &stdin()) {

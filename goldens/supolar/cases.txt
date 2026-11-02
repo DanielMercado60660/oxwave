@@ -65,3 +65,57 @@ sunull nt=513 ntr=6 | suaddnoise seed=89 | supolar wl=0.1 win=welsh rl=0 dir=0 a
 # Full qr is defined for one- and two-sample windows, including nt=1,2.
 sunull nt=2 ntr=6 | suaddnoise seed=101 | supolar wl=0.008 all=3; cat polar.er polar.ir polar.qr polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
 [stderr] sunull nt=9 ntr=7 | suaddnoise seed=19 | supolar wl=0.008 amp=1 verbose=1; cat polar.er polar.ir polar.qr polar.rl polar.dir
+
+# diff-2026-11 (round 1)
+# Defaults and explicit settings on a different plane dataset.
+suplane nt=101 ntr=9 | supolar; cat polar.rl polar.dir
+suplane nt=101 ntr=9 | supolar file=round1 angle=rad win=boxcar wl=0.1 dt=0.004 rlq=1 verbose=0 all=0 rl=1 dir=1 theta=0 phi=0 tau=0 ellip=0 pln=0 f1=0 l1=0 amp=0; cat round1.rl round1.dir
+# Tiny traces: full amplitude output uses only windows of one or two samples.
+suspike nt=1 ntr=3 nspk=3 ix1=1 ix2=2 ix3=3 it1=1 it2=1 it3=1 | supolar wl=0.004 all=3; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+sunull nt=2 ntr=9 | suaddnoise seed=611 | supolar wl=0.004 all=1 win=welsh; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+sunull nt=3 ntr=9 | suaddnoise seed=611 | supolar wl=0.012 all=2 amp=0 win=bartlett; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=4 ntr=9 | suaddnoise seed=611 | supolar wl=0.008 all=3 win=hanning; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+# Incomplete groups, including output flags and changing station headers.
+[stderr] sunull nt=4 ntr=1 | supolar wl=0.008 all=3 amp=0 verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=3 ntr=2 | supolar wl=0.012 all=2 amp=0 win=hanning verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=17 ntr=4 | suaddnoise seed=612 | supolar wl=0.028 all=1 amp=0 verbose=1 angle=gon; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=17 ntr=5 | suaddnoise seed=613 | supolar wl=0.032 all=2 amp=0 win=welsh verbose=1 angle=deg; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=67 ntr=8 | suaddnoise seed=614 | sushw key=tracl,cdp,offset a=101,17,-150 b=3,5,25 | supolar wl=0.028 all=3 amp=0 verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# Large and prime trace lengths, with nonzero samples throughout.
+sunull nt=4097 ntr=6 | suaddnoise seed=615 | supolar wl=0.068 win=welsh all=3 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=65535 ntr=3 | suaddnoise seed=616 | supolar dir=0; cat polar.rl
+# Header dt from the first component controls every station; preserve all headers.
+sunull nt=67 ntr=9 | suaddnoise seed=617 | sushw key=tracl,cdp,dt,delrt a=101,17,2000,-20 b=3,5,250,4 | supolar wl=0.014 win=hanning all=2 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=37 ntr=6 | suaddnoise seed=618 | sushw key=dt a=0 | supolar wl=0.028 win=bartlett theta=2 phi=3 verbose=1; cat polar.rl polar.dir polar.theta polar.phi
+sunull nt=37 ntr=6 | suaddnoise seed=619 | sushw key=dt a=0 | supolar dt=0.002 wl=0.014 theta=3 phi=2 angle=deg; cat polar.rl polar.dir polar.theta polar.phi
+# NINT boundary: 2.5 samples rounds up; immediately below rounds down.
+[stderr] sunull nt=17 ntr=6 | suaddnoise seed=620 | supolar dt=0.008 wl=0.02 win=welsh all=2 amp=0 verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=17 ntr=6 | suaddnoise seed=620 | supolar dt=0.008 wl=0.019999998 all=2 verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1 polar.er polar.ir polar.qr
+[stderr] sunull nt=17 ntr=6 | suaddnoise seed=620 | supolar dt=0.008 wl=0.020000002 all=2 amp=0 verbose=1; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# Whole-trace even and odd windows have different sample-loop boundaries.
+sunull nt=4 ntr=6 | suaddnoise seed=621 | supolar wl=0.016 all=3 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=17 ntr=6 | suaddnoise seed=622 | supolar wl=0.068 win=welsh all=1 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# Explicit independent definitions, nonboolean flags, and contrast factors.
+sunull nt=43 ntr=6 | suaddnoise seed=623 | supolar wl=0.036 rl=3 dir=0 theta=1 phi=2 tau=1 ellip=1 pln=1 f1=1 l1=1 amp=0 angle=gon; cat polar.rl polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=43 ntr=6 | suaddnoise seed=624 | supolar wl=0.032 all=-3 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=43 ntr=6 | suaddnoise seed=625 | supolar wl=0.036 rl=2 rlq=0.125 dir=0; cat polar.rl
+sunull nt=43 ntr=6 | suaddnoise seed=626 | supolar wl=0.032 rl=3 rlq=-2.5 dir=0; cat polar.rl
+# Covariance under small and large finite signal amplitudes.
+sunull nt=101 ntr=9 | suaddnoise seed=918 | sugain scale=1e-10 | supolar wl=0.02 win=hanning all=2 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+sunull nt=101 ntr=9 | suaddnoise seed=918 | sugain scale=1e10 | supolar wl=0.02 win=bartlett all=2 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+# Rank-one and axis-aligned signals exercise eigenvector and angle branches.
+suspike nt=101 ntr=9 nspk=3 ix1=1 ix2=2 ix3=3 it1=45 it2=45 it3=45 | sugain scale=-1 | supolar wl=0.02 all=2 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+suspike nt=101 ntr=3 nspk=1 ix1=2 it1=45 | supolar wl=0.02 all=1 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+suspike nt=101 ntr=3 nspk=1 ix1=1 it1=45 | supolar wl=0.02 all=3 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+susynlv nt=101 dt=0.02 nxm=3 nxo=3 | supolar wl=0.14 win=hanning all=3 amp=0; cat polar.rl polar.dir polar.theta polar.phi polar.tau polar.e21 polar.e31 polar.e32 polar.pln polar.f1 polar.l1
+[stderr] sunull nt=17 ntr=7 | supolar wl=0.028 rl=0 dir=0 verbose=1
+# Empty numeric values restore defaults, including the first-header dt.
+sunull nt=101 ntr=6 | suaddnoise seed=627 | supolar wl= dt= rlq= all= theta= phi= amp=; cat polar.rl polar.dir
+# Error validation precedence and rounding to an empty window.
+[stderr] sunull nt=4 ntr=3 | supolar wl=0.016 file=
+[stderr] sunull nt=4 ntr=3 | supolar wl=0.020 file=
+[stderr] sunull nt=4 ntr=3 | supolar dt=0.008 wl=0.003999999
+[stderr] sunull nt=4 ntr=3 | supolar dt=0 wl=-0.1 angle=wrong win=wrong
+[stderr] sunull nt=4 ntr=3 | supolar dt=0 wl=-0.1 angle=wrong
+[stderr] sunull nt=4 ntr=3 | supolar dt=0 wl=-0.1
+[stderr] sunull nt=4 ntr=3 | supolar wl=0.008 file=missing/round1

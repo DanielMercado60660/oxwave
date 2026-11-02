@@ -14,3 +14,17 @@ vtlvz nt=1 dt=1 a=1
 vtlvz nt=1 dt=1 v0=1
 vtlvz nt=999999999999999999999 dt=1 v0=1 a=1
 [f32] vtlvz nt=5 dt=abc v0=1 a=1
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=1 | vtlvz nt=2 dt=0.004 v0=1500 a=0.8
+[f32] suspike nt=3 ntr=1 | vtlvz nt=3 dt=0.125 v0=2000 a=1.5
+[f32] suplane nt=4 ntr=1 | vtlvz nt=4 dt=0.25 v0=1800 a=-0.4
+[f32] sunull nt=1 ntr=1 | vtlvz nt=17 dt=0.03 v0=2500 a=0.25
+[f32] suspike nt=2 ntr=1 | vtlvz nt=4097 dt=0.0005 v0=1000 a=0.75
+[f32] sunull nt=2 ntr=1 | sushw key=dt a=6000 | vtlvz nt=7 dt=0.1 v0=1450 a=0
+[f32] sunull nt=1 ntr=1 | vtlvz nt=5 dt=-0.125 v0=1750 a=-1.25
+[f32] sunull nt=1 ntr=1 | vtlvz nt=2 nt=7 dt=0.004 v0=1500 a=0.8
+[stderr] sunull nt=1 ntr=1 | vtlvz nt=4 dt=0.002 v0=1200 a=0.3 verbose=1
+sunull nt=1 ntr=1 | vtlvz nt=4 dt=0.1 v0=1500
+sunull nt=1 ntr=1 | vtlvz nt=4 dt=0.1 v0=1500 a=
+[f32] suspike nt=1 ntr=1 | vtlvz nt=1 dt=1e-4 v0=0.001 a=12345
+[f32] sunull nt=1 ntr=1 | vtlvz nt=97 dt=0.5 v0=-3.5 a=0.1

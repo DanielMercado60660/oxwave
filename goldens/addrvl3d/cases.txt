@@ -45,3 +45,62 @@
 [stderr] makevel nz=5 nx=1 | addrvl3d n1=5 n2=1 seed=1
 # fread accepts EOF and leaves the allocation contents untouched.
 [f32] addrvl3d n1=15 n2=3 seed=1 < /dev/null
+
+# diff-2026-11 (round 1)
+# Tiny, odd, prime and long native-float grids; strip SU headers before rewind.
+[f32] [stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=1 n2=1 mode=2 seed=11 < in.bin
+[f32] [stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=2 n2=1 mode=2 nrvl=1 pdv=25 seed=12 < in.bin
+[f32] [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=3 n2=1 mode=2 nrvl=1 pdv=-25 seed=13 < in.bin
+[f32] [stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=4 n2=1 mode=2 nrvl=1 pdv=100 seed=14 < in.bin
+[f32] sunull nt=7 ntr=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=7 n2=1 seed=15 cvel=1750 < in.bin
+[f32] [stderr] suspike nt=17 ntr=3 nspk=1 ix1=2 it1=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=17 n2=3 mode=2 nrvl=1 pdv=40 seed=16 < in.bin
+[f32] [stderr] suplane nt=37 ntr=5 npl=1 dip1=0 ct1=1 len1=5 cx1=3 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=37 n2=5 mode=2 nrvl=1 pdv=75 seed=17 < in.bin
+[f32] [stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=4097 n2=1 mode=2 nrvl=1 pdv=31 seed=18 < in.bin
+[f32] [stderr] makevel nz=65521 nx=1 v000=1700 dvdz=0.125 > in.bin && addrvl3d n1=65521 n2=1 mode=2 nrvl=1 pdv=19 seed=19 < in.bin
+# addrvl3d consumes raw grids, so upstream headers disappear at sustrip.
+[f32] [stderr] suspike nt=19 ntr=5 nspk=1 ix1=3 it1=1 | sushw key=offset,cdp,dt a=-700,30,2000 b=175,-3,0 | suchw key1=sx key2=offset a=17 b=2 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=19 n2=5 mode=2 nrvl=1 pdv=20 seed=20 verbose=1 < in.bin
+# All mode-1 parameters, offsets on all axes, and the constant override.
+[f32] makevel nz=19 nx=5 ny=4 v000=1800 dvdz=2 dvdx=3 dvdy=5 > in.bin && addrvl3d n1=19 n2=5 n3=4 mode=1 seed=21 i1beg=3 i1end=10 i2beg=1 i2end=5 i3beg=1 i3end=4 cvel=1600 r1=2 r2=3 r3=4 nrvl=1 pdv=12 slowness=1 vlsd=87 add=0 how=2 < in.bin
+[f32] makevel nz=19 nx=5 v000=1800 dvdz=2 > in.bin && addrvl3d n1=19 n2=5 n3=1 mode=1 seed=22 i1beg=0 i1end=3 i2beg=0 i2end=5 i3beg=0 i3end=1 cvel=0 r1=0 r2=0 r3=0 nrvl=1 pdv=10 slowness=0 vlsd=540 add=1 how=0 < in.bin
+[f32] makevel nz=19 nx=5 v000=1800 dvdz=2 > in.bin && addrvl3d n1=19 n2=5 seed=22 < in.bin
+[f32] makevel nz=23 nx=4 ny=4 v000=2200 dvdz=3 > in.bin && addrvl3d n1=23 n2=4 n3=4 seed=23 cvel=1500 r1=1 r2=2 r3=3 < in.bin
+[f32] makevel nz=23 nx=4 ny=4 v000=2200 dvdz=3 > in.bin && addrvl3d n1=23 n2=4 n3=4 seed=24 cvel=1500 r1=-1 r2=-2 r3=-3 slowness=-1 how=1 add=0 < in.bin
+[f32] makevel nz=4 nx=3 ny=2 v000=2100 dvdz=1 > in.bin && addrvl3d n1=4 n2=3 n3=2 seed=25 i1end=4 cvel=1700 r1=2 r2=9 r3=9 slowness=1 < in.bin
+[f32] makevel nz=2 nx=2 ny=2 v000=2100 dvdz=1 > in.bin && addrvl3d n1=2 n2=2 n3=2 seed=26 i1end=2 cvel=1700 r1=9 r2=9 r3=9 < in.bin
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=1 n2=1 seed=27 i1end=1 cvel=7 < in.bin
+[f32] makevel nz=4097 nx=3 v000=1900 dvdz=0.25 > in.bin && addrvl3d n1=4097 n2=3 seed=28 cvel=1700 r1=3 < in.bin
+# Mode 2: vertical/lateral gradients, positive/negative/zero perturbations.
+[f32] [stderr] makevel nz=29 nx=5 ny=3 v000=1900 dvdz=2 dvdx=13 dvdy=7 > in.bin && addrvl3d n1=29 n2=5 n3=3 mode=2 nrvl=1 pdv=60 seed=29 < in.bin
+[f32] [stderr] makevel nz=29 nx=5 ny=2 v000=1900 dvdz=2 dvdx=13 dvdy=7 > in.bin && addrvl3d n1=29 n2=5 n3=2 mode=2 nrvl=1 pdv=60 seed=29 < in.bin
+[f32] [stderr] makevel nz=29 nx=4 ny=4 v000=-1900 dvdz=-2 dvdx=-13 dvdy=-7 > in.bin && addrvl3d n1=29 n2=4 n3=4 mode=2 nrvl=1 pdv=-60 seed=30 < in.bin
+[f32] [stderr] sunull nt=31 ntr=5 | sustrip outpar=/dev/null > in.bin && addrvl3d n1=31 n2=5 mode=2 nrvl=1 pdv=100 seed=31 < in.bin
+[f32] [stderr] makevel nz=31 nx=5 v000=1900 dvdz=2 > in.bin && addrvl3d n1=31 n2=5 mode=2 nrvl=1 pdv=0 seed=32 < in.bin
+[f32] [stderr] makevel nz=31 nx=5 v000=1900 dvdz=2 > in.bin && addrvl3d n1=31 n2=5 mode=2 nrvl=0 pdv=90 seed=33 < in.bin
+[f32] [stderr] makevel nz=31 nx=5 v000=1900 dvdz=2 > in.bin && addrvl3d n1=31 n2=5 mode=2 nrvl=-3 pdv=90 seed=34 < in.bin
+[f32] [stderr] makevel nz=31 nx=5 v000=1900 dvdz=2 > in.bin && addrvl3d n1=31 n2=5 mode=2 seed=123 pdv=8 < in.bin
+# Mode-1 controls are parsed and validated, but have no effect in mode 2.
+[f32] [stderr] makevel nz=17 nx=4 ny=3 v000=1700 dvdz=4 > in.bin && addrvl3d n1=17 n2=4 n3=3 mode=2 nrvl=1 pdv=12 seed=35 i1beg=2 i1end=8 i2beg=1 i2end=3 i3beg=1 i3end=2 cvel=777 r1=5 r2=7 r3=9 slowness=1 vlsd=-99 add=0 how=1 < in.bin
+[f32] [stderr] makevel nz=17 nx=4 ny=3 v000=1700 dvdz=4 > in.bin && addrvl3d n1=17 n2=4 n3=3 mode=2 nrvl=1 pdv=12 seed=35 < in.bin
+# Last occurrence wins; numeric empty values restore the documented defaults.
+[f32] [stderr] makevel nz=17 nx=3 v000=1700 dvdz=4 > in.bin && addrvl3d n1=99 n1=17 n2=3 mode=1 mode=2 seed=36 seed=37 nrvl=1 pdv=12 < in.bin
+[f32] [stderr] makevel nz=17 nx=3 v000=1700 dvdz=4 > in.bin && addrvl3d n1=17 n2=3 n3= mode=2 seed=38 nrvl= pdv= slowness= add= how= verbose=1 < in.bin
+# Complete diagnostics for missing, invalid and overflowing values.
+[stderr] sunull nt=1 ntr=1 | addrvl3d n2=1 seed=1
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1= n2=1 seed=1
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1=1 n2= seed=1
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1=1 n2=1 mode=-1 seed=1
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1=1 n2=1 mode=9 seed=1
+[stderr] makevel nz=7 nx=1 > in.bin && addrvl3d n1=7 n2=1 mode=2 seed=39 add=2 < in.bin
+[stderr] makevel nz=7 nx=1 > in.bin && addrvl3d n1=7 n2=1 mode=2 seed=40 how=-1 < in.bin
+[stderr] makevel nz=7 nx=1 > in.bin && addrvl3d n1=7 n2=1 mode=2 seed=41 nrvl=7 < in.bin
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1=2147483648 n2=1 seed=1
+[stderr] sunull nt=1 ntr=1 | addrvl3d n1=1 n2=1 seed=4294967296
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | addrvl3d n1=3 n2=1 mode=2 seed=42
+# Reversed extents: alloc3float returns NULL, but all cell loops are empty.
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i1beg=4 i1end=3 < in.bin
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i2beg=3 i2end=2 < in.bin
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i3beg=3 i3end=2 < in.bin
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i1beg=2 i1end=1 i2beg=2 i2end=1 i3beg=2 i3end=1 < in.bin
+# Empty layer with smoothing along a different, positive extent.
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i2beg=3 i2end=2 r1=3 < in.bin
+[f32] [stderr] makevel nz=17 nx=5 ny=5 v000=2000 dvdz=2 > in.bin && addrvl3d n1=17 n2=5 n3=5 seed=123 i3beg=3 i3end=2 r2=3 < in.bin

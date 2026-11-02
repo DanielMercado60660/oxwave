@@ -303,13 +303,10 @@ fn main() {
         err!("np must be at least 2");
     }
 
-    // tableta's extrapolation reads beyond nt for the shear branch of the
-    // quadratic. Deliberately back those otherwise undefined reads with zeros;
-    // the image table has already reached its last tau sample on these rays.
-    let mut a1111 = vec![0.0f32; 2 * nt + 1];
-    let mut a3333 = vec![0.0f32; 2 * nt + 1];
-    let mut a1313 = vec![0.0f32; 2 * nt + 1];
-    let mut a1133 = vec![0.0f32; 2 * nt + 1];
+    let mut a1111 = vec![0.0f32; nt];
+    let mut a3333 = vec![0.0f32; nt];
+    let mut a1313 = vec![0.0f32; nt];
+    let mut a1133 = vec![0.0f32; nt];
     for it in 0..nt {
         let vnt2 = vnt[it] * vnt[it];
         let vt2 = vt[it] * vt[it];
@@ -678,15 +675,31 @@ fn tableta(
                 a1133t = ((1.0 - frac as f64) * a1133[itau] as f64
                     + (frac * a1133[itau + 1]) as f64) as f32;
             } else {
+                // Confirmed C UB: sumigpsti.c:651-662 reads coefficients
+                // beyond nt. Match the fixed C's bounds checks, which use
+                // zero for unavailable coefficients without changing the
+                // extrapolation formula or any in-bounds coefficient.
                 let itau = itau as usize;
                 a1111t = a1111[ntau - 1]
-                    + (taui - (ntau - 1) as f32 * dtau) * (a1111[itau] - a1111[itau - 1]) / dtau;
+                    + (taui - (ntau - 1) as f32 * dtau)
+                        * (a1111.get(itau).copied().unwrap_or(0.0)
+                            - a1111.get(itau - 1).copied().unwrap_or(0.0))
+                        / dtau;
                 a3333t = a3333[ntau - 1]
-                    + (taui - (ntau - 1) as f32 * dtau) * (a3333[itau] - a3333[itau - 1]) / dtau;
+                    + (taui - (ntau - 1) as f32 * dtau)
+                        * (a3333.get(itau).copied().unwrap_or(0.0)
+                            - a3333.get(itau - 1).copied().unwrap_or(0.0))
+                        / dtau;
                 a1313t = a1313[ntau - 1]
-                    + (taui - (ntau - 1) as f32 * dtau) * (a1313[itau] - a1313[itau - 1]) / dtau;
+                    + (taui - (ntau - 1) as f32 * dtau)
+                        * (a1313.get(itau).copied().unwrap_or(0.0)
+                            - a1313.get(itau - 1).copied().unwrap_or(0.0))
+                        / dtau;
                 a1133t = a1133[ntau - 1]
-                    + (taui - (ntau - 1) as f32 * dtau) * (a1133[itau] - a1133[itau - 1]) / dtau;
+                    + (taui - (ntau - 1) as f32 * dtau)
+                        * (a1133.get(itau).copied().unwrap_or(0.0)
+                            - a1133.get(itau - 1).copied().unwrap_or(0.0))
+                        / dtau;
             }
             f1 = a1111t + a1313t;
             f2 = a3333t + a1313t;
@@ -696,8 +709,8 @@ fn tableta(
             alpha = f2 * f2 - f4 * f4;
             beta = 2.0 * ((f1 * f2 + f3 * f4 - f5) * px2 - f2 * f6);
             gamma = ((f6 * f6) as f64
-                - (2.0 * f1 as f64 * f6 as f64 - ((f1 * f1 - f3 * f3) * px2) as f64)
-                    * px2 as f64) as f32;
+                - (2.0 * f1 as f64 * f6 as f64 - ((f1 * f1 - f3 * f3) * px2) as f64) * px2 as f64)
+                as f32;
             det = ((beta * beta) as f64 - 4.0 * alpha as f64 * gamma as f64) as f32;
             if det < 0.0 {
                 continue;

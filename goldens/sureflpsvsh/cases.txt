@@ -111,3 +111,143 @@ sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5 ct=1.5,2,2.5 ql=
 [stderr] sureflpsvsh stype=2 m1=1 m2=0 m3=1 m0=1 h1=0 h2=0 verbose=2 nlayers=4 cl=3.5,3.5,3.5,5.9 ct=2.2,2.2,2.2,2.9 ql=50,50,50,1000 qt=30,30,30,600 rho=2.65,2.65,2.65,2.8 t=0.001,0.343,0.655,2 lsource=3 lobs=2 nor=1 nx=4 bx=0.025 dx=0.25 tsec=1.024 dt=0.004 nt=256 nw=64 nf=64 p2w=1 pw1=0 pw2=0 pw3=0 pw4=0 decay=5 red_vel=3.5 tlag=0.2 wfield=2 wavelet_type=2 vsp=1 wfp=p.su wfr=r.su wfz=z.su && cat p.su r.su z.su
 [stderr] sureflpsvsh stype=2 m1=1 m2=0 m3=1 m0=1 h1=0 h2=0 verbose=2 nlayers=4 cl=3.5,3.5,3.5,5.9 ct=2.2,2.2,2.2,2.9 ql=50,50,50,1000 qt=30,30,30,600 rho=2.65,2.65,2.65,2.8 t=0.001,0.343,0.655,2 lsource=3 lobs=2 nor=1 nx=4 bx=0.025 dx=0.25 tsec=1.024 dt=0.004 nt=256 nw=64 nf=64 p2w=1 pw1=0 pw2=0 pw3=0 pw4=0 decay=5 red_vel=3.5 tlag=0.2 wfield=2 wavelet_type=2 flt=1 wfz=z.su && cat z.su
 [stderr] sureflpsvsh stype=2 m1=1 m2=0.5 m3=1 nlayers=5 cl=3.5,3.5,3.5,3.5,5.9 ct=2.2,2.2,2.2,2.2,2.9 ql=50,50,50,50,1000 qt=30,30,30,30,600 rho=2.65,2.65,2.65,2.65,2.8 t=0.001,0.001,0.343,0.655,2 lsource=4 lobs=2,3 nor=2 m0=1 h1=0 h2=0 verbose=2 nx=3 bx=0.025 dx=0.25 tsec=1.024 dt=0.004 nt=256 nw=64 nf=64 p2w=1 pw1=0 pw2=0 pw3=0 pw4=0 decay=5 red_vel=3.5 tlag=0.2 wfield=2 wavelet_type=2 wfp=p.su && cat p.su
+
+# diff-2026-11 (round 1)
+# Short/prime output nt=1
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=1 nx=1 wavelet_type=2 wfp=p && cat p
+# Short/prime output nt=2
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=2 nx=1 wavelet_type=2 wfp=p && cat p
+# Short/prime output nt=3
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=3 nx=1 wavelet_type=2 wfp=p && cat p
+# Short/prime output nt=4
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=4 nx=1 wavelet_type=2 wfp=p && cat p
+# Short/prime output nt=17
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=17 nx=1 wavelet_type=2 wfp=p && cat p
+# Short/prime output nt=127
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=127 nx=1 wavelet_type=2 wfp=p && cat p
+# 4097-sample trace, FFT padding
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=4097 nx=1 tsec=16.4 nw=12 nf=12 wavelet_type=1 wfp=p && cat p
+# Explicit scalar defaults
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 rand=0 qopt=0 stype=2 wtype=1 wfield=1 int_type=1 flt=0 vsp=0 win=0 wavelet_type=1 fs=0.07 decay=50 fref=1 bx=0.005 bp=0 fx=0.1 dx=0.001 pw1=0 pw2=0.1 pw3=6.7 pw4=7 h1=1 h2=0 red_vel=5 fpeak=25 tlag=0 nlint=0 nfilters=0 wfp=p && cat p
+# Negative offsets and sub-millisecond header truncation
+[stderr] suplane nt=3 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 bx=-0.00299 dx=0.00111 dt=0.0009999 tsec=0.128 wfp=p && cat p
+# Input headers are ignored by this generator
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=offset,dt,delrt a=987,1000,-25 | suchw key1=cdp key2=offset a=2 b=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 bx=1.2349 dx=-0.1111 dt=0.0019999 wfp=p && cat p
+# Radial output only and non-default force
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 h1=0.25 h2=-0.5 wfield=2 wfr=r && cat r
+# Vertical output only, acceleration
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 h1=0 h2=0 wfield=3 decay=10 red_vel=0 tlag=-0.02 wfz=z && cat z
+# PSV components all compared
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 h1=0 h2=0 wfp=p wfr=r wfz=z && cat p r z
+# Fault source and Filon integration
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 stype=1 delta=67 lambda=-31 phis=123 phi=44 int_type=2 fs=0.09 bp=0.03 win=1 bx=0.1 dx=0.05 wfp=p wfr=r wfz=z && cat p r z
+# Q option parameters
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 qopt=1 layern=2 wrefp=10 wrefs=12 epsp=0.001 epss=0.002 sigp=0.1 sigs=0.15 wfp=p && cat p
+# Flattened model
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 flt=1 wavelet_type=4 fpeak=18 wfz=z && cat z
+# VSP displacement with source below receivers
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 vsp=1 win=1 wfield=1 pw1=0 pw2=0 pw3=0 pw4=0 wfp=p && cat p
+# Ricker and frequency limits
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wavelet_type=2 fpeak=17 fref=2.5 nw=12 nf=5 wfp=p && cat p
+# Minimum phase high cut filter
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 filters_type=1 filters_phase=1 dbpo=12 f1=500 f2=600 wfp=p && cat p
+# Zero phase low cut filter
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 filters_type=2 filters_phase=0 dbpo=6 f1=4 f2=12 wfp=p && cat p
+# Notch and mixed filter array
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 filters_type=3,1 filters_phase=0,1 dbpo=12,6 f1=4,500 f2=8,600 wfp=p && cat p
+# Verbose screen and named report
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 verbose=3 outf=report wfp=p && cat p
+# Processing report with no component files
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 outf=report && cat report
+# Default nt derived from tsec/dt
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt= wfp=p && cat p
+# Zero moment tensor with spike
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 m1=0 m2=0 m3=0 h1=0 h2=0 wfp=p && cat p
+# Repeated and empty general flags use C defaults
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wfield=3 wfield= win=1 win= wavelet_type=2 wfp=p && cat p
+# Binary model files from SU-generated constant arrays
+[stderr] sunull nt=4 ntr=1 | sugain bias=4 | sustrip head=headers outpar=stripinfo >cl && sunull nt=4 ntr=1 | sugain bias=2 | sustrip head=headers outpar=stripinfo >ct && sunull nt=4 ntr=1 | sugain bias=100 | sustrip head=headers outpar=stripinfo >ql && sunull nt=4 ntr=1 | sugain bias=50 | sustrip head=headers outpar=stripinfo >qt && sunull nt=4 ntr=1 | sugain bias=2.5 | sustrip head=headers outpar=stripinfo >rho && sunull nt=4 ntr=1 | sugain bias=0.02 | sustrip head=headers outpar=stripinfo >t && sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nlayers=4 clfile=cl ctfile=ct qlfile=ql qtfile=qt rhofile=rho tfile=t wfp=p && cat p
+# Error exit: m0=
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 m0= 
+# Error exit: wtype=3
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wtype=3 
+# Error exit: stype=3
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 stype=3 
+# Error exit: int_type=3
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 int_type=3 
+# Error exit: filters_type=1 filters_phase=0 dbpo=6 f1=8
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 filters_type=1 filters_phase=0 dbpo=6 f1=8 
+# Error exit: intlayers=2 nintlayers=1,2
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 intlayers=2 nintlayers=1,2 
+# Error exit: wavelet_type=9
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wavelet_type=9 
+# Error exit: ql=100
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 ql=100 
+# Error exit: outf=absent/info
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 outf=absent/info 
+# Error exit: wfr=absent/r
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wfr=absent/r 
+# Error exit: ctfile=absent
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 ctfile=absent 
+# Interpolation with explicit unused final index to keep C within its arrays
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 intlayers=2,99 nintlayers=1,1 intlayth=0.02,0.02 nlayers=4 nlint=2 wfp=p && cat p
+# Random layer option with at most original scratch capacity
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nlayers=4 rand=1 layer=2 nrand_layers=4 zlayer=0.1 sdcl=1 sdct=2 lsource=4 wfp=p && cat p
+# Prime length with enough FFT storage
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 tsec=0.14 dt=0.001 nt=137 nw=9 nf=9 wavelet_type=4 wfp=p && cat p
+# SH at zero range avoids the uninitialized texp branch
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 wtype=2 nx=128 bx=0 dx=0 wavelet_type=2 h1=0 h2=0 wft=tout && cat tout
+# Receiver below the source
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 lsource=2 lobs=3 wfp=p && cat p
+# Receiver coincides with source
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 lsource=3 lobs=3 wfp=p && cat p
+# All-fluid model
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 ct=0,0,0,0 wfp=p && cat p
+# Fluid halfspace and solid source
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 ct=0,2,2.5,3 wfp=p && cat p
+# Receiver in fluid layer
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 ct=1.5,0,2.5,3 wfp=p && cat p
+# Quarter millisecond interval and integer header truncation
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 dt=0.00025 tsec=0.04 wfp=p && cat p
+# High frequency reference and negative reduction velocity
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 fref=8 red_vel=-1 fx=2 bx=0.3 dx=0.15 bp=0.01 wfp=p && cat p
+# Default nt, nf, np with empty numeric arguments
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt= nf= np= wfp=p && cat p
+# Zero phase notch with a wide band
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nw=32 nf=32 filters_type=3 filters_phase=0 dbpo=12 f1=4 f2=40 wfp=p && cat p
+# Minimum phase low cut with positive frequencies
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 filters_type=2 filters_phase=1 dbpo=6 f1=20 f2=30 wfp=p && cat p
+# Filon narrow slowness interval
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 int_type=2 fs=0.12 p2w=0.4 pw1=0 pw2=0 pw3=0 pw4=0 wfp=p && cat p
+# Supplied np=100; C overwrites np during slowness sampling
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 np=100 wfp=p && cat p
+# Supplied np=101
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 np=101 wfp=p && cat p
+# Supplied np=200
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 np=200 wfp=p && cat p
+# Supplied np=201
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 np=201 wfp=p && cat p
+# No receivers leaves the initialized output field zero
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nor=0 lobs= wfp=p && cat p
+# Small slowness block
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 p2w=0.064 wfp=p && cat p
+# Slowness below the 100-element block boundary
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 p2w=0.198 wfp=p && cat p
+# Slowness just above the 100-element block boundary
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 p2w=0.204 wfp=p && cat p
+# Slowness just above the 200-element block boundary
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 p2w=0.404 wfp=p && cat p
+# Three distinct receivers
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nlayers=5 cl=3,3.5,4,5,6 ct=1.5,1.8,2,2.5,3 ql=100,110,120,150,200 qt=50,55,60,80,100 rho=2,2.1,2.2,2.5,2.7 t=0.01,0.02,0.03,0.1,1 nor=3 lobs=2,3,4 lsource=4 p2w=0.064 wfp=p && cat p
+# Even-length short wavelet
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=2,2.2,2.5,2.7 t=0.01,0.02,0.1,1 lsource=3 lobs=2 nor=1 nx=3 nt=127 tsec=0.512 dt=0.004 nw=8 nf=8 np=32 p2w=0.8 nt=4 wavelet_type=4 fpeak=30 wfp=p && cat p
+
+# ub-2026-11 (round 2)
+# Refuted: exact command repeated in grader feedback. sureflpsvsh.c:515-518 rejects rho= (one value per par/lib/getpars.c:421-429) against four cl values before allocation. Vendor, rebuilt orig, fixed and OxWave all return 1, empty stdout and identical density-count diagnostic; no UB is reached. Evidence: diffcamp/ubx/sureflpsvsh/evidence/round2-feedback/.
+[stderr] sunull nt=1 ntr=1 | sureflpsvsh m0=1 stype=2 m1=1 m2=0.2 m3=-0.3 verbose=2 cl=3,4,5,6 ct=1.5,2,2.5,3 ql=100,120,150,200 qt=50,60,80,100 rho=
+
+# ub-2026-11 (round 3)
+# Correction to the round-2 note: grader feedback is truncated at 140 characters.
+# Its two failures identify the full random-layer and interpolation cases in
+# UB_CONFIRMED.txt, not the literal rho= regression above. That ordinary regression
+# remains valid and matches C; no additional claim was refuted in round 3.

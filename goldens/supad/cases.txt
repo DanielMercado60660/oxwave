@@ -19,3 +19,27 @@ supad min=1 max=2 d=0
 supad min=3 max=2
 supad min=1 max=3 key1=notakey
 supad min=1 max=3
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | sushw key=ep,tracf a=5,3 | supad min=1 max=5
+suplane nt=4 ntr=4 | sushw key=ep,tracf a=1,1 b=0,2 | supad key1=ep key2=tracf key3=trid val3=2 d=1 min=1 max=8
+suspike nt=11 ntr=3 | sushw key=ep,tracf a=8,2 b=0,3 | supad min=0 max=10 d=2
+sunull nt=13 ntr=4 | sushw key=cdp,offset a=2,2 b=0,2 | supad key1=cdp key2=offset key3=nhs val3=7 min=0 max=9
+suplane nt=4097 ntr=2 | sushw key=tracf a=2 b=2 | supad min=1 max=5
+suplane nt=3 ntr=5 | sushw key=ep,tracf a=9,1 b=-2,1 c=0,0 j=2,0 | supad min=1 max=4
+suplane nt=7 ntr=3 | sushw key=d1 a=0.25 b=0.75 | supad key1=ep key2=d1 key3=f1 val3=1.25 min=0 max=2 d=0.25
+suplane nt=4 ntr=3 | sushw key=tracf a=5 b=-2 | supad min=1 max=5 d=-1
+suplane nt=2 ntr=2 | sushw key=tracf a=3 b=1 | supad min=3 max=3
+suplane nt=3 ntr=2 | sushw key=tracf a=1 b=0 | supad min=1 max=3
+[stderr] suspike nt=3 ntr=2 | sushw key=tracf a=1 b=2 | supad min=1 max=4 verbose=1
+suplane nt=2 ntr=1 | supad max=2
+suplane nt=2 ntr=1 | supad min=1
+suplane nt=2 ntr=1 | supad min=1 max=2 d=0
+suplane nt=2 ntr=1 | supad min=3 max=2
+suplane nt=2 ntr=1 | supad min=1 max=2 key2=invalid
+suspike nt=17 ntr=4 | sushw key=ep,tracf a=1,0 b=0,2 c=1,0 j=2,0 | supad min=1 max=3
+sunull nt=1 ntr=3 | sushw key=ep,tracf a=3,10 b=1,0 | supad min=1 max=4
+suplane nt=11 ntr=3 | sushw key=tracf a=2 b=2 | supad key1=tracf key2=tracf key3=tracf val3=8 min=1 max=5
+suplane nt=5 ntr=2 | sushw key=tracf a=2 b=2 | supad key3=tracf val3=9 min=1 max=5
+suplane nt=3 ntr=1 | sushw key=tracf a=2 | supad key3=dt val3=65535 min=1 max=3
+suplane nt=3 ntr=2 | sushw key=tracf a=-2 b=3 | supad min=-3 max=3 d=2
+suplane nt=2 ntr=2 | sushw key=ep,tracf a=1,1 b=1,1 | supad key1=ep key2=tracf key3=ep val3=4 min=0 max=3

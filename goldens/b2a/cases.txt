@@ -16,3 +16,17 @@ b2a outpar=/no/such/directory/count </dev/null
 b2a n1=-1 outpar=/dev/null </dev/null
 b2a n1=999999999999999999999 outpar=/dev/null </dev/null
 [stderr] b2a verbose=1 extra=1 outpar=/dev/null </dev/null
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 outpar=count && cat count
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null | b2a outpar=count && cat count
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | b2a n1=3 format=1 outpar=count && cat count
+suspike nt=4 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | b2a n1=4 format=0 outpar=count && cat count
+suspike nt=7 ntr=2 nspk=1 ix1=2 it1=7 | sustrip outpar=/dev/null | b2a n1=7 format=-2 outpar=count && cat count
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | b2a n1=4097 outpar=count && cat count
+[stderr] sunull nt=4 ntr=2 | sushw key=offset a=17 b=3 | sustrip outpar=/dev/null | b2a n1=2 format=0 verbose=1 outpar=count && cat count
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | b2a n1=2 outpar=/dev/null
+sunull nt=4 ntr=1 | sustrip outpar=/dev/null | b2a n1=3 outpar=/dev/null
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | b2a n1=1 format=1 outpar=count && cat count
+sunull nt=3 ntr=3 | sushw key=offset a=-123 b=77 | sugethw key=offset,ns output=binary | b2a n1=2 format=1 outpar=count && cat count
+suplane nt=17 ntr=2 | sustrip outpar=/dev/null | b2a n1=17 format=0 outpar=count && cat count

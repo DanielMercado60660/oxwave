@@ -57,3 +57,37 @@ suspike nt=7 ntr=3 | suaddnoise seed=17 sn=2 | suicepstrum
 suspike nt=7 ntr=3 | suaddnoise seed=17 sn=2 | suicepstrum sym=1 sign1=-1 sign2=1
 suspike nt=9 ntr=2 | suaddnoise seed=29 sn=2 | suicepstrum
 suspike nt=9 ntr=2 | suaddnoise seed=29 sn=2 | suicepstrum sym=1 sign1=-1 sign2=1
+# diff-2026-11 (round 1)
+# Nonzero impulses at every short boundary; explicit positions avoid generator defaults.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suicepstrum
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suicepstrum verbose=1 dt=0.00125 sym=1 sign1=-1 sign2=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suicepstrum sym=0 sign1=1 sign2=-1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suicepstrum sym=-3 sign1=-1 sign2=-1
+suspike nt=4 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=4 | suicepstrum sym=1 sign1=1 sign2=1
+# Other deterministic waveforms and prime input lengths.
+suplane nt=31 ntr=5 npl=1 ct1=13 cx1=3 len1=5 dip1=2 taper=1 | suicepstrum
+suplane nt=31 ntr=5 npl=1 ct1=13 cx1=3 len1=5 dip1=2 taper=1 | suicepstrum sym=1 sign1=-1 sign2=1
+susynlv nt=257 nxm=2 nxo=1 dt=0.016 ref="0.1:0,1;4,1" | suicepstrum sym=1
+suvibro tv=0.128 dt=0.004 t1=0 t2=0 phz=0.37 | sugain scale=0.01 | suicepstrum sign1=-1 sign2=-1
+# Long traces with finite nonzero samples, both centering modes, and a near-limit length.
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=2049 | suaddnoise seed=293 sn=2 | sugain scale=0.01 | suicepstrum
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=2049 | suaddnoise seed=293 sn=2 | sugain scale=0.01 | suicepstrum sym=1 sign1=-1 sign2=1
+[stderr] sunull nt=4097 ntr=1 | suicepstrum verbose=1 dt=0.002 sym=1 sign1=1 sign2=-1
+suspike nt=60000 ntr=1 nspk=1 ix1=1 it1=59999 | sugain scale=0.1 | suicepstrum
+# Sampling is selected from the first trace; preserve unrelated per-trace headers.
+[stderr] suspike nt=509 ntr=3 nspk=1 ix1=2 it1=127 | sushw key=dt,d1,delrt,trid,f1,f2 a=1250,0.03125,17,111,3.5,9 b=250,0.001,-3,1,1,2 | suicepstrum sym=1 verbose=1
+[stderr] suspike nt=101 ntr=3 nspk=1 ix1=1 it1=2 | sushw key=dt,d1,delrt a=0,0.00125,-17 b=0,0.002,7 | suicepstrum dt=0 sym=1 verbose=1
+[stderr] suspike nt=18 ntr=2 nspk=1 ix1=1 it1=9 | sushw key=dt,d1 a=1000,0.0625 b=1000,0 | suicepstrum verbose=1
+[stderr] suspike nt=23 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=dt,d1 a=0,0.0625 | suicepstrum dt=0.0000015 sym=1 verbose=1
+[stderr] sunull nt=23 ntr=2 | sushw key=dt,d1,delrt a=0,0,27 b=0,0,-5 | suicepstrum verbose=1 sym=1
+# Negative input amplitudes and exponent overflow remain deterministic.
+suspike nt=29 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=-5 | suicepstrum sign1=1 sign2=1
+suspike nt=47 ntr=1 nspk=1 ix1=1 it1=1 | sugain scale=100 | suicepstrum sym=1
+# Empty values, validation order, and malformed signs on nonzero traces.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | suicepstrum dt= sym= sign1= sign2= verbose=
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | suicepstrum sign1=3 verbose=1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | suicepstrum sign2=-3 verbose=1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | suicepstrum sign1=oops sign2=0
+# Passing controls immediately outside the shared FFT failure interval (8009..8190).
+suspike nt=8008 ntr=1 nspk=1 ix1=1 it1=1 | suicepstrum
+suspike nt=8191 ntr=1 nspk=1 ix1=1 it1=1 | suicepstrum

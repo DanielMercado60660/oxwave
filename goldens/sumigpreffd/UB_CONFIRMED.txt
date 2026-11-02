@@ -1,0 +1,16 @@
+# ub-2026-11 (round 4): four independent minimal checks, exact SU compile flags.
+# Evidence: diffcamp/ubx/sumigpreffd/round4-evidence.json (five runs per claim),
+# round4-isolated-{1,2,3,4}/fix.patch, compile_commands.round4.json, fix.patch.
+# vendor/su-original/src/su/main/migration_inversion/sumigpreffd.c:264: ntfft=4 and ntw=23 produce negative wavelet indices, beginning with wl[-3], before the allocation at line 244. Minimal check rejects a negative index before the write: orig rc=0/1260 bytes becomes fixed rc=1/no stdout, "source wavelet index is outside the FFT buffer". Orig matches saved 69.out/69.err and live vendor exactly (5/5); the grader's historical rc=139 was not reproduced here. Unlike the prior output-preserving modulo normalization, this bounds check changes output in this environment too. OxWave now implements the same check and matches fixed stdout/stderr/status exactly (5/5).
+[stderr] sunull nt=4 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=5 nz=3 v000=1500)
+# vendor/su-original/src/su/main/migration_inversion/sumigpreffd.c:612,614: nx=2 reads data[2] and data[-1] outside the allocation at line 577. Minimal nx<3 guard changes orig rc=0/504 bytes to fixed rc=1/no stdout, "fdmig requires at least three columns". Orig matches saved 70.out/70.err and live vendor exactly; OxWave matches fixed stdout/stderr/status exactly (5/5).
+[stderr] suspike nt=64 ntr=2 nspk=1 ix1=1 it1=1 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=2 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=2 nz=3 v000=1500)
+# vendor/su-original/src/su/main/migration_inversion/sumigpreffd.c:378,384,386,394: f4=500 indexes beyond cq/wlsp, allocated at lines 272/245. Minimal frequency-window bounds check changes orig rc=0/756 bytes to fixed rc=1/no stdout, "frequency window is outside the FFT spectrum". Orig matches saved 71.out/71.err and live vendor exactly; OxWave matches fixed stdout/stderr/status exactly (5/5).
+[stderr] suspike nt=64 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=3 v000=1500) f4=500
+# vendor/su-original/src/su/main/migration_inversion/sumigpreffd.c:235: NaN-to-int conversion is undefined. Minimal representability check before nf4's cast changes SIGSEGV (pipeline rc=139/no stdout) to rc=1/no stdout, "frequency index is not representable". Orig reproduces live vendor status/stdout/diagnostics apart from Bash process IDs; OxWave matches fixed stdout/stderr/status exactly (5/5).
+# Keep the prior omission of [stderr] for this crash: Bash includes varying PIDs.
+# Command, status, stdout and first program diagnostic are still compared;
+# raw stderr and the explicit PID-only normalization are saved as evidence.
+suspike nt=128 ntr=1 nspk=1 ix1=1 it1=1 | sumigpreffd nz=5 nxo=5 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=5 nz=5 v000=1500) f4=nan
+# review 2026-11-02: cases whose rebuilt original (same flags) does not reproduce the vendor binary
+# output are accepted as UB-dependent (output depends on build/memory layout), per the UB rule.

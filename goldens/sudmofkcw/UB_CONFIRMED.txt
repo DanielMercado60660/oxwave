@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/su/main/dip_moveout/sudmofkcw.c:654 (allocation :610; rounding :621-622): negative delrt makes t1 < ft, so it=0 reads uoft[-1]. Minimal recurrence bounds checks (:654, :656) turn orig's rc=0 / 924-byte output into rc=1 / empty stdout and "maketu: u(t) requires a previous sample". Orig matches vendor byte-for-byte (stdout SHA256 93638d4c6b35115a49c7907df4ef4847d1e40a75213d521e9cde297f436c48f9). OxWave formerly panicked; port now uses the same checks and matches fixed C's exit code, stdout and stderr exactly. Evidence and fix.patch: diffcamp/ubx/sudmofkcw/.
+suspike nt=17 ntr=3 nspk=1 it1=4 ix1=2 | sushw key=cdp,offset,delrt a=1,120,-24 b=1,0,0 | sudmofkcw cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 gamma=1

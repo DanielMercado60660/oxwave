@@ -21,3 +21,38 @@ sunhmospike ntr=1 nt=3 dt=0.065536
 sunhmospike ntr=1 nt=3 dt=0.001001
 sunhmospike gopt=4 ntr=3 nt=301 offinc=-123 offref=900 nspk=3
 [stderr] sunhmospike dt=1e-310
+# diff-2026-11 (round 1)
+sunhmospike ntr=1 nt=2 nspk=1 t1=1 p1=0 a1=2
+sunhmospike ntr=1 nt=3 nspk=1 t1=2 p1=0 a1=-2
+sunhmospike ntr=1 nt=4 nspk=1 t1=3 p1=0 a1=0.5
+sunhmospike ntr=2 nt=4097 dt=0.0005 nspk=4
+sunhmospike ntr=3 nt=127 gopt=1 offref=400 offinc=50 dt=0.002 nspk=4 p1=8 t1=6 a1=-1 p2=20 t2=22 a2=2 p3=-4 t3=50 a3=0.5 p4=2 t4=100 a4=-0.25
+sunhmospike ntr=5 nt=257 gopt=2 refdepth=350 offref=700 offinc=125 nspk=4 p1=5 t1=20 a1=2 p2=30 t2=40 a2=-3 p3=-8 t3=100 a3=0.25 p4=25 t4=160 a4=1.5
+sunhmospike ntr=5 nt=257 gopt=3 offref=500 offinc=-100 nspk=2 p1=-20 t1=30 a1=4 p2=40 t2=100 a2=-1
+sunhmospike ntr=5 nt=257 gopt=4 offref=-500 offinc=-100 nspk=2 p1=20 t1=30 a1=4 p2=-40 t2=100 a2=-1
+sunhmospike ntr=3 nt=113 gopt=7 offref=300 offinc=100 cdp=-17 nspk=1 p1=30 t1=10 a1=2
+sunhmospike ntr=2 nt=97 nspk=0 cdp=12345 dt=0.004 offinc=1.25
+sunhmospike ntr=3 nt=101 nspk=5 p1=0 p2=0 p3=0 p4=0 t1=10 t2=10 t3=10 t4=10 a1=1 a2=2 a3=3 a4=4
+sunhmospike ntr=2 nt=31 nspk=1 p1=0 t1=0 a1=8
+sunhmospike ntr=2 nt=31 nspk=1 p1=0 t1=30 a1=8
+sunhmospike ntr=2 nt=31 nspk=1 p1=0 t1=31 a1=8
+sunhmospike ntr=3 nt=53 gopt=2 refdepth=-200 offref=900 offinc=0 nspk=1 p1=10 t1=15
+sunhmospike ntr=1 nt=17 nspk=1 p1=0 t1=5.9 a1=1.25 dt=0.001
+sunhmospike ntr=1 nt=17 nspk=1 p1=0 t1=-1 a1=3
+sunhmospike ntr=2 nt=73 nspk=3 p1=0 p2=0 p3=0 t1=10 t2=10 t3=10 a1=3 a2=-2 a3=-1
+sunhmospike ntr=2 nt=19 nspk=1 t1=3 p1=0 cdp=2147483647 verbose=1
+sunhmospike ntr=1 nt=5 dt=0.0025 offinc=-3.75 cdp=-99
+sunhmospike ntr=1 nt=17 ntr=2 nt=23 nspk=1 t1=8
+sunhmospike ntr=1 nt=11 nspk=1 t1=abc a1=2
+[stderr] sunhmospike nt=999999999999999999999999
+[stderr] sunhmospike offinc=1e-310
+sunull nt=1 ntr=1 | sunhmospike ntr=1 nt=7 nspk=1 t1=3
+suspike nt=1 ntr=1 | sunhmospike ntr=2 nt=11 gopt=3 offinc=10
+sunull nt=1 ntr=1 | sushw key=cdp a=42 | sunhmospike ntr=1 nt=13 cdp=7
+sunhmospike ntr=1 nt=19 gopt=1 offref=1000 offinc=1000 nspk=1 p1=7 t1=5 a1=2
+sunhmospike ntr=1 nt=19 gopt=2 refdepth=100 offref=1000 offinc=1000 nspk=1 p1=7 t1=5 a1=2
+sunhmospike ntr=1 nt=19 gopt=3 offref=1000 offinc=1000 nspk=1 p1=7 t1=5 a1=2
+sunhmospike ntr=1 nt=19 gopt=4 offref=1000 offinc=1000 nspk=1 p1=7 t1=5 a1=2
+sunhmospike ntr=1 nt=65535 nspk=1 t1=65534 p1=0 a1=2
+sunhmospike ntr=1 nt=1 nspk=1 t1=1 p1=0
+sunhmospike ntr=4 nt=521 gopt=2 refdepth=123.5 offref=333.3 offinc=13.1 dt=0.0013 nspk=2 p1=7 t1=20 p2=50 t2=100

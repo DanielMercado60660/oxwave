@@ -10,3 +10,20 @@ suplane nt=17 ntr=2 | suvelan_nccs nx=2 smute=1
 suplane nt=17 ntr=2 | suvelan_nccs nx=2 pwr=0
 suplane nt=17 ntr=2 | suvelan_nccs nx=2 pwr=-1
 suvelan_nccs nx=2 </dev/null
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=2 | suvelan_nccs nx=2 nv=2 dtratio=1 nsmooth=3
+suplane nt=3 ntr=2 | suvelan_nccs nx=2 nv=2 dtratio=1 nsmooth=4
+suplane nt=4 ntr=3 | suvelan_nccs nx=3 nv=2 dtratio=2 nsmooth=5
+sunull nt=37 ntr=3 dt=0.002 | sushw key=cdpt a=3 | suvelan_nccs nv=2
+suspike nt=101 ntr=4 | sushw key=offset a=-30 b=20 | suvelan_nccs nx=4 nv=4 fv=800 dv=230 smute=1.2 dtratio=2 nsmooth=7 pwr=0.5
+suplane nt=127 ntr=6 | sushw key=offset a=0 b=15 | sushw key=delrt a=40 | suvelan_nccs nx=6 nv=5 fv=900 dv=125 smute=2.5 dtratio=3 nsmooth=8 pwr=3
+[stderr] suplane nt=43 ntr=3 | sushw key=cdpt a=3 | sushw key=cdp a=19 | suvelan_nccs nv=2 verbose=1
+suplane nt=4097 ntr=3 | sushw key=offset a=0 b=10 | suvelan_nccs nx=3 nv=2 dtratio=7 nsmooth=15
+suspike nt=59 ntr=2 | suvelan_nccs nx=2 nv=1 fv=1500 dv=100 smute=1.5 dtratio=5 nsmooth=11 verbose=0 pwr=1
+suplane nt=53 ntr=1 | suvelan_nccs nx=1 nv=2 dtratio=2
+sunull nt=23 ntr=4 | suvelan_nccs nx=4 nv=3 dtratio=1 nsmooth=2
+suspike nt=73 ntr=5 | sushw key=offset a=20 b=5 | suvelan_nccs nx=5 nv=3 fv=2000 dv=-200 dtratio=4 nsmooth=13
+suplane nt=19 ntr=2 | suvelan_nccs nx=2 nv=1 smute=0.5
+suplane nt=19 ntr=2 | suvelan_nccs nx=2 nv=1 pwr=-0.5
+suplane nt=19 ntr=2 | suvelan_nccs nx=2 nv=1 pwr=0
+suplane nt=41 ntr=4 | sushw key=offset a=0 b=3 | suvelan_nccs nx=4 nv=3 dtratio=1 nsmooth=41

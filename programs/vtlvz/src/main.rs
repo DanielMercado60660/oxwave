@@ -66,6 +66,9 @@ fn main() {
     mustgetparfloat("v0", &mut v0);
     mustgetparfloat("a", &mut a);
     checkpars();
+    if nt < 0 {
+        err!("nt must be nonnegative");
+    }
     let mut v = vec![0.0f32; nt as usize];
     let mut t = 0.0f32;
     for it in 0..nt {

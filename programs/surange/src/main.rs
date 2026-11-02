@@ -36,6 +36,31 @@
 //! SEP: Stew Levin; CWP: Jack K. Cohen.
 
 use oxwave_core::prelude::*;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+static INPUT_CLOSED: AtomicBool = AtomicBool::new(false);
+
+unsafe extern "C" {
+    fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
+    fn open(path: *const std::ffi::c_char, flags: i32, ...) -> i32;
+    fn dup2(oldfd: i32, newfd: i32) -> i32;
+    fn close(fd: i32) -> i32;
+}
+
+// C closeinput reopens stdin on /dev/null. Use async-signal-safe descriptor
+// operations: the core input stream may already be borrowed by gettr here.
+extern "C" fn closeinput(_sig: i32) {
+    INPUT_CLOSED.store(true, Ordering::Relaxed);
+    unsafe {
+        let fd = open(c"/dev/null".as_ptr(), 0);
+        if fd >= 0 {
+            dup2(fd, 0);
+            if fd != 0 {
+                close(fd);
+            }
+        }
+    }
+}
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -145,6 +170,11 @@ fn main() {
         Trace::new(),
         Trace::new(),
     );
+    // Set up closing commands, as in the C program (SIGINT and SIGTERM).
+    unsafe {
+        signal(2, closeinput);
+        signal(15, closeinput);
+    }
     if gettr(&mut tr) == 0 {
         err!("can't get first trace");
     }
@@ -197,7 +227,9 @@ fn main() {
     }
     let mut ntr: i32 = 1;
     let (mut mx1, mut my1, mut dmin, mut dmax, mut davg) = (0.0, 0.0, 0.0, 0.0, 0.0);
-    while gettr(&mut tr) != 0 {
+    // freopen also discards read-ahead. Stop before consuming any headers
+    // still buffered by the core stream when closeinput ran.
+    while !INPUT_CLOSED.load(Ordering::Relaxed) && gettr(&mut tr) != 0 {
         sx = 0.0;
         sy = 0.0;
         gx = 0.0;

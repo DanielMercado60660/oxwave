@@ -15,3 +15,30 @@ suimp2d verbose=1 nt=31
 suimp2d nt=-1
 suimp2d c=0
 suimp2d c=0 nshot=2 nrec=2 nt=117
+# diff-2026-11 (round 1)
+suimp2d nshot=1 nrec=1 nt=2 x0=1 z0=1 c=1000 dt=0.001
+suimp2d nshot=1 nrec=1 nt=3 x0=1 z0=1 c=1000 dt=0.001
+suimp2d nshot=1 nrec=1 nt=4 x0=1 z0=1 c=1000 dt=0.001
+suimp2d nt=5 x0=1 z0=2 c=2000 dt=0.001
+suimp2d nt=17 x0=10 z0=10 c=1000 dt=0.002
+suimp2d nt=257 nrec=2 x0=200 z0=100 c=1800 dt=0.001
+suimp2d nt=4097 x0=150 z0=100 c=2000 dt=0.002
+suimp2d nshot=1 nrec=1 nt=256 c=5000 dt=0.004 x0=1000 z0=1000 sxmin=0 szmin=0 gxmin=0 gzmin=0 dsx=100 dsz=0 dgx=100 dgz=0
+suimp2d nshot=3 nrec=4 nt=101 c=1800 dt=0.002 x0=80 z0=35 sxmin=-30.4 szmin=7.6 gxmin=20.5 gzmin=-4.5 dsx=11.25 dsz=-2.75 dgx=-13.5 dgz=3.25
+suimp2d nshot=2 nrec=4 nt=73 x0=15 z0=30 sxmin=5 szmin=-10 gxmin=-20 gzmin=5 dsx=0 dsz=8 dgx=0 dgz=9
+suimp2d nshot=2 nrec=4 nt=73 x0=15 z0=30 sxmin=5 szmin=-10 gxmin=-20 gzmin=5 dsx=0 dsz=-8 dgx=0 dgz=-9
+suimp2d nshot=2 nrec=4 nt=73 x0=15 z0=30 sxmin=5 szmin=-10 gxmin=-20 gzmin=5 dsx=8 dsz=0 dgx=9 dgz=0
+suimp2d nshot=2 nrec=4 nt=73 x0=15 z0=30 sxmin=5 szmin=-10 gxmin=-20 gzmin=5 dsx=-8 dsz=0 dgx=-9 dgz=0
+suimp2d nshot=2 nrec=3 nt=64 x0=-100 z0=-50 sxmin=-1.5 szmin=2.5 gxmin=4.5 gzmin=-3.5 dsx=0 dsz=0 dgx=0 dgz=0
+suimp2d nt=31 dt=0.000001 c=1500 x0=1 z0=1
+suimp2d nt=127 dt=0.01 c=3000 x0=500 z0=600
+suimp2d nt=128 c=1500 x0=15 z0=10 nrec=3 dgx=7 | sushw key=cdp a=10 b=2
+suimp2d nt=97 nshot=2 nrec=3 x0=25 z0=40 | suchw key1=cdp key2=sx key3=gx a=0 b=1 c=1 d=2
+[stderr] suimp2d verbose=1 nshot=2 nrec=2 nt=53 c=2500 dt=0.003 x0=20 z0=30
+suimp2d nshot=0 nrec=3 nt=5
+suimp2d nshot=2 nrec=0 nt=8
+suimp2d nt=65536
+suimp2d nt=abc
+suimp2d nshot=999999999999999999999
+suimp2d nt=19 nt=43 x0=20 z0=20
+suimp2d nt=37 c=2000 dt=0.001 x0=25 z0=20 sxmin=1 szmin=2 gxmin=3 gzmin=4 dsx=5 dsz=6 dgx=7 dgz=8 nshot=2 nrec=2

@@ -350,7 +350,10 @@ fn dmooff(
     let nufft = npfa((nu as i32).wrapping_add(nupad)) as usize;
     let nw = nufft;
     let dw = (2.0 * PI / (nufft as f32 * du) as f64) as f32;
-    let mut pu = vec![Complex::default(); nufft]; // pu and pw alias in C.
+    // Negative sdmo can make nufft smaller than nu. Interpolation still
+    // writes and reads nu samples (C suocext.c:452,506), so reserve both.
+    // This minimal C allocation fix preserves the original NaN output.
+    let mut pu = vec![Complex::default(); max(nu, nufft)]; // pu and pw alias in C.
     let nk = nxfft / 2 + 1;
     let dk = (2.0 * PI / abs(nxfft as f32 * dx) as f64) as f32;
     let kmax = (PI / abs(dx) as f64) as f32;
@@ -376,7 +379,7 @@ fn dmooff(
             pu[iu].r = 0.0;
             pu[iu].i = 0.0;
         }
-        pfacc(1, &mut pu);
+        pfacc(1, &mut pu[..nufft]);
         let wmin = abs(0.5 * vrms[0] as f64 * k as f64) as f32;
         let wmax = abs(PI / du as f64) as f32;
         let iwmin = max(1, min(((nw - 1) / 2) as i32, nint((wmin / dw) as f64))) as usize;
@@ -418,7 +421,7 @@ fn dmooff(
             pu[iw] = czero;
             pu[iwn] = czero;
         }
-        pfacc(-1, &mut pu);
+        pfacc(-1, &mut pu[..nufft]);
         ints8c(
             du,
             fu,

@@ -1,0 +1,11 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/su/main/transforms/sust.c:273-274
+# reads h[8] past the len=8 allocation at :202: bins are [8,9], and
+# n=9, i=7 leaves k=8 after the single subtraction at :270-271.
+# Minimal fix: reject nonempty bin ranges outside [0,nfft] after checkpars.
+# With SU's exact build flags, orig matches vendor (10 runs each): rc=0,
+# stdout=1088 bytes, SHA256=b7d0186791e56a79f381218ed5e516809a68d64713370f288646b1b48fc97847.
+# Fixed: rc=1, empty stdout, clean range diagnostic [8,9] outside [0,8].
+# OxWave matches fixed exactly (rc/stdout/stderr); no port changes needed.
+# Evidence and minimal patch: diffcamp/ubx/sust/results/claim.json and fix.patch.
+sunull nt=8 ntr=2 | suaddnoise seed=139 | sust dt=0.015625 fmin=60 fmax=60

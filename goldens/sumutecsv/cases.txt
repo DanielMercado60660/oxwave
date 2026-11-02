@@ -29,3 +29,34 @@ suplane nt=30 ntr=1 | sumutecsv grid_xa=0 cdp=1 offs=0 tims=0
 # Mode 1 mute before the trace start also overwrites the tail of the header.
 suplane nt=31 ntr=2 | sushw key=shortpad a=123 | sumutecsv cdp=1 offs=0 tims=-0.04 mode=1 ntaper=3
 suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=-0.008 mode=1
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | sumutecsv cdp=1 offs=0 tims=0 mode=0 ntaper=0
+suspike nt=2 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.004 mode=1
+suspike nt=3 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.004 mode=0 ntaper=1
+suspike nt=4 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.008 mode=1 ntaper=1
+suspike nt=4097 ntr=2 | sushw key=offset a=20 b=60 | sumutecsv cdp=1 offs=0,100 tims=0.04,0.08 mode=0 ntaper=7
+suplane nt=101 ntr=7 | sushw key=cdp a=1 b=1 | sushw key=offset a=-100 b=50 | sumutecsv cdp=2,6 offs=-100,0,100 tims=0.04,0.08,0.12 tims=0.08,0.12,0.16 abs=0 extrapi=1 extrapt=1
+suplane nt=103 ntr=5 | sushw key=cdp a=1 b=2 | sushw key=offset a=25 b=25 | sumutecsv cdp=2,8 offs=0,100 tims=0.04,0.08 tims=0.08,0.12 extrapi=2 extrapt=2
+suplane nt=103 ntr=5 | sushw key=cdp a=1 b=2 | sushw key=offset a=125 b=25 | sumutecsv cdp=2,8 offs=0,100 tims=0.04,0.08 tims=0.08,0.12 extrapi=3 extrapt=3
+suplane nt=151 ntr=4 | sushw key=offset a=-20 b=10 | sumutecsv cdp=1 offs=0,100 tims=0.04,0.08 abs=1 mode=2 vel=1000 tzero=0.1 ntaper=4
+suplane nt=151 ntr=4 | sushw key=offset a=20 b=10 | sumutecsv cdp=1 offs=0,100 tims=0.04,0.08 abs=0 mode=3 vel=1000 tzero=0.1 ntaper=4
+suplane nt=251 ntr=2 | sushw key=delrt a=20 | sumutecsv cdp=1 offs=0 tims=150 mode=0 ntaper=3
+suplane nt=251 ntr=2 | sushw key=delrt a=20 | sumutecsv cdp=1 offs=0 tims=150 mode=1 ntaper=3
+suplane nt=101 ntr=3 | sushw key=trid,d1 a=30,0.01 | sumutecsv cdp=1 offs=0 tims=0.2 mode=0
+[stderr] suplane nt=101 ntr=3 | sushw key=offset a=20 b=10 | sumutecsv cdp=1 offs=0,100 tims=0.04,0.08 mode=0 ntaper=0 abs=1 extrapi=0 extrapc=0 extrapt=0 vel=330 tzero=0 offkey=offset check=0 print=1 verbose=1
+[stderr] printf 'C_SU_NDIMS,vary,,,,\nC_SU_NAMES\nC_SU_ID,cdp,offs,tims,offs,tims\nQ,1,0,0.04,100,0.08\nQ,5,0,0.08,100,0.12\n' > q.csv; suplane nt=101 ntr=5 | sushw key=cdp,offset a=1,50 b=1,0 | sumutecsv qin=q.csv mode=1 print=1
+[stderr] printf 'C_SU_SETID,K\nC_SU_FORMS\nC_SU_ID,%%g,%%g,%%g,%%g,%%g,%%g,%%g,%%g\nC_SU_NAMES\nC_SU_ID,grid_xa,grid_ya,grid_xb,grid_yb,grid_xc,grid_yc,grid_wb,grid_wc\nK,0,0,40,0,0,40,10,10\n' > grid.k; suplane nt=101 ntr=4 | sushw key=cdp a=1 b=1 | sumutecsv rfile=grid.k cdp=1,3,11,13 offs=0,100 tims=0.02,0.04 tims=0.03,0.05 tims=0.04,0.06 tims=0.05,0.07 check=1 extrapc=1
+suplane nt=127 ntr=6 | sushw key=cdp a=4 b=0 | sushw key=offset a=0 b=20 | sumutecsv cdp=2,6 offs=0,100 tims=0.04,0.08 tims=0.08,0.12
+suplane nt=127 ntr=5 | sushw key=cdp a=5 b=-1 | sumutecsv cdp=5,1,3 offs=0,100 tims=0.08,0.12 tims=0.02,0.04 tims=0.04,0.08
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.04 mode=-1
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.04 extrapi=-1
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.04 extrapc=4
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0 tims=0.04 vel=0
+suplane nt=31 ntr=1 | sumutecsv cdp=1 offs=0,100 tims=0.04
+suplane nt=31 ntr=1 | sushw key=dt a=0 | sumutecsv cdp=1 offs=0 tims=0.04
+suplane nt=31 ntr=1 | sushw key=trid a=130 | sushw key=d1 a=0 | sumutecsv cdp=1 offs=0 tims=1
+[stderr] printf 'C_SU_NAMES\nC_SU_ID,cdp,tims,tims\nC_SU_NDIMS,offs,0,100\nQ,5,0.08,0.12\nQ,1,0.04,0.08\n' > q.csv; suplane nt=101 ntr=5 | sushw key=cdp,offset a=1,50 b=1,0 | sumutecsv qin=q.csv print=1 extrapt=1
+suplane nt=101 ntr=3 | sushw key=trid,d1 a=130,0.01 | sumutecsv cdp=1 offs=0 tims=0.2 mode=0
+suplane nt=101 ntr=4 | sushw key=delrt a=10 | sushw key=cdp a=1 b=1 | sumutecsv cdp=1,4 offs=0,100 tims=0.04,0.08 tims=0.1,0.14 offkey=cdp ntaper=5
+suplane nt=501 ntr=2 | sushw key=offset a=15 | sumutecsv cdp=1 offs=0 tims=0.183 mode=3 vel=1579.7 tzero=0.234 ntaper=5

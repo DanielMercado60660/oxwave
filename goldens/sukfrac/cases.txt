@@ -11,3 +11,30 @@ suplane nt=7 ntr=1 | sukfrac d1=-1 d2=1 power=0.5
 [stderr] sukfrac
 [stderr] suplane nt=8 ntr=2 | sukfrac d1=1 d2=1 power=1e999
 [stderr] sunull nt=65534 ntr=1 | sukfrac d1=1 d2=1
+
+# diff-2026-11 (round 1)
+[stderr] suspike nt=2 ntr=1 | sukfrac d1=1 d2=1 verbose=1
+suspike nt=3 ntr=2 | sukfrac d1=0.25 d2=2 power=1
+suspike nt=4 ntr=3 | sukfrac d1=2 d2=0.5 power=-1 sign=-1
+suspike nt=13 ntr=7 | sukfrac power=0 phasefac=0.25 sign=-1
+suspike nt=101 ntr=11 | sukfrac d1=0.7 d2=1.3 power=0.75 angle=37 phasefac=-0.2
+suspike nt=4097 ntr=2 | sukfrac d1=1 d2=2 power=0.5
+sunull nt=17 ntr=5 | sukfrac d1=1 d2=1 power=2 angle=180
+suplane nt=47 ntr=13 | sushw key=trid,d1,d2 a=130,0.125,4 | sukfrac power=1.25 sign=-1 angle=-90 verbose=0
+suplane nt=29 ntr=8 | sukfrac d1=0.3 d2=5 power=-0.25 phasefac=0.75
+suplane nt=5 ntr=1 | sukfrac d1=1 d2=1 power=1 angle=0
+suplane nt=127 ntr=17 | sukfrac d1=2 d2=3 power=2 angle=45
+[stderr] sunull nt=4 ntr=2 | sukfrac verbose=0 power=0 sign=1 phasefac=0
+[stderr] suspike nt=31 ntr=4 | sushw key=trid,d1,d2 a=130,2,3 | sukfrac verbose=1
+[stderr] sunull nt=32 ntr=2 | sukfrac d1=1 d2=1 sign=1e999
+[stderr] suplane nt=16 ntr=2 | sukfrac d1=1 d2=1 angle=1e999
+suspike nt=257 ntr=23 | sukfrac d1=0.003 d2=17 power=3.5 angle=33 sign=-1 phasefac=0.37
+suspike nt=257 ntr=31 | sukfrac d1=13 d2=0.07 power=-1.5 angle=70 phasefac=-0.4
+suspike nt=8 ntr=101 | sukfrac d1=0.25 d2=0.75 power=2.5 sign=0.3
+suspike nt=2 ntr=13 | sukfrac d1=1 d2=1 power=0.5 angle=90
+suspike nt=1 ntr=7 | sukfrac d1=1 d2=1 power=1 angle=45
+suplane nt=211 ntr=19 | sukfrac d1=0.0001 d2=1000 power=3 phasefac=0.125
+suplane nt=257 ntr=29 | sukfrac d1=7 d2=0.002 power=1.75 angle=123.45
+suspike nt=23 ntr=9 | sukfrac d1=1 d2=1 power=-2 angle=0
+suspike nt=43 ntr=13 | sukfrac d1=1 d2=1 power=0 phasefac=-1.5
+suspike nt=63 ntr=16 | sukfrac d1=1 d2=1 power=1 sign=-2 angle=360

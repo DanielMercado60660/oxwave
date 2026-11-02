@@ -18,3 +18,28 @@ cpftrend ix=1 iy=2 min_x=-1 max_x=1 min_y=0 max_y=1 logx=1
 cpftrend ix=1 iy=2 min_x=0 max_x=1 min_y=-1 max_y=1 logy=1
 [stderr] printf '2 2\n2 3\n' | cpftrend ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=7 verbose=1
 printf '%s\n' '-4 -3' '-3 -2' '-2 -1' '-1 0' '0 1' | cpftrend ix=1 iy=2 min_x=-5 max_x=1 min_y=-5 max_y=2 nx=7 ny=9
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=1 | sushw key=sx,gx a=20,30 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suspike ntr=4 nt=2 | sushw key=sx,gx a=20,20 b=0,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suspike ntr=8 nt=3 | sushw key=sx,gx a=10,10 b=10,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suplane ntr=7 nt=4 | sushw key=sx,gx a=20,10 b=0,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=5 ny=10
+suplane ntr=11 nt=7 | sushw key=sx,gx a=10,15 b=5,7 | sugethw key=sx,gx output=geom | cpftrend ix=2 iy=1 min_x=0 max_x=100 min_y=0 max_y=100 nx=7 ny=11
+sunull ntr=10 nt=4097 | sushw key=sx,gx a=20,20 b=0,5 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=20
+suspike ntr=8 nt=5 | sushw key=sx,gx,offset a=20,10,1 b=0,10,1 | sugethw key=sx,gx,offset output=geom | cpftrend ix=1 iy=2 ir=3 rmin=4 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suspike ntr=8 nt=5 | sushw key=sx,gx,offset a=20,10,1 b=0,10,1 | sugethw key=sx,gx,offset output=geom | cpftrend ix=1 iy=2 ir=3 rmax=5 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suspike ntr=8 nt=5 | sushw key=sx,gx,offset a=20,10,1 b=0,10,1 | sugethw key=sx,gx,offset output=geom | cpftrend ix=1 iy=2 ir=3 rmax=5 rmin=3 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+suplane ntr=8 nt=9 | sushw key=sx,gx a=2,3 b=2,3 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=1 max_x=100 min_y=1 max_y=100 nx=5 ny=8 logx=1 logy=1
+suplane ntr=8 nt=9 | sushw key=sx,gx a=2,3 b=2,3 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=1 max_x=100 min_y=0 max_y=30 nx=7 ny=8 logx=1
+suplane ntr=8 nt=9 | sushw key=sx,gx a=2,3 b=2,3 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=20 min_y=1 max_y=100 nx=7 ny=8 logy=1
+[stderr] suspike ntr=6 nt=3 | sushw key=sx,gx a=20,20 b=0,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10 verbose=1
+sunull ntr=6 nt=1 | sushw key=sx,gx a=-30,-25 b=10,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=-50 max_x=50 min_y=-50 max_y=50 nx=10 ny=10
+suspike ntr=7 nt=1 | sushw key=sx,gx a=0,0 b=10,10 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=60 min_y=0 max_y=60 nx=6 ny=6
+sunull ntr=3 nt=2 | sushw key=sx,gx a=20,30 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=100 ny=100 logx=0 logy=0
+suspike ntr=5 nt=2 | sushw key=sx,gx a=20,30 | sugethw key=sx,gx output=geom | cpftrend ix=1 iy=2 ir=0 min_x=0 max_x=100 min_y=0 max_y=100 nx=5 ny=5
+sunull ntr=5 nt=2 | sushw key=sx,gx,offset a=20,30,1 | sugethw key=sx,gx,offset output=geom | cpftrend ix=1 iy=2 ir=3 rmin=0 min_x=0 max_x=100 min_y=0 max_y=100 nx=5 ny=5
+sunull ntr=1 nt=1 | sugethw key=tracl,tracr output=geom | cpftrend iy=2
+sunull ntr=1 nt=1 | sugethw key=tracl,tracr output=geom | cpftrend ix=1 iy=2 ir=3
+sunull ntr=1 nt=1 | sugethw key=tracl,tracr output=geom | cpftrend ix=1 iy=2 min_x=-1 max_x=1 min_y=0 max_y=1 logx=1
+sunull ntr=1 nt=1 | sugethw key=tracl,tracr output=geom | cpftrend ix=1 iy=2 min_x=0 max_x=1 min_y=-1 max_y=1 logy=1
+sunull ntr=2 nt=1 | sugethw key=tracl output=geom | awk 'NR==1 {print "20 30"} NR==2 {printf "40%c 90\n", 0}' | cpftrend ix=1 iy=2 min_x=0 max_x=100 min_y=0 max_y=100 nx=10 ny=10
+sunull ntr=2 nt=1 | sugethw key=tracl output=geom | awk '{print "1.0000000596046447753906250001 2"}' | cpftrend ix=1 iy=2 min_x=0 max_x=2.000000238418579 min_y=0 max_y=4 nx=2 ny=4

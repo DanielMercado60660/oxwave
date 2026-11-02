@@ -17,3 +17,31 @@
 [exact] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6f",1,-2,3.5,0,9,4))' | ftnunstrip n1=3 outpar=count; cat count
 [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=5f",1,-2,3.5,0,9))' | ftnunstrip n1=3 outpar=count
 [exact] printf '\001\002\003' | ftnunstrip n1=1 outpar=count; cat count
+
+# diff-2026-11 (round 1)
+[exact] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | ftnunstrip outpar=count; cat count
+[exact] suspike nt=2 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=count; cat count
+[exact] suspike nt=3 ntr=2 | sushw key=tracl a=42 b=3 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=count; cat count
+[exact] sunull nt=4 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=4 outpar=count; cat count
+[exact] suplane nt=11 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=11 outpar=count; cat count
+[exact] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=4097 outpar=count; cat count
+[exact] suspike nt=7 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=7 n1=3 outpar=count; cat count
+[exact] [stderr] suspike nt=4 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=/dev/stderr verbose=1
+[stderr] suplane nt=7 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=count
+[exact] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=0 outpar=count; cat count
+[exact] [stderr] suspike nt=4 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=4 outpar=count verbose=1; cat count
+[exact] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | head -c 7 | ftnunstrip n1=1 outpar=count; cat count
+[stderr] suspike nt=4 ntr=1 | sustrip outpar=/dev/null | head -c 14 | ftnunstrip n1=2 outpar=count
+
+# diff-2026-11 (round 2)
+[exact] sunull nt=1 ntr=3 | sustrip outpar=/dev/null | ftnunstrip outpar=records; cat records
+[exact] suspike nt=2 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=1 outpar=records; cat records
+[exact] suplane nt=3 ntr=2 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=records; cat records
+[exact] suspike nt=4 ntr=3 | sustrip outpar=/dev/null | ftnunstrip n1=6 outpar=records; cat records
+[exact] suplane nt=13 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=13 outpar=records; cat records
+[exact] sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=4097 outpar=records; cat records
+[exact] [stderr] suspike nt=3 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=3 outpar=records verbose=1; cat records
+[stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=/dev/null
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] sunull nt=3 ntr=2 | sustrip outpar=/dev/null | ftnunstrip n1=2 outpar=/dev/stdout

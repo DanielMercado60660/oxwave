@@ -64,3 +64,56 @@
 [stderr] triray xs=0 zs=0 prim=1
 [stderr] triray xs=0 zs=0 krecord=1 prim=1
 [exact] triray xs=0 zs=0 nangle=0
+
+# diff-2026-11 (round 1)
+# Triangulated model input has no SEG-Y trace headers or ntr. nt samples wavefront coordinates.
+# Explicit defaults and exact diagnostic text.
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray xs=0.5 zs=0 nangle=101 fangle=-45 langle=45 nxz=101 nt=101 krecord=2147483647 prim=2147483647 ffreq=-1 outparfile=parameters
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray xs=0.5 zs=0 nangle=1 fangle=90 langle=90 infofile=i verbose=1 > /dev/null && cat i
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.23 zs=0.1 nangle=13 fangle=-179 langle=179 infofile=i > /dev/null && cat i
+# Wavefront boundaries, odd/prime counts, and long arrays; stderr verifies the time increment.
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=1 wavefile=w > /dev/null && cat w
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=2 wavefile=w > /dev/null && cat w
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=3 wavefile=w > /dev/null && cat w
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=4 wavefile=w > /dev/null && cat w
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=17 wavefile=w > /dev/null && cat w
+[f32] [stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.4 zs=0.1 nangle=3 fangle=-40 langle=40 nt=4097 wavefile=w > /dev/null && cat w
+# Ray coordinate boundaries and long paths.
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.37 zs=0.2 nangle=3 fangle=-60 langle=60 nxz=2 rayfile=r > /dev/null && cat r
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.37 zs=0.2 nangle=3 fangle=-60 langle=60 nxz=3 rayfile=r > /dev/null && cat r
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.37 zs=0.2 nangle=3 fangle=-60 langle=60 nxz=4 rayfile=r > /dev/null && cat r
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 sfill=0.2,0.2,0,0,1,-0.7,2 qfill=0.2,0.2,37 densfill=0.2,0.2,2.5 | triray xs=0.37 zs=0.2 nangle=3 fangle=-60 langle=60 nxz=4097 rayfile=r > /dev/null && cat r
+# Velocity/density discontinuities: critical transmission, taper and reflection phase.
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.6 zs=0.1 nangle=19 fangle=-89 langle=89 infofile=i > /dev/null && cat i
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.2 zs=0.49 nangle=9 fangle=17 langle=19 infofile=i > /dev/null && cat i
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.5 zs=0.49 nangle=5 fangle=84 langle=89 infofile=i > /dev/null && cat i
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.2 zs=0.1 nangle=9 fangle=-80 langle=80 refseq=1,1,-1 infofile=i > /dev/null && cat i
+# Direct and reflected selection, including counts and all coordinate output modes.
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.4 zs=0.1 nangle=7 fangle=-20 langle=20 refseq=1,-1 krecord=1 prim=0 nxz=17 rayfile=r ffreq=25 fresnelfile=f nt=19 wavefile=w > /dev/null && cat r f w
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.4 zs=0.1 nangle=7 fangle=-20 langle=20 refseq=1,-1 krecord=1 prim=0 rayfile=r outparfile=counts infofile=i > /dev/null && cat i counts
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.4 zs=0.1 nangle=5 fangle=-20 langle=20 refseq=1,1,-1 krecord=10 prim=1 nxz=19 rayfile=r ffreq=12 fresnelfile=f > /dev/null && cat r f
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.4 zs=0.1 nangle=5 fangle=-20 langle=20 refseq=1,1,-1 krecord=10 prim=1 rayfile=r outparfile=counts infofile=i > /dev/null && cat i counts
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.4 zs=0.1 nangle=3 refseq=1,0,-1 krecord=-7 rayfile=r ffreq=12 outparfile=counts > /dev/null && cat r fresnelfile.bin counts
+# Curved interfaces and nonconstant sloth in both regions.
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,0.5,1 zedge=0.6,0.3,0.6 sedge=1,1,1 kedge=10,20,1 maxangle=8 sfill=0.2,0.1,0,0,1,0.3,0.7 sfill=0.2,0.9,0,0,0.2,0.4,-0.1 densfill=0.2,0.1,2 densfill=0.2,0.9,3 | triray xs=0.4 zs=0.1 nangle=17 fangle=-78 langle=78 refseq=1,1,-1 nxz=29 rayfile=r nt=31 wavefile=w > /dev/null && cat r w
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,0.5,1 zedge=0.6,0.3,0.6 sedge=1,1,1 kedge=10,20,1 maxangle=8 sfill=0.2,0.1,0,0,1,0.3,0.7 sfill=0.2,0.9,0,0,0.2,0.4,-0.1 densfill=0.2,0.1,2 densfill=0.2,0.9,3 | triray xs=0.51 zs=0.6 nangle=19 fangle=60 langle=120 infofile=i > /dev/null && cat i
+[f32] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,0.5,1 zedge=0.6,0.3,0.6 sedge=1,1,1 kedge=10,20,1 maxangle=8 sfill=0.2,0.1,0,0,1,0.3,0.7 sfill=0.2,0.9,0,0,0.2,0.4,-0.1 densfill=0.2,0.1,2 densfill=0.2,0.9,3 | triray xs=0.6 zs=0.1 nangle=19 fangle=-89 langle=89 nxz=31 rayfile=r ffreq=12 fresnelfile=f > /dev/null && cat r f
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,0.5,1 zedge=0.6,0.3,0.6 sedge=1,1,1 kedge=10,20,1 maxangle=8 sfill=0.2,0.1,0,0,1,0.3,0.7 sfill=0.2,0.9,0,0,0.2,0.4,-0.1 densfill=0.2,0.1,2 densfill=0.2,0.9,3 | triray xs=0.4 zs=0.1 nangle=3 fangle=30 langle=-30 refseq=1,1,-1 rayfile=r ffreq=20 nxz=11 infofile=i outparfile=counts > /dev/null && cat i counts
+# Alternate SU generator and adaptive triangulation, with initialized density and Q.
+[f32] makevel nx=7 nz=5 dx=0.2 dz=0.25 v000=1 dvdx=0.1 dvdz=0.3 | uni2tri n1=5 n2=7 d1=0.25 d2=0.2 method=3 tol=1 errmax=0.01 verbose=0 | triray nangle=7 fangle=-85 langle=85
+[f32] [stderr] makevel nx=7 nz=5 dx=0.2 dz=0.25 v000=1 dvdx=0.1 dvdz=0.3 | uni2tri n1=5 n2=7 d1=0.25 d2=0.2 method=3 tol=1 errmax=0.01 verbose=0 | triray nangle=3 wavefile=w nt=17 rayfile=r nxz=31 ffreq=20 fresnelfile=f > /dev/null && cat r w f
+[exact] makevel nx=7 nz=5 dx=0.2 dz=0.25 v000=1 dvdx=0.1 dvdz=0.3 | uni2tri n1=5 n2=7 d1=0.25 d2=0.2 method=3 tol=1 errmax=0.01 verbose=0 | triray nangle=7 fangle=-170 langle=170 infofile=i > /dev/null && cat i
+[f32] makevel nx=3 nz=3 v000=1 | uni2tri n1=3 n2=3 method=3 verbose=0 | triray nangle=1 fangle=180 langle=180 nt=4 wavefile=w > /dev/null && cat w
+# Nonzero and negative coordinate origins, and boundary sources.
+[exact] trimodel xmin=-3 xmax=2 zmin=4 zmax=6 xedge=-3,2 xedge=2,-3 zedge=4,4 zedge=6,6 sedge=1,1 sedge=1,1 | triray nangle=5 infofile=i > /dev/null && cat i
+[f32] trimodel xmin=-3 xmax=2 zmin=4 zmax=6 xedge=-3,2 xedge=2,-3 zedge=4,4 zedge=6,6 sedge=1,1 sedge=1,1 | triray xs=-3 zs=6 nangle=7 fangle=-180 langle=180 rayfile=r nxz=17 nt=23 wavefile=w > /dev/null && cat r w
+[exact] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 xedge=0,1 zedge=0.5,0.5 sedge=1,1 kedge=10,20,1 sfill=0.2,0.2,0,0,1,0,0 sfill=0.2,0.8,0,0,0.1,0,0 densfill=0.2,0.2,2 densfill=0.2,0.8,3 qfill=0.2,0.2,50 qfill=0.2,0.8,90 | triray xs=0.5 zs=0.5 nangle=3 fangle=-180 langle=180 infofile=i > /dev/null && cat i
+# Empty/invalid values and required parameter dependencies.
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 prim=0 refseq=1,-1
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 krecord=1 prim=0
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 nt=2147483648
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 rayfile=
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 wavefile=
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 infofile=
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 ffreq=1 fresnelfile=
+[stderr] trimodel xedge=0,1 xedge=1,0 zedge=0,0 zedge=1,1 sedge=1,1 sedge=1,1 | triray nangle=1 outparfile=

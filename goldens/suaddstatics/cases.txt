@@ -49,3 +49,48 @@ sunull nt=1 ntr=1 | sushw key=cdp,sx,gx,dt a=-7,300,-400,4000 > input.su; suadds
 [stderr] suspike nt=5 ntr=5 | sushw key=cdp,sx,gx,dt a=1,10,20,2500 b=0,0,1,0 > input.su; suaddstatics sources=3 receivers=2 cmps=1 maxfold=5 datafile=input.su shift=19.75 seed=42 verbose=-1
 # Observe every draw across many generator-state wraps with fractional header dt.
 [exact] suspike nt=11 ntr=257 | sushw key=cdp,sx,gx,dt,tstat a=1,-300,500,3333,-99 b=0,1,1,0,0 > input.su; suaddstatics sources=257 receivers=257 cmps=1 maxfold=257 datafile=input.su shift=32768.25 seed=123456789 verbose=0
+# diff-2026-11 (round 1)
+# Explicit spikes keep the tiny generators in bounds; zero shift permits the default seed.
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp,sx,gx,tstat a=-1,-2,3,111 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0
+[exact] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=cdp,sx,gx,dt a=7,0,0,125 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=0.499 seed=0 dt=0.125 verbose=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=cdp,sx,gx,dt a=-3,-10,-20,65535 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=15.375 seed=19 verbose=2
+# Descending and revisited CDPs are successive gathers, without sorting or merging.
+[exact] suspike nt=4 ntr=4 nspk=1 ix1=4 it1=4 | sushw key=cdp,sx,gx a=-1,100,200 b=-1,-10,-20 > input.su; suaddstatics sources=4 receivers=4 cmps=4 maxfold=1 datafile=input.su shift=100.125 seed=167
+[stderr] suspike nt=13 ntr=4 nspk=1 ix1=1 it1=7 | sushw key=cdp,sx,gx a=1,10,20 b=1,1,1 c=0,0,0 j=2,2,2 > input.su; suaddstatics sources=2 receivers=2 cmps=4 maxfold=1 datafile=input.su shift=-33.25 seed=177 verbose=1
+[exact] suspike nt=17 ntr=6 nspk=1 ix1=3 it1=17 | sushw key=cdp,sx,gx a=-3,10,20 b=0,10,20 c=1,0,0 j=2,3,2 > input.su; suaddstatics sources=3 receivers=2 cmps=3 maxfold=2 datafile=input.su shift=12.875 seed=157 dt=0.3333333
+# Long traces, including the largest legal SU trace, preserve every sample.
+[exact] suplane nt=4097 ntr=3 npl=1 dip1=0 ct1=4096 cx1=2 len1=3 | sushw key=cdp,sx,gx a=9,10,20 b=0,1,1 > input.su; suaddstatics sources=3 receivers=3 cmps=1 maxfold=3 datafile=input.su shift=80.25 seed=147
+[exact] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 | sushw key=cdp,sx,gx a=123,-99,100 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=-7.75 seed=731 dt=-1.25
+# Independent source and receiver dictionaries even when their coordinates coincide.
+[exact] suspike nt=19 ntr=13 nspk=1 ix1=7 it1=10 | suaddnoise seed=2718 sn=2 | sushw key=cdp,sx,gx a=1,0,0 b=0,10,10 c=0,0,0 j=13,2,2 > input.su; suaddstatics sources=2 receivers=2 cmps=1 maxfold=13 datafile=input.su shift=18.125 seed=169
+[exact] sunull nt=2 ntr=1 | sushw key=cdp,sx,gx a=-2147483648,-2147483648,2147483520 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=input.su shift=27.125 seed=179
+# Only the first trace's dt determines statics; scaling and Y coordinates are ignored.
+[exact] suspike nt=23 ntr=4 nspk=1 ix1=2 it1=11 | sushw key=cdp,sx,gx,dt a=8,10,20,1000 b=0,0,0,3000 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=4 datafile=input.su shift=11.875 seed=64 dt=0
+[exact] suspike nt=11 ntr=5 nspk=1 ix1=3 it1=6 | sushw key=cdp,sx,gx,sy,gy,scalco,tstat,sstat,gstat a=8,10,10,0,0,-100,-99,12,-13 b=0,0,0,100,-200,25,1,1,-1 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=5 datafile=input.su shift=49.5 seed=14
+[exact] sunull nt=29 ntr=4 | sushw key=cdp a=1 b=1 | suchw key1=sx key2=tracl a=100 b=-17 | suchw key1=gx key2=sx a=5 b=1 > input.su; suaddstatics sources=4 receivers=4 cmps=4 maxfold=1 datafile=input.su shift=0.75 seed=53
+# Exhaustion at the first trace of a new gather saves no header or samples for it.
+[stderr] suspike nt=5 ntr=4 nspk=1 ix1=1 it1=3 | sushw key=cdp,sx,gx a=1,10,20 b=0,0,0 c=1,1,0 j=2,2,1 > input.su; suaddstatics sources=1 receivers=1 cmps=2 maxfold=2 datafile=input.su shift=22.5 seed=42 verbose=1
+[stderr] suspike nt=5 ntr=4 nspk=1 ix1=2 it1=4 | sushw key=cdp,sx,gx a=1,10,20 b=0,0,0 c=1,0,1 j=2,1,2 > input.su; suaddstatics sources=1 receivers=1 cmps=2 maxfold=2 datafile=input.su shift=22.5 seed=42 verbose=-2
+# A fourth waveform generator exercises real nonzero samples and natural geometry headers.
+[exact] susynlv nt=127 nxm=3 nxo=2 fxo=0.05 dxo=0.05 dt=0.004 ft=1.8 | sushw key=cdp a=1 b=0 c=1 j=2 > input.su; suaddstatics sources=6 receivers=6 cmps=3 maxfold=2 datafile=input.su shift=5.125 seed=362436
+# Explicit defaults and last-occurrence parameter semantics.
+[stderr] suplane nt=31 ntr=4 npl=1 dip1=0 ct1=16 cx1=2 len1=3 | sushw key=cdp a=1 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=4 datafile=input.su shift=3.25 seed=1 dt=4 verbose=1
+[stderr] sunull nt=4 ntr=2 | sushw key=cdp,sx,gx a=1,10,20 > input.su; suaddstatics sources=9 sources=1 receivers=9 receivers=1 cmps=9 cmps=1 maxfold=9 maxfold=2 datafile=missing datafile=input.su shift=999 shift=7.25 seed=9 seed=1 dt=999 dt=4 verbose=0 verbose=1
+# Invalid or missing required values retain the C diagnostic and evaluation order.
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift= seed=1
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers= cmps=1 maxfold=1 datafile=missing shift=0 seed=1
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps= maxfold=1 datafile=missing shift=0 seed=1
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold= datafile=missing shift=0 seed=1
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=. shift=0 seed=1
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift=0 seed=2147483648
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift=0 seed=1 dt=1e-310
+[stderr] sunull nt=2 ntr=1 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=1 datafile=missing shift=0 seed=1 verbose=2147483648
+# CDP zero is safe after a nonzero first gather; the initial-zero C defect is pending UB.
+[exact] suspike nt=7 ntr=3 nspk=1 ix1=2 it1=7 | sushw key=cdp,sx,gx a=1,10,20 b=-1,1,-1 > input.su; suaddstatics sources=3 receivers=3 cmps=3 maxfold=1 datafile=input.su shift=4.5 seed=123
+# Thousands of traces exercise repeated dictionary searches and a large fold.
+[exact] suspike nt=2 ntr=4097 nspk=2 ix1=1 it1=1 ix2=4097 it2=2 | sushw key=cdp,sx,gx a=1,-100,200 b=0,1,-1 c=0,0,0 j=4097,131,127 > input.su; suaddstatics sources=131 receivers=127 cmps=1 maxfold=4097 datafile=input.su shift=30000.25 seed=1234567 dt=3.333
+# Seekable /dev/stdin can rewind successfully, unlike the pending pipe case.
+[stderr] suspike nt=3 ntr=3 nspk=1 ix1=2 it1=3 | sushw key=cdp,sx,gx a=1,10,20 > input.su; suaddstatics sources=1 receivers=1 cmps=1 maxfold=3 datafile=/dev/stdin shift=4 seed=7 verbose=1 < input.su
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | sushw key=cdp,sx,gx a=1,10,20 | suaddstatics sources=1 receivers=1 cmps=1 maxfold=3 datafile=/dev/stdin shift=4 seed=7 verbose=1

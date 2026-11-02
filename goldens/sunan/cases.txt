@@ -10,3 +10,16 @@ suplane nt=7 ntr=1 | sunan interp=1 value=9 verbose=0
 [stderr] suplane nt=3 ntr=1 | sunan unexpected=1 verbose=1
 # Inject positive infinity, negative infinity and NaN with finite neighbors.
 [stderr] sunull nt=5 ntr=1 | python3 -c 'import sys,struct; b=bytearray(sys.stdin.buffer.read()); b[240:260]=struct.pack(">5f",1,float("inf"),2,float("nan"),float("-inf")); sys.stdout.buffer.write(b)' | sunan interp=1 value=7 verbose=1
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | suai2r | sunan verbose=0 value=-2 interp=0
+[stderr] sunull nt=2 ntr=2 | suai2r | sunan verbose=1 value=4 interp=0
+sunull nt=3 ntr=1 | suai2r | sunan verbose=0 value=1.25
+sunull nt=4 ntr=1 | suai2r | sunan verbose=0 interp=0 value=-9
+suspike nt=17 ntr=3 | sushw key=tracl a=30 b=7 | sunan verbose=0 interp=1 value=3
+suplane nt=4097 ntr=1 | sunan verbose=0 interp=0 value=0
+[stderr] sunull nt=7 ntr=2 | python3 -c 'import sys,struct; b=bytearray(sys.stdin.buffer.read()); b[240:268]=struct.pack(">7f",float("inf"),1,float("nan"),3,4,5,float("-inf")); sys.stdout.buffer.write(b)' | sunan verbose=1 interp=1 value=-4.5
+sunull nt=11 ntr=1 | python3 -c 'import sys,struct; b=bytearray(sys.stdin.buffer.read()); b[240:284]=struct.pack(">11f",1,2,float("nan"),float("inf"),5,6,7,8,9,10,11); sys.stdout.buffer.write(b)' | sunan verbose=0 interp=0 value=2.75
+[stderr] suspike nt=13 ntr=1 | sunan verbose=2 interp=-2 value=-1
+[stderr] suplane nt=3 ntr=1 | sunan verbose=999999999999999999999
+[stderr] sunull nt=4 ntr=1 | sunan interp=999999999999999999999

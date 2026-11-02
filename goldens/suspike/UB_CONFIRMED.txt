@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/suspike.c:86: nt=-1 makes nt*FSIZE a huge size_t passed to memset beyond tr.data; CHECK_NT only enforces an upper limit. A minimal nt<0 guard inside the trace loop changes SIGTRAP (rc=-5), no output/stderr, to rc=1, no stdout, stderr "\nsuspike: nt=-1 must be nonnegative\n". OxWave already matches fixed C exactly.
+suspike nt=-1 ntr=1

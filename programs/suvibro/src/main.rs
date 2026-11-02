@@ -97,11 +97,14 @@ fn main() {
     let mut freq = Vec::new(); let mut time = Vec::new();
     if sweep == 2 {
         let mut ntseg = countparval("tseg"); if ntseg == 0 { ntseg = 2; }
-        let mut tseg = vec![0.0f32; ntseg as usize];
+        // Empty numeric arrays count as one value but the fallback writes two.
+        // Reserve both slots while preserving the segment count: ntseg == 1
+        // generates no segments, just as C does after fixing its allocations.
+        let mut tseg = vec![0.0f32; ntseg.max(2) as usize];
         if getparfloat("tseg", &mut tseg) == 0 { tseg[0] = 0.0; tseg[1] = tv; }
         let mut nfseg = countparval("fseg"); if nfseg == 0 { nfseg = 2; }
         if nfseg != ntseg { err!("number of tseg and fseg must be equal"); }
-        freq = vec![0.0f32; nfseg as usize];
+        freq = vec![0.0f32; nfseg.max(2) as usize];
         if getparfloat("fseg", &mut freq) == 0 { freq[0] = f1; freq[1] = f2; }
         if ntseg > 2 { for i in 1..ntseg as usize { if tseg[i] <= tseg[i-1] { err!("tseg must increase monotonically"); } } }
         let isegm = ntseg as usize - 1; tv = tseg[isegm];

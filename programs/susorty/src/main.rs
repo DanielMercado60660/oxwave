@@ -85,6 +85,7 @@ fn main() {
     let mut nt = 100;
     getparint("nt", &mut nt);
     CHECK_NT("nt", nt);
+    if nt < 0 { err!("nt must be nonnegative"); }
     tr.ns = nt as u16;
     let mut nshot = 10;
     getparint("nshot", &mut nshot);

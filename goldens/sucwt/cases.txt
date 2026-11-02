@@ -68,3 +68,51 @@ sunull nt=31 ntr=2 | suaddnoise seed=349 | sushw key=cdpt,d2,f2 a=42,0.5,-7 | su
 [stderr] suspike nt=9 ntr=1 | sucwt holder=1 divisor=-2 first=-1 last=0 expinc=0.25
 # Zero xmax with a nonzero coordinate span, including a one-sample filter.
 suspike nt=15 ntr=1 | sucwt xmin=-4 xcenter=0 xmax=0 first=-0.5 last=0.5 expinc=0.25
+
+# diff-2026-11 (round 1)
+# Actual nonzero impulses, with default and explicit effective-default parameters.
+suspike nt=37 ntr=1 nspk=1 ix1=1 it1=19 | sucwt
+suspike nt=37 ntr=1 nspk=1 ix1=1 it1=19 | sucwt base=10 first=-1 expinc=0.01 last=1.5 wtype=0 nwavelet=1024 xmin=0 xcenter=0 xmax=20 sigma=1 holder=0 divisor=1 verbose=0
+# nt=1..4 with short filters: all indices stay within the C allocations.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sucwt base=2 first=0 last=0 expinc=1 nwavelet=17 xmin=0 xcenter=0.5 xmax=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sucwt base=2 first=0 last=1 expinc=1 nwavelet=17 xmin=0 xcenter=0.5 xmax=1 sigma=0.5
+suspike nt=3 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=3 | sucwt base=2 first=0 last=1 expinc=0.5 nwavelet=17 xmin=0 xcenter=1 xmax=2
+suspike nt=4 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=4 | sucwt base=2 first=0 last=1 expinc=0.5 nwavelet=19 xmin=0 xcenter=1 xmax=2 sigma=-0.8
+# Multiple generators, prime and odd trace lengths, and long traces with edge impulses.
+suplane nt=17 ntr=3 npl=1 ct1=9 cx1=2 len1=3 dip1=0 | sucwt base=2 first=0 last=2 expinc=0.25 nwavelet=127 xmin=-4 xcenter=4 xmax=4 sigma=0.7
+sunull nt=257 ntr=2 | suaddnoise seed=202611 | sucwt base=2 first=0 last=2 expinc=0.125 nwavelet=255 xmin=-4 xcenter=4 xmax=4 sigma=0.8
+suspike nt=4097 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=4097 | sucwt base=2 first=0 last=2 expinc=0.25 nwavelet=255 xmin=-4 xcenter=4 xmax=4
+# Dense scales exercise real Holder fits, including fractional regression intervals.
+sunull nt=4097 ntr=1 | suaddnoise seed=2761 | sucwt base=2 first=0 last=2 expinc=0.02 nwavelet=255 xmin=-8 xcenter=8 xmax=8 sigma=0.8 holder=1 divisor=1
+sunull nt=131 ntr=2 | suaddnoise seed=2761 | sucwt base=2 first=0 last=2 expinc=0.02 nwavelet=255 xmin=-8 xcenter=8 xmax=8 sigma=0.8 holder=1 divisor=1.5
+sunull nt=131 ntr=2 | suaddnoise seed=2761 | sucwt base=2 first=0 last=2 expinc=0.02 nwavelet=255 xmin=-8 xcenter=8 xmax=8 sigma=0.8 holder=1 divisor=4
+# A base below one works with a negative exponent increment.
+sunull nt=97 ntr=1 | suaddnoise seed=404 | sucwt base=0.5 first=0 last=-2 expinc=-0.25 nwavelet=127 xmin=0 xcenter=4 xmax=8 sigma=1.2
+# Both modes preserve timing/spatial headers; amplitude replaces cdpt, Holder preserves it.
+sunull nt=67 ntr=3 | suaddnoise seed=279 | sushw key=dt,delrt,d1,f1,d2,f2,cdpt,offset a=0,-37,0.25,-1,0.5,-7,42,-100 b=0,1,0,0,0.25,1,1,50 | suchw key1=cdp key2=tracl a=100 b=3 | sucwt base=2 first=0 last=1 expinc=0.125 nwavelet=127 xmin=0 xcenter=4 xmax=8
+sunull nt=67 ntr=3 | suaddnoise seed=279 | sushw key=dt,delrt,d1,f1,d2,f2,cdpt,offset a=2000,-37,0.25,-1,0.5,-7,42,-100 b=0,1,0,0,0.25,1,1,50 | suchw key1=cdp key2=tracl a=100 b=3 | sucwt base=2 first=0 last=2 expinc=0.02 nwavelet=255 xmin=-8 xcenter=8 xmax=8 holder=1 divisor=2
+# Minimum wavelet size, single-scale Holder output, and zero data in another Holder mode.
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=3 | sucwt nwavelet=2 xmin=0 xcenter=0.5 xmax=1 base=2 first=0 last=0 expinc=1 sigma=0.7
+suspike nt=11 ntr=1 nspk=1 ix1=1 it1=6 | sucwt holder=1 nwavelet=31 xmin=-1 xcenter=1 xmax=1 base=2 first=0 last=0 expinc=1
+sunull nt=3 ntr=2 | sucwt holder=2 base=2 first=0 last=1 expinc=0.125 nwavelet=17 xmin=0 xcenter=0.5 xmax=1 divisor=3
+# Full successful diagnostics and convolution lengths straddling the library's short-filter cutoff.
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sucwt verbose=1 base=2 first=0 last=1 expinc=0.5 nwavelet=17 xmin=0 xcenter=0.5 xmax=1
+[stderr] sunull nt=19 ntr=1 | suaddnoise seed=11 | sucwt verbose=-1 base=2 first=0 last=0 expinc=1 nwavelet=63 xmin=0 xcenter=2 xmax=4
+sunull nt=31 ntr=2 | suaddnoise seed=59 | sucwt base=2 first=0 last=0 expinc=1 nwavelet=127 xmin=0 xcenter=14 xmax=28 sigma=3
+sunull nt=30 ntr=2 | suaddnoise seed=59 | sucwt base=2 first=0 last=0 expinc=1 nwavelet=127 xmin=0 xcenter=14.5 xmax=29 sigma=3
+sunull nt=31 ntr=2 | suaddnoise seed=59 | sucwt base=2 first=0 last=0 expinc=1 nwavelet=127 xmin=0 xcenter=15 xmax=30 sigma=3
+# Empty numeric arguments use defaults, including the historical omitted-xcenter xmin assignment.
+suspike nt=23 ntr=1 nspk=1 ix1=1 it1=12 | sucwt base= first= last= expinc= wtype= nwavelet= xmin=-9 xcenter= xmax= sigma= holder= divisor= verbose=
+# Negative or NaN maximum scales must fail allocation before touching input (signed count regression).
+[stderr] sunull nt=1 ntr=1 | sucwt base=-2
+[stderr] sunull nt=1 ntr=1 | sucwt base=-2 last=1 verbose=1
+[stderr] sunull nt=1 ntr=1 | sucwt last=nan verbose=1
+# Negative filter lengths skip C's signed loops. Empty input exits before any invalid convolution.
+[stderr] sunull nt=1 ntr=0 | sucwt base=-2 first=0 last=2 expinc=1 verbose=1
+[stderr] sunull nt=1 ntr=0 | sucwt xmin=5 xcenter=0 xmax=-5 first=0 last=0 expinc=1 verbose=1
+# Decreasing scales exhaust SHRT_MAX before preprocessing or reading input.
+[stderr] sunull nt=1 ntr=1 | sucwt base=0.5 first=1 last=0 expinc=0.1
+
+# ub-2026-11 (round 1)
+# Refuted: zero-scale allocation/read UB is fixed without changing empty stdout/stderr or rc=0.
+[stderr] sunull nt=1 ntr=1 | sucwt base=0.5 first=0 last=1 expinc=0.1

@@ -64,3 +64,60 @@ python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10
 # The unused sins/sing calculations must not panic on the C velocity tail reads.
 [stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",*([1500.0]*10)))'; sunull nt=131 ntr=20 dt=0.004 | suaddnoise seed=79 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=19 dzo=7.5 na=37
 [stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=10f",1500,1600,1700,1800,1900,2000,2100,2200,2300,2400))'; suplane nt=129 ntr=20 dt=0.004 ct1=10 ct2=15 ct3=20 | sushw key=offset a=0 | suinvzco3d ny=4 nz=10 nxm=5 vfile=v dxm=15 dy=15 dz=15 nxo=5 nyo=4 nzo=27 dzo=5 fzo=2.5 na=31
+
+# diff-2026-11 (round 1)
+# All parsed parameters on a successful inversion; explicit values override headers.
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.002 | suaddnoise seed=1102 | sushw key=dt,d2,offset a=0,0,999 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dt=0.002 offs=5 fxm=-3 fxo=1 dxo=12 fyo=2 dyo=13 fzo=3 dzo=9 nxb=4 nxc=2 na=37 nzc=3 verbose=1 fmax=80 ang=75
+# Single trace and short input lengths; spike coordinates are explicitly valid.
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=1 ntr=1 dt=0.004 offset=0 nspk=1 ix1=1 it1=1 | suinvzco3d ny=1 nz=30 nxm=1 vfile=v dxm=60 dy=60 dz=20 nxo=2 nyo=2 nzo=4 nxb=0 na=11 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=2 ntr=1 dt=0.004 offset=0 nspk=1 ix1=1 it1=1 | suinvzco3d ny=1 nz=30 nxm=1 vfile=v dxm=60 dy=60 dz=20 nxo=2 nyo=2 nzo=4 nxb=0 na=11 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=3 ntr=1 dt=0.004 offset=0 nspk=1 ix1=1 it1=1 | suinvzco3d ny=1 nz=30 nxm=1 vfile=v dxm=60 dy=60 dz=20 nxo=2 nyo=2 nzo=4 nxb=0 na=11 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=4 ntr=1 dt=0.004 offset=0 nspk=1 ix1=1 it1=1 | suinvzco3d ny=1 nz=30 nxm=1 vfile=v dxm=60 dy=60 dz=20 nxo=2 nyo=2 nzo=4 nxb=0 na=11 verbose=0
+# Odd, prime, and long traces with deterministic nonzero inputs.
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=17 ntr=20 dt=0.001 | suaddnoise seed=1103 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.001 | suaddnoise seed=1103 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=4097 ntr=20 dt=0.001 | suaddnoise seed=1103 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=16381 ntr=20 dt=0.001 | suaddnoise seed=1103 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43 verbose=0
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=32749 ntr=20 dt=0.001 | suaddnoise seed=1103 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43 verbose=0
+# Independent deterministic generators.
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=263 ntr=20 dt=0.002 offset=0 nspk=4 ix1=1 ix2=7 ix3=13 ix4=20 it1=11 it2=19 it3=29 it4=43 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 na=71 dzo=9 offs=0
+makevel nx=1 nz=30 v000=1800 > v; suimp2d nt=257 nshot=4 nrec=5 c=1800 x0=30 z0=30 dsx=20 dgx=20 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 offs=0 na=31 dzo=9
+makevel nx=1 nz=30 v000=1800 > v; susynlv nt=257 dt=0.002 nxm=20 dxm=0.02 v00=1.8 ref="1:-1,0.03;1,0.03" | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 offs=0 na=23 dzo=9
+# Depth-dependent velocities: decreasing speeds and many turning rays.
+makevel nx=1 nz=30 v000=2400 dvdz=-20 > v; sunull nt=257 ntr=20 dt=0.002 | suaddnoise seed=1104 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=53 offs=-5
+[stderr] makevel nx=1 nz=30 v000=1500 dvdz=100 > v; suspike nt=257 ntr=20 offset=0 nspk=1 ix1=8 it1=15 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=13 verbose=1
+# Header defaults, explicit overrides, and deliberately unrelated header ordering.
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.002 | suaddnoise seed=1105 | sushw key=d2,offset a=20,5 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=47
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.002 | suaddnoise seed=1106 | sushw key=tracl,cdp,sx,gx,delrt,scalco a=90,70,1000,-1000,200,-100 b=-3,-2,11,13,0,0 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 offs=0 dzo=9 na=29
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.001 | suaddnoise seed=1107 | sushw key=dt a=0 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dt=0.002 dzo=9 na=29
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 dt=0.002 | suaddnoise seed=1108 | sushw key=d2 a=-99 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=29
+# Optional defaults, cropped origins, anisotropic and sub-unit spacing.
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 | suaddnoise seed=1109 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 nxo=5 nyo=4 nzo=7 na=41
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 | suaddnoise seed=1110 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 fxm=-10 fxo=-7 fyo=3 fzo=2 dxo=7 dyo=11 dzo=5 na=61
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 | suaddnoise seed=1111 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dxm=0.75 dy=0.875 dz=1 dxo=0.5 dyo=0.625 dzo=0.375 offs=0.25 na=67 nxb=5
+# Empty output volume and single output depth; all output is SU depth traces.
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=4 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nxo=0 na=7
+[stderr] makevel nx=1 nz=30 v000=1800 > v; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 offset=0 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nzo=1 na=5
+# Early EOF repeats the final input trace, as in the unchecked C gettr loop.
+makevel nx=1 nz=30 v000=1800 > v; suspike nt=257 ntr=1 dt=0.002 nspk=1 ix1=1 it1=19 offset=0 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 dzo=9 na=43
+# Deliberately inactive dip/antialias/corner parameters, including limits.
+makevel nx=1 nz=30 v000=1800 > v; sunull nt=257 ntr=20 | suaddnoise seed=1112 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 ang=0 fmax=-1 nxc=999 nzc=999 nxb=5 dzo=9 na=17 verbose=-1
+# Validation/conversion errors before allocation or unchecked C file access.
+[stderr] sunull nt=2 ntr=1 | suinvzco3d dxm=abc
+[stderr] sunull nt=2 ntr=1 | suinvzco3d dt=0.00000001
+[stderr] sunull nt=2 ntr=1 | suinvzco3d dxm=15 ny=
+[stderr] sunull nt=2 ntr=1 | suinvzco3d dxm=15 ny=2 nz=
+[stderr] sunull nt=2 ntr=1 | suinvzco3d dxm=15 ny=2 nz=10 nxm=
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=2 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 fxo=-0.01
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=2 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 offs=-1000
+[stderr] makevel nx=1 nz=1 v000=1800 > v; sunull nt=2 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7
+# Negative allocation dimensions must retain the C allocation error and ordering.
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nxo=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nyo=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nzo=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nz=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 na=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 na=-1 offs=1000
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nz=-1 fxo=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 ny=-1
+[stderr] makevel nx=1 nz=30 v000=1800 > v; sunull nt=3 ntr=1 | suinvzco3d ny=4 nz=30 nxm=5 vfile=v dxm=20 dy=20 dz=20 nxo=5 nyo=4 nzo=7 nxm=-1

@@ -24,3 +24,33 @@
 [stderr] pdfhistogram ix=1 iy=2 min_x=0 max_x=5 min_y=0 max_y=5 norm=bad
 [stderr] pdfhistogram ix=1 iy=2 min_x=-1 max_x=1 min_y=0 max_y=1 logx=1
 [stderr] pdfhistogram ix=1 iy=2 min_x=0 max_x=1 min_y=-1 max_y=1 logy=1
+# diff-2026-11 (round 1)
+[f32] suplane ntr=1 nt=1 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=4 min_y=0 max_y=4 nx=4 ny=4
+[f32] suplane ntr=2 nt=2 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=4 min_y=0 max_y=4 nx=4 ny=4 norm=total
+[f32] suplane ntr=3 nt=3 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=6 min_y=0 max_y=6 nx=6 ny=6 norm=sqrt
+[f32] suplane ntr=4 nt=4 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=8 min_y=0 max_y=8 nx=8 ny=8 norm=avg_cnt
+[f32] suplane ntr=7 nt=7 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5 norm=avg_sum
+[f32] suplane ntr=11 nt=13 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=15 min_y=0 max_y=15 nx=5 ny=5 norm=xcnt
+[f32] suplane ntr=9 nt=4097 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=12 min_y=4000 max_y=4100 nx=6 ny=6 norm=ycnt
+[f32] suspike ntr=8 nt=5 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5 norm=log
+[f32] sunull ntr=5 nt=3 | sushw key=offset a=2 b=1 | sugethw key=tracl,offset output=geom | pdfhistogram ix=2 iy=1 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5
+[f32] sunull ntr=8 nt=4 | sushw key=offset a=1 b=1 | sugethw key=tracl,offset,ns output=geom | pdfhistogram ix=1 iy=2 ir=3 rmin=3 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5
+[f32] suplane ntr=8 nt=4 | sushw key=offset a=1 b=1 | sugethw key=tracl,offset,ns output=geom | pdfhistogram ix=2 iy=1 ir=3 rmax=5 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5
+[f32] suplane ntr=8 nt=4 | sugethw key=tracl,ns,dt output=geom | pdfhistogram ix=1 iy=2 ir=3 rmin=100 rmax=5000 min_x=0 max_x=10 min_y=0 max_y=10 nx=5 ny=5
+[f32] suplane ntr=8 nt=5 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=1 max_x=16 min_y=1 max_y=16 logx=1 logy=1 nx=4 ny=4
+[f32] suplane ntr=8 nt=5 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=1 max_x=16 min_y=0 max_y=10 logx=1 logy=0 nx=4 ny=4 verbose=1
+[f32] suspike ntr=7 nt=5 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=10 min_y=1 max_y=16 logx=0 logy=1 nx=4 ny=4
+[f32] sunull ntr=3 nt=4 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10
+[f32] sunull ntr=3 nt=4 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=10 min_y=0 max_y=10 nx=100 ny=100 norm=total logx=0 logy=0
+[f32] suplane ntr=6 nt=3 | sushw key=offset a=-3 b=1 | sugethw key=offset,tracl output=geom | pdfhistogram ix=1 iy=2 min_x=-4 max_x=4 min_y=0 max_y=8 nx=4 ny=4
+[f32] suplane ntr=6 nt=3 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=8 min_y=0 max_y=8 nx=1 ny=1
+[stderr] suplane ntr=1 nt=1 | sugethw key=tracl,ns output=geom | pdfhistogram iy=2 min_x=0 max_x=4 min_y=0 max_y=4
+[stderr] suspike ntr=1 nt=1 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 ir=2 min_x=0 max_x=4 min_y=0 max_y=4
+[stderr] sunull ntr=1 nt=1 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=4 min_y=0 max_y=4 norm=invalid
+[f32] sunull ntr=1 nt=1 | sugethw key=tracl output=geom | awk '{print "1.0000000596046447753906250001 2"}' | pdfhistogram ix=1 iy=2 min_x=0 max_x=4.000000476837158203125 min_y=0 max_y=4 nx=4 ny=4
+[f32] sunull ntr=1 nt=1 | sugethw key=tracl output=geom | awk '{print "2 1.0000000596046447753906250001"}' | pdfhistogram ix=1 iy=2 min_x=0 max_x=4 min_y=0 max_y=4.000000476837158203125 nx=4 ny=4 norm=xcnt
+[f32] suplane ntr=5 nt=3 | sugethw key=tracl,ns output=geom | awk '{print $1 " 2e0"}' | pdfhistogram ix=1 iy=2 min_x=0 max_x=8 min_y=0 max_y=8 nx=4 ny=4
+[f32] suplane ntr=6 nt=3 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 ir=1 rmin=3 min_x=0 max_x=8 min_y=0 max_y=8 nx=4 ny=4 norm=avg_sum
+[f32] suplane ntr=6 nt=3 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 ir=1 rmax=3 min_x=0 max_x=8 min_y=0 max_y=8 nx=4 ny=4 norm=sqrt
+[f32] sunull ntr=4 nt=4 | sushw key=offset a=2 b=0 | sugethw key=tracl,offset output=geom | pdfhistogram ix=1 iy=2 min_x=8 max_x=0 min_y=0 max_y=8 nx=4 ny=4
+[stderr] [f32] suplane ntr=3 nt=4 | sugethw key=tracl,ns output=geom | pdfhistogram ix=1 iy=2 min_x=0 max_x=8 min_y=0 max_y=8 nx=4 ny=4 verbose=1

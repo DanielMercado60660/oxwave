@@ -588,6 +588,11 @@ pub(super) fn absorb1(
     let mut velr: Vec<f32> = Vec::new();
     let mut velt: Vec<f32> = Vec::new();
     let mut velb: Vec<f32> = Vec::new();
+    // Match the minimal C fix: absorb1's side stencil reads both adjacent
+    // rows (sufctanismod.c:1101,1103), which do not exist for nx=1.
+    if side != 0 && mbx2 - mbx1 < 2 {
+        err!("absorb1: side boundaries require at least two x grid points");
+    }
     vell = vec![0.0f32; (nz) as usize];
     velr = vec![0.0f32; (nz) as usize];
     velt = vec![0.0f32; (nx) as usize];

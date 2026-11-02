@@ -94,3 +94,47 @@ sunull nt=2049 ntr=2 | suaddnoise seed=97 | sushw key=cdp a=1 b=1 | supef cdp=1,
 [stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=mono wienerout=1 verbose=1
 [stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=akima wienerout=1 verbose=1
 [stderr] sunull nt=2049 ntr=2 | suaddnoise seed=107 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=4,3,2 method=spline wienerout=1 verbose=1
+
+# diff-2026-11 (round 1)
+# Nonzero tiny traces; explicit lags avoid the C zero-length filter allocation.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | supef minlag=0 maxlag=0
+suspike nt=2 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=2 | supef minlag=0.004 maxlag=0.004 pnoise=0
+suwaveform type=unit ns=3 | supef minlag=0.004 maxlag=0.008
+[stderr] suwaveform type=unit ns=4 | supef minlag=0.004 maxlag=0.012 wienerout=1
+# Prime length, defaults and their explicit equivalents, with nontrivial wavelets.
+suwaveform type=ricker1 ns=509 fpeak=17 | supef
+suwaveform type=ricker1 ns=509 fpeak=17 | supef minlag=0.004 maxlag=0.100 pnoise=0.001 mincorr=0 maxcorr=2.036 mix=1 wienerout=0 method=linear outpar=/dev/null
+suwaveform type=berlage ns=127 fpeak=23 | supef minlag=0.008 maxlag=0.092 pnoise=0.03
+# Long traces and the last safe default-inclusive correlation sample in tr.data.
+sunull nt=4097 ntr=4 | suaddnoise seed=137 | supef minlag=0.012 maxlag=0.244 mix=1,0.5,0.25,0.125,0.0625
+suwaveform type=unit ns=65534 | supef minlag=0.004 maxlag=0.012
+sunull nt=521 ntr=1 | suaddnoise seed=139 | supef minlag=0.016 maxlag=0.096 pnoise=0.1
+# Header-driven dt, unchanged CDP, and one interpolation transition with exact allocation sizes.
+suwaveform type=ricker1 ns=127 | sushw key=cdp a=17 | supef cdp=17 minlag=0.004 maxlag=0.020 method=akima
+sunull nt=4097 ntr=3 | suaddnoise seed=149 | sushw key=cdp a=1 b=1 | supef cdp=1,4 minlag=0.004,0.008 maxlag=0.004,0.008 method=linear
+sunull nt=4097 ntr=2 | suaddnoise seed=151 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=3.5,3,2 method=linear
+[stderr] suspike nt=127 ntr=2 nspk=2 ix1=1 it1=20 ix2=2 it2=30 | sushw key=dt,offset,delrt a=0,-321,-40 | supef dt=0.001 minlag=0.001 maxlag=0.010 verbose=1
+suplane nt=127 ntr=5 | sushw key=dt,delrt a=2000,-30 b=1000,10 | supef minlag=0.002 maxlag=0.016
+# Both output modes, full diagnostics, and actual parameter-file contents.
+[stderr] sunull nt=127 ntr=4 | suaddnoise seed=157 | supef minlag=0.004 maxlag=0.028 wienerout=-2 verbose=1
+[ws] suwaveform type=unit ns=31 | supef minlag=0.004 maxlag=0.016 wienerout=1 outpar=round1-filter.txt > /dev/null && cat round1-filter.txt
+[ws] sunull nt=127 ntr=3 | suaddnoise seed=163 | supef minlag=0.004 maxlag=0.020 mix=1,0.25 wienerout=1 outpar=round1-mixed.txt > /dev/null && cat round1-mixed.txt
+[stderr] sunull nt=3 ntr=2 | supef minlag=0.004 maxlag=0.004 wienerout=1 outpar=/dev/null
+# Singular whitening, a zero first mixing weight, and a very short correlation window.
+suwaveform type=unit ns=31 | supef minlag=0.004 maxlag=0.020 pnoise=-1
+[stderr] sunull nt=127 ntr=4 | suaddnoise seed=167 | supef minlag=0.004 maxlag=0.028 mix=0,1 wienerout=1
+sunull nt=127 ntr=3 | suaddnoise seed=173 | supef minlag=0.004 maxlag=0.016 mincorr=0.002 maxcorr=0.006
+suwaveform type=unit ns=3 | supef minlag=0.004 maxlag=0.040
+# Errors, required dt, validation order, and an unused method selector.
+[stderr] suspike nt=31 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=dt a=0 | supef dt=
+[stderr] suwaveform type=unit ns=31 | supef cdp=1 minlag=0.004 maxlag=0.124
+[stderr] suwaveform type=unit ns=31 | supef mincorr=-0.004 maxcorr=1
+[stderr] suwaveform type=unit ns=31 | supef wienerout=-999999999999999999999
+[stderr] suwaveform type=unit ns=31 | supef maxlag=-0.004
+[stderr] suwaveform type=unit ns=31 | supef mincorr=0.020 maxcorr=0.020
+[stderr] suwaveform type=unit ns=31 | supef method=unrecognised
+# Cubic selectors with one CDP transition: cdptotal=ncdp and initial nlag=1.
+sunull nt=4097 ntr=2 | suaddnoise seed=151 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=3.5,3,2 method=mono
+sunull nt=4097 ntr=2 | suaddnoise seed=151 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=3.5,3,2 method=akima
+sunull nt=4097 ntr=2 | suaddnoise seed=151 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=3.5,3,2 method=spline
+[stderr] sunull nt=4097 ntr=2 | suaddnoise seed=151 | sushw key=cdp a=1 b=1 | supef cdp=1,4,5 minlag=3.5,2.4,1.2 maxlag=3.5,3,2 method=unknown

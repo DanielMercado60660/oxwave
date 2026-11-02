@@ -19,3 +19,34 @@ sunull nt=65535 ntr=1 | suspecfk
 # Explicit empty tmpdir overrides the environment; malformed numeric input.
 [stderr] suplane nt=8 ntr=2 | CWP_TMPDIR=/no/such/directory suspecfk tmpdir= verbose=1
 [stderr] suplane nt=8 ntr=2 | suspecfk verbose=999999999999999999999999999999
+
+# diff-2026-11 (round 1)
+# Nonzero unit and tiny time transforms; explicit spike positions are 1-based.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suspecfk dt=0.004 dx=1
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=2 | suspecfk
+suspike nt=3 ntr=5 nspk=1 ix1=4 it1=3 | suspecfk dt=0.00125 dx=7.5
+suspike nt=4 ntr=7 nspk=2 ix1=2 it1=1 ix2=6 it2=4 | suspecfk dt=0.002 dx=-12.5
+# Prime, odd, and long temporal transforms with admissible spatial sizes.
+suplane nt=257 ntr=11 dip1=-3 dip2=2.5 dip3=9 taper=1 | suspecfk
+suplane nt=4097 ntr=3 dip1=-3 dip2=2 dip3=7 | suspecfk dt=0.003 dx=25
+suspike nt=65520 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=65520 | suspecfk dt=0.0005 dx=2
+# Different continuous waveform and deterministic broadband input.
+susynlv nt=257 dt=0.004 nxm=5 nxo=1 ref="1:0,0.2;1,0.2" | suspecfk
+sunull nt=127 ntr=13 | suaddnoise seed=20261102 sn=2 | suspecfk dx=3.25
+# Header defaults, first-trace precedence, and fresh output headers.
+[stderr] suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=dt,d2 a=0,0 | suspecfk verbose=1
+suspike nt=19 ntr=5 nspk=1 ix1=3 it1=10 | sushw key=dt,d2,d1,f1,f2,delrt,cdp,trid a=62500,-3.25,7,9,11,-12,99,2 b=-500,0.5,0,0,0,0,1,0 | suspecfk
+suspike nt=19 ntr=5 nspk=1 ix1=3 it1=10 | sushw key=dt,d2 a=62500,-3.25 | suspecfk dt=0.002 dx=10
+# Temporary files: all explicit parameters and both selection branches.
+[stderr] suspike nt=23 ntr=3 nspk=1 ix1=2 it1=12 | suspecfk dt=0.002 dx=2.5 verbose=1 tmpdir=.
+[stderr] suspike nt=29 ntr=5 nspk=1 ix1=3 it1=15 | suspecfk dt=0.002 dx=2.5 verbose=-1 tmpdir=
+# Bad numeric values and invalid input headers must retain C diagnostics.
+[stderr] sunull nt=4 ntr=1 | suspecfk dt=inf dx=1
+[stderr] sunull nt=4 ntr=1 | suspecfk dt=0.004 dx=-inf
+[stderr] sunull nt=4 ntr=1 | suspecfk dt=1e-310 dx=1
+[stderr] sunull nt=4 ntr=1 | sushw key=ns a=0 | suspecfk dt=0.004 dx=1
+# Interrupt after the named temporary file exists; check status and cleanup.
+{ sunull nt=4 ntr=1; sleep 1; } | (suspecfk dt=0.004 dx=1 tmpdir=. <&0 & pid=$!; for i in {1..100}; do set -- ./cmgui*; test -f "$1" && break; sleep 0.01; done; kill -TERM "$pid"; wait "$pid"; status=$?; set -- ./cmgui*; if test -f "$1"; then printf "temporary file leaked\n"; fi; exit "$status")
+{ sunull nt=4 ntr=1; sleep 1; } | (suspecfk dt=0.004 dx=1 tmpdir=. <&0 & pid=$!; for i in {1..100}; do set -- ./cmgui*; test -f "$1" && break; sleep 0.01; done; kill -INT "$pid"; wait "$pid"; status=$?; set -- ./cmgui*; if test -f "$1"; then printf "temporary file leaked\n"; fi; exit "$status")
+{ sunull nt=4 ntr=1; sleep 1; } | (suspecfk dt=0.004 dx=1 tmpdir=. <&0 & pid=$!; for i in {1..100}; do set -- ./cmgui*; test -f "$1" && break; sleep 0.01; done; kill -QUIT "$pid"; wait "$pid"; status=$?; set -- ./cmgui*; if test -f "$1"; then printf "temporary file leaked\n"; fi; exit "$status")
+{ sunull nt=4 ntr=1; sleep 1; } | (suspecfk dt=0.004 dx=1 tmpdir=. <&0 & pid=$!; for i in {1..100}; do set -- ./cmgui*; test -f "$1" && break; sleep 0.01; done; kill -HUP "$pid"; wait "$pid"; status=$?; set -- ./cmgui*; if test -f "$1"; then printf "temporary file leaked\n"; fi; exit "$status")

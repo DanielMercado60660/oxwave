@@ -14,3 +14,35 @@
 [stderr] unisam2 method1=
 [stderr] unisam2
 [stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=2
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=2 | sustrip outpar=/dev/null | unisam2 nx1=2 nx2=2 n1=3 n2=3
+[f32] suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sustrip outpar=/dev/null | unisam2 nx1=4 nx2=4 n1=9 n2=7 method1=mono method2=linear
+[f32] suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sustrip outpar=/dev/null | unisam2 nx1=4 nx2=4 n1=9 n2=7 method1=linear method2=mono
+[f32] suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sustrip outpar=/dev/null | unisam2 nx1=4 nx2=4 n1=9 n2=7 method1=akima method2=spline
+[f32] suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sustrip outpar=/dev/null | unisam2 nx1=4 nx2=4 n1=9 n2=7 method1=spline method2=akima
+[f32] suspike nt=7 ntr=5 nspk=3 ix1=1 it1=2 ix2=3 it2=4 ix3=5 it3=7 | sustrip outpar=/dev/null | unisam2 x1=-3,-2,0,1,4,8,9 x2=-4,-1,0,2,6 n1=13 n2=11 method1=akima method2=mono
+[f32] suspike nt=7 ntr=5 nspk=3 ix1=1 it1=2 ix2=3 it2=4 ix3=5 it3=7 | sustrip outpar=/dev/null | unisam2 x1=9,8,4,1,0,-2,-3 x2=6,2,0,-1,-4 n1=13 n2=11 method1=spline method2=akima
+[f32] suspike nt=7 ntr=5 nspk=2 ix1=2 it1=3 ix2=4 it2=6 | sustrip outpar=/dev/null | unisam2 nx1=7 dx1=0.5 fx1=-1 nx2=5 dx2=2 fx2=-4 n1=11 d1=0.4 f1=-2 n2=9 d2=1.5 f2=-5 method1=linear method2=linear
+[f32] suspike nt=7 ntr=5 nspk=2 ix1=2 it1=3 ix2=4 it2=6 | sustrip outpar=/dev/null | unisam2 nx1=7 dx1=-0.5 fx1=2 nx2=5 dx2=-2 fx2=4 n1=11 d1=-0.4 f1=3 n2=9 d2=-1.5 f2=5
+[f32] suspike nt=1 ntr=5 nspk=1 ix1=3 it1=1 | sustrip outpar=/dev/null | unisam2 nx1=1 nx2=5 n1=4 n2=9 method1=mono method2=akima
+[f32] suspike nt=5 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=1 n1=9 n2=4 method1=akima method2=mono
+[f32] suspike nt=2 ntr=2 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | unisam2 nx1=2 nx2=2 n1=5 n2=5 method1=mono method2=mono
+[f32] suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=3 n1=7 n2=7 method1=akima method2=akima
+[f32] suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | unisam2 nx1=3 nx2=3 n1=7 n2=7 method1=spline method2=spline
+[f32] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2049 | sustrip outpar=/dev/null | unisam2 nx1=4097 nx2=1 n1=4099 n2=1
+[f32] sunull nt=11 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=11 nx2=3 n1=17 n2=5 method1=spline method2=mono
+[f32] suplane nt=17 ntr=5 | sustrip outpar=/dev/null | unisam2 nx1=17 nx2=5 n1=19 n2=7 method1=mono method2=spline
+[f32] suspike nt=5 ntr=4 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=4 n1=6 n2=8 verbose=1
+[f32] suspike nt=5 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=3 n1=1 n2=1 f1=2.5 f2=1.5
+[f32] suspike nt=5 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=3 n1=8 n2=1 d1=0.5 f1=-1 f2=2 method2=monotonic
+[f32] suspike nt=5 ntr=3 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=3 n1=1 n2=8 d2=0.5 f2=-1 f1=2 method1=akima
+[stderr] suspike nt=2 ntr=1 | sustrip outpar=/dev/null | unisam2 nx1=5 nx2=3
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 method1=bogus
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 method2=bogus
+[f32] suspike nt=11 ntr=7 | suaddnoise sn=2 seed=42 | sustrip outpar=/dev/null | unisam2 nx1=11 nx2=7 n1=23 n2=15 method1=spline method2=akima
+[f32] suspike nt=11 ntr=7 | suaddnoise sn=2 seed=42 | sustrip outpar=/dev/null | unisam2 x1=0,1,2,3,4,5,6,7,8,9,10 x2=0,1,2,3,4,5,6 n1=17 n2=13 method1=mono method2=mono
+[f32] suspike nt=2 ntr=2 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | unisam2 nx1=2 nx2=2 n1=5 n2=5 method1=akima method2=spline
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 n1=-1
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 n2=-1
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 nx1=-1
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=/dev/null | unisam2 nx2=-1

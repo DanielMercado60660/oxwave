@@ -4,3 +4,13 @@
 [exact] printf '\n' | pause '' 'two  spaces' ''
 [exact] printf '\n' | pause verbose=1 n=0 -1
 [exact] printf 'abc' | pause 'special %s' 'quote"and\\slash'
+
+# diff-2026-11 (round 1)
+[exact] sunull nt=1 ntr=1 | pause
+[exact] sunull nt=2 ntr=1 | pause proceed
+[exact] suspike nt=3 ntr=1 | pause '' next '' step
+[exact] suspike nt=4 ntr=1 | pause 'literal %n' --help
+[exact] sunull nt=17 ntr=2 | sushw key=tracl a=7 b=3 | pause verbose=1 key=tracl
+[exact] suplane nt=31 ntr=1 | pause 'tabs and spaces' ' leading' 'trailing '
+[exact] sunull nt=4097 ntr=1 | (pause long input; cat > /dev/null)
+[exact] suspike nt=7 ntr=1 | pause -n = -1 '*?[$]'

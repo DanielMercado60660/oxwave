@@ -243,7 +243,8 @@ fn main() {
     fprintf!(
         stderr(),
         "total VND memory at end = %ld\n",
-        nt as i64 * mxfold as i64 * 4 + 24
+        // VNDemalloc rounds the unfreed gather allocation to sizeof(long).
+        (nt as i64 * mxfold as i64 * 4 + 7) / 8 * 8 + 24
     );
     fprintf!(
         stderr(),

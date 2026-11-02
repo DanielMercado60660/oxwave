@@ -10,3 +10,23 @@
 [stderr] printf '' | resamp n1=3
 [stderr] printf '' | resamp n2=1
 [stderr] resamp n1=99999999999999999999
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=1 | sustrip head=hdr outpar=par | resamp n1=2 n1r=9 d1r=0.25 f1r=0
+[f32] suspike nt=3 ntr=2 | sustrip head=hdr outpar=par | resamp n1=3 n2=2 d1=0.5 f1=-0.5 n1r=8 d1r=0.25 f1r=-1
+[f32] suspike nt=4 ntr=1 | sustrip head=hdr outpar=par | resamp n1=4 n1r=11 d1r=0.5 f1r=-1
+[f32] suspike nt=13 ntr=3 | sustrip head=hdr outpar=par | resamp n1=13 n2=1 d1=2 f1=3 n1r=7 d1r=3 f1r=4
+[f32] suspike nt=4097 ntr=1 | sustrip head=hdr outpar=par | resamp n1=4097 n1r=2050 d1r=2 f1r=1
+[f32] suplane nt=31 ntr=3 | sustrip head=hdr outpar=par | resamp n1=31 n1r=49 d1r=0.7 f1r=-2
+[f32] sunull nt=17 ntr=3 | sustrip head=hdr outpar=par | resamp n1=17 n2=5 n1r=23 d1r=0.8
+[f32] suspike nt=11 ntr=2 | sushw key=dt a=2000 | sustrip head=hdr outpar=par | resamp n1=11 d1=0.002 f1=0 n1r=21 d1r=0.001 f1r=0
+[f32] suspike nt=17 ntr=2 | sustrip head=hdr outpar=par > in.bin && resamp n2=1 d1=0.25 n1r=19 d1r=0.125 f1r=0 < in.bin
+[f32] suspike nt=19 ntr=2 | sustrip head=hdr outpar=par | resamp n1=19 n2=-1 d1=1 f1=1 n1r=19 d1r=1 f1r=1
+[f32] suspike nt=23 ntr=2 | sustrip head=hdr outpar=par | resamp n1=23 n1r=30 d1r=-0.75 f1r=24
+[f32] suplane nt=41 ntr=4 | sustrip head=hdr outpar=par | resamp n1=41 n2=3 n1r=27 d1r=1.5 f1r=0.25
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=5 verbose=1 unexpected=2
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=5 n1r=999999999999999999999
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=5 d1=1e999
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n2=1
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=-1
+[stderr] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=5 n1r=-1
+[f32] suspike nt=5 ntr=1 | sustrip head=hdr outpar=par | resamp n1=5 d1=-1 n1r=10 d1r=0.5

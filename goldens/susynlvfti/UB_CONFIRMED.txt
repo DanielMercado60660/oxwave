@@ -1,0 +1,19 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/par/lib/modeling.c:304: NaN dsmax from
+# vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynlvfti.c:262
+# makes the segment-count conversion NaN -> int undefined. The minimal range
+# check changes rc=1/empty stdout/ENOMEM to rc=1/empty stdout with
+# "makeref: invalid reflector segment count". OxWave now matches fixed exactly.
+sunull nt=1 ntr=0 | susynlvfti nxm=1 verbose=0 fpeak=-5
+# vendor/su-original/src/par/lib/modeling.c:304: dsmax=-0 from
+# vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynlvfti.c:261-262
+# gives a -infinity segment count, undefined when converted to int. The minimal
+# range check changes rc=1/empty stdout/ENOMEM to rc=1/empty stdout with
+# "makeref: invalid reflector segment count". OxWave now matches fixed exactly.
+sunull nt=1 ntr=0 | susynlvfti nxm=1 verbose=0 dt=-0.04
+# vendor/su-original/src/su/main/synthetics_waveforms_testpatterns/susynlvfti.c:402-403
+# writes trace[65535] beyond segy.data[65535] (vendor/su-original/src/su/include/segy.h:29,581);
+# subsequent convolutions also exceed the array. A minimal nt>SU_NFLTS check
+# changes rc=0/240-byte header with ns=0 to rc=1/empty stdout with
+# "nt exceeds SU_NFLTS (65535)". OxWave's previous panic is fixed; it matches fixed exactly.
+sunull nt=1 ntr=0 | susynlvfti nxm=1 verbose=0 nt=65536

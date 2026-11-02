@@ -71,3 +71,44 @@ surandspike seed=23 n1=65535 n2=1 nspk=1000
 # Empty arguments and duplicate parameters also select the seeded spike path.
 surandspike seed=1 n1= n2=1 nspk= dt= amax= mode=
 [stderr] surandspike seed=9 seed=3 n1=11 n2=2 nspk=7 mode=2 verbose=1 unknown=1
+
+# diff-2026-11 (round 1)
+# Defaults versus explicit values; all seven program parameters are exercised.
+surandspike seed=271828
+surandspike mode=1 seed=271828 n1=500 dt=0.002 n2=100 nspk=20 amax=0.2
+
+# Tiny traces, collisions, single-trace output, and both spike modes.
+[exact] surandspike seed=177 n1=1 n2=1 nspk=73 mode=1
+[exact] surandspike seed=167 n1=2 n2=4 nspk=73 mode=2 amax=-1.25
+[exact] surandspike seed=157 n1=3 n2=4 nspk=73 mode=1
+[exact] surandspike seed=147 n1=4 n2=1 nspk=73 mode=2
+
+# Prime, odd, and near-capacity traces; keep RNG state across many placements.
+[exact] surandspike seed=20261102 n1=257 n2=7 nspk=503 mode=1 dt=0.00314159 amax=-1.25
+[exact] surandspike seed=20261102 n1=4097 n2=3 nspk=2049 mode=1 dt=0.001
+[exact] surandspike seed=20261102 n1=4097 n2=7 nspk=2049 mode=2 dt=0.001
+[exact] surandspike seed=987654321 n1=65534 n2=2 nspk=20000 dt=0.004
+
+# Signed zero, float subnormals, large finite amplitudes, and interval truncation.
+[exact] surandspike seed=12345 n1=17 n2=3 nspk=71 amax=-0 dt=0.0000001
+[exact] surandspike seed=12345 n1=17 n2=3 nspk=71 dt=1e-45
+[exact] surandspike seed=12345 n1=17 n2=3 nspk=71 amax=3.4028234e38
+surandspike seed=12345 n1=17 n2=3 nspk=71 dt=0.065535
+surandspike seed=12345 n1=17 n2=3 nspk=71 dt=0.0000005
+[exact] surandspike seed=12345 n1=17 n2=3 nspk=71 amax=1e-45
+
+# stdin is unused: neither incoming samples nor edited headers affect output.
+# Keep the reader open, then drain unused stdin to avoid upstream SIGPIPE races.
+# The && retains a failed surandspike exit status.
+sunull nt=1 ntr=1 | { surandspike seed=2468 n1=19 n2=2 nspk=13 && cat > /dev/null; }
+sunull nt=1 ntr=1 | sushw key=dt,tracl,offset,delrt a=7000,99,-500,123 | { surandspike seed=2468 n1=19 n2=2 nspk=13 && cat > /dev/null; }
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | suchw key1=cdp key2=tracl a=17 b=3 | { surandspike seed=2468 n1=19 n2=2 nspk=13 mode=2 && cat > /dev/null; }
+suplane nt=4 ntr=1 npl=0 | { surandspike seed=2468 n1=19 n2=2 nspk=13 mode=2 && cat > /dev/null; }
+
+# Empty values use defaults. Diagnostics retain ordering and verbose output.
+[stderr] surandspike mode= seed=321 n1= n2=1 nspk= dt= amax= verbose=1
+[stderr] surandspike seed=321 n1=4 n2=2 nspk=7 dt=0.004 amax=-0.7 mode=2 verbose=1 unused=9
+[stderr] surandspike mode=4 seed=4294967296 n1=2147483648
+[stderr] surandspike seed=321 n1=-2147483649
+[stderr] surandspike seed=321 n1=4 n2=1 dt=1e-310
+[stderr] surandspike seed=321 n1=4 n2=1 amax=1e39

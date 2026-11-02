@@ -308,11 +308,15 @@ fn main() {
         getpardouble("outlist", &mut dind);
     }
 
-    let mut navrg = [10i32; 2];
+    // Empty numeric lists write no values in getpar. Match the C UB fix:
+    // zero-initialize the arrays, retaining defaults only for absent lists.
+    let mut navrg = [0i32; 2];
     if countparval("navrg") > 2 {
         err!("**** Error: navrg= list can only have 1 or 2 values ");
     }
-    if countparval("navrg") >= 1 {
+    if countparval("navrg") < 1 {
+        navrg = [10; 2];
+    } else {
         getparint("navrg", &mut navrg[..]);
         if countparval("navrg") == 1 {
             navrg[1] = navrg[0];
@@ -325,11 +329,12 @@ fn main() {
         err!("**** Error in second navrg value. It must be greater or equal to -1 ");
     }
 
-    let mut nsmth = navrg;
+    let mut nsmth = [0i32; 2];
     if countparval("nsmth") > 2 {
         err!("**** Error: nsmth= list can only have 1 or 2 values ");
     }
     if countparval("nsmth") < 1 {
+        nsmth = navrg;
         if nsmth[0] == -1 {
             nsmth[0] = 0;
         }
@@ -349,11 +354,13 @@ fn main() {
         err!("**** Error in second nsmth value. It must be greater or equal to 0 ");
     }
 
-    let mut nback = [3i32; 2];
+    let mut nback = [0i32; 2];
     if countparval("nback") > 2 {
         err!("**** Error: nback= list can only have 1 or 2 values ");
     }
-    if countparval("nback") >= 1 {
+    if countparval("nback") < 1 {
+        nback = [3; 2];
+    } else {
         getparint("nback", &mut nback[..]);
         if countparval("nback") == 1 {
             nback[1] = nback[0];
@@ -1272,10 +1279,11 @@ fn runsmo(
         return;
     }
     let lastcdp = (msize - 2 * nmax - 1) as usize;
-    // Both extrapolation passes need real locations at first+nback and
-    // last-nback. C can access invalid memory when this documented bound
-    // is exceeded; report the caller's parameter-range error instead.
-    if nback as usize >= lastcdp {
+    // C also permits these reads to land in initialized padding, beyond
+    // the real locations. Only reject indices outside its allocation.
+    if nmax as usize + 1 + nback as usize >= dalla.len()
+        || nback as usize > lastcdp + nmax as usize
+    {
         *ierr = 2;
         return;
     }

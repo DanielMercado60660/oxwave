@@ -191,10 +191,28 @@ fn main() {
     }
     let ntraces = ntraces as usize;
     // C uses each ealloc2float panel as one contiguous block when clearing it.
-    let mut S11 = vec![0.0f32; nS11 * ntraces];
-    let mut S12 = vec![0.0f32; nS12 * ntraces];
-    let mut S21 = vec![0.0f32; nS21 * ntraces];
-    let mut S22 = vec![0.0f32; nS22 * ntraces];
+    // Fallible reservations preserve ealloc2float's diagnostic and exit code
+    // for positive dimensions whose panels cannot fit in the address space.
+    let mut S11 = Vec::<f32>::new();
+    if S11.try_reserve_exact(nS11 * ntraces).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    let mut S12 = Vec::<f32>::new();
+    if S12.try_reserve_exact(nS12 * ntraces).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    let mut S21 = Vec::<f32>::new();
+    if S21.try_reserve_exact(nS21 * ntraces).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    let mut S22 = Vec::<f32>::new();
+    if S22.try_reserve_exact(nS22 * ntraces).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    S11.resize(nS11 * ntraces, 0.0);
+    S12.resize(nS12 * ntraces, 0.0);
+    S21.resize(nS21 * ntraces, 0.0);
+    S22.resize(nS22 * ntraces, 0.0);
     S11[..nS11].copy_from_slice(&in_S11_tr.data[..nS11]);
     S12[..nS12].copy_from_slice(&in_S12_tr.data[..nS11]);
     S21[..nS21].copy_from_slice(&in_S21_tr.data[..nS11]);

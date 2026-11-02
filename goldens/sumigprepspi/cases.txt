@@ -49,3 +49,62 @@
 # nx=17 requires padding to nk=18; seeded broadband input and deeper propagation.
 [stderr] makevel nx=17 nz=37 v000=1500 dvdx=60 dvdz=4 | transp n1=37 n2=17 >vel; suplane nt=127 ntr=17 | suaddnoise seed=102 sn=8 | sushw key=gx a=0 b=10 | sumigprepspi nz=37 dz=6 vfile=vel nxo=17 nxshot=1 dx=10
 [stderr] makevel nx=17 nz=37 v000=1900 >vel; suplane nt=127 ntr=17 | suaddnoise seed=103 sn=8 | sushw key=gx a=0 b=10 | sumigprepspi nz=37 dz=6 vfile=vel nxo=17 nxshot=1 dx=10 nflag=1
+
+# diff-2026-11 (round 1)
+# Tiny traces use a short source pulse to keep the original wavelet indexing in bounds.
+[stderr] makevel nx=1 nz=9 v000=1750 >vel; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=gx a=0 b=10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=1 nxshot=1 dx=10 fmax=1000 f1=0 f2=125 f3=125 f4=125 nflag=1
+[stderr] makevel nx=1 nz=9 v000=1750 >vel; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=gx a=0 b=10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=1 nxshot=1 dx=10 fmax=1000 f1=0 f2=125 f3=125 f4=125 nflag=0
+[stderr] makevel nx=3 nz=9 v000=1750 >vel; suspike nt=3 ntr=3 nspk=1 ix1=2 it1=3 | sushw key=gx a=0 b=10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=3 nxshot=1 dx=10 fmax=1000 f1=0 f2=125 f3=125 f4=125 nflag=1
+[stderr] makevel nx=3 nz=9 v000=1750 >vel; suspike nt=4 ntr=3 nspk=1 ix1=2 it1=4 | sushw key=gx a=0 b=10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=3 nxshot=1 dx=10 fmax=1000 f1=0 f2=125 f3=125 f4=125 nflag=0
+# Odd/prime lengths and large traces, with nonzero input retained after the C trace-placement loop.
+[stderr] makevel nx=5 nz=7 v000=1500 dvdx=10 dvdz=4 | transp n1=7 n2=5 >vel; suspike nt=7 ntr=5 nspk=1 ix1=2 it1=7 | sushw key=gx a=0 b=10 | sumigprepspi nz=7 dz=6 vfile=vel nxo=5 nxshot=1 dx=10 nflag=1 fmax=1000 f1=0 f2=40 f3=60 f4=100
+[stderr] makevel nx=7 nz=9 v000=1500 dvdx=100 dvdz=4 | transp n1=9 n2=7 >vel; suspike nt=11 ntr=7 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=9 dz=6 vfile=vel nxo=7 nxshot=1 dx=10 nflag=0 fmax=1000 f1=0 f2=40 f3=80 f4=100
+[stderr] makevel nx=11 nz=17 v000=1500 dvdx=20 dvdz=4 | transp n1=17 n2=11 >vel; suspike nt=17 ntr=11 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=17 dz=6 vfile=vel nxo=11 nxshot=1 dx=10 nflag=0 fmax=1000 f1=0 f2=40 f3=80 f4=100
+[stderr] makevel nx=13 nz=25 v000=1500 dvdx=50 dvdz=4 | transp n1=25 n2=13 >vel; suspike nt=31 ntr=13 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=25 dz=6 vfile=vel nxo=13 nxshot=1 dx=10 nflag=1 fmax=1000 f1=0 f2=40 f3=80 f4=100
+[stderr] makevel nx=19 nz=101 v000=1500 dvdx=0 dvdz=4 | transp n1=101 n2=19 >vel; suspike nt=97 ntr=19 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=101 dz=6 vfile=vel nxo=19 nxshot=1 dx=10 nflag=0
+[stderr] makevel nx=23 nz=51 v000=1500 dvdx=100 dvdz=4 | transp n1=51 n2=23 >vel; suspike nt=257 ntr=23 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=51 dz=6 vfile=vel nxo=23 nxshot=1 dx=10 nflag=1
+[stderr] makevel nx=29 nz=100 v000=1500 dvdx=0 dvdz=4 | transp n1=100 n2=29 >vel; suspike nt=509 ntr=29 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=100 dz=6 vfile=vel nxo=29 nxshot=1 dx=10 nflag=0
+[stderr] makevel nx=31 nz=120 v000=1500 dvdx=50 dvdz=4 | transp n1=120 n2=31 >vel; suspike nt=1021 ntr=31 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=120 dz=6 vfile=vel nxo=31 nxshot=1 dx=10 nflag=0
+[stderr] makevel nx=3 nz=15 v000=1500 dvdx=0 dvdz=4 | transp n1=15 n2=3 >vel; suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=15 dz=6 vfile=vel nxo=3 nxshot=1 dx=10 nflag=0
+[stderr] makevel nx=5 nz=25 v000=1500 dvdx=50 dvdz=4 | transp n1=25 n2=5 >vel; suspike nt=4097 ntr=5 nspk=1 ix1=2 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=25 dz=6 vfile=vel nxo=5 nxshot=1 dx=10 nflag=1
+[stderr] makevel nx=1 nz=7 v000=1500 dvdx=0 dvdz=4 | transp n1=7 n2=1 >vel; suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=gx a=0 b=10 | sumigprepspi nz=7 dz=6 vfile=vel nxo=1 nxshot=1 dx=10 nflag=0
+# Explicit defaults, all optional parameters, and a nondefault window/spacing.
+[stderr] makevel nx=11 nz=31 v000=2050 >vel; suplane nt=129 ntr=11 | sushw key=gx a=0 b=8 | sumigprepspi nz=31 dz=5 vfile=vel nxo=11 nxshot=1 dx=8
+[stderr] makevel nx=11 nz=31 v000=2050 >vel; suplane nt=129 ntr=11 | sushw key=gx a=0 b=8 | sumigprepspi nz=31 dz=5 vfile=vel nxo=11 nxshot=1 dx=8 dt=0.004 fmax=25 f1=10 f2=20 f3=40 f4=50 lpad=9999 rpad=9999 dip=65 nflag=0 verbose=0
+[stderr] makevel nx=11 nz=31 v000=1750 dvdx=47 dvdz=2 | transp n1=31 n2=11 >vel; suplane nt=193 ntr=11 dip1=-1.7 dip2=3.2 dip3=6.1 | sushw key=gx a=0 b=7 | sumigprepspi nz=31 dz=3.7 vfile=vel nxo=11 nxshot=1 dx=7.3 dt=0.0025 fmax=47 f1=3 f2=13 f3=63 f4=91 lpad=3 rpad=5 dip=89 nflag=1 verbose=2
+# Zero-input normalization, deterministic Gaussian/flat noise, deeper propagation, and FFT spatial padding.
+[stderr] makevel nx=7 nz=19 v000=1800 >vel; sunull nt=131 ntr=7 | sushw key=gx a=0 b=10 | sumigprepspi nz=19 dz=9 vfile=vel nxo=7 nxshot=1 dx=10 nflag=1 verbose=1
+[stderr] makevel nx=19 nz=101 v000=1700 dvdx=90 dvdz=3 | transp n1=101 n2=19 >vel; sunull nt=257 ntr=19 | suaddnoise seed=1102 sn=1 | sushw key=gx a=0 b=7 | sumigprepspi nz=101 dz=3.7 vfile=vel nxo=19 nxshot=1 dx=7.3 dt=0.0025 fmax=47 f1=3 f2=13 f3=30 f4=51 nflag=0
+[stderr] makevel nx=23 nz=251 v000=1700 dvdx=20 dvdz=3 | transp n1=251 n2=23 >vel; sunull nt=509 ntr=23 | suaddnoise seed=1103 sn=1 noise=flat | sushw key=gx a=0 b=10 | sumigprepspi nz=251 dz=10 vfile=vel nxo=23 nxshot=1 dx=10 f1=0 f2=10 f3=40 f4=60 nflag=1
+# Header dt/d2 selection and explicit overrides; ignored headers must not affect output.
+[stderr] makevel nx=5 nz=17 v000=2100 >vel; suspike nt=137 ntr=5 nspk=1 ix1=3 it1=7 | sushw key=gx,dt,d2,delrt a=0,2500,12.5,-100 b=12,0,0,0 | sumigprepspi nz=17 dz=5 vfile=vel nxo=5 nxshot=1 verbose=2
+[stderr] makevel nx=5 nz=17 v000=2100 >vel; suspike nt=137 ntr=5 nspk=1 ix1=3 it1=7 | sushw key=gx,dt,d2,delrt a=0,0,0,500 b=12,0,0,0 | sumigprepspi nz=17 dz=5 vfile=vel nxo=5 nxshot=1 dt=0.0025 dx=12.5 verbose=2
+[stderr] makevel nx=5 nz=17 v000=2100 >vel; suspike nt=137 ntr=5 nspk=1 ix1=3 it1=7 | sushw key=gx,dt,d2 a=0,0,0 b=1,0,0 | sumigprepspi nz=17 dz=5 vfile=vel nxo=5 nxshot=1
+# Positive/negative scalco, signed radial remapping, and the most negative short scalar.
+[stderr] makevel nx=9 nz=23 v000=1900 >vel; suplane nt=139 ntr=7 | sushw key=sx,sy,gx,gy,scalco a=-100,0,-100,0,-32768 b=0,0,32768,0,0 | sumigprepspi nz=23 dz=4 vfile=vel nxo=9 nxshot=1 dx=1 nflag=1
+[stderr] makevel nx=13 nz=23 v000=1900 >vel; suplane nt=139 ntr=7 | sushw key=sx,sy,gx,gy,scalco a=-30,-40,-30,-40,2 b=0,0,10,0,0 | sumigprepspi nz=23 dz=4 vfile=vel nxo=13 nxshot=1 dx=10 verbose=2
+# Multiple shots, deliberate receiver-bin collisions, and an aperture smaller than the output grid.
+[stderr] makevel nx=11 nz=29 v000=1900 dvdx=50 | transp n1=29 n2=11 >vel; suplane nt=151 ntr=12 | sushw key=sx,gx a=0,0 b=0,10 c=30,0 j=4,4 | sumigprepspi nz=29 dz=6 vfile=vel nxo=11 nxshot=3 dx=10 nflag=1 verbose=2
+[stderr] makevel nx=7 nz=29 v000=1900 >vel; suplane nt=151 ntr=7 | sushw key=gx a=0 b=1 | sumigprepspi nz=29 dz=6 vfile=vel nxo=7 nxshot=1 dx=10 verbose=2
+[stderr] makevel nx=17 nz=29 v000=1900 dvdx=35 | transp n1=29 n2=17 >vel; suplane nt=151 ntr=5 | sushw key=sx,gx a=80,60 b=0,10 | sumigprepspi nz=29 dz=6 vfile=vel nxo=17 nxshot=1 dx=10 lpad=0 rpad=0 verbose=2
+# Source-wavelet fallback, any nonzero normalization flag, and signed depth increments.
+[stderr] makevel nx=5 nz=17 v000=1800 >vel; suplane nt=173 ntr=5 | sushw key=gx a=0 b=10 | sumigprepspi nz=17 dz=6 vfile=vel nxo=5 nxshot=1 dx=10 fmax=0 nflag=2 dip=-1
+[stderr] makevel nx=5 nz=17 v000=1800 >vel; suplane nt=173 ntr=5 | sushw key=gx a=0 b=10 | sumigprepspi nz=17 dz=0 vfile=vel nxo=5 nxshot=1 dx=10 nflag=-3
+[stderr] makevel nx=5 nz=17 v000=1800 >vel; suplane nt=173 ntr=5 | sushw key=gx a=0 b=10 | sumigprepspi nz=17 dz=-0.25 vfile=vel nxo=5 nxshot=1 dx=10
+# A modelled reflection supplies a third independent nonzero generator.
+[stderr] makevel nx=7 nz=29 v000=2000 >vel; susynlv nt=151 dt=0.004 nxs=1 fxs=0 nxo=7 dxo=0.01 v00=2 ref="1:-1,0.08;1,0.08" | sumigprepspi nz=29 dz=5 vfile=vel nxo=7 nxshot=1 dx=10 nflag=1
+# Missing values, parse failures, nonexistent velocity files, and sort-order errors.
+[stderr] sunull nt=4 ntr=1 | sumigprepspi nz=9 dz=
+[stderr] sunull nt=4 ntr=1 | sumigprepspi nz=9 dz=4 vfile=vel nxo=5
+[stderr] sunull nt=4 ntr=1 | sumigprepspi nz=9 dz=4 vfile=missing-round1 nxo=5 nxshot=1
+[stderr] sunull nt=4 ntr=1 | sumigprepspi nz=9 dz=4 vfile=vel nxo=2147483648 nxshot=1
+[stderr] makevel nx=7 nz=9 v000=1800 >vel; suspike nt=137 ntr=3 nspk=1 ix1=2 it1=8 | sushw key=sx,gx a=0,40 b=0,-10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=7 nxshot=1 dx=10
+[stderr] makevel nx=7 nz=9 v000=1800 >vel; suspike nt=137 ntr=3 nspk=1 ix1=2 it1=8 | sushw key=sx,gx a=40,0 b=-10,10 | sumigprepspi nz=9 dz=4 vfile=vel nxo=7 nxshot=1 dx=10
+# Same radial sign crossing with sufficient output-grid storage.
+[stderr] makevel nx=19 nz=23 v000=1900 >vel; suplane nt=139 ntr=7 | sushw key=sx,sy,gx,gy,scalco a=300,400,300,400,-10 b=0,0,100,0,0 | sumigprepspi nz=23 dz=4 vfile=vel nxo=19 nxshot=1 dx=10 verbose=2
+# Velocity contrast immediately below/above the 1-percent branch threshold.
+[stderr] makevel nx=2 nz=43 v000=2000 dvdx=19.999 | transp n1=43 n2=2 >vel; sunull nt=211 ntr=2 | suaddnoise seed=1111 sn=1 | sushw key=gx a=0 b=10 | sumigprepspi nz=43 dz=7 vfile=vel nxo=2 nxshot=1 dx=10 nflag=0
+[stderr] makevel nx=2 nz=43 v000=2000 dvdx=20.001 | transp n1=43 n2=2 >vel; sunull nt=211 ntr=2 | suaddnoise seed=1112 sn=1 | sushw key=gx a=0 b=10 | sumigprepspi nz=43 dz=7 vfile=vel nxo=2 nxshot=1 dx=10 nflag=1
+# Derived coordinates and empty optional values retain C parameter defaults.
+[stderr] makevel nx=7 nz=23 v000=1950 >vel; suplane nt=179 ntr=7 | suchw key1=gx key2=tracl a=-100 b=100 | sushw key=scalco a=-10 | sumigprepspi nz=23 dz=7 vfile=vel nxo=7 nxshot=1 dx=10
+[stderr] makevel nx=7 nz=23 v000=1950 >vel; suplane nt=179 ntr=7 | sushw key=gx a=0 b=10 | sumigprepspi nz=23 dz=7 vfile=vel nxo=7 nxshot=1 dx=10 fmax= f1= f2= f3= f4= lpad= rpad= dip= nflag= verbose=

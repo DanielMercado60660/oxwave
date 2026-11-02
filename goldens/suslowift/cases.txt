@@ -12,3 +12,23 @@ sunull nt=1 ntr=1 | suslowift verbose=1
 sunull nt=8 ntr=1 | suslowift sign=0
 sunull nt=8 ntr=1 | suslowift sign=2
 suslowift sign=-1
+
+# diff-2026-11 (round 1)
+# Small nonzero complex pairs and both signs.
+suspike nt=2 ntr=1 k1=1 | suslowift sign=1 dt=0.003
+suspike nt=3 ntr=2 k1=2 | suslowift sign=-1
+suspike nt=4 ntr=2 k1=3 | suslowift sign=1
+# Odd and prime sizes, changing header values and traces.
+suspike nt=11 ntr=3 k1=2 | sushw key=dt,d1,f1,trid a=2000,2,3,11 | suslowift
+suplane nt=31 ntr=4 | sushw key=dt a=8000 | suslowift sign=1 dt=0.001
+# Longer inputs exercise the quadratic transform and trace buffer.
+suspike nt=257 ntr=1 k1=11 | suslowift sign=-1
+suspike nt=4097 ntr=1 k1=23 | suslowift sign=1
+# Diagnostics, fallback interval, and invalid parameter values.
+[stderr] suspike nt=13 ntr=2 k1=4 | sushw key=dt a=0 | suslowift dt=0 verbose=1
+sunull nt=4 ntr=1 | suslowift sign=abc
+sunull nt=4 ntr=1 | suslowift sign=999999999999999999999
+# Dense, seeded inputs and complex spectra exercise accumulation.
+suplane nt=127 ntr=3 | suaddnoise seed=123 sn=2 | suslowift sign=1 dt=0.002
+suplane nt=509 ntr=2 | suaddnoise seed=42 sn=3 | suslowift sign=-1
+suspike nt=63 ntr=2 k1=7 | suslowft sign=1 | suslowift sign=-1

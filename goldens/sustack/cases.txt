@@ -18,3 +18,23 @@ sunull nt=3 ntr=1 | sustack key=notakey
 # Invalid numeric parameter and unknown parameter
 sunull nt=3 ntr=1 | sustack nrepeat=999999999999999999999999
 sunull nt=3 ntr=1 | sustack extra=1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=4 it1=1 it2=2 it3=1 it4=2 | sustack key=cdp normpow=1 repeat=0 nrepeat=3 verbose=0
+suspike nt=3 ntr=5 it1=1 it2=2 it3=1 it4=3 | sushw key=cdp a=1 b=1 j=2 | sustack normpow=0.5
+suspike nt=4 ntr=6 | sushw key=nhs a=4 | sustack normpow=2
+suplane nt=4097 ntr=3 | sustack normpow=0
+sunull nt=1 ntr=4 | sushw key=offset a=-3 b=3 j=2 | sustack key=offset repeat=1 nrepeat=3
+[stderr] suspike nt=11 ntr=7 | sushw key=cdp a=3 b=-1 j=2 | sustack key=cdp verbose=1 normpow=-0.5
+suplane nt=23 ntr=5 | sushw key=trid,nhs a=2,-3 b=1,0 j=2,1 | sustack key=trid normpow=1
+[stderr] sunull nt=2 ntr=4 | sushw key=d1 a=1 b=1 j=2 | sustack key=d1 verbose=1
+suspike nt=17 ntr=8 | sushw key=cdp a=2 b=1 c=-3 j=2 k=4 | sustack repeat=1 nrepeat=2 normpow=0
+suplane nt=29 ntr=1 | sushw key=nhs,offset a=7,50 | sustack normpow=0.25
+sunull nt=3 ntr=2 | sustack repeat=0 nrepeat=-5
+suspike nt=19 ntr=5 | sustack normpow=2.5
+sunull nt=4 ntr=1 | sustack key=
+sunull nt=4 ntr=1 | sustack normpow=1e999
+sunull nt=4 ntr=1 | sustack verbose=999999999999999999999999
+suspike nt=5 ntr=4 ix1=1 ix2=2 ix3=3 ix4=4 it1=2 it2=2 it3=2 it4=3 | sustack normpow=0.5
+suspike nt=7 ntr=3 nspk=3 ix1=1 ix2=2 ix3=3 it1=3 it2=3 it3=3 | sushw key=nhs a=-1 | sustack normpow=1
+[stderr] suspike nt=13 ntr=4 ix1=1 ix2=2 ix3=3 ix4=4 it1=3 it2=3 it3=4 it4=4 | sushw key=nhs a=1 b=1 j=2 | sustack key=nhs repeat=1 nrepeat=2 verbose=1

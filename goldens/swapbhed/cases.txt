@@ -10,3 +10,18 @@
 [exact] suplane nt=1 ntr=1 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary
 # An input stream error reports one 400-byte item.
 [stderr] swapbhed < .
+# diff-2026-11 (round 1)
+[exact] suplane nt=1 ntr=1 | swapbhed
+[exact] suplane nt=2 ntr=1 | swapbhed verbose=1
+[exact] suplane nt=3 ntr=1 | swapbhed arbitrary=value
+[exact] suspike nt=4 ntr=1 | swapbhed
+[exact] sunull nt=7 ntr=3 | sushw key=tracl,cdp a=100,500 b=1,2 | swapbhed
+[exact] suspike nt=4097 ntr=1 | swapbhed | swapbhed
+[exact] suplane nt=17 ntr=2 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary
+[exact] suspike nt=31 ntr=3 dt=0.002 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary | swapbhed
+[exact] sunull nt=37 ntr=2 | sushw key=tracl,cdp a=123,456 | segyhdrs bfile=binary hfile=header > in.su && swapbhed < binary
+[exact] suplane nt=1 ntr=1 | dd bs=1 count=59 2>/dev/null | swapbhed
+[exact] suplane nt=1 ntr=1 | dd bs=1 count=60 2>/dev/null | swapbhed
+[exact] suspike nt=41 ntr=1 | dd bs=1 count=399 2>/dev/null | swapbhed
+[exact] suspike nt=41 ntr=1 | dd bs=1 count=400 2>/dev/null | swapbhed
+[exact] suspike nt=41 ntr=1 | dd bs=1 count=401 2>/dev/null | swapbhed

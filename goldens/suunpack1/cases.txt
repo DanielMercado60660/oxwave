@@ -12,3 +12,19 @@ suunpack1
 sunull nt=3 ntr=1 | suunpack1
 # Arguments are ignored because the program does not call checkpars.
 suplane nt=5 ntr=1 | supack1 | suunpack1 verbose=1 unknown=1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | supack1 gpow=1 | suunpack1
+suspike nt=3 ntr=2 | supack1 gpow=0.5 | suunpack1
+suspike nt=4 ntr=3 | supack1 gpow=0.75 | suunpack1
+suplane nt=4097 ntr=2 | supack1 gpow=1 | suunpack1
+suplane nt=127 ntr=4 | suaddnoise seed=85 sn=1 | supack1 gpow=0.25 | suunpack1
+suplane nt=17 ntr=3 | sushw key=offset a=-100 b=100 | supack1 gpow=2 | suunpack1
+(suspike nt=13 ntr=1 | supack1 gpow=0.5; suspike nt=13 ntr=1 | supack1 gpow=1) | suunpack1
+(suspike nt=19 ntr=1 | supack1 gpow=0.7; suspike nt=19 ntr=1 | supack1 gpow=0.5) | suunpack1
+sunull nt=11 ntr=2 | supack1 gpow=1 | suunpack1 arbitrary=value
+sunull nt=2 ntr=1 | sushw key=trid a=2 | suunpack1
+suplane nt=37 ntr=2 | suaddnoise seed=19 sn=1 | supack1 gpow=1 | sushw key=unscale a=-0.25 | suunpack1
+suplane nt=37 ntr=2 | suaddnoise seed=20 sn=1 | supack1 gpow=1 | sushw key=ungpow a=3 | suunpack1
+suplane nt=29 ntr=3 | suaddnoise seed=21 sn=1 | supack1 | sushw key=unscale a=0.1 b=0.2 | suunpack1
+suplane nt=31 ntr=2 | suaddnoise seed=22 sn=1 | supack1 | sushw key=ungpow a=1.000001 | suunpack1

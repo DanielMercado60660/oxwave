@@ -18,3 +18,24 @@ suflex2d binalign=-1
 sunull nt=3 ntr=3 | suflex2d maxfold=2
 sunull nt=3 ntr=3 | sushw key=offset a=100 b=-30 | suflex2d
 sunull nt=3 ntr=3 | sushw key=cdp a=3 b=-1 | suflex2d
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | suflex2d maxflex=0 minflex=0 maxfold=1 binfold=1 binsize=10 binalign=0 keepmore=0 igiadd=0 binbest=0
+sunull nt=3 ntr=6 | sushw key=cdp a=10 b=1 | sushw key=igi a=-20 b=8 | suflex2d maxflex=2 minflex=-2 binfold=3 igiadd=17
+sunull nt=4 ntr=5 | sushw key=cdp a=5 b=2 | sushw key=offset a=12 b=5 | suflex2d maxflex=2 minflex=0 binsize=10 binalign=5
+sunull nt=11 ntr=5 | sushw key=cdp a=5 b=2 | sushw key=offset a=12 b=5 | suflex2d maxflex=0 minflex=-2 binsize=10 binalign=5
+suspike nt=17 ntr=8 | sushw key=cdp a=3 b=0 c=1 j=2 | sushw key=offset a=0 b=11 j=2 | sushw key=igc a=-15 b=4 | suflex2d binbest=-2 binfold=2 keepmore=1
+suplane nt=13 ntr=9 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=-8 b=-8 j=3 | suflex2d binbest=3 binsize=10 binalign=25 binfold=1
+suspike nt=4097 ntr=2 | sushw key=cdp a=1 b=1 | suflex2d maxflex=1 binfold=1
+sunull nt=3 ntr=8 | sushw key=cdp a=1 b=0 c=1 j=4 | sushw key=igi a=20 b=-5 | suflex2d maxflex=0 binfold=2 keepmore=1
+sunull nt=3 ntr=8 | sushw key=cdp a=1 b=0 c=1 j=4 | sushw key=igi a=20 b=-5 | suflex2d maxflex=0 binfold=2 keepmore=0
+sunull nt=5 ntr=9 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=25 j=3 | sushw key=igc a=-12 b=3 | suflex2d binbest=1 binfold=3 binsize=25 binalign=12.5
+sunull nt=5 ntr=9 | sushw key=cdp a=1 b=0 c=1 j=3 | sushw key=offset a=0 b=25 j=3 | sushw key=igc a=-12 b=3 | suflex2d binbest=2 binfold=3 binsize=25 binalign=12.5
+[stderr] sunull nt=7 ntr=4 | sushw key=cdp a=2 b=1 | suflex2d verbose=1 maxfold=1
+sunull nt=2 ntr=4 | sushw key=cdp a=-3 b=2 | suflex2d maxflex=3 minflex=-1 igiadd=-300
+sunull nt=3 ntr=4 | sushw key=offset a=20 b=-5 | suflex2d binsize=100 binfold=4 maxflex=0
+sunull nt=3 ntr=3 | suflex2d keepmore=2 binfold=1 maxflex=0
+sunull nt=3 ntr=2 | suflex2d maxfold=1
+sunull nt=3 ntr=3 | sushw key=cdp a=2 b=-1 | suflex2d maxflex=0
+sunull nt=3 ntr=3 | sushw key=offset a=100 b=-40 | suflex2d binsize=10
+sunull nt=3 ntr=1 | suflex2d binsize=-1
+sunull nt=3 ntr=1 | suflex2d binbest=-1

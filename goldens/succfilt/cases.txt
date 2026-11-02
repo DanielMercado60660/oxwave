@@ -14,3 +14,26 @@ sunull nt=8 ntr=2 | succfilt key=invalid
 sunull nt=128 ntr=2 | succfilt padd=100000
 # Invalid numeric parameter.
 sunull nt=8 ntr=2 | succfilt verbose=999999999999999999999999
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=3 | succfilt padd=0 ccl=-1 cch=1
+suspike nt=3 ntr=2 | succfilt padd=0 ccl=0.9 cch=1
+suspike nt=4 ntr=1 | succfilt padd=0 verbose=1
+suplane nt=17 ntr=5 | succfilt key=ep padd=25 ccl=0.3 cch=1 verbose=0
+suplane nt=19 ntr=6 | sushw key=cdp a=5 b=1 j=2 | succfilt key=cdp padd=50 ccl=-0.2 cch=0.5 verbose=1
+[stderr] suspike nt=23 ntr=7 | sushw key=offset a=10 b=1 j=3 | succfilt key=offset ccl=1 cch=1 verbose=1
+suplane nt=4097 ntr=3 | succfilt padd=0 ccl=-1 cch=0.75
+sunull nt=97 ntr=4 | succfilt padd=100 ccl=0 cch=0
+suspike nt=31 ntr=4 | suaddnoise seed=77 | succfilt ccl=0.8 cch=-0.8
+suplane nt=101 ntr=8 | sushw key=tracf a=1 b=1 | succfilt key=tracf padd=10 verbose=1
+sunull nt=4 ntr=2 | succfilt padd=0 ccl=-1 cch=1
+suplane nt=257 ntr=3 | suaddnoise seed=999 | succfilt padd=200 ccl=-0.7 cch=0.7
+sunull nt=16 ntr=2 | succfilt padd=1000000
+sunull nt=16 ntr=2 | succfilt ccl=1e999
+sunull nt=16 ntr=2 | succfilt key=notakey
+suspike nt=127 ntr=8 | suaddnoise seed=1234 | succfilt padd=0 ccl=1 cch=1
+suplane nt=251 ntr=9 | suaddnoise seed=12 | succfilt padd=13 ccl=-1 cch=-1
+suspike nt=2 ntr=1 | succfilt padd=100 verbose=1
+suplane nt=3 ntr=4 | succfilt ccl=-1 cch=0.99999994 padd=0
+suplane nt=4 ntr=5 | suaddnoise seed=5 | succfilt ccl=-0.99999994 cch=0.99999994
+suspike nt=1021 ntr=5 | suaddnoise seed=44 | sushw key=ep a=1 b=1 j=2 | succfilt key=ep padd=75 ccl=-0.4 cch=0.2

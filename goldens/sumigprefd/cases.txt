@@ -56,3 +56,48 @@
 # Minimum safe aperture, with one input trace and each source boundary.
 [stderr] sunull nt=5 ntr=7 | sugain bias=1700 | sustrip outpar=vel.par > vel.bin; suspike nt=128 ntr=1 | sumigprefd nz=5 nxo=7 dz=10 vfile=vel.bin nxshot=1 lpad=0 rpad=2
 [stderr] sunull nt=5 ntr=7 | sugain bias=1700 | sustrip outpar=vel.par > vel.bin; suspike nt=128 ntr=1 | sushw key=sx a=2 | sumigprefd nz=5 nxo=7 dz=10 vfile=vel.bin nxshot=1 lpad=0 rpad=0
+# diff-2026-11 (round 1)
+# Short traces: explicit wavelets fit the FFT, including nt=1..4 and one receiver.
+[stderr] sunull nt=3 ntr=4 | sugain bias=1500 | sustrip outpar=vp > v; sunull nt=1 ntr=1 | sugain bias=1 | sumigprefd nz=4 nxo=3 dz=5 vfile=v nxshot=1 fmax=500 f1=0 f2=125 f3=125 f4=125 dip=45
+[stderr] sunull nt=3 ntr=4 | sugain bias=1500 | sustrip outpar=vp > v; sunull nt=2 ntr=3 | sugain bias=1 | sushw key=gx b=1 | sumigprefd nz=4 nxo=3 dz=5 vfile=v nxshot=1 fmax=250 f1=0 f2=125 f3=125 f4=125 dip=65
+[stderr] sunull nt=4 ntr=4 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=3 ntr=4 | sushw key=gx b=1 | sumigprefd nz=4 nxo=4 dz=7 vfile=v nxshot=1 fmax=150 f1=0 f2=60 f3=90 f4=125 dip=80
+[stderr] sunull nt=5 ntr=4 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=4 ntr=5 | sushw key=gx b=1 | sumigprefd nz=4 nxo=5 dz=7 vfile=v nxshot=1 fmax=100 f1=0 f2=60 f3=90 f4=125 dip=90
+# Odd/prime and long inputs, nonconstant velocity, all dip approximations.
+[stderr] sunull nt=7 ntr=11 | suaddnoise seed=21 sn=1 | sugain scale=200 bias=1800 | sustrip outpar=vp > v; suspike nt=17 ntr=7 | sushw key=gx b=7 | sumigprefd nz=11 nxo=7 dz=8 dx=7 vfile=v nxshot=1 fmax=30 dip=87
+[stderr] sunull nt=7 ntr=11 | suaddnoise seed=21 sn=1 | sugain scale=200 bias=1800 | sustrip outpar=vp > v; suspike nt=53 ntr=7 | sushw key=gx b=7 | sumigprefd nz=11 nxo=7 dz=8 dx=7 vfile=v nxshot=1 dip=89
+[stderr] sunull nt=7 ntr=11 | suaddnoise seed=21 sn=1 | sugain scale=200 bias=1800 | sustrip outpar=vp > v; suplane nt=257 ntr=7 | sushw key=gx b=10 | sumigprefd nz=11 nxo=7 dz=8 dx=10 vfile=v nxshot=1 dip=45
+[stderr] sunull nt=7 ntr=11 | suaddnoise seed=21 sn=1 | sugain scale=200 bias=1800 | sustrip outpar=vp > v; suplane nt=509 ntr=7 | sushw key=gx b=10 | sumigprefd nz=11 nxo=7 dz=8 dx=10 vfile=v nxshot=1 dip=65
+[stderr] sunull nt=5 ntr=7 | sugain bias=1900 | sustrip outpar=vp > v; suspike nt=4097 ntr=5 | sushw key=gx b=10 | sumigprefd nz=7 nxo=5 dz=10 dx=10 vfile=v nxshot=1 dip=79
+[stderr] sunull nt=5 ntr=7 | sugain bias=1900 | sustrip outpar=vp > v; sunull nt=4097 ntr=5 | suaddnoise seed=73 sn=1 | sushw key=gx b=10 | sumigprefd nz=7 nxo=5 dz=10 dx=10 vfile=v nxshot=1 dip=90 fmax=35 f1=3 f2=11 f3=39 f4=61
+# Header defaults versus explicit values; carry unrelated headers to the output.
+[stderr] sunull nt=5 ntr=7 | sugain bias=2000 | sustrip outpar=vp > v; suspike nt=139 ntr=5 dt=0.002 | sushw key=gx,d2,delrt,fldr a=0,12.5,-25,17 b=12,0,0,0 | sumigprefd nz=7 nxo=5 dz=12.5 vfile=v nxshot=1 verbose=2
+[stderr] sunull nt=5 ntr=7 | sugain bias=2000 | sustrip outpar=vp > v; suspike nt=139 ntr=5 dt=0.002 | sushw key=gx,d2,delrt,fldr a=0,12.5,-25,17 b=12,0,0,0 | sumigprefd nz=7 nxo=5 dz=12.5 vfile=v nxshot=1 dt=0.002 dx=12.5 fmax=25 f1=10 f2=20 f3=40 f4=50 lpad=9999 rpad=9999 dip=79 verbose=0
+[stderr] sunull nt=5 ntr=7 | sugain bias=2000 | sustrip outpar=vp > v; suspike nt=139 ntr=5 | sushw key=gx,dt,d2 a=0,0,0 b=1,0,0 | sumigprefd nz=7 nxo=5 dz=8 vfile=v nxshot=1 verbose=1
+# Native-float velocity from a second velocity generator; modeled scatterer input.
+[stderr] makevel nx=7 nz=9 v000=1700 dvdx=5 dvdz=7 | transp n1=9 n2=7 > v; suimp2d nt=257 nrec=7 c=1700 dgx=10 x0=30 z0=80 | sumigprefd nz=9 nxo=7 dz=10 dx=10 vfile=v nxshot=1 dip=80
+# Source/receiver radial remap, negative coordinate scales and fractional dx.
+[stderr] sunull nt=13 ntr=7 | sugain bias=1750 | sustrip outpar=vp > v; suspike nt=127 ntr=5 | sushw key=sx,sy,gx,gy,scalco a=-400,-300,-800,-600,-10 b=0,0,40,30,0 | sumigprefd nz=7 nxo=13 dz=9 dx=5 vfile=v nxshot=1 verbose=2
+[stderr] sunull nt=9 ntr=7 | sugain bias=1750 | sustrip outpar=vp > v; suspike nt=127 ntr=5 | sushw key=sx,sy,gx,gy,scalco a=4,3,0,0,2 b=0,0,4,3,0 | sumigprefd nz=7 nxo=9 dz=9 dx=10 vfile=v nxshot=1 lpad=1 rpad=2
+[stderr] sunull nt=7 ntr=7 | sugain bias=1750 | sustrip outpar=vp > v; suspike nt=127 ntr=5 | sushw key=gx,scalco a=0,-10 b=25,0 | sumigprefd nz=7 nxo=7 dz=9 dx=2.5 vfile=v nxshot=1
+# Three shots and repeated EOF preserve the original shot-loop semantics.
+[stderr] sunull nt=13 ntr=7 | sugain bias=1600 | sustrip outpar=vp > v; suplane nt=131 ntr=18 | sushw key=sx,gx a=0,0 b=0,10 c=20,0 j=6,6 | sumigprefd nz=7 nxo=13 dz=10 dx=10 vfile=v nxshot=3 verbose=2
+[stderr] sunull nt=5 ntr=7 | sugain bias=1600 | sustrip outpar=vp > v; suspike nt=131 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=3 verbose=1
+# Unordered inner window corners remain within allocated frequency bins.
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1 f1=5 f2=40 f3=10 f4=50
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1 f1=5 f2=-10 f3=60 f4=50
+# Signed dx and signed time/frequency values without invalid array indices.
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=1 | sumigprefd nz=7 nxo=5 dz=10 dx=-10 vfile=v nxshot=1
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 dt=-0.004 vfile=v nxshot=1 fmax=-25 f1=-5 f2=-10 f3=-40 f4=-50
+# Zero velocity and zero amplitude use IEEE arithmetic, not a memory exception.
+[stderr] sunull nt=5 ntr=7 | sustrip outpar=vp > v; suspike nt=137 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; sunull nt=137 ntr=5 | sushw key=gx b=1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1
+# Required-value and parser errors, plus actual decreasing coordinate sequences.
+[stderr] sunull nt=4 ntr=1 | sumigprefd nz= nxo=5 dz=10 vfile=v nxshot=1
+[stderr] sunull nt=4 ntr=1 | sumigprefd nz=3 nxo=5 dz= vfile=v nxshot=1
+[stderr] sunull nt=4 ntr=1 | sumigprefd nz=3 nxo=5 dz=10 vfile=v nxshot=
+[stderr] sunull nt=4 ntr=1 | sumigprefd nz=3 nxo=5 dz=10 vfile=v nxshot=1 lpad=999999999999999999
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=4 | sushw key=sx,gx a=3,0 b=-1,1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1
+[stderr] sunull nt=5 ntr=7 | sugain bias=1800 | sustrip outpar=vp > v; suspike nt=137 ntr=4 | sushw key=sx,gx a=0,3 b=0,-1 | sumigprefd nz=7 nxo=5 dz=10 vfile=v nxshot=1
+# Maximum trace ns and a deep output section, both with small output streams.
+[stderr] sunull nt=3 ntr=3 | sugain bias=1500 | sustrip outpar=vp > v; suspike nt=65535 ntr=3 | sushw key=gx b=1 | sumigprefd nz=3 nxo=3 dz=5 vfile=v nxshot=1
+[stderr] sunull nt=3 ntr=4097 | sugain bias=1500 | sustrip outpar=vp > v; suspike nt=64 ntr=3 | sushw key=gx b=1 | sumigprefd nz=4097 nxo=3 dz=0.1 vfile=v nxshot=1 f1=10 f2=14 f3=18 f4=22

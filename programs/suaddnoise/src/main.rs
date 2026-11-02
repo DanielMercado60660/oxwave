@@ -340,6 +340,7 @@ fn main() {
     /* Add scaled noise to trace and output sum */
     erewind(&headerfp);
     erewind(&tracefp);
+    let mut output_bytesper = 4usize;
     for itr in 0..ntr {
         let trshift = itr.wrapping_mul(nt) as usize;
         efread(tr.hdr.as_bytes_mut(), &headerfp);
@@ -347,7 +348,28 @@ fn main() {
         for i in 0..nt as usize {
             tr.data[i] += noiscale * noise[trshift + i];
         }
-        puttr(&mut tr);
+        if itr == 0 {
+            output_bytesper = match tr.trid {
+                201 => 1,
+                202 => 2,
+                _ => 4,
+            };
+        }
+        if output_bytesper != 4 && tr.trid != 201 && tr.trid != 202 {
+            // fputtr.c:123-130 encodes all floats, but writes only the byte
+            // count saved from the first (packed) trace. The shared Rust
+            // writer writes all encoded bytes and then reports an error.
+            // Keep SU's truncated output here, including a partial float.
+            let fp = stdout();
+            efwrite(&tr.hdr.to_xdr(), &fp);
+            let mut encoded = Vec::with_capacity(databytes);
+            for i in 0..nt as usize {
+                encoded.extend_from_slice(&tr.data[i].to_bits().to_be_bytes());
+            }
+            efwrite(&encoded[..output_bytesper * nt as usize], &fp);
+        } else {
+            puttr(&mut tr);
+        }
     }
 
     /* Clean up */

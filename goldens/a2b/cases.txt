@@ -14,3 +14,23 @@
 [stderr] printf 'bad' | a2b n1=1
 [stderr] a2b outpar=/no/such/directory/count </dev/null
 [exact] a2b n1=0 </dev/null
+# diff-2026-11 (round 1)
+[f32] suspike nt=1 ntr=1 | suascii bare=1 | a2b n1=1
+[f32] sunull nt=2 ntr=1 | suascii bare=1 | a2b
+[f32] suspike nt=3 ntr=2 | suascii bare=1 | a2b n1=3 outpar=/dev/null
+[f32] suplane nt=4 ntr=2 | suascii bare=1 | a2b n1=4
+[f32] suspike nt=7 ntr=3 | suascii bare=1 | a2b n1=7
+[f32] sunull nt=4097 ntr=1 | suascii bare=1 | a2b n1=4097
+[exact] suspike nt=3 ntr=2 | suascii bare=1 | a2b n1=2 outpar=count > data; cat count
+[stderr] sunull nt=2 ntr=1 | suascii bare=1 | a2b n1=1 outpar=/dev/stderr verbose=1 > /dev/null
+[f32] suplane nt=4 ntr=3 | sushw key=cdp a=12 b=3 | sugethw key=cdp output=geom | a2b n1=1
+[stderr] suspike nt=3 ntr=1 | suascii bare=1 | a2b n1=2
+[stderr] sunull nt=2 ntr=1 | suascii bare=1 | sed s/0/bad/ | a2b n1=1
+[stderr] sunull nt=2 ntr=1 | suascii bare=1 | a2b n1=99999999999999999999
+[stderr] suspike nt=4 ntr=1 | suascii bare=1 | a2b n1=2 outpar=count verbose=1 > /dev/null
+[stderr] sunull nt=1 ntr=1 | suascii bare=1 | a2b n1=-1
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] sunull nt=1 ntr=1 | suascii bare=1 | sed s/.*/inf/ | a2b n1=1 | b2a n1=1 outpar=/dev/null
+[f32] sunull nt=1 ntr=1 | suascii bare=1 | sed s/.*/0x1.8p2/ | a2b n1=1
+[f32] sunull nt=1 ntr=1 | suascii bare=1 | sed s/.*/1e+/ | a2b n1=1

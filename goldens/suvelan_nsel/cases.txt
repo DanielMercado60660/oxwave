@@ -18,3 +18,25 @@ susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0
 susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | suaddnoise seed=31 sn=6 | sushw key=offset,delrt a=-400,20 b=50,0 | suvelan_nsel nx=8 dx=50 nv=5 fv=1800 dv=150 tau=0.7 nsmooth=9 dtratio=3 pwr=3
 susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | sushw key=cdpt,d2 a=8,50 | suvelan_nsel
 susynlv nt=126 dt=0.004 nxo=8 fxo=0.05 dxo=0.05 nxs=1 ref="0,0.25;2,0.25" ref="0,0.5;2,0.5" v00=2 fpeak=30 | sushw key=offset a=50 b=12 | suvelan_nsel nx=8 dx=12.5 nv=4 fv=1900 dv=40 tau=0.1 dtratio=1 nsmooth=3 smute=3
+
+# diff-2026-11 (round 1)
+suplane nt=1 ntr=1 | suvelan_nsel nx=1 dx=25 nv=2 tau=0.3
+suplane nt=2 ntr=8 | suvelan_nsel nx=8 dx=20 nv=2 tau=0 dtratio=1 nsmooth=2
+suplane nt=3 ntr=8 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.2 dtratio=1 nsmooth=3
+suplane nt=4 ntr=8 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.3 dtratio=1 nsmooth=4
+suplane nt=17 ntr=8 | sushw key=offset a=-70 b=20 | suvelan_nsel nx=8 dx=20 nv=3 fv=1100 dv=250 tau=0 dtratio=1 nsmooth=5 smute=2 pwr=0.5
+suplane nt=101 ntr=9 | sushw key=offset,delrt,cdp a=20,35,42 b=15,0,0 | suvelan_nsel nx=9 dx=15 nv=4 fv=1300 dv=125 tau=0.25 smute=2.2 dtratio=4 nsmooth=7 pwr=2 verbose=1
+[stderr] suplane nt=63 ntr=8 | sushw key=offset a=0 b=25 | suvelan_nsel nx=8 dx=25 nv=3 dv=50 fv=1500 tau=0.5 smute=15 dtratio=5 nsmooth=6 pwr=1 verbose=1
+suplane nt=4097 ntr=8 | sushw key=offset a=0 b=20 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.1 dtratio=11 nsmooth=13
+sunull nt=79 ntr=8 | sushw key=dt,offset a=2000,0 b=0,30 | suvelan_nsel nx=8 dx=30 nv=3 tau=0.4 dtratio=2
+suspike nt=97 ntr=8 | sushw key=offset a=0 b=20 | suvelan_nsel nx=8 dx=20 nv=3 tau=0.1 dtratio=2 nsmooth=5
+suplane nt=73 ntr=12 | sushw key=offset a=100 b=10 | suvelan_nsel nx=12 dx=10 nv=4 tau=0.7 dtratio=3 nsmooth=9
+suplane nt=43 ntr=8 | sushw key=cdpt,d2,offset a=8,40,0 b=0,0,40 | suvelan_nsel nv=3 tau=0.2
+suplane nt=53 ntr=8 | sushw key=offset a=80 b=-10 | suvelan_nsel nx=8 dx=10 nv=1 fv=2000 dv=-25 tau=0.35 dtratio=2 nsmooth=1
+suplane nt=29 ntr=8 | suvelan_nsel nx=8 dx=20 nv=0 verbose=1
+suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 smute=0.5
+suplane nt=32 ntr=8 | suvelan_nsel nx=8 dx=20 pwr=-0.5
+
+# ub-2026-11 (round 1)
+suplane nt=127 ntr=8 | sushw key=offset a=0 b=20 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.2 dtratio=25 nsmooth=9
+sunull nt=97 ntr=8 | sushw key=dt,offset a=30000,0 b=0,20 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.2 dtratio=3 nsmooth=5

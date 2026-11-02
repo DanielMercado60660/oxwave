@@ -1,0 +1,2 @@
+mkdir gathers && suspike nt=3 ntr=1 > gathers/a && sunull nt=4 ntr=1 > gathers/b && sugetgthr dir=gathers
+# oxwave-core trace::fgettr_internal: state is attached to each new CFile, whereas SU retains state keyed by FILE pointer across fclose and reuses it when fopen returns the same pointer; the second file consequently fails the original's ns check.

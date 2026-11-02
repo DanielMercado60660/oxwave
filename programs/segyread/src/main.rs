@@ -469,11 +469,6 @@ fn main() {
         if nread == 0 {
             break;
         }
-        // Packed samples may fit the tape buffer while exceeding Trace's
-        // float storage. C overruns that storage; fail before conversion.
-        if ns > SU_NFLTS as i32 {
-            err!("ns=%d exceeds trace capacity (%d)", ns, SU_NFLTS);
-        }
         tapesegy_to_segy(&tapetr, &mut tr);
         if swaphdrs == 0 {
             for i in 0..TAPEHDR.len() {
@@ -503,6 +498,13 @@ fn main() {
         }
         itr = itr.wrapping_add(1);
         if itr >= trmin {
+            // Packed records can fit tapetr even when ns exceeds Trace's
+            // float storage. Skipped traces and unswapped SHORTPACK output
+            // do not access ns float slots. In the latter case C narrows
+            // tr.ns to u16 before puttr, keeping the output in bounds.
+            if ns > SU_NFLTS as i32 && !(conv == 0 && bh.format == 3 && swapdata != 0) {
+                err!("ns=%d exceeds trace capacity (%d)", ns, SU_NFLTS);
+            }
             if conv != 0 {
                 match bh.format {
                     1 => {

@@ -69,3 +69,38 @@ sunull nt=1 ntr=9 | sushw key=d1,fldr a=3e38,1 b=3e38,1 > in.su && susort d1 < i
 # Interrupt after trace I/O has filled the named temporary file, with stdin
 # still open. Each signal must exit silently with status 1 and remove the file.
 [stderr] sunull nt=3 ntr=1025 > in.su && mkdir tmpdir && for sig in INT QUIT HUP TERM; do mkfifo input && exec 3<>input || exit 2; CWP_TMPDIR=tmpdir susort < input > out.su & pid=$!; cat in.su >&3; for i in $(seq 1 200); do test -n "$(find tmpdir -type f -size +0c -print)" && break; sleep 0.01; done; test -n "$(find tmpdir -type f -size +0c -print)" || exit 2; kill -s "$sig" "$pid"; wait "$pid"; rc=$?; exec 3>&-; test "$rc" -eq 1 && test ! -s out.su && test -z "$(find tmpdir -type f -print)" || exit 2; rm input; done
+
+# diff-2026-11 (round 1)
+# Small sample counts with a second generator and identifiable nonzero samples.
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 > in.su && susort < in.su
+suspike nt=4 ntr=13 nspk=2 ix1=2 it1=1 ix2=11 it2=4 | sushw key=cdp,offset a=-3,10 b=1,-2 j=5,13 > in.su && susort -cdp +offset < in.su
+# Long, odd traces and the largest legal sample count, in both I/O paths.
+suspike nt=4097 ntr=7 | sushw key=fldr a=7 b=-1 > in.su && susort fldr < in.su
+sunull nt=65535 ntr=2 | sushw key=cdp a=2 b=-1 > in.su && susort cdp < in.su
+[exact] suplane nt=4097 ntr=7 | susort -tracl > out.su && cat out.su
+# SHORTPACK uses two bytes per sample, including odd and minimal trace sizes.
+[exact] suplane nt=7 ntr=11 | supack2 > in.su && susort -tracl < in.su
+[exact] suplane nt=7 ntr=11 | supack2 | susort -tracl > out.su && cat out.su
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | supack2 > in.su && susort -ns < in.su
+# Less commonly used floating and tail header words; conflicting repeated keys.
+sunull nt=3 ntr=11 | sushw key=f1,d2,f2,unscale,ungpow,ntr,mark a=-1,3,-5,0.25,2,8,-8 b=0.25,-0.5,1,0.25,-0.25,-1,2 > in.su && susort -f1 d2 -f2 unscale -ungpow ntr -mark < in.su
+sunull nt=1 ntr=41 | sushw key=cdp,fldr a=-4,1 b=1,1 j=7,41 > in.su && susort cdp -cdp cdp -fldr < in.su
+# Exercise every ordinary signed header key in both directions with trace identity.
+[exact] for key in tracl tracr fldr tracf ep cdp cdpt offset gelev selev sdepth gdel sdel swdep gwdep sx sy gx gy ntr; do sunull nt=2 ntr=17 | sushw key=$key,d1 a=-2000000000,1 b=234567891,1 j=7,17 > in.su || exit; susort +$key < in.su && susort -$key < in.su || exit; done
+[exact] for key in trid nvs nhs duse scalel scalco counit wevel swevel sut gut sstat gstat tstat laga lagb delrt muts mute gain igc igi corr sfs sfe slen styp stas stae tatyp afilf afils nofilf nofils lcf hcf lcs hcs year day hour minute sec timbas trwf grnors grnofr grnlof gaps otrav mark shortpad; do sunull nt=3 ntr=17 | sushw key=$key,fldr a=-32768,1 b=8191,1 j=9,17 > in.su || exit; susort +$key < in.su && susort -$key < in.su || exit; done
+# Derived headers and three priorities, with the primary key deliberately tied.
+suplane nt=17 ntr=19 | sushw key=cdp,offset,fldr a=0,-9,1 b=1,1,1 j=3,7,19 | suchw key1=gx key2=offset key3=cdp a=3 b=-2 c=5 d=1 > in.su && susort +cdp -gx offset < in.su
+# Explicit cdp keeps signed int comparison across the full range.
+sunull nt=2 ntr=5 | sushw key=cdp,fldr a=-2147483648,1 b=1073741823,1 > in.su && susort +cdp < in.su
+# File input supports a downstream consumer and append-mode disk output.
+suspike nt=4 ntr=7 nspk=1 ix1=3 it1=2 > in.su && susort -tracl < in.su | sugethw key=tracl,tracr,offset
+sunull nt=3 ntr=2 > in.su && susort -tracl < in.su >> out.su && cat out.su
+# A valid tmpdir is also checked on the disk-input path.
+sunull nt=3 ntr=1 > in.su && CWP_TMPDIR=. susort -tracl < in.su
+# Only one sign is consumed, keys are case-sensitive, and named options are keys.
+[stderr] sunull nt=2 ntr=5 > in.su && susort --cdp < in.su
+[stderr] sunull nt=2 ntr=5 > in.su && susort +CDP < in.su
+[stderr] sunull nt=4 ntr=1 > in.su && susort verbose=1 < in.su
+# A writable regular file is not a temporary directory; /dev/null output is accepted.
+[stderr] sunull nt=3 ntr=1 > tmpfile && sunull nt=1 ntr=1 | CWP_TMPDIR=tmpfile susort cdp > out.su
+[stderr] sunull nt=2 ntr=1 | susort cdp > /dev/null

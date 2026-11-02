@@ -10,3 +10,19 @@ sucdpbin xline=1,0 yline=0,1 dcdp=1
 sucdpbin xline=0,10 yline=0,0 dcdp=5
 suspike nt=3 ntr=1 | sushw key=sx,gx,scalco a=100,100,2 | sucdpbin xline=0,10 yline=0,0 dcdp=5 distmax=0 cdpmin=0
 [stderr] suspike nt=3 ntr=1 | sucdpbin xline=0,50,100 yline=0,10,0 dcdp=10 verbose=1
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=9 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,1 b=5,5,0,0,0 | sucdpbin xline=0,40 yline=0,0 dcdp=5
+suspike nt=4 ntr=8 | sushw key=sx,gx,sy,gy,scalco a=0,10,0,10,1 b=7,7,2,2,0 | sucdpbin xline=0,20,60 yline=0,10,20 dcdp=6 cdpmin=17 distmax=4
+sunull nt=13 ntr=6 | sushw key=sx,gx,sy,gy,scalco a=0,20,0,0,-10 b=100,100,0,0,0 | sucdpbin xline=0,60 yline=0,0 dcdp=10 distmax=5
+suplane nt=17 ntr=5 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,2 b=5,5,5,5,0 | sucdpbin xline=0,50 yline=0,50 dcdp=10 cdpmin=200
+suspike nt=4097 ntr=1 | sushw key=sx,gx,sy,gy,scalco a=10,20,0,0,1 | sucdpbin xline=0,50 yline=0,0 dcdp=10 distmax=5
+suspike nt=3 ntr=5 | sushw key=sx,gx,sy,gy,scalco a=0,0,3,3,1 b=10,10,0,0,0 | sucdpbin xline=0,40 yline=0,0 dcdp=10 distmax=3
+suspike nt=1 ntr=5 | sushw key=sx,gx,sy,gy,scalco a=5,5,0,0,1 b=10,10,0,0,0 | sucdpbin xline=0,40 yline=0,0 dcdp=10 cdpmin=-10 distmax=5
+[stderr] sunull nt=2 ntr=1 | sushw key=scalco a=1 | sucdpbin xline=0,20,40 yline=0,0,0 dcdp=7 verbose=1 cdpmin=5 distmax=3
+suspike nt=7 ntr=4 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,1 b=15,15,-5,-5,0 | sucdpbin xline=0,15,30,60 yline=0,-5,10,0 dcdp=8 distmax=9
+sunull nt=1 ntr=1 | sushw key=sx,gx,sy,gy,scalco a=-10,-10,0,0,1 | sucdpbin xline=-20,20 yline=0,0 dcdp=5 distmax=1
+suspike nt=2 ntr=1 | sucdpbin xline=0,0 yline=0,1 dcdp=1
+suspike nt=2 ntr=1 | sucdpbin xline=0,1 yline=0,1 dcdp=
+suspike nt=11 ntr=12 | sushw key=sx,gx,sy,gy,scalco a=1000,1003,-400,-397,-10 b=13,13,7,7,0 | sucdpbin xline=99.5,104.25,112.75,120 yline=-40,-37.5,-42,-35 dcdp=1.3 cdpmin=23 distmax=2.2
+sunull nt=3 ntr=9 | sushw key=sx,gx,sy,gy,scalco a=0,0,0,0,1 b=4,4,0,0,0 | sucdpbin xline=0,12,24,36 yline=0,0,0,0 dcdp=4 distmax=0 verbose=0
+suspike nt=4 ntr=3 | sushw key=sx,gx,sy,gy,scalco a=100,100,100,100,-100 | sucdpbin xline=0,10 yline=0,10 dcdp=2 distmax=-1 cdpmin=99

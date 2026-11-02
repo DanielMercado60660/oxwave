@@ -46,3 +46,36 @@ sunull nt=50000 ntr=1 dt=0.004 | suphidecon tm=-0.01 tp=0.01
 # Safety probes run separately against Rust: the C reference has undefined
 # behavior for nt=64 with the default 126-sample window (nfft=105), and for
 # overflowing window lengths or wrap offsets.
+
+# diff-2026-11 (round 1)
+# complexf.c cwp_clog uses float ar*ar+ai*ai, including underflow/overflow.
+# These deliberately preserve the original's nonfinite output (not C UB).
+suspike nt=512 ntr=1 dt=0.004 nspk=1 ix1=1 it1=129 | sugain scale=1e-25 | suphidecon tm=-0.016 tp=0.032 pad=0.1
+suspike nt=512 ntr=1 dt=0.004 nspk=1 ix1=1 it1=129 | sugain scale=1e-20 | suphidecon tm=-0.016 tp=0.032 pad=0.1
+suspike nt=512 ntr=1 dt=0.004 nspk=1 ix1=1 it1=129 | sugain scale=1e25 | suphidecon tm=-0.016 tp=0.032 pad=0.1
+# Negative prewhitening exposes logarithm rounding with finite output.
+suspike nt=509 ntr=1 dt=0.004 nspk=1 ix1=1 it1=169 | suphidecon tm=0 tp=0 pad=-100
+suspike nt=1024 ntr=1 dt=0.004 nspk=1 ix1=1 it1=341 | suphidecon tm=0 tp=0 pad=-100
+suspike nt=16381 ntr=1 dt=0.004 nspk=1 ix1=1 it1=5460 | suphidecon tm=0 tp=0 pad=-100
+# Large odd length, seeded signal, defaults versus explicit defaults.
+sunull nt=4097 ntr=3 dt=0.002 | suaddnoise seed=314 | suphidecon
+sunull nt=4097 ntr=3 dt=0.002 | suaddnoise seed=314 | suphidecon tm=-0.1 tp=0.4 pad=0.1
+# The first trace's dt fixes the window; later dt and other headers survive.
+[stderr] suplane nt=521 ntr=5 dt=0.002 | sushw key=dt,delrt,offset a=8000,-24,-200 b=1000,4,100 | suphidecon tm=-0.024 tp=0.056 pad=0.7 verbose=1
+# A fourth generator, with nonzero reflected wavelets and multiple offsets.
+susynlv nt=257 nxm=2 nxo=2 dt=0.008 | suphidecon tm=-0.016 tp=0.064 pad=1.25
+# One-sided extraction, a negative stabilizer, and a larger zero gather.
+sunull nt=257 ntr=4 dt=0.004 | suaddnoise seed=917 | suphidecon tm=0.008 tp=0.016 pad=-0.5
+sunull nt=4097 ntr=2 dt=0.008 | suphidecon tm=-0.024 tp=0.072 pad=0
+# Numeric parsing: nonnumeric tm is zero, empty values use defaults,
+# and repeated parameters use their last value. Verbose is ignored in C.
+suspike nt=512 ntr=1 | suphidecon tm=abc tp=0 pad=0
+[stderr] suspike nt=512 ntr=1 | suphidecon tm= tp= pad= verbose=1
+suspike nt=512 ntr=1 nspk=1 ix1=1 it1=127 | suphidecon tm=-0.1 tm=-0.016 tp=0.4 tp=0.032 pad=99 pad=0.5
+# Four-sample boundary rejected before the original's odd FFT reads unwritten
+# storage. The existing suite already includes nt=1,2,3 successful cases.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | suphidecon tm=0.04 tp=0
+# Parameter errors and the maximum trace header size (FFT limit error).
+[stderr] suspike nt=512 ntr=1 | suphidecon pad=1e-310
+[stderr] suspike nt=512 ntr=1 | suphidecon tm=1e999
+[stderr] sunull nt=65535 ntr=1 dt=0.002 | suphidecon tm=0 tp=0

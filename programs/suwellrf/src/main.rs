@@ -200,7 +200,12 @@ fn main() {
             maxtrace[itempt] = (tempv[i]*tempr[i] - tempv[i-1]*tempr[i-1]) / (tempv[i]*tempr[i] + tempv[i-1]*tempr[i-1]);
         }
     }
-    let mut t = vec![0.0f32; ntout.max(0) as usize];
+    // ealloc1float receives a size_t; a negative count becomes an
+    // impossible allocation in the original.
+    if ntout < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    let mut t = input_array(ntout as usize);
     let mut tvalue = 0.0f32;
     for v in &mut t { *v = tvalue; tvalue += dtout; }
     ints8r(dtmin, 0.0, &maxtrace[..ntmax.max(0) as usize], 0.0, 0.0, &t, &mut tr.data);

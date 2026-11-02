@@ -216,19 +216,12 @@ fn main() {
         let mut wl = vec![0.0f32; ntfft as usize];
         let mut wlsp = vec![Complex::default(); nw as usize];
         let wtmp = ricker(fmax, dt);
-        // C writes beyond wl when the wavelet exceeds the padded trace.
-        // Reject that undefined case before copying any wavelet samples.
-        if wtmp.len() > wl.len() {
-            err!(
-                "Ricker wavelet length %d exceeds padded trace length %d",
-                wtmp.len() as i32,
-                ntfft
-            );
-        }
         wl.fill(0.0);
         // The original still uses the uncentered wavelet: its proposed
         // time-zero correction is inside a C comment.
-        for it in 0..wtmp.len() {
+        // C sumigpresp.c:255 overruns wl for short traces. Bounding this
+        // copy leaves the nt=4 regression's C output byte-identical.
+        for it in 0..wtmp.len().min(wl.len()) {
             wl[it] = wtmp[it];
         }
         drop(wtmp);
@@ -340,7 +333,15 @@ fn main() {
         // Transpose cq[ix][iw] and apply the original Hamming window.
         for ix in 0..nx {
             for iw in 0..nw {
-                let value = cq[((ix + ix2) * input_nw + iw + nf1) as usize];
+                // C sumigpresp.c:405-413 can read beyond the input spectrum.
+                // Zero extension matches the minimal C bounds fix, whose
+                // f4=200 regression output is identical to the original.
+                let frequency = iw + nf1;
+                let value = if frequency >= 0 && frequency < input_nw {
+                    cq[((ix + ix2) * input_nw + frequency) as usize]
+                } else {
+                    cmplx(0.0, 0.0)
+                };
                 cp[iw as usize][ix as usize] = if iw >= 0 && iw <= nf2 - nf1 {
                     let mut tmpp = (PI / (nf2 - nf1) as f64) as f32;
                     let tmppp = ((tmpp * (iw - nf1) as f32) as f64 - PI) as f32;
@@ -358,7 +359,14 @@ fn main() {
             }
         }
         for iw in 0..nw {
-            cp1[iw as usize][(ixshot - ix2) as usize] = wlsp[(iw + nf1) as usize];
+            // Apply the same bounds fix to the C wavelet read at line 420.
+            let frequency = iw + nf1;
+            cp1[iw as usize][(ixshot - ix2) as usize] =
+                if frequency >= 0 && frequency < input_nw {
+                    wlsp[frequency as usize]
+                } else {
+                    cmplx(0.0, 0.0)
+                };
         }
         if verbose == 2 {
             warn!(

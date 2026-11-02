@@ -224,6 +224,10 @@ fn main() {
     if nplot > 5000 {
         err!("too many plots");
     }
+    // ealloc1 receives nplot as an unsigned allocation size in C.
+    if nplot < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
     let np = nplot.max(0) as usize;
     for i in nn as usize..np {
         n[i] = n[nn as usize - 1];
@@ -251,7 +255,11 @@ fn main() {
     let mut x1data = Vec::new();
     let mut x2data = Vec::new();
     for p in 0..np {
-        let len = n[p].max(0) as usize;
+        // ealloc1float converts a negative npoint to an allocation size.
+        if n[p] < 0 {
+            err!("ealloc.c: malloc failed (Cannot allocate memory)");
+        }
+        let len = n[p] as usize;
         let mut x = vec![0.0; len];
         let mut y = vec![0.0; len];
         if d1[p] == 0.0 && d2[p] == 0.0 && pairs[p] == 0 {

@@ -1,0 +1,23 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/comp/dct/lib/wavepack1.c:150,
+# wavePack_1 evaluates 1<<stage with stage=-1 (undefined negative shift).
+# The final copy at lines 153-159 is skipped in this build, leaving half of
+# z uninitialized before wavePack_row consumes it (wavepack2.c:75).
+# Minimal fix: reject stage<0 at wavepack1.c:49 with err("nstage1 must be nonnegative").
+# orig matches vendor exactly: rc=0, stdout=168 bytes (SHA256
+# f3daedbbc9d1a3e8f1f08022a6d7721cdf37c00fdcb2ec635c2c223ca568921a).
+# fixed: rc=1, empty stdout, stderr="\nwptcomp: nstage1 must be nonnegative\n".
+# OxWave matches fixed exactly (exit status, stdout and full stderr).
+# Evidence: diffcamp/ubx/wptcomp/evidence.json; minimal patch: fix.patch there.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage1=-1
+# Confirmed: vendor/su-original/src/comp/dct/lib/wavepack2.c:239,
+# wavePack_row evaluates 1<<stage with stage=-1 (undefined negative shift).
+# The final copy at lines 242-249 is skipped in this build, leaving half of
+# g uninitialized before uniQuant consumes it (main/wptcomp.c:121).
+# Minimal fix: reject stage<0 at wavepack2.c:118 with err("nstage2 must be nonnegative").
+# orig matches vendor exactly: rc=0, stdout=164 bytes (SHA256
+# c5b8fbf7bbf222f64aaf8d128be3db11ff212885276a13e9ab592fe1da50e410).
+# fixed: rc=1, empty stdout, stderr="\nwptcomp: nstage2 must be nonnegative\n".
+# OxWave matches fixed exactly (exit status, stdout and full stderr).
+# Evidence: diffcamp/ubx/wptcomp/evidence.json; minimal patch: fix.patch there.
+[exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wptcomp n1=16 n2=8 nstage2=-1

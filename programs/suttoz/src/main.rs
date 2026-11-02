@@ -166,15 +166,13 @@ fn maketz(dt: f32, ft: f32, v: &[f32], dz: f32, fz: f32, t: &mut [f32]) {
     yxtoxy(dt, ft, &zt, dz, fz, 0.0, 0.0, t);
     let mut iz = 0usize;
     let mut z = fz;
-    while z <= zt[0] {
-        if iz >= nz { err!("depth extrapolation exceeds output samples"); }
+    while iz < nz && z <= zt[0] {
         t[iz] = (2.0 * z as f64 / v[0] as f64) as f32;
         iz += 1; z += dz;
     }
     let mut iz = nz as isize - 1;
     let mut z = lz;
-    while z >= zt[nt-1] {
-        if iz < 0 { err!("depth extrapolation exceeds output samples"); }
+    while iz >= 0 && z >= zt[nt-1] {
         t[iz as usize] = (lt as f64 + 2.0 * (z - zt[nt-1]) as f64 / v[nt-1] as f64) as f32;
         iz -= 1; z -= dz;
     }

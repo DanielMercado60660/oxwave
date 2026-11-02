@@ -121,7 +121,8 @@ fn assign_header(tr: &mut Trace, b: &[u8], dt: f32) {
     tr.ns = value(b, 8) as i32 as u16;
     tr.dt = ((dt as f64 + if dt >= 0.0 { 0.5 } else { -0.5 }) as i32) as u16;
     tr.delrt = value(b, 80) as i32 as i16;
-    tr.trid = ((value(b, 84) as f64 + 1.0) as i32) as i16;
+    // sstr.zflag + 1 is evaluated as float before conversion to short.
+    tr.trid = ((value(b, 84) + 1.0_f32) as i32) as i16;
     let hour = value(b, 92) / 3600.0_f32;
     let minute = (hour - hour as i32 as f32) * 60.0_f32;
     tr.hour = hour as i32 as i16;

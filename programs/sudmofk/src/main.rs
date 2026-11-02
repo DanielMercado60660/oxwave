@@ -204,6 +204,10 @@ fn main() {
     mkvrms(&tdmo, &vdmo, nt, dt, ft, &mut vrms);
 
     let nx = cdpmax.wrapping_sub(cdpmin).wrapping_add(1) as usize;
+    // Reject oversized padding before C's int conversion and nx addition.
+    if 0.5 * abs(offset / dx) as f64 > i32::MAX as f64 - nx as f64 {
+        err!("cdp padding exceeds int range");
+    }
     let nxpad = (0.5 * abs(offset / dx) as f64) as i32;
     let nxfft = npfar((nx as i32).wrapping_add(nxpad)) as usize;
     let mut p = vec![0.0f32; nt * (nxfft + 2)];
@@ -254,6 +258,9 @@ fn main() {
             noff += 1;
             p = Vec::new();
             if offset != oldoffset {
+                if 0.5 * abs(offset / dx) as f64 > i32::MAX as f64 - nx as f64 {
+                    err!("cdp padding exceeds int range");
+                }
                 let nxpad = (0.5 * abs(offset / dx) as f64) as i32;
                 let nxfft = npfar((nx as i32).wrapping_add(nxpad)) as usize;
                 p = vec![0.0f32; nt * (nxfft + 2)];
@@ -335,6 +342,9 @@ fn dmooff(
     vrms: &[f32],
     ptx: &mut [f32],
 ) {
+    if 0.5 * abs(offset / dx) as f64 > i32::MAX as f64 - nx as f64 {
+        err!("cdp padding exceeds int range");
+    }
     let nxfft = npfar((nx as i32).wrapping_add((0.5 * abs(offset / dx) as f64) as i32)) as usize;
     let mut itmin = nt;
     for ix in 0..nx {
@@ -532,6 +542,12 @@ fn maketu(
     if nu > numax {
         nu = numax;
         du = (eu - fu) / (nu - 1) as f32;
+    }
+    // C converts a negative nu to size_t in ealloc1float and rejects the
+    // resulting enormous allocation. Preserve that error instead of letting
+    // Vec panic on capacity overflow; nu == 0 is accepted by the C allocator.
+    if nu < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
     }
     let mut tofu = vec![0.0f32; nu as usize];
     yxtoxy(dt, ft, &uoft[..nt], du, fu, ft, et, &mut tofu);

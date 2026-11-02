@@ -24,3 +24,24 @@
 [exact] suplane nt=7 ntr=3 | sushw key=d2,f2,delrt a=2.5,-3,-123 | suascii bare=5
 [exact] suspike nt=7 ntr=3 k1=2,4 mag=-2.25,3.5 | suascii bare=3
 [stderr] suplane nt=5 ntr=2 | suascii bare=4 ntr=5 index=1 verbose=1
+# diff-2026-11 (round 1)
+[exact] suspike nt=2 ntr=1 k1=1 mag=-1.25 | suascii bare=0
+[exact] sunull nt=3 ntr=2 | suascii bare=1
+[exact] suspike nt=4 ntr=1 k1=4 mag=2.5 | suascii bare=3 ntr=1
+[exact] suplane nt=13 ntr=4 | suascii option=4 index=0 ntr=3
+[stderr] suspike nt=3 ntr=2 | sushw key=dt,delrt a=12345,-123 | suascii bare=4 index=1 verbose=1
+[exact] suspike nt=4097 ntr=1 k1=4097 mag=-3 | suascii bare=1
+[exact] sunull nt=4097 ntr=1 | suascii bare=3 ntr=1
+[exact] suspike nt=3 ntr=3 k1=2 mag=1.75 | sushw key=d2,f2 a=-0.25,2.5 | suascii bare=5 sep='--'
+[exact] suplane nt=4 ntr=3 | sushw key=offset a=-300 b=125 | suascii bare=5 key=offset
+[exact] suplane nt=3 ntr=2 | sushw key=d1,f1,trid a=0.125,-2,30 | suascii bare=5 key=d1 sep=END
+[stderr] sunull nt=2 ntr=1 | sushw key=dt a=0 | suascii bare=4 dt=0.2 index=1 verbose=1
+[stderr] sunull nt=4 ntr=1 | sushw key=trid,d1,f1 a=30,0,-0.5 | suascii option=4 dt=0.125 index=1 verbose=1
+[stderr] suplane nt=2 ntr=1 | suascii bare=2 option=1 verbose=1
+[exact] suplane nt=1 ntr=2 | suascii option=5 sep='>'
+[exact] suspike nt=17 ntr=2 k1=1,17 mag=0.00001,-123.75 | suascii bare=3 ntr=5
+[stderr] suplane nt=3 ntr=1 | suascii bare=7
+[stderr] suplane nt=3 ntr=1 | suascii ntr=-2
+[stderr] sunull nt=2 ntr=1 | sushw key=dt a=0 | suascii bare=4 dt=0
+[stderr] suplane nt=3 ntr=1 | sushw key=trid,d1 a=18,0 | suascii bare=5
+[exact] suplane nt=3 ntr=2 | sushw key=trid,dt,delrt a=109,12345,321 | suascii bare=5 key=trid

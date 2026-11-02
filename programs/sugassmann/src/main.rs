@@ -270,7 +270,7 @@ fn rock_r0(q:Params)->f32 {
 fn main(){
  let argv=args(); initargs(&argv); requestdoc(0,SDOC); let mut tr=Trace::new();
  let mut nt=500; getparint("nt",&mut nt); CHECK_NT("nt",nt); tr.ns=nt as u16;
- let mut ntr=200; getparint("ntr",&mut ntr); let mut dt=0.004f32; getparfloat("dt",&mut dt); tr.dt=(dt*1000000.0) as i32 as u16;
+ let mut ntr=200; getparint("ntr",&mut ntr); let mut dt=0.004f32; getparfloat("dt",&mut dt); tr.dt=(dt*1000000.0) as u16;
  let mut mode=0; getparint("mode",&mut mode); if mode!=0 && mode!=1 {mode=0;} let mut it1=nt/2; getparint("it1",&mut it1);
  let mut q=Params{temp:140.0,pres:200.0,v1:3300.0,r1:2.6,g:0.56,api:50.0,s:0.35,so:0.7,sg:0.2,kmin:37900.0,mumin:44300.0,rmin:2.67,phi:0.24,a:1.0,b:15.0,c:1.0};
  getparfloat("temp",&mut q.temp); getparfloat("pres",&mut q.pres); getparfloat("v1",&mut q.v1); getparfloat("r1",&mut q.r1); getparfloat("g",&mut q.g); getparfloat("api",&mut q.api); getparfloat("s",&mut q.s); getparfloat("so",&mut q.so); getparfloat("sg",&mut q.sg); getparfloat("kmin",&mut q.kmin); getparfloat("mumin",&mut q.mumin); getparfloat("rmin",&mut q.rmin); getparfloat("phi",&mut q.phi); getparfloat("a",&mut q.a); getparfloat("b",&mut q.b); getparfloat("c",&mut q.c);

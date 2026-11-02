@@ -557,7 +557,11 @@ fn main() {
                 115 => tr.gdel as f64,
                 116 => tr.swdep as f64,
                 117 => tr.gwdep as f64,
-                k => fromhead(&tr, k),
+                k @ 1..=80 => fromhead(&tr, k),
+                // GetCase accepts numbN names outside the header case range.
+                // Zero-initializing headcase.c's otherwise uninitialized dval
+                // preserves the original numb1 regression output (cdp=1).
+                _ => 0.0,
             };
             if (101..=106).contains(&kase[i]) {
                 if tr.scalco > 1 {

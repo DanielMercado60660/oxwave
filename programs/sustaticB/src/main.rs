@@ -164,12 +164,26 @@ fn main() {
         let mut rec_file = String::new();
         getparstring("sou_file", &mut sou_file);
         getparstring("rec_file", &mut rec_file);
-        rec_statics = vec![0.0f32; nr as usize];
-        sou_statics = vec![0.0f32; ns as usize];
+        // alloc1float returns NULL on failure (not ealloc1float's error).
+        // In particular, negative counts must not panic before efopen can
+        // report a missing file. Keep failed allocations empty until use.
+        if rec_statics.try_reserve_exact(nr as usize).is_ok() {
+            rec_statics.resize(nr as usize, 0.0f32);
+        }
+        if sou_statics.try_reserve_exact(ns as usize).is_ok() {
+            sou_statics.resize(ns as usize, 0.0f32);
+        }
         let fpr = efopen(&rec_file, "rb");
+        // C would read through a NULL allocation here; reject that UB.
+        if rec_statics.len() != nr as usize {
+            err!("receiver statics allocation failed");
+        }
         efread(&mut rec_statics, &fpr);
         efclose(&fpr);
         let fps = efopen(&sou_file, "rb");
+        if sou_statics.len() != ns as usize {
+            err!("source statics allocation failed");
+        }
         efread(&mut sou_statics, &fps);
         efclose(&fps);
     }
@@ -202,15 +216,16 @@ fn main() {
             }
             if hdrs == 2 {
                 let ir = is.wrapping_add(io);
-                // Keep C's skipped lookups, but reject its undefined reads at
-                // the inclusive upper bounds (or a wrapped negative index).
-                if is <= ns {
+                // Use the exclusive bounds of the minimal C repair, retaining
+                // the previous static when a lookup is skipped. The nr=1
+                // boundary case is byte-identical to the original (UB round 1).
+                if is < ns {
                     if is < 0 || is as usize >= sou_statics.len() {
                         err!("source static index %d out of range for ns=%d", is, ns);
                     }
                     tsd = (sou_statics[is as usize] as f64 / 1000.0) as f32;
                 }
-                if ir > 0 && ir <= nr {
+                if ir > 0 && ir < nr {
                     if ir as usize >= rec_statics.len() {
                         err!("receiver static index %d out of range for nr=%d", ir, nr);
                     }

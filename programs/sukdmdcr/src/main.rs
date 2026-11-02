@@ -582,7 +582,9 @@ fn dat2d(
     if mr < 0 {
         mr = 0;
     }
-    if mr + nxe > nxi - 1 {
+    // A single surface point makes the C endpoint adjustment set mr=-1.
+    // Match the minimal C bounds fix by rejecting it before interpolation.
+    if nxi < 2 || mr + nxe > nxi - 1 {
         err!("Topography definition is out of range!\n");
     }
 
@@ -658,7 +660,14 @@ fn dat2d(
         }
         let ax0 = (1.0 - ax as f64) as f32;
         for iz in 0..nzt as usize {
-            tzt[iz] = ax0 * tsum[jx as usize][iz] + ax * tsum[(jx + 1) as usize][iz];
+            // At the last table column ax=0; the unused neighbor is outside
+            // the allocation. Match the C fix by skipping that zero term.
+            let right = if ax == 0.0 {
+                0.0
+            } else {
+                ax * tsum[(jx + 1) as usize][iz]
+            };
+            tzt[iz] = ax0 * tsum[jx as usize][iz] + right;
         }
         // Datuming depth at output location.
         am = (x - fxi) / dxi;

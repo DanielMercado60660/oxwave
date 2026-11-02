@@ -14,3 +14,18 @@ printf '%%%%BoundingBox: nonsense\n' > a.ps; psmerge in=a.ps | sed -e '/^%%Creat
 # Real PostScript generators and odd dimensions.
 pslabel t=First > a.ps; pslabel t=Second > b.ps; psmerge in=a.ps in=b.ps translate=0,0 translate=2,1 rotate=30 scale=0.8,1.2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suspike nt=63 ntr=7 | sustrip outpar=/dev/null | pswigb n1=63 n2=7 verbose=0 > a.ps && psmerge in=a.ps origin=1,1 scale=0.5,0.5 rotate=-90 translate=1,2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | pswigb n1=1 n2=1 > a.ps && psmerge in=a.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | pswigb n1=2 n2=1 > a.ps && psmerge in=a.ps rotate=0 scale=1,1 translate=0,0 origin=0,0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=2 | sustrip outpar=/dev/null | pswigb n1=3 n2=2 > a.ps && psmerge in=a.ps rotate=45 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=3 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | pswigb n1=4 n2=3 > a.ps && psmerge in=a.ps scale=-2,0.75 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=5 | sustrip outpar=/dev/null | pswigb n1=17 n2=5 > a.ps && psmerge in=a.ps translate=-1.25,2.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=31 ntr=4 | sushw key=cdp a=10 b=2 | sustrip outpar=/dev/null | pswigb n1=31 n2=4 > a.ps && psmerge in=a.ps origin=1.5,-0.25 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | pswigb n1=4097 n2=1 > a.ps && psmerge in=a.ps scale=0,1 rotate=-37 translate=1,-1 origin=0.5,2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=13 ntr=3 | sustrip outpar=/dev/null | pswigb n1=13 n2=3 > a.ps && suplane nt=13 ntr=3 | sustrip outpar=/dev/null | pswigb n1=13 n2=3 > b.ps && psmerge in=a.ps in=b.ps in=a.ps rotate=30 rotate=-15 scale=1.2,0.5 translate=1,2 translate=-1,0 origin=0.25,0.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=2 | sustrip outpar=/dev/null | pswigb n1=7 n2=2 > a.ps && psmerge in=a.ps scale=2 translate=3 origin=4 rotate=12,13 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=11 ntr=2 | sustrip outpar=/dev/null | pswigb n1=11 n2=2 > a.ps && psmerge in=a.ps in=a.ps rotate=180 scale=-1,-1 translate=-2,-3 origin=-1,-2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | pswigb n1=5 n2=1 > a.ps && psmerge in=missing.ps
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | pswigb n1=5 n2=1 > a.ps && psmerge in=a.ps rotate=1e999
+suspike nt=5 ntr=2 | sustrip outpar=/dev/null | pswigb n1=5 n2=2 > a.ps && psmerge in=a.ps rotate=1e20 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=5 ntr=2 | sustrip outpar=/dev/null | pswigb n1=5 n2=2 > a.ps && psmerge in=a.ps rotate=-1e18 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

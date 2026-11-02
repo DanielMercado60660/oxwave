@@ -19,3 +19,37 @@ sugassmann api=10 g=1.8 s=.02 temp=15 pres=5 so=.3 sg=.4
 sugassmann phi=.05 c=2.5 a=.8 b=30 kmin=70000 mumin=30000 rmin=2.71 v1=4500 r1=2.5
 sugassmann sg=.01 so=0 p=1 g=.6 api=30
 sugassmann temp=250 pres=300 s=.8 so=.1 sg=.05 v1=2000 r1=2.1 p=.5
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sugassmann nt=1 ntr=1 mode=0 dt=.004 it1=0
+sunull nt=2 ntr=1 | sugassmann nt=2 ntr=1 mode=0
+sunull nt=3 ntr=1 | sugassmann nt=3 ntr=1 mode=0
+sunull nt=4 ntr=1 | sugassmann nt=4 ntr=1 mode=0
+suspike nt=7 ntr=1 | sugassmann nt=7 ntr=1 mode=2
+suplane nt=11 ntr=1 | sugassmann nt=4097 ntr=1 mode=0
+sunull nt=1 ntr=1 | sugassmann mode=1 ntr=1 nt=1
+sunull nt=1 ntr=1 | sugassmann mode=2 ntr=1 nt=13 p=.05
+sunull nt=1 ntr=1 | sugassmann temp=40 pres=10 v1=3000 r1=2.2
+sunull nt=1 ntr=1 | sugassmann g=.8 api=30 s=.05 so=.4 sg=.1
+sunull nt=1 ntr=1 | sugassmann kmin=40000 mumin=30000 rmin=2.65 phi=.18
+sunull nt=1 ntr=1 | sugassmann a=1.1 b=10 c=1.3 h=25 p=.1
+sunull nt=1 ntr=1 | sugassmann sg=0 so=0 p=0
+sunull nt=1 ntr=1 | sugassmann sg=.5 so=.2 p=.3
+sunull nt=1 ntr=1 | sugassmann temp=10 pres=1
+sunull nt=1 ntr=1 | sugassmann temp=200 pres=80
+sunull nt=1 ntr=1 | sugassmann phi=.4 a=2 b=5 c=2
+sunull nt=1 ntr=1 | sugassmann v1=1800 r1=1.8
+sunull nt=1 ntr=1 | sugassmann dt=.000001 nt=19
+[stderr] sunull nt=1 ntr=1 | sugassmann verbose=1 mode=0
+sunull nt=1 ntr=1 | sugassmann so=.95 sg=.1
+sunull nt=1 ntr=1 | sugassmann nt=65536
+sunull nt=1 ntr=1 | sugassmann nt=abc
+sunull nt=1 ntr=1 | sugassmann mode=-7 nt=23
+sunull nt=1 ntr=1 | sugassmann p=-.2 sg=.15 so=.5
+sunull nt=1 ntr=1 | sugassmann p=.9 sg=.2 so=.1
+sunull nt=1 ntr=1 | sugassmann v1=2981.5
+sunull nt=1 ntr=1 | sugassmann v1=3056.5
+sunull nt=1 ntr=1 | sugassmann nt=999999999999999999999
+
+# ub-2026-11 (round 1)
+sunull nt=1 ntr=1 | sugassmann dt=-.001 mode=0

@@ -14,3 +14,20 @@ suspike nt=32 | suiclogfft
 suiclogfft
 suspike nt=127 ntr=2 | suaddnoise seed=17 sn=2 | suclogfft | suiclogfft
 suspike nt=125 ntr=2 | suaddnoise seed=42 sn=3 | suclogfft | suiclogfft sign=1 sym=1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suclogfft | suiclogfft sym=0 sign=-1
+suspike nt=3 ntr=2 | suclogfft | suiclogfft sign=1 sym=0
+suspike nt=4 ntr=1 | suclogfft | suiclogfft sym=1 sign=1
+suspike nt=4097 ntr=1 | suclogfft | suiclogfft sign=-1
+suplane nt=251 ntr=4 | suclogfft | suiclogfft sym=1
+sunull nt=17 ntr=3 | suclogfft | suiclogfft sign=1
+suspike nt=53 ntr=3 | suaddnoise seed=91 sn=1 | suclogfft unwrap=0 | sushw key=d1,delrt a=7.5,123 b=0,7 | suiclogfft sym=1
+suspike nt=89 ntr=2 | suclogfft sign=-1 | sushw key=d1,dt a=0,3500 | suiclogfft sign=1 sym=-2
+[stderr] suspike nt=13 ntr=1 | suclogfft | suiclogfft verbose=1 sym=1 sign=-1
+suspike nt=9 ntr=1 | suclogfft | suiclogfft sign=3
+suspike nt=9 ntr=1 | suiclogfft sym=1
+sunull nt=18 ntr=4 | suaddnoise seed=123 sn=1 | sushw key=trid,d1,delrt a=111,2.5,-13 | suiclogfft sym=1 sign=1
+suspike nt=62 ntr=2 | suaddnoise seed=77 sn=0.5 | sushw key=trid,d1,delrt a=111,0.125,30 b=0,0,5 | suiclogfft sign=-1
+suspike nt=22 ntr=1 | suaddnoise seed=37 sn=4 | sushw key=trid,d1,dt a=111,0,500 | suiclogfft sym=2 sign=1
+suspike nt=4097 ntr=3 | suaddnoise seed=64 sn=2 | suclogfft unwrap=0 | suiclogfft sym=1 sign=1

@@ -598,12 +598,14 @@ fn main() {
     }
     write_grid(&u, &stdout());
     warn!("Source function set");
-    output_seismogram(&reflxfile, nx, sx, sz, nt, dx, dt, suhead, &refl_x);
-    output_seismogram(&reflyfile, nx, sx, sz, nt, dx, dt, suhead, &refl_y);
-    output_seismogram(&reflzfile, nx, sx, sz, nt, dx, dt, suhead, &refl_z);
-    output_seismogram(&vspxfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_x);
-    output_seismogram(&vspyfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_y);
-    output_seismogram(&vspzfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_z);
+    output_seismogram(&reflxfile, nx, sx, sz, nt, dx, dt, suhead, &refl_x, true);
+    output_seismogram(&reflyfile, nx, sx, sz, nt, dx, dt, suhead, &refl_y, true);
+    output_seismogram(&reflzfile, nx, sx, sz, nt, dx, dt, suhead, &refl_z, true);
+    output_seismogram(&vspxfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_x, true);
+    // C leaves these two streams open until exit. Keep their buffers alive:
+    // closing early changes the final data when output paths alias snapshots.
+    let _outvspy = output_seismogram(&vspyfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_y, false);
+    let _outvspz = output_seismogram(&vspzfile, nz, sx, sz, nt, dx, dt, suhead, &vsp_z, false);
     exit(CWP_Exit());
 }
 
@@ -649,9 +651,10 @@ fn output_seismogram(
     dt: f32,
     suhead: i32,
     data: &Grid,
-) {
+    close: bool,
+) -> Option<CFile> {
     if file.is_empty() {
-        return;
+        return None;
     }
     let Some(fp) = fopen(file, "w") else {
         fprintf!(stderr(), "Cannot open file=%s\n", file);
@@ -662,7 +665,12 @@ fn output_seismogram(
     } else {
         write_grid(data, &fp);
     }
-    fclose(&fp);
+    if close {
+        fclose(&fp);
+        None
+    } else {
+        Some(fp)
+    }
 }
 
 fn su_output(

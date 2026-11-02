@@ -10,3 +10,27 @@ suplane nt=8 ntr=4 | supscube tmpdir=/no/such/directory
 suplane nt=8 ntr=4 | env -u CWPROOT -u CWPBIN supscube
 suplane nt=8 ntr=4 | supscube n2=0 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
 suplane nt=8 ntr=4 | supscube n2=-1 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | supscube n2=1 n3=1 d1=.003 d2=2 d3=4 f1=-.5 f2=8 tmpdir=. verbose=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=3 ntr=1 | supscube n2=1 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=4 ntr=2 | supscube n2=2 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suspike nt=13 ntr=6 k1=3 k2=2 | supscube n2=2 n3=3 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suspike nt=19 ntr=6 k1=5 k2=4 | sushw key=ntr a=0 | supscube n2=2 tmpdir=. verbose=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=4097 ntr=2 | supscube n2=2 n3=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=11 ntr=6 | sushw key=ntr a=0 | supscube n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=23 ntr=6 | sushw key=ntr a=6 | supscube n2=3 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=29 ntr=6 | sushw key=ntr a=6 | supscube n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=7 ntr=4 | sushw key=trid,dt,d1,d2,f1,f2,tracr,tracl a=130,0,0,0,0,0,0,0 | supscube n2=2 n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=7 ntr=4 | sushw key=trid,dt,delrt,tracr,tracl a=1,2000,-250,7,3 | supscube n2=2 n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=7 ntr=4 | sushw key=trid,dt,tracr,tracl a=1,0,0,9 | supscube n2=2 n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=17 ntr=4 | sushw key=d1,d2,f1,f2 a=.01,4,-2,5 | supscube n2=2 n3=2 d1=.02 d2=3 d3=2 f1=1 f2=-4 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suplane nt=31 ntr=6 | supscube n2=2 n3=3 style=seismic title=Test | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=5 ntr=2 | supscube tmpdir=/this/path/does/not/exist
+sunull nt=5 ntr=2 | supscube n2=999999999999999999999
+sunull nt=5 ntr=2 | supscube n2=1 n3=2 d1=0 d2=1 d3=1 f1=0 f2=0 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+[stderr] sunull nt=9 ntr=4 | sushw key=ntr,trid,dt,d1,tracr,tracl a=0,1,0,0,0,0 | supscube n2=2 verbose=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+[stderr] sunull nt=9 ntr=4 | sushw key=ntr,trid,dt,d1,tracr,tracl a=0,130,0,0,0,0 | supscube n3=2 tmpdir=. verbose=1 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=4 ntr=5 | supscube n2=2 n3=2 faces=1 verbose=0 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+suspike nt=31 ntr=8 k1=4 k2=3 | supscube n2=4 n3=2 legend=1 bps=24 brgb=0,0,1 wrgb=1,0,0 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=11 ntr=4 | env CWPBIN="$CWPROOT/bin" supscube n2=2 n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d
+sunull nt=11 ntr=4 | sushw key=trid,dt,d1,tracr,tracl a=109,0,0,0,0 | supscube n2=2 n3=2 | sed -e /^%%CreationDate/d -e /^%%Creator/d

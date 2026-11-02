@@ -147,6 +147,11 @@ fn main() {
         if getparfloat("fxo", &mut fxo) == 0 {
             fxo = 0.0;
         }
+        // Preserve ealloc1float(nxo), including its failure for a negative
+        // count converted to size_t, before reading shot/midpoint geometry.
+        if xo.try_reserve_exact(nxo as usize).is_err() {
+            err!("ealloc.c: malloc failed (Cannot allocate memory)");
+        }
         for ixo in 0..nxo {
             xo.push(fxo + ixo as f32 * dxo);
         }
@@ -317,8 +322,9 @@ fn main() {
     tr.trid = 1;
     tr.counit = 1;
     tr.ns = nt as u16;
-    // C converts to an integer before narrowing to the 16-bit header field.
-    tr.dt = (1.0e6 * dt as f64) as i32 as u16;
+    // C uses an unsigned conversion for dt and a signed one for delrt,
+    // before narrowing to the respective 16-bit header fields.
+    tr.dt = (1.0e6 * dt as f64) as u32 as u16;
     tr.delrt = (1.0e3 * ft as f64) as i32 as i16;
 
     // Own the makeone static filter here, initializing it on the first trace.
@@ -383,7 +389,9 @@ fn main() {
                 nt,
                 dt,
                 ft,
-                &mut tr.data[..nt as usize],
+                // Negative nt runs no sample loop in C, then fails at
+                // makeone's workspace allocation rather than slicing here.
+                &mut tr.data[..nt.max(0) as usize],
                 &mut hd,
             );
             puttr(&mut tr);
@@ -420,8 +428,8 @@ fn makeone(
         hd
     });
 
-    for it in 0..nt as usize {
-        trace[it] = 0.0;
+    for it in 0..nt {
+        trace[it as usize] = 0.0;
     }
 
     // Velocities at source and receiver.
@@ -469,12 +477,25 @@ fn makeone(
             amp *= (ci + cr) * ar * ds;
 
             // Add sinc wavelet to trace.
+            // modeling.c:520-540 truncates negative tn toward zero, leaving
+            // a negative sinc-table index for events just before ft. Match
+            // the bounds-checked C's clean error before calling addsinc.
+            let tn = (time - ft) / dt;
+            let jt = tn as i32;
+            let jsinc = ((tn - jt as f32) * 100.0) as i32;
+            if jt.wrapping_add(4) >= 0 && jt.wrapping_sub(3) < nt && !(0..101).contains(&jsinc) {
+                err!("addsinc: sinc index %d out of bounds", jsinc);
+            }
             addsinc(time, amp, dt, ft, trace);
         }
     }
 
     // Apply the half-derivative filter, then convolve the wavelet with trace.
-    let mut temp = vec![0.0; nt as usize];
+    let mut temp = Vec::new();
+    if temp.try_reserve_exact(nt as usize).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    temp.resize(nt as usize, 0.0);
     convolve_cwp(-LHD, hd, 0, trace, 0, &mut temp);
     convolve_cwp(w.iw, &w.wv[..w.lw as usize], 0, &temp, 0, trace);
 }

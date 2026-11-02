@@ -139,6 +139,10 @@ fn main() {
     if getparint("nt", &mut nt) == 0 {
         nt = 101;
     }
+    // The minimally fixed C rejects counts beyond segy's data array.
+    if nt > SU_NFLTS as i32 {
+        err!("nt exceeds SU_NFLTS (%d)", SU_NFLTS);
+    }
     if getparfloat("dt", &mut dt) == 0 {
         dt = 0.04;
     }
@@ -167,6 +171,11 @@ fn main() {
         }
         if getparfloat("fxo", &mut fxo) == 0 {
             fxo = 0.0;
+        }
+        // ealloc1float converts a negative count to an impossible size_t
+        // allocation and reports ENOMEM, rather than panicking on capacity.
+        if nxo < 0 {
+            err!("ealloc.c: malloc failed (Cannot allocate memory)");
         }
         xo = vec![0.0f32; nxo as usize];
         for ixo in 0..nxo {
@@ -332,6 +341,12 @@ fn main() {
     }
     tmin = max(tmin, max(ft, dt));
     let dsmax = ((vmin / (2 * ndpfz) as f32) as f64 * ((tmin / fpeak) as f64).sqrt()) as f32;
+    // NaN or zero spacing makes makeref's C segment-count conversion
+    // undefined. Match its minimal range check before calling the library,
+    // whose saturating Rust cast would otherwise generate invalid traces.
+    if !input.is_empty() && (dsmax.is_nan() || dsmax == 0.0) {
+        err!("makeref: invalid reflector segment count");
+    }
     let r = makeref(dsmax, &input);
     let mut ns = 0i32;
     for reflector in &r {
@@ -592,8 +607,17 @@ fn makeone(
             if jt > i32::MAX - 4 || jt < i32::MIN + 3 {
                 reference_sigbus();
             }
-            addsinc(time, amp, dt, ft, &mut trace[..nt as usize]);
+            // With nt < 0, addsinc's clipped sample loop is empty. Do not
+            // turn that signed count into a slice length before ealloc below.
+            if nt >= 0 {
+                addsinc(time, amp, dt, ft, &mut trace[..nt as usize]);
+            }
         }
+    }
+    // Keep the failure at C's workspace allocation, after ray tracing and
+    // before convolution. Empty output geometries never reach this point.
+    if nt < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
     }
     let mut temp = vec![0.0f32; nt as usize];
     convolve_cwp(-LHD, hd, 0, &trace[..nt as usize], 0, &mut temp);

@@ -15,3 +15,32 @@ suvel2df tn=0.2 offsetm=100
 suplane nt=10 ntr=1 | suvel2df offsetm=1
 suplane nt=10 ntr=1 | suvel2df tn=0.1
 suplane nt=10 ntr=1 | suvel2df tn=0.1 offsetm=1 nv=999999999999999999999
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | suvel2df tn=0 offsetm=10 nv=1 nvh=1 nsmooth=1
+suspike nt=3 ntr=2 k1=2 | suvel2df tn=0.004 offsetm=10 nv=2 nvh=2 nsmooth=1
+suspike nt=4 ntr=3 k1=2 | sushw key=offset a=0 b=1 | suvel2df tn=0.004 offsetm=20 nv=2 nvh=3 nsmooth=3 offsetmax=20
+suplane nt=31 ntr=1 | suvel2df tn=0.04 offsetm=100 nv=1 nvh=1 dtratio=1
+suplane nt=37 ntr=4 | sushw key=offset a=-30 b=20 | suvel2df tn=0.06 offsetm=200 nv=4 dv=100 fv=1400 nvh=3 dvh=125 fvh=1500 xod=3 vavg=1800 dtratio=2
+suspike nt=4097 ntr=2 k1=1001 | sushw key=offset a=0 b=40 | suvel2df tn=4 offsetm=100 nv=2 nvh=3 nsmooth=7 offsetmax=100
+sunull nt=53 ntr=4 | sushw key=cdp a=10 b=1 | suvel2df tn=0.1 offsetm=50 nv=2 nvh=2 verbose=1
+[stderr] suspike nt=121 ntr=6 dt=0.004 k1=30,31,32 mag=1,2,3 | sushw key=offset a=-50 b=20 | suvel2df tn=0.12 offsetm=200 nv=3 nvh=4 nsmooth=5 offsetmax=50 verbose=1
+suplane nt=101 ntr=5 | sushw key=cdp a=1 b=0 j=2 | sushw key=offset a=0 b=10 | suvel2df tn=0.1 offsetm=100 nv=2 nvh=2 nsmooth=4 offsetmax=100
+suspike nt=101 ntr=4 dt=0.002 k1=51 | sushw key=delrt a=20 | sushw key=offset a=0 b=10 | suvel2df tn=0.08 offsetm=50 nv=3 nvh=3 nsmooth=5 offsetmax=50
+suplane nt=73 ntr=3 | sushw key=offset a=40 b=0 | suvel2df tn=0.08 offsetm=5 nv=2 nvh=2 xod=0 vavg=1000
+suplane nt=73 ntr=3 | sushw key=offset a=40 b=0 | suvel2df tn=0.08 offsetm=500 nv=2 nvh=2 xod=4 vavg=2000
+suspike nt=81 ntr=3 k1=20 | sushw key=offset a=0 b=15 | suvel2df tn=0.076 offsetm=100 nv=2 nvh=2 fv=1000 dv=0 fvh=1800 dvh=0 nsmooth=1 offsetmax=100
+suplane nt=89 ntr=5 | sushw key=offset a=-60 b=30 | suvel2df tn=0.08 offsetm=100 nv=3 nvh=4 fv=1800 dv=-100 fvh=1900 dvh=-200 nsmooth=7 offsetmax=60
+suplane nt=101 ntr=3 | suvel2df tn=0.2 offsetm=100 nv=2 nvh=2 dtratio=0
+suplane nt=101 ntr=3 | suvel2df tn=1 offsetm=100 nv=2 nvh=2 nsmooth=5
+suspike nt=101 ntr=4 k1=25 | sushw key=offset a=0 b=20 | suvel2df tn=0.1 offsetm=100 nv=3 nvh=3 nsmooth=21 offsetmax=100
+[stderr] suplane nt=41 ntr=3 | sushw key=cdp a=2 b=-1 | suvel2df tn=0.04 offsetm=20 nv=2 nvh=2 verbose=1
+suplane nt=41 ntr=1 | suvel2df tn=0.04 offsetm=20 nv=1 nvh=1 dvh=25.5
+suspike nt=71 ntr=5 dt=0.004 k1=21 | sushw key=offset a=-20 b=10 | suvel2df tn=0.08 offsetm=50 nv=2 nvh=2 nsmooth=2 offsetmax=20
+suplane nt=10 ntr=1 | suvel2df tn= offsetm=1
+suplane nt=10 ntr=1 | suvel2df tn=0.1 offsetm=
+suplane nt=10 ntr=1 | suvel2df tn=0.1 offsetm=1 nvh=999999999999999999999
+sunull nt=20 ntr=1 | suvel2df tn=0.02 offsetm=10 nv=0 nvh=2
+sunull nt=20 ntr=1 | suvel2df tn=0.02 offsetm=10 nv=2 nvh=0
+sunull nt=20 ntr=1 | suvel2df tn=0.02 offsetm=10 nv=2 nvh=2 nsmooth=0
+suspike nt=5 ntr=2 k1=2 | suvel2df tn=0.004 offsetm=10 nv=2 nvh=17 nsmooth=3
+[stderr] suspike nt=101 ntr=6 k1=25,26 | sushw key=offset a=-30 b=12 | sushw key=cdp a=10 b=1 j=3 | suvel2df tn=0.1 offsetm=100 nv=4 nvh=4 fv=1250.3 dv=37.2 fvh=1475.4 dvh=52.7 nsmooth=6 offsetmax=100 verbose=1

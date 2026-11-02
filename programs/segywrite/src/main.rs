@@ -118,7 +118,17 @@ fn main() {
     if verbose != 0 { warn!("header file closed successfully"); }
     let mut errcount = 0;
     write_tape(&mut fd, &fp, &ebcbuf[..3200], &mut errcount, errmax, verbose, "ebcdic header", 0);
-    let mut bhbytes = [0u8; 400]; fread(&mut bhbytes, &binaryfp);
+    let mut bhbytes = [0u8; 400];
+    let nread = fread(&mut bhbytes, &binaryfp);
+    // xdrbhdrsub continues after a failed read, retaining its last utemp
+    // for each subsequent pair of shorts.
+    if nread >= 16 && nread < bhbytes.len() {
+        let end = nread / 4 * 4;
+        let last: [u8; 4] = bhbytes[end-4..end].try_into().unwrap();
+        for i in (end..bhbytes.len()).step_by(4) {
+            bhbytes[i..i+4].copy_from_slice(&last);
+        }
+    }
     let mut bh = Bhed::from_xdr(&bhbytes);
     if format_set { bh.format = format as i16; } bh.ntrpr = 1;
     let ns = bh.hns as usize;

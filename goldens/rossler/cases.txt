@@ -73,3 +73,50 @@
 
 # Parameter-file parsing and command-line precedence.
 [f32] printf 'stepmax=9 mode=xyz a=.1 b=.3 c=4 y0=2 y1=1 y2=3 h=.02 tol=1e-7\n' > parameters; rossler par=parameters a=.2
+
+# diff-2026-11 (round 1)
+# ROSSLER is a source of native floats, not a trace filter: it never reads stdin.
+# Keep stdin open, then drain it after the command, preserving its exit status.
+# This exercises supplied trace sizes/headers without a producer SIGPIPE race.
+# Defaults, explicit defaults, every mode, and one through four output points.
+[f32] sunull nt=1 ntr=1 | { rossler; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=2 ntr=1 | { rossler stepmax=500 verbose=0 y0=1 y1=-1 y2=1 h=.01 tol=1e-8 mode=xy a=.2 b=.2 c=5.7; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | { rossler stepmax=1 mode=x y0=-2.5 y1=3 y2=.125; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | { rossler stepmax=2 mode=y h=.125; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { rossler stepmax=3 mode=z h=-.125; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4 ntr=1 | { rossler stepmax=4 mode=yz a=-.3 b=.4 c=2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suplane nt=17 ntr=3 npl=1 dip1=0 len1=3 cx1=2 ct1=8 | { rossler stepmax=17 mode=xz y0=-.75 y1=2.5 y2=.25; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=31 ntr=3 nspk=1 ix1=2 it1=17 | { rossler stepmax=31 mode=xyz h=.0625 tol=1e-12 a=.1 b=.25 c=6; rc=$?; cat >/dev/null; exit "$rc"; }
+# Headers and large input are irrelevant; large trajectories also exercise output.
+[f32] sunull nt=4097 ntr=1 | sushw key=dt,delrt,offset,cdp a=2000,-25,-1200,17 | { rossler stepmax=4097 mode=xyz; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=17 ntr=3 nspk=1 ix1=2 it1=8 | suchw key1=cdp key2=tracl key3=tracl a=101 b=2 c=0 | { rossler stepmax=97 mode=xy h=.03125; rc=$?; cat >/dev/null; exit "$rc"; }
+sunull nt=1 ntr=1 | { rossler stepmax=4097 mode=x h=.02; rc=$?; cat >/dev/null; exit "$rc"; } | suaddhead ns=4097
+# The solver stops at half its minimum step (5e-7); test both sides and signs.
+[f32] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=4 mode=xyz h=.0000004999999999 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { rossler stepmax=4 mode=xyz h=.0000005 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=3 ntr=1 | { rossler stepmax=4 mode=xyz h=.0000005000000001 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=4 ntr=1 | { rossler stepmax=4 mode=xyz h=-.0000005 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=7 ntr=1 | { rossler stepmax=4 mode=xyz h=-.0000005000000001 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+# Overshoot/retry, backward integration, and convergence failure diagnostics.
+[f32] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=11 mode=xyz h=2 tol=1e-15 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { rossler stepmax=11 mode=xyz h=-1 tol=1e-12 verbose=2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=3 ntr=1 | { rossler stepmax=4 mode=xyz h=.000001 tol=-.001 verbose=-2; rc=$?; cat >/dev/null; exit "$rc"; }
+# Stationary signed zeros and exactly representable coordinates (byte comparison).
+[exact] sunull nt=1 ntr=1 | { rossler stepmax=4 mode=xyz h=-0 y0=-0 y1=-0 y2=-0; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] sunull nt=2 ntr=1 | { rossler stepmax=3 mode=xyz h=0 y0=0x1.8p1 y1=-0x1.4p2 y2=0x1p-12; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { rossler stepmax=19 mode=xyz h=0x1p-5 a=0x1p-2 b=0x1p-3 c=0x1.8p2; rc=$?; cat >/dev/null; exit "$rc"; }
+# At exactly 5e-7, later t+h subtraction can round above the solver threshold,
+# triggering coefficient parsing after three points. Empty output never parses a.
+[f32] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=4 mode=xyz h=.0000005 a=1e999 b=1e999 c=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=-2147483648 mode=xyz verbose=1 a=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+# Mode validation still occurs with no points; initial values parse before modes.
+[stderr] sunull nt=1 ntr=1 | { rossler stepmax=0 mode=xyzjunk; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { rossler stepmax=0 mode=; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { rossler stepmax=1 mode=bad y2=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=1 mode=xyz c=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { rossler stepmax=-2147483649; rc=$?; cat >/dev/null; exit "$rc"; }
+[stderr] sunull nt=1 ntr=1 | { rossler stepmax=1 y1=0x1p1024; rc=$?; cat >/dev/null; exit "$rc"; }
+# Numeric defaults, repeated values, and nonfinite tolerance/coordinates.
+[f32] sunull nt=1 ntr=1 | { rossler stepmax=11 h= tol= y0= y1= y2= a= b= c= mode=xyz; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=1 ntr=1 | { rossler stepmax=0 stepmax=13 mode=bad mode=xyz a=1e999 a=.25 y1=9 y1=-2; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { rossler stepmax=5 mode=xyz y1=nan y2=-1 tol=nan verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }

@@ -16,3 +16,26 @@ sushw key=cdp infile=missing.bin
 sunull nt=3 ntr=1 | sushw key=cdp infile=
 python3 -c 'import struct; open("values.bin","wb").write(struct.pack("=4f",1.5,-2,3,4))' && sunull nt=3 ntr=2 | sushw key=cdp,offset infile=values.bin
 python3 -c 'import struct; open("values.bin","wb").write(struct.pack("=2f",1,2))' && sunull nt=3 ntr=3 | sushw key=cdp infile=values.bin
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=8 | sushw key=cdp a=11 b=3 c=40 d=1 j=3
+suspike nt=4 ntr=6 | sushw key=offset a=-4.75 b=1.5 c=-2.25 d=-3 j=2
+suplane nt=17 ntr=4 | sushw key=tracl,tracr,cdp a=10,20,30 b=1,-2,3 c=5,6,-7 d=0,1,-1 j=2,3,4
+sunull nt=4097 ntr=1 | sushw key=d1 a=0.125
+sunull nt=3 ntr=4 | sushw key=dt,delrt a=65535,-12 b=-1,4
+sunull nt=2 ntr=5 | sushw key=offset a=5 b=2 c=7 d=-4 j=-3
+sunull nt=1 ntr=3 | sushw key=cdp a=8 b=2 j=0
+sunull nt=3 ntr=3 | sushw key=cdp a=9 b=1 | suchw key1=gx key2=cdp b=2 | sushw key=offset a=7 b=3
+[stderr] suspike nt=7 ntr=2 | sushw key=cdp a=2 verbose=1
+printf '1.5 -2 3 4 5 6\n' | a2b n1=2 > values.bin && sunull nt=4 ntr=3 | sushw key=cdp,offset infile=values.bin
+printf '10 20\n' | a2b n1=1 > values.bin && sunull nt=2 ntr=2 | sushw key=d1 infile=values.bin
+sunull nt=2 ntr=1 | sushw key=notakey
+sunull nt=2 ntr=1 | sushw key=cdp,offset a=1,2 b=3
+sunull nt=2 ntr=1 | sushw key=cdp infile=does-not-exist
+sunull nt=2 ntr=2 | sushw key=cdp a=0 b=1 c=0 d=0 j=18446744073709551615
+sunull nt=3 ntr=4 | sushw key=unscale,ungpow a=1.25,-3.5 b=0.5,0.25 c=2,-1 d=0,1 j=2,3
+printf '1 2 3\n' | a2b n1=1 > values.bin && sunull nt=2 ntr=2 | sushw key=cdp,offset infile=values.bin
+sunull nt=4 ntr=4 | sushw key=cdp,cdp a=10,20 b=1,-2 j=2,3
+sunull nt=2 ntr=4 | sushw key=dt a=-0.5 b=0.5
+sunull nt=2 ntr=6 | sushw key=d1 a=0.333333333333 b=0.111111111111 c=-0.222222222222 d=0.5 j=2.5
+sunull nt=2 ntr=3 | sushw key=offset a=2 b=3 d=1 j=1
+sunull nt=2 ntr=2 | sushw key=cdp a=4 a=8 b=1

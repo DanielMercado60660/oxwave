@@ -105,7 +105,7 @@ fn dmoapply(
     np: usize,
     dp2: f32,
     h: f32,
-    tntable: &[Vec<f32>],
+    tntable: &[f32],
     it0min: &[usize],
     nt0: &[usize],
     tmin: f32,
@@ -158,7 +158,7 @@ fn jakub1k(
     nt: usize,
     dt: f32,
     ft: f32,
-    tntable: &[Vec<f32>],
+    tntable: &[f32],
     it0min: &[usize],
     nt0: &[usize],
     fmax: f32,
@@ -205,7 +205,7 @@ fn jakub1k(
             // sinc table; reject that undefined input before calling it.
             let xouts = (1.0 / dt as f64) as f32;
             let xoutb = (8.0 - (ft * xouts) as f64) as f32;
-            for &tn in &tntable[ip][..nt0[ip]] {
+            for &tn in &tntable[ip * nt..ip * nt + nt0[ip]] {
                 let xoutn = xoutb + tn * xouts;
                 if !xoutn.is_finite() || xoutn < i32::MIN as f32 || xoutn >= -(i32::MIN as f32) {
                     err!("DMO mapping exceeds sinc interpolation sample range");
@@ -217,7 +217,7 @@ fn jakub1k(
                 qq,
                 czero,
                 czero,
-                &tntable[ip][..nt0[ip]],
+                &tntable[ip * nt..ip * nt + nt0[ip]],
                 &mut qn[it0min[ip]..it0min[ip] + nt0[ip]],
             );
             for it in it0min[ip] + nt0[ip]..ntfft {
@@ -719,7 +719,9 @@ fn dmooff(
     // C reads one past a row when no mapping was found. The tables are
     // contiguous and zeroed, so supply that next row's zero explicitly.
     let mut t0table = vec![vec![0.0f32; ntn + 1]; np];
-    let mut tntable = vec![vec![0.0f32; nt]; np];
+    // ealloc2float has contiguous rows. A nonmonotone mapping can make
+    // the initial nt0 negative, so extrapolation starts in a previous row.
+    let mut tntable = vec![0.0f32; nt * np];
     let h = (offset as f64 / 2.0).abs() as f32;
     let mut tn = ftn;
     for itn in 0..ntn {
@@ -762,7 +764,7 @@ fn dmooff(
         }
         let itnmax = itnmax as usize;
         let it0max = (nint((t0table[ip][itnmax] / dt) as f64) as usize).min(nt - 1);
-        nt0[ip] = it0max - it0min[ip] + 1;
+        let n = it0max as i32 - it0min[ip] as i32 + 1;
         for itn in itnmin + 1..itnmax {
             if t0table[ip][itn] <= t0table[ip][itn - 1] && verbose != 0 {
                 fprintf!(
@@ -779,23 +781,18 @@ fn dmooff(
             it0min[ip] as f32 * dt,
             ftn + itnmin as f32 * dtn,
             ftn + itnmax as f32 * dtn,
-            &mut tntable[ip][..nt0[ip]],
+            // With ny <= 0, C's yxtoxy does not write any samples.
+            &mut tntable[ip * nt..ip * nt + n.max(0) as usize],
         );
-        let mut it = nt0[ip];
-        if it == 1 && it < nt {
-            // C's ealloc2float stores all rows contiguously: at it=1,
-            // tntable[ip][it-2] is the last sample of the preceding row.
-            // For the first row that read is outside the allocation.
-            if ip == 0 {
+        for it in n..nt as i32 {
+            let index = (ip * nt) as i64 + it as i64;
+            // Reads within preceding rows are valid in the contiguous
+            // allocation; reads before its beginning are undefined in C.
+            if index < 2 {
                 err!("DMO mapping has fewer than two samples for extrapolation");
             }
-            tntable[ip][it] =
-                (2.0 * tntable[ip][it - 1] as f64 - tntable[ip - 1][nt - 1] as f64) as f32;
-            it += 1;
-        }
-        for it in it..nt {
-            tntable[ip][it] =
-                (2.0 * tntable[ip][it - 1] as f64 - tntable[ip][it - 2] as f64) as f32;
+            let index = index as usize;
+            tntable[index] = (2.0 * tntable[index - 1] as f64 - tntable[index - 2] as f64) as f32;
         }
         nt0[ip] = nt - it0min[ip];
         ip += 1;

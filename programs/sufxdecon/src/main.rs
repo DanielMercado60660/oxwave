@@ -340,6 +340,18 @@ fn main() {
         } else {
             nsp - nspws * iw + nstaper / 2
         };
+        // UB verification: C's memset(tidataw+nspw, ...) at line 334
+        // overruns the allocation for a negative or oversized window.
+        // Match the bounds-checked C's clean error instead of slicing it.
+        if nspw < 0 || nspw > nfft {
+            err!("time window exceeds trace bounds");
+        }
+        // C lines 505-509 start at nstaper; lines 520-521 start at
+        // nspw-nstaper. These cases index before the first output trace.
+        // Later short windows retain the established padded representation.
+        if nwx > 0 && ntw > 1 && (nstaper < 0 || (iw == 0 && nstaper > nspw)) {
+            err!("taper exceeds time window bounds");
+        }
         if verbose != 0 {
             warn!("iw=%i, ntw=%i, nspw=%i, twlen=%f", iw, ntw, nspw, twlen);
         }

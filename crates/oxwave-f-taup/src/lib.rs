@@ -301,10 +301,11 @@ pub fn fwd_tx_sstack(
     out_traces: &mut [Vec<f32>],
 ) {
     for ip in 0..out_traces.len() {
-        let p = pmin + ip as f32 * dp;
+        // C initializes p and x directly before the first loop iterations.
+        let p = if ip == 0 { pmin } else { pmin + ip as f32 * dp };
         out_traces[ip][..nt].fill(0.0);
         for ix in 0..traces.len() {
-            let x = xmin + ix as f32 * dx;
+            let x = if ix == 0 { xmin } else { xmin + ix as f32 * dx };
             let delay = p * x / dt;
             let (id, fit, lit) = if delay >= 0.0 {
                 (delay as i32, delay as i32 + 1, nt as i32 - 1)
@@ -544,6 +545,8 @@ pub fn fwd_FK_sstack(
 ) {
     let nx = traces.len();
     let np = out_traces.len();
+    // C computes nx-1 as a signed integer, including for an empty panel.
+    let nx_last = nx as i64 - 1;
     let pmax = pmin + (np - 1) as f32 * dp;
     let fp = (pmin as f64 + 0.5 * (pmax - pmin - (np - 1) as f32 * dp) as f64) as f32;
     let pmax = if dp < 0.0 {
@@ -554,7 +557,7 @@ pub fn fwd_FK_sstack(
     let xmax = if dx < 0.0 {
         xmin
     } else {
-        xmin + (nx - 1) as f32 * dx
+        xmin + nx_last as f32 * dx
     };
     let ntpad = (pmax * xmax).abs() / dt;
     let ntfft = oxwave_pfa_fft::npfar((nt + ntpad as usize) as i32) as usize;
@@ -594,7 +597,7 @@ pub fn fwd_FK_sstack(
             ka[ik] = ka[nxfft + ik];
             ka[8 + nxfft + ik] = ka[8 + ik];
         }
-        let shift = (0.5 * (nx - 1) as f64 * dx as f64) as f32;
+        let shift = (0.5 * nx_last as f64 * dx as f64) as f32;
         let mut k = fka;
         for z in &mut ka {
             let phase = k * shift;
@@ -613,7 +616,7 @@ pub fn fwd_FK_sstack(
         }
         let mut hp = vec![zero; np];
         oxwave_sinc_interp::ints8c(dk, fka, &ka, zero, zero, &kp, &mut hp);
-        let shift = (-xmin as f64 - 0.5 * (nx - 1) as f64 * dx as f64) as f32;
+        let shift = (-xmin as f64 - 0.5 * nx_last as f64 * dx as f64) as f32;
         for ip in 0..np {
             let phase = kp[ip] * shift;
             let c = (phase as f64).cos() as f32;
@@ -933,5 +936,38 @@ pub fn forward_p_transform(
         oxwave_pfa_fft::pfacr(-1, &out[ip], &mut rt);
         taupmute(ip as i32, ipa, ipb, 7, &mut rt);
         output[ip][..nt].copy_from_slice(&rt[..nt]);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_fk_panel_outputs_zero_traces() {
+        for dx in [1.0, -1.0] {
+            let mut out = vec![vec![7.0; 17]; 3];
+            fwd_FK_sstack(0.004, 17, 0.0, dx, -0.002, 0.002, 0.0, &[], &mut out);
+            assert!(out.iter().flatten().all(|&v| v == 0.0));
+        }
+    }
+
+    #[test]
+    fn first_tx_slope_does_not_multiply_infinite_step_by_zero() {
+        let traces = vec![vec![1.0, 2.0, 3.0, 4.0, 5.0]];
+        let mut out = vec![vec![0.0; 5]];
+        fwd_tx_sstack(1.0, 5, 1.0, 1.0, 0.0, f32::INFINITY, &traces, &mut out);
+        assert_eq!(out[0], [0.0, 2.0, 3.0, 4.0, 0.0]);
+    }
+
+    #[test]
+    fn inverse_single_slope_uses_finite_first_coordinate() {
+        let traces = vec![vec![1.0, -2.0, 3.0, -4.0, 5.0]];
+        let mut out = vec![vec![0.0; 5]];
+        inv_tx_sstack(1.0, 5, 1, 1.0, 1.0, 0.1, f32::INFINITY, &traces, &mut out);
+        assert_eq!(
+            out[0],
+            [0.0, 0.0, f32::INFINITY, f32::NEG_INFINITY, f32::INFINITY]
+        );
     }
 }

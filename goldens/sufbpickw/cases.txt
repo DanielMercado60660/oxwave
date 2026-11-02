@@ -57,3 +57,45 @@ sunull nt=3 ntr=1 | sufbpickw window=0.004
 sunull nt=7 ntr=1 | sufbpickw
 # Nonzero data in several gathers exercises cf clearing and find initialization
 suplane nt=129 ntr=6 | sushw key=ep a=0 b=1 j=2 | sufbpickw window=0.012 test=1
+
+# diff-2026-11 (round 1)
+# Singleton traces and nt=1..4; explicit spike indices ensure nonzero inputs.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sufbpickw window=0 tdv=0 test=0 verbose=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sufbpickw window=0 t=0.004 o=400 tdv=0 test=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sufbpickw window=0
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sufbpickw window=0.004 test=0
+sunull nt=4 ntr=1 | sufbpickw window=0.008 test=1
+# Prime length, boundary spikes, and a two-sample amplitude window.
+suspike nt=127 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=127 | sufbpickw window=0.008 test=1
+# Long traces in both output modes, with deterministic signed samples.
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=2049 | suaddnoise seed=53 sn=2 | sufbpickw window=0.028 test=1
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=2049 | suaddnoise seed=53 sn=2 | sufbpickw window=0.028 test=0
+suplane nt=4097 ntr=4 | sufbpickw
+sunull nt=65535 ntr=1 | sufbpickw window=0.004 test=1
+# Header-driven dt, signed offsets, three-point templates, descending gather keys.
+suspike nt=127 ntr=9 nspk=1 ix1=1 it1=41 | sushw key=dt,fldr,offset a=2500,7,-200 b=0,-1,100 j=1,3,9 | sufbpickw keyg=fldr window=0.00875 t=0.03,0.075,0.15 o=-100,100,300 tdv=0.01 test=0
+suspike nt=127 ntr=9 nspk=1 ix1=1 it1=41 | sushw key=dt,fldr,offset a=2500,7,-200 b=0,-1,100 j=1,3,9 | sufbpickw keyg=fldr window=0.00875 t=0.15,0.075,0.03 o=300,100,-100 tdv=0.01 test=1
+# Float-valued gather key and full diagnostics, including an unused argument.
+[stderr] suspike nt=127 ntr=6 nspk=1 ix1=1 it1=41 | sushw key=d1 a=0.5 b=-0.25 j=2 | sufbpickw keyg=d1 window=0.01 tdv=0 test=-2 verbose=1 unused=1
+# Finite zero-width searches at and outside the template endpoints stay in bounds.
+suspike nt=127 ntr=3 nspk=1 ix1=1 it1=41 | sushw key=offset a=-500 b=500 | sufbpickw t=0.04,0.2 o=-100,100 window=0.004 tdv=0 test=0
+sunull nt=17 ntr=1 | sufbpickw window=0 t=10 o=0 tdv=0 test=0
+sunull nt=17 ntr=1 | sufbpickw window=0 t=-10 o=0 tdv=0.008 test=0
+# A different waveform generator, with actual nonzero reflection arrivals.
+susynlv nt=127 dt=0.004 nxm=3 nxo=2 dxo=0.1 ref='1:0,0.02;0.2,0.02' | sufbpickw window=0.008 test=1
+susynlv nt=127 dt=0.004 nxm=3 nxo=2 dxo=0.1 ref='1:0,0.02;0.2,0.02' | sufbpickw window=0.008 test=0
+# First trace fixes dt even when later trace headers change.
+suspike nt=127 ntr=6 nspk=1 ix1=1 it1=41 | sushw key=dt,ep a=1500,4 b=500,1 j=6,2 | sufbpickw keyg=ep window=0.00375 test=0
+# Missing template offsets and bad numeric values: compare complete diagnostics.
+[stderr] sunull nt=17 ntr=1 | sufbpickw t=0.04,0.08
+[stderr] sunull nt=17 ntr=1 | sufbpickw t=0.04 o=0,100
+[stderr] sunull nt=17 ntr=1 | sufbpickw test=-2147483649
+[stderr] sunull nt=17 ntr=1 | sufbpickw window=1e309
+# Contiguous multi-trace gathers (c increments between groups; b increments within).
+suspike nt=127 ntr=9 nspk=1 ix1=1 it1=41 | sushw key=dt,fldr,offset a=2500,7,-200 b=0,0,100 c=0,-1,0 j=1,3,9 | sufbpickw keyg=fldr window=0.00875 t=0.03,0.075,0.15 o=-100,100,300 tdv=0.01 test=0
+suspike nt=127 ntr=9 nspk=1 ix1=1 it1=41 | sushw key=dt,fldr,offset a=2500,7,-200 b=0,0,100 c=0,-1,0 j=1,3,9 | sufbpickw keyg=fldr window=0.00875 t=0.15,0.075,0.03 o=300,100,-100 tdv=0.01 test=1
+suplane nt=127 ntr=6 | sushw key=d1 a=0.5 c=-0.25 j=2 | sufbpickw keyg=d1 window=0.01 test=1
+suspike nt=127 ntr=6 nspk=1 ix1=1 it1=41 | sushw key=dt,ep a=1500,4 b=500,0 c=0,1 j=6,2 | sufbpickw keyg=ep window=0.00375 test=0
+# Variable-length input: later short traces retain the previous long trace's tail.
+{ suspike nt=127 ntr=2 nspk=1 ix1=1 it1=41; suspike nt=31 ntr=2 nspk=1 ix1=1 it1=11; } | sufbpickw window=0.008 test=1
+{ suspike nt=127 ntr=2 nspk=1 ix1=1 it1=41; suspike nt=31 ntr=2 nspk=1 ix1=1 it1=11; } | sufbpickw window=0.008 test=0

@@ -9,3 +9,18 @@
 # Error on a later header with no samples, and a partial final sample.
 [stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h+struct.pack("=f",3)+h)' | suoldtonew
 [stderr] python3 -c 'import sys,struct; h=bytearray(240); struct.pack_into("=H",h,114,1); sys.stdout.buffer.write(h+b"\x00\x01")' | suoldtonew
+# diff-2026-11 (round 1)
+[stderr] sunull nt=1 ntr=1 | suswapbytes | suoldtonew
+[stderr] suspike nt=2 ntr=2 k1=1,2 mag=1,-3 | suswapbytes | suoldtonew verbose=1
+[stderr] sunull nt=3 ntr=3 | sushw key=tracl,offset,dt a=7,-15,2000 b=1,5,0 | suswapbytes | suoldtonew
+[stderr] suspike nt=4 ntr=1 k1=4 mag=-2 | suswapbytes | suoldtonew ignored=1
+[stderr] suplane nt=17 ntr=5 | suswapbytes | suoldtonew
+[stderr] suspike nt=4097 ntr=2 k1=4097 mag=3 | suswapbytes | suoldtonew
+[stderr] sunull nt=7 ntr=2 | sushw key=cdp,delrt,scalco a=31,-20,-100 b=2,1,0 | suswapbytes | suoldtonew
+[stderr] suspike nt=11 ntr=2 k1=2,10 mag=2,-1 | suswapbytes | dd bs=1 count=244 2>/dev/null | suoldtonew
+[stderr] sunull nt=3 ntr=1 | suswapbytes | dd bs=1 count=240 2>/dev/null | suoldtonew
+[stderr] ( suspike nt=7 ntr=1 k1=7 mag=4 | suswapbytes; sunull nt=3 ntr=1 | suswapbytes ) | suoldtonew
+[stderr] ( sunull nt=3 ntr=1 | suswapbytes; suspike nt=7 ntr=1 k1=7 mag=4 | suswapbytes ) | suoldtonew
+[stderr] ( suspike nt=5 ntr=1 k1=1,3,5 mag=1,2,3 | suswapbytes; sunull nt=5 ntr=1 | suswapbytes | dd bs=1 count=244 2>/dev/null ) | suoldtonew
+[stderr] suspike nt=13 ntr=2 k1=3 mag=2 | sushw key=trid a=2 | suswapbytes | suoldtonew
+[stderr] sunull nt=65535 ntr=1 | suswapbytes | suoldtonew

@@ -81,6 +81,12 @@ fn main() {
     }
     checkpars();
 
+    // Reject zero blocks before C's integer division and dctAlloc(0).
+    // The minimally fixed C reports this error instead of emitting a UB stream.
+    if blocksize1 == 0 || blocksize2 == 0 {
+        err!("blocksize1 and blocksize2 must be nonzero");
+    }
+
     /* regular sizes; arm64 C integer division by zero yields zero. */
     let nblock1 = n1
         .wrapping_sub(1)

@@ -12,3 +12,26 @@
 # Exercise each stage parameter independently, leaving the other at its default.
 [exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=16 n2=8 nstage1=1
 [exact] [stderr] suplane nt=16 ntr=8 | sustrip outpar=/dev/null | wtcomp n1=16 n2=8 nstage2=1
+# diff-2026-11 (round 1)
+[exact] [stderr] suspike nt=2 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=2 n2=1 nfilter=0
+[exact] [stderr] suspike nt=3 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=3 n2=1 nfilter=1 error=0.02
+[exact] [stderr] suspike nt=4 ntr=2 | sustrip outpar=/dev/null | wtcomp n1=4 n2=2 nfilter=2 nstage1=1 nstage2=1
+[exact] [stderr] suplane nt=31 ntr=5 | sustrip outpar=/dev/null | wtcomp n1=31 n2=5 nfilter=3 error=0.05
+[exact] [stderr] suplane nt=63 ntr=7 | sustrip outpar=/dev/null | wtcomp n1=63 n2=7 nfilter=5
+[exact] [stderr] suspike nt=19 ntr=11 | sustrip outpar=/dev/null | wtcomp n1=19 n2=11 nfilter=6 nstage1=3 nstage2=2
+[exact] [stderr] suplane nt=37 ntr=3 | sustrip outpar=/dev/null | wtcomp n1=37 n2=3 nfilter=7 error=0.2
+[exact] [stderr] suspike nt=33 ntr=5 | sustrip outpar=/dev/null | wtcomp n1=33 n2=5 nfilter=8
+[exact] [stderr] suplane nt=17 ntr=9 | sustrip outpar=/dev/null | wtcomp n1=17 n2=9 nfilter=9 nstage1=0 nstage2=2
+[exact] [stderr] suspike nt=13 ntr=7 | sustrip outpar=/dev/null | wtcomp n1=13 n2=7 nfilter=10
+[exact] [stderr] suplane nt=29 ntr=5 | sustrip outpar=/dev/null | wtcomp n1=29 n2=5 nfilter=12
+[exact] [stderr] suspike nt=23 ntr=3 | sustrip outpar=/dev/null | wtcomp n1=23 n2=3 nfilter=13 error=0.005
+[exact] [stderr] suplane nt=41 ntr=6 | sustrip outpar=/dev/null | wtcomp n1=41 n2=6 nfilter=14 nstage1=2 nstage2=0 verbose=1
+[exact] [stderr] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=4097 n2=1 nstage1=4
+[exact] [stderr] sunull nt=17 ntr=4 | sushw key=offset a=123 b=17 | sustrip outpar=/dev/null | wtcomp n1=17 n2=4
+[stderr] suspike nt=4 ntr=1 | sustrip outpar=/dev/null | wtcomp n1= n2=1
+[stderr] suspike nt=4 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=4 n2=
+[exact] [stderr] suplane nt=127 ntr=13 | suaddnoise sn=2 seed=42 | sustrip outpar=/dev/null | wtcomp n1=127 n2=13 error=0.01
+[exact] [stderr] suspike nt=101 ntr=17 | suaddnoise sn=1 seed=123 | sustrip outpar=/dev/null | wtcomp n1=101 n2=17 nfilter=0 error=0.001
+[exact] [stderr] sunull nt=257 ntr=7 | suaddnoise sn=1 seed=123 | sustrip outpar=/dev/null | wtcomp n1=257 n2=7 nfilter=14 error=0.1
+[exact] [stderr] suplane nt=97 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=97 n2=1 nstage1=0 nstage2=0 error=0.3
+[exact] [stderr] suspike nt=1 ntr=19 | sustrip outpar=/dev/null | wtcomp n1=1 n2=19 nfilter=4 nstage2=3

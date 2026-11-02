@@ -17,3 +17,22 @@ sulcthw xt=0
 sulcthw xt=1e999
 # Numeric parsing accepts invalid text as zero.
 suspike nt=1 ntr=1 | sulcthw xt=abc yt=0 zr=0
+# diff-2026-11 (round 1)
+# Short traces, explicit defaults and separate translations.
+sunull nt=2 ntr=1 | sulcthw xt=0 yt=0 zt=0 xr=0 yr=0 zr=0
+sunull nt=3 ntr=2 | sushw key=sx,sy,gx,gy a=101,-202,303,-404 | sulcthw xt=0.125
+suspike nt=4 ntr=1 | sushw key=sx,sy,gx,gy a=-12,34,56,-78 | sulcthw yt=-0.75
+sunull nt=1 ntr=1 | sushw key=selev,gelev a=15,-25 | sulcthw zt=2.25
+# Independent rotations with nonzero coordinates and elevation.
+sunull nt=11 ntr=3 | sushw key=sx,sy,gx,gy,selev,gelev a=120,25,-42,67,11,-19 b=5,-3,2,7,1,-2 | sulcthw xr=-37
+suplane nt=31 ntr=5 | sushw key=sx,sy,gx,gy,selev,gelev a=10,20,30,40,50,60 | sulcthw yr=23
+suspike nt=13 ntr=2 | sushw key=sx,sy,gx,gy,selev,gelev a=-11,32,44,-53,10,-20 | sulcthw zr=180
+# Vary input scalars and all ancillary elevation headers.
+sunull nt=17 ntr=4 | sushw key=sx,sy,gx,gy,selev,gelev,sdepth,gdel,sdel,swdep,gwdep,scalco,scalel a=12,-23,34,-45,56,-67,78,-89,90,-11,22,-10,-100 | sulcthw xt=1.25 yt=-2.5 zt=3.75 xr=12 yr=34 zr=-56
+sunull nt=19 ntr=3 | sushw key=sx,sy,gx,gy,selev,gelev,scalco,scalel a=214748,20,-214748,0,12,-13,1,10 b=1,0,-1,0,0,0,0,0 | sulcthw xt=-1 yr=1
+sunull nt=23 ntr=2 | sushw key=sx,sy,gx,gy,selev,gelev,scalco,scalel a=2147483,-2147483,0,1,100,-100,1,1 | sulcthw zr=0.01
+suplane nt=4097 ntr=2 npl=1 | sushw key=sx,sy,gx,gy a=1000,-2000,3000,-4000 b=5,7,-9,11 | sulcthw xt=4 yt=5 zr=45
+# checkpars diagnostics, repeated and empty numeric parameters.
+[stderr] sunull nt=4 ntr=1 | sulcthw verbose=1 xt=3 xt=-2 yt= zr=360
+suspike nt=2 ntr=1 | sulcthw xr=0.5 yr=-0.5 zr=0.5 xt=-0.5 yt=0.5 zt=-0.5
+sulcthw yr=1e999

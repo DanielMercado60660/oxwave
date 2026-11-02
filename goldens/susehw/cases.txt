@@ -14,3 +14,27 @@ sunull nt=1 ntr=1 | susehw key1=invalid
 sunull nt=1 ntr=1 | susehw key2=invalid
 sunull nt=1 ntr=1 | susehw a=1e-400
 sunull nt=1 ntr=1 | susehw key1= key2=cdpt
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | susehw key1=cdp key2=cdpt a=1 b=1 verbose=0
+sunull nt=4 ntr=8 | sushw key=fldr a=4 c=1 j=2 | susehw key1=fldr key2=tracf a=10 b=-2
+suspike nt=17 ntr=6 | susehw key1=cdp key2=offset a=-10.75 b=1.25
+sunull nt=4097 ntr=2 | susehw key1=cdp key2=d2 a=0.125 b=0.0625
+[stderr] sunull nt=3 ntr=4 | susehw key1=cdp key2=cdpt a=2 b=3 verbose=1
+sunull nt=2 ntr=6 | sushw key=cdp a=1 b=1 | susehw key1=cdp key2=cdp a=50 b=5
+sunull nt=4 ntr=6 | sushw key=d1 a=-1.8 b=0.6 | susehw key1=d1 key2=ep a=3 b=2
+sunull nt=11 ntr=7 | sushw key=cdp a=9 c=-1 j=2 | susehw key2=trid a=-7.75 b=2.5
+suspike nt=13 ntr=5 | susehw key2=dt a=100.9 b=2.5
+sunull nt=1 ntr=4 | susehw key1=tracl key2=f1 a=-0.5 b=0.25
+sunull nt=3 ntr=4 | susehw a= b=0 key2=offset
+sunull nt=3 ntr=4 | susehw a=3 a=7 b=-1 key2=offset
+sunull nt=2 ntr=1 | susehw verbose=abc
+sunull nt=2 ntr=1 | susehw b=1e-400
+sunull nt=4 ntr=3 | susehw key2=bogus verbose=1
+sunull nt=5 ntr=12 | sushw key=cdp a=1 b=1 d=3 | susehw key1=cdp key2=tracf a=0 b=1
+sunull nt=3 ntr=5 | susehw key2=d1 a=-0 b=-0
+sunull nt=4 ntr=6 | susehw key2=dt a=65530 b=1
+suspike nt=23 ntr=11 | sushw key=offset a=-30 b=10 | susehw key1=offset key2=gelev a=-15 b=4
+sunull nt=2 ntr=256 | susehw key2=tracf a=0 b=1
+sunull nt=3 ntr=4 | susehw key2=trid a=-32768 b=16383
+sunull nt=4 ntr=4 | susehw key2=f2 a=0.3333333333333333 b=0.000000059604644775390625

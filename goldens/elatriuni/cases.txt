@@ -21,3 +21,28 @@ elatriuni nx=1 nz=1 < /dev/null
 [f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nz=2 < m; cat a1111.bin rho.bin
 [f32] elamodel fill=0.5,0.5,3,1.5,2 > m 2>/dev/null; elatriuni nx=3 nz=5 fx=0.2 fz=0.1 dx=0.2 dz=0.2 a3333file=out < m; cat out
 [f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=1 nz=1 fx=0.5 fz=0.5 verbose=1 < m; cat rho.bin
+# diff-2026-11 (round 1)
+[f32] elamodel fill=0.5,0.5,10,11,12,13,14,15,16,17,18,19 > m 2>/dev/null; elatriuni nx=1 nz=1 fx=0.25 fz=0.75 dx=0 dz=0 a1111file=o1 a3333file=o2 a1133file=o3 a1313file=o4 a1113file=o5 a3313file=o6 a1212file=o7 a2323file=o8 a1223file=o9 rhofile=o10 < m; cat o1 o2 o3 o4 o5 o6 o7 o8 o9 o10
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=1 nz=4 fx=0.25 dz=0.25 < m; cat a1111.bin a1133.bin rho.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=4 nz=1 dx=0.25 fz=0.75 < m; cat a3333.bin a1313.bin rho.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=3 nz=7 dx=0.5 dz=0.125 < m; cat a1111.bin a3333.bin a1133.bin a1313.bin rho.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=7 nz=3 dx=0.125 dz=0.5 fx=0.125 < m; cat a1111.bin a1212.bin a2323.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=1 nz=4097 dz=0.000244140625 < m; cat rho.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=4097 nz=1 dx=0.000244140625 < m; cat a1111.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=5 nz=5 fx=1 fz=1 dx=-0.25 dz=-0.25 < m; cat a1111.bin rho.bin
+[f32] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nx=3 nz=2 dx=0.5 dz=1 < m; cat rho.bin
+[f32] elamodel xmin=-2 xmax=2 zmin=-3 zmax=3 fill=0,0,2,1,4 > m 2>/dev/null; elatriuni nx=5 nz=7 fx=-2 fz=-3 dx=1 dz=1 < m; cat a1111.bin rho.bin
+[f32] elamodel fill=0.5,0.5,3,1.5,0.1,0.05,0.2,30,2 > m 2>/dev/null; elatriuni nx=5 nz=5 dx=0.25 dz=0.25 < m; cat a1111.bin a3333.bin a1133.bin a1313.bin a1113.bin a3313.bin a1212.bin a2323.bin a1223.bin rho.bin
+[f32] elamodel fill=0.5,0.5,1,2,3,4,5,6,7,8,9,10 > m 2>/dev/null; elatriuni nx=2 nz=2 fx=0.3 fz=0.6 dx=0 dz=0 < m; cat a1111.bin a3333.bin a1133.bin a1313.bin a1113.bin a3313.bin a1212.bin a2323.bin a1223.bin rho.bin
+[stderr] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=1 nz=1 fx=0.5 fz=0.5 verbose=1 extra=2 < m
+[stderr] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nz=2 fx=-0.01 dx=0.1 dz=0.1 < m
+[stderr] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nz=2 fz=-0.01 dx=0.1 dz=0.1 < m
+[stderr] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=3 nz=2 fx=1 dx=-0.6 dz=0.5 < m
+[stderr] elamodel fill=0.5,0.5,2,1,1 > m 2>/dev/null; elatriuni nx=2 nz=3 fz=1 dz=-0.6 dx=0.5 < m
+[stderr] elatriuni nx=1 nz=1 rhofile=/no/such/directory/a
+[stderr] elatriuni nx=1 nz=1 a2323file=/no/such/directory/a
+[stderr] elatriuni nx=1 nz=1 a1223file=/no/such/directory/a
+[stderr] elatriuni nx=1 nz=1 a1113file=/no/such/directory/a
+[f32] elamodel kedge=1 xedge=0,1 zedge=0.5,0.5 fill=0.5,0.25,2,1,1 fill=0.5,0.75,4,2,3 > m 2>/dev/null; elatriuni nx=5 nz=5 dx=0.25 dz=0.25 < m; cat a1111.bin a1313.bin rho.bin
+[f32] elamodel kedge=1 xedge=0.5,0.5 zedge=0,1 fill=0.25,0.5,2,1,1 fill=0.75,0.5,4,2,3 > m 2>/dev/null; elatriuni nx=5 nz=5 dx=0.25 dz=0.25 < m; cat a3333.bin a1133.bin rho.bin
+[f32] elamodel kedge=1 xedge=0,1 zedge=0.5,0.5 fill=0.5,0.25,2,1,1 fill=0.5,0.75,4,2,3 > m 2>/dev/null; elatriuni nx=9 nz=9 fx=1 fz=1 dx=-0.125 dz=-0.125 < m; cat a1111.bin rho.bin

@@ -369,8 +369,16 @@ fn main() {
         let recfp = recfp
             .as_ref()
             .unwrap_or_else(|| err!("cannot open recfile=%s\n", recfile));
+        let mut r1 = 0.0f32;
         for i in 0..nxi as usize {
-            let r1 = fscanf_f32(recfp).unwrap_or_else(|| err!("not enough points in recfile!\n"));
+            // C tests fscanf < 0: a matching failure leaves r1 unchanged.
+            // A failure before any successful conversion uses uninitialized
+            // memory in C; only the previously assigned value is meaningful.
+            if let Some(value) = fscanf_f32(recfp) {
+                r1 = value;
+            } else if feof(recfp) || ferror(recfp) {
+                err!("not enough points in recfile!\n");
+            }
             szif[i][0] = r1;
         }
         fclose(recfp);
@@ -383,8 +391,14 @@ fn main() {
         let datfp = datfp
             .as_ref()
             .unwrap_or_else(|| err!("cannot open datfile=%s\n", datfile));
+        let mut r2 = 0.0f32;
         for i in 0..nxi as usize {
-            let r2 = fscanf_f32(datfp).unwrap_or_else(|| err!("not enough points in datfile!\n"));
+            // As above, fscanf returning zero retains the last depth.
+            if let Some(value) = fscanf_f32(datfp) {
+                r2 = value;
+            } else if feof(datfp) || ferror(datfp) {
+                err!("not enough points in datfile!\n");
+            }
             szif[i][1] = r2;
         }
         fclose(datfp);
@@ -590,6 +604,11 @@ fn dat2d(
     }
     if mr + nxe > nxi - 1 {
         err!("Topography definition is out of range!\n");
+    }
+    // The C endpoint interpolation reads szif[-1] when nxi == 1.
+    // Match the minimal C bounds fix before interpolating either surface.
+    if nxi < 2 {
+        err!("Topography definition requires at least two points!\n");
     }
 
     // Depth and derivative of the recording surface at the input source.

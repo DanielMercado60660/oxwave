@@ -426,10 +426,9 @@ fn render_faces(
     let mut nc = [0; 3];
     let mut step = [0; 3];
     for i in 0..3 {
-        ib[i] =
-            nint(((beg[i] - f[i]) / d[i]) as f64)
-                .min(if i == 0 { n[i] } else { n[i] - 1 })
-                .max(0);
+        ib[i] = nint(((beg[i] - f[i]) / d[i]) as f64)
+            .min(if i == 0 { n[i] } else { n[i] - 1 })
+            .max(0);
         beg[i] = f[i] + ib[i] as f32 * d[i];
         ie[i] = nint(((end[i] - f[i]) / d[i]) as f64).min(n[i] - 1).max(0);
         end[i] = f[i] + ie[i] as f32 * d[i];
@@ -625,6 +624,8 @@ fn render_faces(
     xbox *= 72.0;
     ybox *= 72.0;
     let mut bbox = [0; 4];
+    check_metric_font(&labelfont);
+    check_metric_font(&titlefont);
     psAxesBBox(
         xbox,
         ybox,
@@ -774,6 +775,52 @@ fn render_faces(
     }
     showpage();
     endeps();
+}
+
+// basic.c declares 38 metrics but initializes only 37. Unknown names reach
+// strcmp with the last entry's null name. Reject them as the fixed C does,
+// before the shared font-metrics library can panic.
+fn check_metric_font(name: &str) {
+    match name {
+        "AvantGarde-Book"
+        | "AvantGarde-BookOblique"
+        | "AvantGarde-Demi"
+        | "AvantGarde-DemiOblique"
+        | "Bookman-Demi"
+        | "Bookman-DemiItalic"
+        | "Bookman-Light"
+        | "Bookman-LightItalic"
+        | "Courier"
+        | "Courier-Bold"
+        | "Courier-BoldOblique"
+        | "Courier-Oblique"
+        | "Helvetica"
+        | "Helvetica-Bold"
+        | "Helvetica-BoldOblique"
+        | "Helvetica-Oblique"
+        | "Helvetica-Narrow"
+        | "Helvetica-Narrow-Bold"
+        | "Helvetica-Narrow-BoldOblique"
+        | "Helvetica-Narrow-Oblique"
+        | "NewCentrySchlbk-Bold"
+        | "NewCenturySchlbk-BoldItalic"
+        | "NewCenturySchlbk-Roman"
+        | "Palatino-Bold"
+        | "Palatino-BoldItalic"
+        | "Palatino-Italics"
+        | "Palatino-Roman"
+        | "SanSerif-Bold"
+        | "SanSerif-BoldItalic"
+        | "SanSerif-Roman"
+        | "Symbol"
+        | "Times-Bold"
+        | "Times-BoldItalic"
+        | "Times-Roman"
+        | "Times-Italic"
+        | "ZapfChancery-MediumItalic"
+        | "Unknown" => (),
+        _ => err!("unsupported font: %s", name),
+    }
 }
 
 fn rgb_value(n1: f32, n2: f32, mut hue: f32) -> f32 {

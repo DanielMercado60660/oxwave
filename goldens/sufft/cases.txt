@@ -16,3 +16,22 @@ suspike nt=32 ntr=1 | sufft sign=0 verbose=0
 suspike nt=32 ntr=1 | sufft sign=2 verbose=0
 sufft verbose=0 </dev/null
 sunull nt=65535 ntr=1 | sufft verbose=0
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sufft sign=-1 verbose=0
+suspike nt=3 ntr=1 | sufft sign=1 verbose=0
+suspike nt=4 ntr=2 | sufft sign=-1 verbose=0
+sunull nt=4097 ntr=1 | sufft sign=1 verbose=0
+suplane nt=257 ntr=4 | sufft sign=-1 verbose=0
+[stderr] suspike nt=47 ntr=2 | sushw key=trid,dt,d1 a=17,2500,0.125 | sufft verbose=1 sign=1
+[stderr] suspike nt=47 ntr=2 | sushw key=trid,dt,d1 a=18,2500,0.125 | sufft verbose=1 sign=-1
+[stderr] suspike nt=47 ntr=2 | sushw key=trid,dt,d1 a=109,2500,0.125 | sufft verbose=1
+suspike nt=4097 ntr=2 | sufft verbose=0 sign=-1
+sunull nt=127 ntr=3 | sushw key=trid,dt,d1 a=130,0,0.003 | sufft verbose=0
+suspike nt=31 ntr=1 | sufft sign=abc verbose=0
+suspike nt=211 ntr=3 | suaddnoise seed=12345 sn=2 | sufft sign=1 verbose=0
+suspike nt=1001 ntr=2 | suaddnoise seed=27 sn=5 | sufft sign=-1 verbose=0
+suspike nt=8191 ntr=1 | suaddnoise seed=32 sn=1 | sufft verbose=0
+suplane nt=4097 ntr=2 | sufft sign=1 verbose=0
+[stderr] suspike nt=19 ntr=3 | sushw key=trid,dt,d1 a=1,3000,0.002 b=17,1000,0.005 | sufft verbose=1 sign=-1
+suspike nt=30000 ntr=1 | sufft verbose=0

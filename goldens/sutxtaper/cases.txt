@@ -27,3 +27,39 @@ suplane nt=63 ntr=257 | sushw key=offset a=-128 b=1 | sutxtaper key=offset min=-
 suplane nt=31 ntr=7 | suaddnoise seed=7 sn=2 | sushw key=sx,scalco a=1000,-1 b=500,0 | sutxtaper key=sx min=150 max=350 dx=100 taper=4
 suplane nt=31 ntr=7 | suaddnoise seed=7 sn=2 | sushw key=gelev,scalel a=100,1 b=50,0 | sutxtaper key=gelev min=1500 max=3500 dx=1500 taper=5 low=0.2 tend=40
 suplane nt=40 ntr=9 | suaddnoise seed=7 sn=2 | sutxtaper tr1=3 tr2=2 taper=4 tbeg=20 low=0.25
+
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | sutxtaper ntr=1 low=1 tr1=0 tr2=0
+sunull nt=2 ntr=1 | sutxtaper tbeg=4 taper=1
+sunull nt=3 ntr=2 | sutxtaper tend=4 taper=2
+sunull nt=4 ntr=3 | sutxtaper tbeg=4 tend=4 taper=3
+suspike nt=17 ntr=1 nspk=1 k1=1 k2=1 | sutxtaper tbeg=8 taper=2
+suspike nt=17 ntr=5 nspk=1 k1=16 k2=3 | sutxtaper tend=12 taper=4
+suspike nt=37 ntr=7 nspk=1 k1=10 k2=4 | sutxtaper tr1=0 tr2=3 taper=5
+suplane nt=4097 ntr=3 | sutxtaper tbeg=100 tend=80 tr1=1 tr2=1 taper=3
+suplane nt=41 ntr=11 | sutxtaper tr1=4 tr2=2 low=0.35 taper=1 tbeg=14 tend=20
+suplane nt=43 ntr=9 | sutxtaper tr1=3 tr2=0 low=1 taper=1
+suplane nt=19 ntr=7 | sutxtaper tr1=0 tr2=2 taper=2
+suplane nt=19 ntr=7 | sutxtaper tr1=2 tr2=3 taper=5 low=0.4
+[stderr] suplane nt=17 ntr=7 | sutxtaper verbose=1 ntr=7 tr1=2 tr2=1 taper=2
+[stderr] suplane nt=17 ntr=7 | sushw key=offset a=-30 b=10 | sutxtaper verbose=2 key=offset min=-10 max=10 dx=20 taper=1 low=0.25 n2=7
+suplane nt=23 ntr=9 | sushw key=cdp a=100 b=5 | sutxtaper key=cdp min=110 max=125 dx=10 taper=2 ntr=9
+suplane nt=29 ntr=7 | sushw key=offset a=30 b=-10 | sutxtaper key=offset min=-10 max=10 dx=20 taper=4
+suplane nt=31 ntr=5 | sushw key=tracl a=10 b=2 | sutxtaper key=tracl min=12 max=16 dx=4 taper=5
+suplane nt=31 ntr=7 | sutxtaper key=tr low=0 tbeg=0 tend=0 taper=1 tr1=0 tr2=0 n2=7
+suplane nt=31 ntr=7 | sushw key=ntr a=0 | sutxtaper tr1=2 tr2=1 low=0.2
+suplane nt=31 ntr=7 | sutxtaper n2=5 tr1=1 tr2=1
+suplane nt=31 ntr=7 | sutxtaper tbeg=80 tend=48
+suplane nt=31 ntr=7 | sutxtaper taper=0 tbeg=4
+suplane nt=31 ntr=7 | sutxtaper low=1.01
+suplane nt=31 ntr=7 | sutxtaper key=unknown
+[stderr] suplane nt=23 ntr=7 | sushw key=ntr a=0 | sutxtaper verbose=1 tr1=2 tr2=1
+[stderr] suplane nt=23 ntr=7 | sutxtaper n2=5 ntr=7 verbose=1 tr1=1 tr2=2
+suplane nt=37 ntr=13 | suaddnoise seed=11 sn=2 | sushw key=offset a=-17 b=3 | sutxtaper key=offset min=-7 max=11 dx=13 low=0.123 taper=1
+suplane nt=37 ntr=13 | suaddnoise seed=11 sn=2 | sushw key=offset a=-17 b=3 | sutxtaper key=offset min=-7 max=11 dx=13 taper=2
+suplane nt=37 ntr=13 | suaddnoise seed=11 sn=2 | sushw key=offset a=-17 b=3 | sutxtaper key=offset min=-7 max=11 dx=13 taper=3
+suplane nt=37 ntr=13 | suaddnoise seed=11 sn=2 | sushw key=offset a=-17 b=3 | sutxtaper key=offset min=-7 max=11 dx=13 taper=4
+suplane nt=37 ntr=13 | suaddnoise seed=11 sn=2 | sushw key=offset a=-17 b=3 | sutxtaper key=offset min=-7 max=11 dx=13 taper=5
+suspike nt=101 ntr=11 nspk=3 k1=1,50,99 k2=1,6,11 | sutxtaper tbeg=37 tend=47 taper=5 tr1=3 tr2=5 low=0.2
+suplane nt=67 ntr=11 | sushw key=dt a=1500 | sutxtaper tbeg=20 tend=30 taper=4 tr1=3 tr2=4
+suplane nt=17 ntr=3 | sutxtaper ntr=0

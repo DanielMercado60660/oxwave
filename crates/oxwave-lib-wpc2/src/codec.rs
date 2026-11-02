@@ -292,8 +292,21 @@ pub fn wpcWrite(w: &WpcPacked, fp: &mut impl Write) -> std::io::Result<()> {
 }
 
 /// C prototype: `void *wpcRead(FILE *fp)`.
-/// Returns I/O errors for truncated input rather than C's uninitialized data.
+/// C ignores short config/code reads. Missing bytes are zero-filled here;
+/// defined C decoding must not consume those uninitialized bytes.
 pub fn wpcRead(fp: &mut impl Read) -> std::io::Result<WpcPacked> {
+    fn available(fp: &mut impl Read, mut b: &mut [u8]) -> std::io::Result<usize> {
+        let len = b.len();
+        while !b.is_empty() {
+            match fp.read(b) {
+                Ok(0) => break,
+                Ok(n) => b = &mut b[n..],
+                Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(len - b.len())
+    }
     fn int(fp: &mut impl Read) -> std::io::Result<i32> {
         let mut b = [0; 4];
         fp.read_exact(&mut b)?;
@@ -309,28 +322,37 @@ pub fn wpcRead(fp: &mut impl Read) -> std::io::Result<WpcPacked> {
             "negative WPC size",
         ));
     }
+    let mut config_bytes = [0; 12 * 4 + 24 * 4];
+    let config_len = available(fp, &mut config_bytes)?;
+    if config_len < config_bytes.len() && n1 > 0 && n2 > 0 && size > 0 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::UnexpectedEof,
+            "truncated WPC configuration",
+        ));
+    }
+    let mut config_input = &config_bytes[..];
     let mut c = WpcConfig::default();
-    c.powt = int(fp)?;
-    c.powx = int(fp)?;
-    c.tileszt = int(fp)?;
-    c.tileszx = int(fp)?;
-    c.nblock = int(fp)?;
-    c.lblock = int(fp)?;
-    c.codenblock = int(fp)?;
-    c.codelblock = int(fp)?;
-    c.staget = int(fp)?;
-    c.stagex = int(fp)?;
-    c.ishift = int(fp)?;
-    c.len = int(fp)?;
+    c.powt = int(&mut config_input)?;
+    c.powx = int(&mut config_input)?;
+    c.tileszt = int(&mut config_input)?;
+    c.tileszx = int(&mut config_input)?;
+    c.nblock = int(&mut config_input)?;
+    c.lblock = int(&mut config_input)?;
+    c.codenblock = int(&mut config_input)?;
+    c.codelblock = int(&mut config_input)?;
+    c.staget = int(&mut config_input)?;
+    c.stagex = int(&mut config_input)?;
+    c.ishift = int(&mut config_input)?;
+    c.len = int(&mut config_input)?;
     for filter in [&mut c.filterh, &mut c.filterg] {
         for v in filter {
             let mut b = [0; 4];
-            fp.read_exact(&mut b)?;
+            config_input.read_exact(&mut b)?;
             *v = f32::from_ne_bytes(b);
         }
     }
     let mut code = vec![0; size as usize];
-    fp.read_exact(&mut code)?;
+    available(fp, &mut code)?;
     Ok(WpcPacked {
         version,
         n1,
@@ -338,4 +360,42 @@ pub fn wpcRead(fp: &mut impl Read) -> std::io::Result<WpcPacked> {
         config: c,
         code,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn short_declared_code_buffer_can_contain_complete_tile() {
+        let mut samples = vec![0.0; 256 * 256];
+        samples[2 * 256 + 6] = 1.0;
+        let packed = wpcCompress(&samples, 256, 256, 0.01).unwrap();
+        let mut bytes = Vec::new();
+        wpcWrite(&packed, &mut bytes).unwrap();
+        let size = packed.code.len() + 17;
+        bytes[12..16].copy_from_slice(&(size as i32).to_ne_bytes());
+        let read = wpcRead(&mut bytes.as_slice()).unwrap();
+        assert_eq!(read.code.len(), size);
+        assert_eq!(&read.code[..packed.code.len()], packed.code);
+        let mut expected = vec![0.0; samples.len()];
+        let mut actual = expected.clone();
+        assert_eq!(wpcUncompress(&packed, &mut expected), 1);
+        assert_eq!(wpcUncompress(&read, &mut actual), 1);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn empty_data_does_not_require_unused_config() {
+        for (n1, n2, size) in [(0i32, 256i32, 0i32), (256, 0, 0), (256, 256, 0)] {
+            let bytes: Vec<u8> = [1, n1, n2, size]
+                .iter()
+                .flat_map(|v| v.to_ne_bytes())
+                .collect();
+            let packed = wpcRead(&mut bytes.as_slice()).unwrap();
+            assert_eq!(packed.n1, n1);
+            assert_eq!(packed.n2, n2);
+            assert_eq!(wpcUncompress(&packed, &mut []), 0);
+        }
+    }
 }

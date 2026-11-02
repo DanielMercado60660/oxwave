@@ -15,3 +15,23 @@ supack2 gpow=0
 supack2 gpow=-1
 supack2 gpow=abc
 supack2
+
+# diff-2026-11 (round 1)
+[exact] suspike nt=2 ntr=1 | supack2 gpow=1
+[exact] suspike nt=3 ntr=2 | suaddnoise seed=123 | supack2 gpow=0.5
+[exact] suspike nt=4 ntr=3 | suaddnoise seed=31 | supack2 gpow=2
+[exact] suplane nt=4097 ntr=2 | suaddnoise seed=43 | supack2 gpow=0.7
+[exact] suplane nt=101 ntr=3 | suaddnoise seed=91 | supack2 gpow=0.999999
+[exact] suplane nt=101 ntr=3 | suaddnoise seed=91 | supack2 gpow=0.500001
+[exact] suspike nt=127 ntr=4 | suaddnoise seed=27 | sushw key=offset a=-100 b=75 | supack2 gpow=0.25
+[exact] sunull nt=4097 ntr=1 | sushw key=ungpow,unscale a=3,4 | supack2 gpow=1.5
+[stderr] suspike nt=5 ntr=1 | supack2 gpow=1 verbose=1
+supack2 gpow=-0.5
+supack2 gpow=1e999
+[exact] suplane nt=65535 ntr=1 | suaddnoise seed=73 | supack2 gpow=1
+[exact] suspike nt=257 ntr=3 | suaddnoise seed=75 | sugain scale=-12.5 | supack2 gpow=3.5
+[exact] suspike nt=251 ntr=2 | suaddnoise seed=24 | sugain scale=0.00001 | supack2 gpow=0.1
+[exact] suspike nt=509 ntr=2 | suaddnoise seed=11 | supack2 gpow=1.0001
+[exact] suspike nt=509 ntr=2 | suaddnoise seed=11 | supack2 gpow=0.4999
+[exact] suspike nt=17 ntr=3 | sushw key=trid,offset a=1,-20 b=0,20 | supack2
+[exact] sunull nt=2 ntr=2 | supack2 gpow=0.001

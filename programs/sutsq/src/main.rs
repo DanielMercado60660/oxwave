@@ -102,7 +102,7 @@ fn main() {
     loop {
         for j in 0..nt as usize { buf[j] = tr.data[j]; }
         tr.ns = ntout as u16;
-        tr.dt = (dtout as f64 * 1000000.0) as u16;
+        tr.dt = (dtout as f64 * 1000000.0) as i64 as u16;
         ints8r(dt, 0.0, &buf, 0.0, 0.0, &ttn, &mut tr.data[..ntout as usize]);
         puttr(&mut tr);
         if gettr(&mut tr) == 0 { break; }

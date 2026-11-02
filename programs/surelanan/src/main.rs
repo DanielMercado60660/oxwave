@@ -115,6 +115,10 @@ fn main() {
     getparint("verbose", &mut verbose);
     getparstring("method", &mut method);
     checkpars();
+    // Reject empty pick arrays before interpolation, as in the UB-fixed C.
+    if npicks <= 0 {
+        err!("npicks must be positive");
+    }
     let fp = fopen(&refl, "r").expect("reflector file could not be opened");
     // Allocate before reading the picks, as in the C program.
     let mut data = vec![0.0f32; nz];

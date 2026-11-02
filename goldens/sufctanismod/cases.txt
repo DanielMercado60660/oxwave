@@ -95,3 +95,51 @@ sufctanismod nx=13 nz=15 nt=17 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=3 
 [f32] [stderr] mkdir snapshotx.data; printf stale > snapshoty.data; printf stale > snapshotz.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshotx.data && test -f snapshoty.data && test ! -s snapshoty.data && test -f snapshotz.data && test ! -s snapshotz.data && cat final
 [f32] [stderr] mkdir snapshoty.data; printf stale > snapshotx.data; printf stale > snapshotz.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshoty.data && test -f snapshotx.data && test ! -s snapshotx.data && test -f snapshotz.data && test ! -s snapshotz.data && cat final
 [f32] [stderr] mkdir snapshotz.data; printf stale > snapshotx.data; printf stale > snapshoty.data; sufctanismod nx=7 nz=9 nt=0 > final || exit; test -d snapshotz.data && test -f snapshotx.data && test ! -s snapshotx.data && test -f snapshoty.data && test ! -s snapshoty.data && cat final
+
+# diff-2026-11 (round 1)
+# This generator does not read stdin: upstream trace headers must not set its grid/time parameters.
+[f32] sunull nt=1 ntr=1 | sushw key=dt,sx,sdepth a=8000,99,99 | sufctanismod nx=7 nz=9 nt=1 source=1 indexux=1 wavelet=4
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sufctanismod nx=7 nz=9 nt=2 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=3
+[f32] suplane nt=4 ntr=1 | sufctanismod nx=7 nz=9 nt=3 source=1 indexuy=1 wavelet=2 suhead=0 vspyfile=vy > final; cat vy final
+[f32] sunull nt=4 ntr=1 | suchw key1=sx key2=tracl a=100 b=3 | sufctanismod nx=7 nz=9 nt=4 source=1 indexuz=1 wavelet=1 suhead=0 reflzfile=rz > final; cat rz final
+# Tiny spatial allocations are safe without time stepping (the C boundary solver requires larger grids).
+[f32] sunull nt=1 ntr=1 | sufctanismod nx=1 nz=1 nt=0 source=0
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=2 nz=3 nt=0 sx=2 sz=3 source=0
+# Prime and long time axes; sparse snapshots keep side output small.
+[f32] sunull nt=3 ntr=1 | sufctanismod nx=13 nz=17 nt=101 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=1 mt=101 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz > final; cat rx ry rz final
+[f32] sunull nt=4 ntr=1 | sufctanismod nx=7 nz=9 nt=4097 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 dt=0.0001 mt=4097 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final; cat rx ry rz vx vy vz final
+# Every actual default is explicit here, including defaults that differ from the selfdoc.
+[f32] [stderr] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=4 sx=4 sz=5 receiverdepth=5 vspnx=4 impulse=0 source=0 isurf=1 dofct=0 fctxbeg=0 fctzbeg=0 fctxend=9 fctzend=11 indexux=0 indexuy=0 indexuz=0 wavelet=1 movebc=0 order=2 suhead=1 mt=1 verbose=0 dx=0.02 dz=0.02 dt=0.002 fpeak=20 aa00=2 cc00=2 ff00=2 ll00=2 nn00=2 rho00=1 eta0=0.03 eta=0.04
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=17 nz=19 nt=43 sx=3 sz=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 dx=0.031 dz=0.023 dt=0.0009 fpeak=31 rho00=1.8 aa00=3.2 cc00=4.1 ff00=1.1 ll00=0.8 nn00=1.3 daadx=0.13 daadz=-0.07 dccdx=-0.11 dccdz=0.17 dffdx=0.19 dffdz=-0.23 dlldx=0.29 dlldz=0.31 dnndx=-0.37 dnndz=0.41 drhodx=-0.03 drhodz=0.05 mt=43 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final; cat rx ry rz vx vy vz final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=13 nz=17 nt=29 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=2 dofct=1 isurf=3 order=4 fctxbeg=2 fctzbeg=3 fctxend=10 fctzend=12 eta0=0.017 eta=0.023 deta0dx=0.2 deta0dz=-0.3 detadx=-0.4 detadz=0.5 mt=29 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=51 nz=101 nt=29 source=2 indexux=1 indexuy=1 indexuz=1 wavelet=3 movebc=1 impulse=0 mt=29 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=101 nz=101 nt=17 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 movebc=1 impulse=1 mt=17 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=29 nz=41 nt=19 source=2 indexux=1 indexuy=1 indexuz=1 wavelet=3 isurf=2 mt=19 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=31 nz=43 nt=23 source=3 indexux=1 indexuy=1 indexuz=1 wavelet=4 isurf=3 mt=23 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+# Read all seven complete, deterministic native-float input grids; material grids are nonuniform.
+[f32] makevel nx=9 nz=11 v000=2 dvdx=0.01 dvdz=0.02 > elastic; makevel nx=9 nz=11 v000=1.6 dvdx=0.02 dvdz=0.01 > density; suspike nt=11 ntr=9 nspk=1 ix1=5 it1=6 | sustrip outpar=/dev/null > source; sufctanismod nx=9 nz=11 nt=37 indexux=1 indexuy=1 indexuz=1 wavelet=2 dfile=density afile=elastic cfile=elastic ffile=elastic lfile=elastic nfile=elastic sfile=source mt=37 suhead=0 reflxfile=rx reflyfile=ry reflzfile=rz > final; cat rx ry rz final
+[f32] suplane nt=13 ntr=11 | sushw key=sx,dt a=-1234,9000 | sustrip outpar=/dev/null > source; sufctanismod nx=11 nz=13 nt=31 source=3 sfile=source indexux=1 indexuy=1 indexuz=1 wavelet=1 mt=31 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+[f32] sunull nt=11 ntr=9 | sugain bias=1.5 | sustrip outpar=/dev/null > 'density grid'; sufctanismod nx=9 nz=11 nt=17 source=1 indexux=1 wavelet=4 dfile='density grid' afile= cfile= ffile= lfile= nfile= sfile= mt=17
+# SU output samples from all six files; strip the C local segy's uninitialized header fields.
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=3 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 receiverdepth=4 vspnx=3 suhead=1 reflxfile=rx reflyfile=ry reflzfile=rz vspxfile=vx vspyfile=vy vspzfile=vz > final; cat rx ry rz vx vy vz | sustrip outpar=/dev/null
+[ws] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=4 sx=2 sz=3 dx=1.25 dz=0.75 dt=0.000123 suhead=1 vspxfile=vx > final; sugethw key=trid,sx,sdepth,ns,dt,d2,offset,tracl,tracr < vx
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=4 source=1 indexuy=1 wavelet=4 suhead=-1 reflyfile=ry vspyfile=vy > final; cat ry vy final
+# Regression: C retains y/z VSP streams until exit, after snapshot streams flush.
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexuy=1 wavelet=4 suhead=0 vspyfile=snapshoty.data > final; cat snapshoty.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexuz=1 wavelet=4 suhead=0 vspzfile=snapshotz.data > final; cat snapshotz.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 suhead=0 vspyfile=snapshotx.data > final; cat snapshotx.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 suhead=0 vspzfile=snapshoty.data > final; cat snapshoty.data final
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 suhead=0 vspyfile=snapshoty.data vspzfile=snapshotz.data > final; cat snapshotx.data snapshoty.data snapshotz.data final
+# Exact verbose diagnostics, repeated parameters, ignored flags, and sparse/negative snapshot cadence.
+[f32] [stderr] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=4 source=1 indexux=-2 indexuy=3 indexuz=-1 wavelet=4 verbose=2 mt=-3
+[f32] [stderr] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=4 nt=3 source=1 indexux=1 wavelet=2 verbose=1 mt=20 ignored=1
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=7 source=1 indexux=1 wavelet=4 mt=0 > final; cat snapshotx.data snapshoty.data snapshotz.data final
+# There are no mandatory parameters. Exercise missing files and invalid values instead.
+[stderr] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=2 sx=8
+[stderr] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=2 receiverdepth=999999999999999999
+[stderr] sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=2 sfile=does-not-exist
+[f32] [stderr] mkdir receiver; sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=2 vspyfile=receiver
+[f32] [stderr] mkdir receiver; sunull nt=2 ntr=1 | sufctanismod nx=7 nz=9 nt=2 vspzfile=receiver
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[f32] sunull nt=2 ntr=1 | sufctanismod nx=9 nz=11 nt=11 source=1 indexux=1 indexuy=1 indexuz=1 wavelet=4 suhead=0 vspyfile=snapshoty.data vspzfile=snapshotz.data > final; cat snapshoty.data snapshotz.data final

@@ -14,3 +14,27 @@ suplane nt=19 ntr=1 | suresamp dt=0
 suplane nt=19 ntr=1 | suresamp nt=-1
 [stderr] suplane nt=19 ntr=1 | suresamp verbose=1
 [stderr] suplane nt=19 ntr=1 | sushw key=trid,d1,f1 a=30,0.5,1 | suresamp verbose=1
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suresamp nt=4 dt=0.002 tmin=-0.002
+suspike nt=3 ntr=1 | suresamp rf=1.5
+suspike nt=4 ntr=1 | suresamp nt=3 dt=0.006
+suplane nt=4097 ntr=1 | suresamp rf=0.5
+suspike nt=101 ntr=2 | suresamp nt=113 dt=0.0037 tmin=-0.013
+sunull nt=13 ntr=2 | sushw key=dt,delrt a=2000,-7 | suresamp rf=1.5 verbose=1
+suplane nt=37 ntr=2 | sushw key=trid,d1,f1 a=30,0.125,-2 | suresamp nt=47 dt=0.075 tmin=-2.2
+suspike nt=31 ntr=1 | sushw key=trid,d1,f1 a=30,0,1 | suresamp dt_in=0.25 rf=2
+suplane nt=23 ntr=2 | sushw key=delrt a=5 b=3 | suresamp dt=0.003 nt=29
+suplane nt=29 ntr=1 | sushw key=trid a=109 | suresamp rf=1.25
+suspike nt=7 ntr=1 | suresamp rf=0.01
+sunull nt=11 ntr=1 | sushw key=dt a=0 | suresamp dt_in=0
+suplane nt=17 ntr=1 | suresamp rf=-0.25
+[stderr] suspike nt=5 ntr=1 | sushw key=delrt a=9 | suresamp verbose=1 dt=0.003 tmin=0
+suplane nt=41 ntr=1 | suresamp rf=2 nt=23 dt=0.005
+suplane nt=13 ntr=1 | sushw key=trid,d1,f1 a=30,0.1,1.25 | suresamp
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suresamp nt=5 dt=0.001 tmin=-0.002
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suresamp rf=2 tmin=-0.001
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suresamp nt=9 dt=0.001
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | suresamp nt=11 dt=0.0015 tmin=-0.003
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2049 | suresamp nt=4097 dt=0.0039 tmin=0.002
+suspike nt=101 ntr=1 nspk=1 ix1=1 it1=50 | sushw key=trid,d1,f1 a=30,0.125,-2 | suresamp rf=1.7 tmin=-2.0625
+suspike nt=37 ntr=1 nspk=1 ix1=1 it1=18 | sushw key=dt a=0 | suresamp dt_in=0.004 nt=61 dt=0.0025

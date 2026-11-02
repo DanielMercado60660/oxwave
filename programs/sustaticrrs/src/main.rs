@@ -245,7 +245,7 @@ fn main() {
         getparfloat("fx", &mut fx);
         getparfloat("dx", &mut dx);
         getparfloat("V_r", &mut v_r);
-        if nsamp <= 0 {
+        if nsamp < 0 {
             err!("nsamp must be positive");
         }
         blvl_arr = vec![0.0; nsamp as usize];
@@ -295,7 +295,7 @@ fn main() {
         getparint("nsamp", &mut nsamp);
         getparfloat("fx", &mut fx);
         getparfloat("dx", &mut dx);
-        if nsamp <= 0 {
+        if nsamp < 0 {
             err!("nsamp must be positive");
         }
         tcdp_arr = vec![0.0; nsamp as usize];
@@ -307,6 +307,12 @@ fn main() {
     }
     checkpars();
     if hdrs == 3 || hdrs == 4 {
+        // Zero-length allocations and reads are valid in C. Defer this guard
+        // until after setup so file-open and required-parameter errors retain
+        // their C order; processing an empty grid would access out of bounds.
+        if nsamp == 0 {
+            err!("nsamp must be positive");
+        }
         if !fx.is_finite() {
             err!("fx must be finite");
         }

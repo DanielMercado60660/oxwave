@@ -9,3 +9,16 @@ pslabel t='a(b)\c' f=Unknown size=1.25 tcolor=unknown bcolor=unknown | sed -e '/
 [stderr] pslabel size=3
 [stderr] pslabel t=x size=1e999
 [stderr] pslabel t=x f=Helvetica nonsense=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+sunull nt=1 ntr=1 | { cat >/dev/null; pslabel t=default; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=2 ntr=1 | { cat >/dev/null; pslabel t=default f=Times-Bold size=30 nsub=0 tcolor=black bcolor=white; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=1 | { cat >/dev/null; pslabel t='small text' f=Courier size=2.75 nsub=1 tcolor=red bcolor=blue; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4 ntr=1 | { cat >/dev/null; pslabel t=first f=Helvetica t=second f=Times-Italic size=42.5 nsub=2; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=1 | sushw key=offset a=123 | { cat >/dev/null; pslabel t='label 17' f=Symbol tcolor='#123456' bcolor='#fedcba'; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4097 ntr=1 | { cat >/dev/null; pslabel t=large f=Palatino-Roman size=12.3; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=1 | { cat >/dev/null; pslabel t='(left)\\right' f=Helvetica-Bold size=19.4 nsub=20 tcolor=gray bcolor=green; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] sunull nt=5 ntr=1 | { cat >/dev/null; pslabel t=one t=two f=Courier f=Symbol f=Helvetica verbose=1; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=11 ntr=1 | { cat >/dev/null; pslabel t='' f=Times-Roman size=0.25 tcolor=white bcolor=black; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=13 ntr=1 | { cat >/dev/null; pslabel t=repeat f=Courier size=4 size=23 nsub=-3 tcolor=yellow bcolor=magenta; } | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; pslabel size=9; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; pslabel t=bad nsub=999999999999999999999999; }

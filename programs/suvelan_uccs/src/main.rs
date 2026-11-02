@@ -109,15 +109,12 @@ fn main() {
         err!("we are creating an all-white semblance: pwr = 0");
     }
     checkpars();
-    // These sizes lead to invalid allocations or indexing in the C program.
+    // This size leads to invalid allocations or indexing in the C program.
     if nx <= 0 {
         err!("nx must be greater than zero");
     }
-    if dtratio <= 0 {
+    if dtratio == 0 {
         err!("dtratio must be greater than zero");
-    }
-    if nsmooth < 0 {
-        err!("nsmooth must not be negative");
     }
     // C's arm64 integer division by zero returns zero.
     let ntout = 1 + (nt - 1).checked_div(dtratio).unwrap_or(0);

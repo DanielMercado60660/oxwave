@@ -1109,15 +1109,18 @@ fn main() {
     }
     // Resolve setid and outid. Quotes embedded in the argument preserve case.
     if lenid > 3 && Rid.starts_with('"') && Rid.ends_with('"') {
-        Rid = Rid[1..Rid.len() - 1].to_owned();
+        // C shifts the opening quote away without moving the terminator.
+        // Keep the two closing quotes in storage; lenid limits comparisons.
+        Rid.remove(0);
+        Rid.push('"');
         lenid -= 2;
     } else {
         Rid.make_ascii_uppercase();
     }
     let mut isetid = 1;
-    if lenid == 3 && Rid.eq_ignore_ascii_case("any") {
+    if lenid == 3 && Rid[..lenid].eq_ignore_ascii_case("any") {
         lenid = 0;
-    } else if lenid == 4 && Rid.eq_ignore_ascii_case("none") {
+    } else if lenid == 4 && Rid[..lenid].eq_ignore_ascii_case("none") {
         lenid = 0;
         isetid = 0;
     }
@@ -1127,7 +1130,8 @@ fn main() {
         getparstring("outid", &mut Rod);
         lenod = Rod.len();
         if lenod > 3 && Rod.starts_with('"') && Rod.ends_with('"') {
-            Rod = Rod[1..Rod.len() - 1].to_owned();
+            Rod.remove(0);
+            Rod.push('"');
             lenod -= 2;
         } else {
             Rod.make_ascii_uppercase();
@@ -1515,84 +1519,117 @@ fn main() {
 
     let iwidth = iwidth as usize;
     if iC_SU > 0 {
-        let mut row = String::from("C_SU_MATCH");
-        for key in &match_ {
-            row.push(',');
-            row.push_str(key);
+        if iwtype == 0 {
+            textraw[..iwidth].fill(b' ');
+            textraw[iwidth] = b'\n';
         }
-        if iwtype == 0 && row.len().saturating_sub(1) > iwidth {
+        textraw[..11].copy_from_slice(b"C_SU_MATCH\0");
+        let mut mspot = 9usize;
+        for key in &match_ {
+            mspot += 1;
+            textraw[mspot] = b',';
+            let mleng = key.len();
+            textraw[mspot + 1..mspot + 1 + mleng].copy_from_slice(key.as_bytes());
+            mspot += mleng;
+        }
+        if iwtype == 0 && mspot > iwidth {
             err!("**** Error: too many match= for width= size.");
         }
-        let mut bytes = row.into_bytes();
+        if iwtype != 0 {
+            textraw[mspot + 1] = b'\n';
+            textraw[mspot + 2] = 0;
+        }
+        let end = textraw.iter().position(|b| *b == 0).unwrap_or(maxtext);
+        fputs_bytes(&textraw[..end], &fpW);
+
         if iwtype == 0 {
-            if bytes.len() <= iwidth {
-                bytes.resize(iwidth, b' ');
-                bytes.push(b'\n');
+            textraw[..iwidth].fill(b' ');
+            textraw[iwidth] = b'\n';
+        }
+        if lenod > 0 {
+            textraw[..12].copy_from_slice(b"C_SU_SETID,\0");
+            textraw[11..11 + Rod.len()].copy_from_slice(Rod.as_bytes());
+            textraw[11 + Rod.len()] = 0;
+            if iwtype == 0 {
+                textraw[11 + lenod] = b' ';
+            } else {
+                textraw[11 + lenod] = b'\n';
+                textraw[12 + lenod] = 0;
             }
-            // C permits mspot == iwidth: the last character then replaces
-            // the newline rather than producing the width error above.
-        } else {
-            bytes.push(b'\n');
-        }
-        fputs_bytes(&bytes, &fpW);
-        let id = if lenod > 0 {
-            &Rod[..lenod]
         } else if isetid == 1 {
-            "ANY"
+            textraw[..15].copy_from_slice(b"C_SU_SETID,ANY\0");
+            if iwtype == 0 {
+                textraw[14] = b' ';
+            } else {
+                textraw[14] = b'\n';
+                textraw[15] = 0;
+            }
         } else {
-            "NONE"
-        };
-        let mut bytes = format!("C_SU_SETID,{id}").into_bytes();
-        if iwtype == 0 {
-            bytes.resize(iwidth, b' ');
+            textraw[..16].copy_from_slice(b"C_SU_SETID,NONE\0");
+            if iwtype == 0 {
+                textraw[15] = b' ';
+            } else {
+                textraw[15] = b'\n';
+                textraw[16] = 0;
+            }
         }
-        bytes.push(b'\n');
-        fputs_bytes(&bytes, &fpW);
+        let end = textraw.iter().position(|b| *b == 0).unwrap_or(maxtext);
+        fputs_bytes(&textraw[..end], &fpW);
+
         let mut ibeg = if isetid == 0 { 0 } else { 1 };
         let mut iend = num_names;
         if iwtype != 0 {
             ibeg = 0;
             iend = numcases;
         }
-        // These two blocks use the same wrapping convention as the C loops.
+        // Both C blocks write into the same initialized textraw array.
+        // Filling only iwidth bytes preserves suffixes from longer records.
         for (title, fields) in [("C_SU_FORMS", &form2), ("C_SU_NAMES", &name2)] {
-            let mut bytes = title.as_bytes().to_vec();
             if iwtype == 0 {
-                bytes.resize(iwidth, b' ');
+                textraw[..iwidth].fill(b' ');
+                textraw[iwidth] = b'\n';
             }
-            bytes.push(b'\n');
-            fputs_bytes(&bytes, &fpW);
-            let mut row = if isetid == 1 {
-                b"C_SU_ID,".to_vec()
-            } else {
-                Vec::new()
-            };
+            textraw[..10].copy_from_slice(title.as_bytes());
+            textraw[10] = if iwtype == 0 { b' ' } else { b'\n' };
+            if iwtype != 0 {
+                textraw[11] = 0;
+            }
+            let end = textraw.iter().position(|b| *b == 0).unwrap_or(maxtext);
+            fputs_bytes(&textraw[..end], &fpW);
+
+            if iwtype == 0 {
+                textraw[..iwidth].fill(b' ');
+                textraw[iwidth] = b'\n';
+            }
+            mspot = 0;
+            if isetid == 1 {
+                mspot = 8;
+                textraw[..9].copy_from_slice(b"C_SU_ID,\0");
+            }
             for i in ibeg..iend {
-                let value = fields[i].as_bytes();
-                if iwtype == 0 && row.len() + value.len() + 1 > iwidth {
-                    if let Some(last) = row.last_mut() {
-                        *last = b' ';
-                    }
-                    row.resize(iwidth, b' ');
-                    row.push(b'\n');
-                    fputs_bytes(&row, &fpW);
-                    row = b"C_SU_MORE,".to_vec();
+                let mleng = fields[i].len();
+                if iwtype == 0 && mspot + mleng + 1 > iwidth {
+                    textraw[mspot - 1] = b' ';
+                    let end = textraw.iter().position(|b| *b == 0).unwrap_or(maxtext);
+                    fputs_bytes(&textraw[..end], &fpW);
+                    textraw[..iwidth].fill(b' ');
+                    textraw[iwidth] = b'\n';
+                    mspot = 10;
+                    textraw[..11].copy_from_slice(b"C_SU_MORE,\0");
                 }
-                row.extend_from_slice(value);
-                row.push(b',');
+                textraw[mspot..mspot + mleng].copy_from_slice(fields[i].as_bytes());
+                mspot += mleng;
+                textraw[mspot] = b',';
+                mspot += 1;
             }
             if iwtype == 0 {
-                if let Some(last) = row.last_mut() {
-                    *last = b' ';
-                }
-                row.resize(iwidth, b' ');
-            } else if let Some(last) = row.last_mut() {
-                *last = b'\n';
+                textraw[mspot - 1] = b' ';
+            } else {
+                textraw[mspot - 1] = b'\n';
+                textraw[mspot] = 0;
             }
-            if iwtype == 0 {
-                row.push(b'\n');
-            }
-            fputs_bytes(&row, &fpW);
+            let end = textraw.iter().position(|b| *b == 0).unwrap_or(maxtext);
+            fputs_bytes(&textraw[..end], &fpW);
         }
     }
 
@@ -1876,8 +1913,21 @@ fn main() {
                         textraw2[iwidth] = b'\n';
                         textraw2[..lenod].copy_from_slice(&Rod.as_bytes()[..lenod]);
                         for ineed in 0..numcases {
+                            // C sutoolcsv.c:2652/2655 writes before textraw2
+                            // when bare names leave column bounds at -1.
+                            // Match the bounds check in the UB-fixed C.
+                            if ilead[ineed] < 1
+                                || itrail[ineed] < ilead[ineed]
+                                || itrail[ineed] > iwidth as i32
+                            {
+                                err!("**** Error: fixed output requires column bounds in names=.");
+                            }
                             let formatted = sprintf!(&forms[ineed], RecInfo[count].dfield[ineed]);
                             let mfill = formatted.len();
+                            // C sprintf writes into textbeg. Later process=
+                            // operations reuse its suffix after a short strncpy.
+                            textbeg[..mfill].copy_from_slice(formatted.as_bytes());
+                            textbeg[mfill] = 0;
                             if itrail[ineed] - mfill as i32 + 1 < ilead[ineed] {
                                 textraw2[(itrail[ineed] - 1) as usize] = b'*';
                             } else {
@@ -1896,6 +1946,8 @@ fn main() {
                             if v < 1.0e308 {
                                 let formatted = sprintf!(&forms[ineed], v);
                                 let mfill = formatted.len();
+                                textbeg[..mfill].copy_from_slice(formatted.as_bytes());
+                                textbeg[mfill] = 0;
                                 textraw2[mhere] = b',';
                                 textraw2[mhere + 1..mhere + 1 + mfill]
                                     .copy_from_slice(formatted.as_bytes());

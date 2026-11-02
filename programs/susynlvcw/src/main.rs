@@ -469,6 +469,18 @@ fn makeone(
                 (1.0 / (time as f64).sqrt()) as f32
             };
 
+            // modeling.c:520-540 truncates negative tn toward zero, so an
+            // overlapping wavelet can read a negative sinc row. Match the
+            // bounds-checked C's clean error before calling the shared routine.
+            let tn = (time - ft) / dt;
+            let jt = tn as i32;
+            let jsinc = ((tn - jt as f32) * 100.0) as i32;
+            if jt.wrapping_add(4) >= 0
+                && jt.wrapping_sub(3) < nt
+                && !(0..101).contains(&jsinc)
+            {
+                err!("addsinc: sinc index out of bounds");
+            }
             addsinc(time, amp, dt, ft, trace);
         }
     }

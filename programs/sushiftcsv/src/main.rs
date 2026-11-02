@@ -993,7 +993,11 @@ fn scaledfromhead(tr: &Trace, k: i32) -> f64 {
         115 => (tr.gdel as f64, tr.scalel),
         116 => (tr.swdep as f64, tr.scalel),
         117 => (tr.gwdep as f64, tr.scalel),
-        _ => return fromhead(tr, k),
+        1..=80 => return fromhead(tr, k),
+        // GetCase accepts numb* names beyond the shared helper's range.
+        // Use zero as in the minimal headcase.c initialization fix, which
+        // preserves SU's output for the refuted numb17 UB claim.
+        _ => return 0.0,
     };
     if scale > 1 {
         dval *= scale as f64;

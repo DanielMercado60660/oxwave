@@ -64,3 +64,53 @@ tetramod nxhz=10 nyhz=31 hzfile=hz.bin nhz=4 ficth=1,0 z00=1,0,2,3 z01=1,0,2,3 z
 # C sometimes succeeds using out-of-bounds heap garbage on this repro.
 # Its model is excluded; require either C success or SIGSEGV, never a Rust panic.
 { tetramod nxhz=2 nyhz=41 hzfile=hz.bin nhz=4 ficth=2,1,0 blt=0 > model.txt 2> model.err; rc=$?; test "$rc" -eq 0 || test "$rc" -eq 139; } 2>/dev/null
+
+# diff-2026-11 (round 1)
+# tetramod does not read trace headers or samples. Drain trace generators first
+# so long input cannot make an otherwise successful test fail with SIGPIPE.
+# Defaults, explicit defaults, nt=1..4, prime nt, and changed input headers.
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin; }
+[stderr] sunull nt=2 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin nhz=1 verbose=0 ficth=-1 blt=1 xmin=0 xmax=2 ymin=0 ymax=2 zmax=0 z00=0 z01=0 z10=0 z11=0 v00=1 v01=1 v10=1 v11=1 dvdz00=0 dvdz01=0 dvdz10=0 dvdz11=0; }
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin verbose=1; }
+[stderr] sunull nt=4 ntr=2 | sushw key=offset,cdp,delrt a=-120,41,-8 | { cat >/dev/null; tetramod nxhz=2 nyhz=5 hzfile=horizon.bin verbose=2; }
+[stderr] suplane nt=17 ntr=3 npl=1 len1=3 cx1=1 ct1=8 dip1=0 | suchw key1=cdp key2=tracl a=100 b=-3 | { cat >/dev/null; tetramod nxhz=3 nyhz=7 hzfile=horizon.bin verbose=-1; }
+# Boundary coordinates, individual slopes, velocity sign and small thickness.
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin xmin=5 xmax=-2 ymin=3 ymax=-4 zmax=-1 blt=0.25; }
+[stderr] sunull nt=2 ntr=1 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin z00=0.2; }
+[stderr] sunull nt=3 ntr=1 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin z01=0.2; }
+[stderr] sunull nt=4 ntr=1 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin z10=0.2; }
+[stderr] sunull nt=5 ntr=1 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin z11=0.2; }
+[stderr] sunull nt=7 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin v00=-1 v01=-2 v10=-3 v11=-4 dvdz00=-0.1 dvdz01=-0.2 dvdz10=-0.3 dvdz11=-0.4; }
+[stderr] sunull nt=11 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin blt=0.00005 zmax=0.0001; }
+# Several fictitious predecessors, repeated and out-of-range indices.
+[stderr] sunull nt=3 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 nhz=4 hzfile=horizon.bin ficth=1,2 verbose=1; }
+[stderr] sunull nt=3 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 nhz=4 hzfile=horizon.bin ficth=2,1 blt=0.00005; }
+[stderr] sunull nt=3 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 nhz=3 hzfile=horizon.bin ficth=1,1; }
+[stderr] sunull nt=3 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 nhz=3 hzfile=horizon.bin ficth=-2,10; }
+# Touching, reversed, and almost touching horizons; each list fills nhz entries.
+[stderr] sunull nt=2 ntr=1 | { cat >/dev/null; tetramod nxhz=3 nyhz=3 nhz=3 hzfile=horizon.bin z00=0,0.00001,1 z01=0,0.00001,1 z10=0,0.00001,1 z11=0,0.00001,1; }
+[stderr] sunull nt=2 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=5 nhz=3 hzfile=horizon.bin z00=1,0,2 z01=1,0,2 z10=1,0,2 z11=1,0,2 blt=0.5; }
+# Actual additive grids from SU generators, not handcrafted trace bytes.
+[stderr] suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | sustrip outpar=/dev/null | { cat >depth-grid.bin; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin z0file=depth-grid.bin; }
+[stderr] suplane nt=3 ntr=3 npl=1 len1=3 cx1=1 ct1=1 dip1=0 | sustrip outpar=/dev/null | { cat >velocity-grid.bin; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin v0file=velocity-grid.bin; }
+[stderr] makevel nx=3 nz=3 v000=0.1 dvdx=0.02 dvdz=0.01 | { cat >gradient-grid.bin; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin dvdz0file=gradient-grid.bin; }
+[stderr] makevel nx=3 nz=3 v000=0 dvdz=1 | { cat >x-grid.bin; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin x0file=x-grid.bin nhz=2; }
+[stderr] makevel nx=3 nz=3 v000=0 dvdx=1 | { cat >y-grid.bin; tetramod nxhz=3 nyhz=3 hzfile=horizon.bin y0file=y-grid.bin nhz=2; }
+[stderr] makevel nx=3 nz=3 v000=0.05 dvdx=0.01 dvdz=0.02 | { cat >additive-grid.bin; tetramod nxhz=3 nyhz=3 nhz=2 hzfile=horizon.bin z0file=additive-grid.bin v0file=additive-grid.bin dvdz0file=additive-grid.bin z1file=additive-grid.bin v1file=additive-grid.bin dvdz1file=additive-grid.bin verbose=1; }
+# Native binary horizon output is checked byte for byte, including its header.
+[exact] sunull nt=3 ntr=2 | sustrip outpar=/dev/null | { cat >depth-grid.bin; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin z0file=depth-grid.bin >/dev/null && cat horizon.bin; }
+[exact] makevel nx=3 nz=3 v000=0.125 dvdx=0.0625 dvdz=0.03125 | { cat >additive-grid.bin; tetramod nxhz=3 nyhz=3 nhz=2 hzfile=horizon.bin z0file=additive-grid.bin dvdz0file=additive-grid.bin ficth=1 >/dev/null && cat horizon.bin; }
+[exact] sunull nt=17 ntr=7 | sustrip outpar=/dev/null | { cat >depth-grid.bin; tetramod nxhz=17 nyhz=7 hzfile=horizon.bin z0file=depth-grid.bin >/dev/null && cat horizon.bin; }
+# A 4097-column horizon exercises real model indexing; discard its large ASCII
+# model and compare only the 246 KB binary horizon output.
+[exact] sunull nt=4097 ntr=3 | sustrip outpar=/dev/null | { cat >depth-grid.bin; tetramod nxhz=4097 nyhz=3 hzfile=horizon.bin z0file=depth-grid.bin >/dev/null && cat horizon.bin; }
+# Error cases still use a generator. No shell stage masks tetramod exit status.
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nyhz=3 hzfile=horizon.bin; }
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 hzfile=horizon.bin; }
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=; }
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=0 hzfile=horizon.bin; }
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=6 hzfile=horizon.bin; }
+sunull nt=1 ntr=1 | { cat >/dev/null; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin nhz=2147483648; }
+makevel nx=1 nz=4 v000=0 | { cat >short-grid.bin; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin z0file=short-grid.bin; }
+makevel nx=1 nz=4 v000=0 | { cat >short-grid.bin; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin v0file=short-grid.bin; }
+makevel nx=1 nz=4 v000=0 | { cat >short-grid.bin; tetramod nxhz=2 nyhz=3 hzfile=horizon.bin dvdz0file=short-grid.bin; }

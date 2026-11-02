@@ -693,9 +693,16 @@ fn zcoor_surfaces(
         szif[(0, is)] = 2.0 * szif[(1, is)] - szif[(2, is)];
         szif[(nx - 1, is)] = 2.0 * szif[(nx - 2, is)] - szif[(nx - 3, is)];
     }
-    sz[0] = 2.0 * sz[1] - sz[2];
+    // C lines 751/753 read beyond sz when nxs=2. Retaining the depths
+    // already interpolated above matches both original and bounds-fixed
+    // C for the round 1 case (byte-identical output).
+    if nxs >= 3 {
+        sz[0] = 2.0 * sz[1] - sz[2];
+    }
     nangl[0] = 2.0 * nangl[1] - nangl[2];
-    sz[nxs as usize - 1] = 2.0 * sz[nxs as usize - 2] - sz[nxs as usize - 3];
+    if nxs >= 3 {
+        sz[nxs as usize - 1] = 2.0 * sz[nxs as usize - 2] - sz[nxs as usize - 3];
+    }
     nangl[nx as usize - 1] = 2.0 * nangl[nx as usize - 2] - nangl[nx as usize - 3];
 }
 
@@ -1016,18 +1023,21 @@ fn dat2d(
         let az = z0 + iz as f32 * rdz;
         let mut jz = az as i32;
         if jz >= nzt - 1 {
-            jz = nzt - 2;
+            jz = if nzt > 1 { nzt - 2 } else { 0 };
         }
+        // A singleton depth table uses its sole sample at both endpoints.
+        // C lines 1026-1052 instead read index -1 with weight zero; this
+        // bounds fix leaves the round 1 case's output byte-identical.
+        let jz1 = cmin(jz + 1, nzt - 1) as usize;
         let sz = az - jz as f32;
         let sz0 = (1.0 - sz as f64) as f32;
-        let td = sz0 * tzt[jz as usize] + sz * tzt[jz as usize + 1];
+        let td = sz0 * tzt[jz as usize] + sz * tzt[jz1];
         let mut at = (sgn as f32 * td - ft) * odt;
         if iz < nzp && antiali != 0 {
             at += mtmax as f32;
             let jt = at as i32;
-            let ampd = sz0 * ampi[jz as usize] + sz * ampi[jz as usize + 1];
-            let mt =
-                (0.5 + (sz0 * tm[jz as usize]) as f64 + (sz * tm[jz as usize + 1]) as f64) as i32;
+            let ampd = sz0 * ampi[jz as usize] + sz * ampi[jz1];
+            let mt = (0.5 + (sz0 * tm[jz as usize]) as f64 + (sz * tm[jz1]) as f64) as i32;
             let res = cabs(at - jt as f32);
             let res0 = (1.0 - res as f64) as f32;
             for it in 0..nt {
@@ -1053,7 +1063,7 @@ fn dat2d(
             }
         } else {
             let jt = at as i32;
-            let ampd = sz0 * amp[jz as usize] + sz * amp[jz as usize + 1];
+            let ampd = sz0 * amp[jz as usize] + sz * amp[jz1];
             let res = cabs(at - jt as f32);
             let res0 = (1.0 - res as f64) as f32;
             for it in 0..nt {

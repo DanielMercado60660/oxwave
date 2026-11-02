@@ -136,6 +136,15 @@ fn main() {
 
         /* Set output trace length */
         let ntout = nt + nforshot - 1;
+        // The C passes ntout to a fixed SU_NFLTS output array. Reject an
+        // oversized convolution before writing past it, like the bounds-fixed C.
+        if ntout > SU_NFLTS as i32 {
+            err!(
+                "output trace length %d exceeds SU_NFLTS=%d",
+                ntout,
+                SU_NFLTS as i32
+            );
+        }
 
         /* Main loop over reverse shot traces */
         loop {

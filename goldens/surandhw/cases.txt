@@ -75,3 +75,43 @@ suplane nt=7 ntr=5 | surandhw seed=17 key=dt a=0 noise=flat min=100 max=1000
 
 # A long uniform sequence complements the long Gaussian sequence above.
 suplane nt=1 ntr=4097 | surandhw seed=17 key=d1 a=0 noise=flat min=-4 max=9
+
+# diff-2026-11 (round 1)
+# Small traces from other generators; defaults and explicit distribution modes.
+sunull nt=1 ntr=1 | surandhw seed=2026
+sunull nt=2 ntr=3 | surandhw seed=2026 key=tstat a=1 min=0 max=1 noise=gauss
+sunull nt=3 ntr=7 | sushw key=tstat a=120 b=-13 | surandhw seed=911 min=-5 max=8
+suspike nt=4 ntr=5 nspk=1 ix1=3 it1=2 offset=-37 | surandhw seed=73 key=offset a=-0.5 min=-7 max=11 noise=flat
+suspike nt=17 ntr=11 nspk=2 ix1=1 it1=1 ix2=11 it2=17 | surandhw seed=32707 key=f2 a=0 min=-2.3 max=4.9 noise=gauss
+suspike nt=19 ntr=7 nspk=1 ix1=7 it1=19 | surandhw seed=32708 key=ungpow a=0 min=4.9 max=-2.3 noise=flat
+
+# Large sample counts must leave samples untouched while updating headers.
+suplane nt=4097 ntr=3 | surandhw seed=1000003 key=d2 a=0 min=-17 max=23 noise=gauss
+sunull nt=65535 ntr=1 | surandhw seed=73 key=ns a=1 min=0 max=0 noise=flat
+
+# Header-driven arithmetic across signed short, unsigned short, int, and float.
+sunull nt=4 ntr=3 | sushw key=dt a=65530 b=2 | surandhw seed=73 key=dt a=0.5 min=10 max=20 noise=flat
+sunull nt=3 ntr=5 | sushw key=tstat a=-32700 b=1000 | surandhw seed=73 key=tstat a=0.25 min=-10 max=10 noise=gauss
+sunull nt=2 ntr=5 | sushw key=cdp a=100 b=3 | suchw key1=offset key2=cdp a=-7 b=2 | surandhw seed=73 key=offset a=0.5 min=3 max=-2 noise=flat
+suspike nt=7 ntr=5 nspk=1 ix1=2 it1=4 | sushw key=unscale a=-1.25 b=0.375 | surandhw seed=73 key=unscale a=-2.25 min=-0.125 max=0.25 noise=gauss
+
+# Changing ns exercises output sizing, including initialized samples beyond input ns.
+sunull nt=4 ntr=3 | surandhw seed=73 key=ns a=0 min=2 max=2 noise=flat
+sunull nt=2 ntr=3 | surandhw seed=73 key=ns a=0 min=4 max=4 noise=gauss
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | surandhw seed=73 key=trid a=0 min=1 max=1
+
+# Scalar parsing boundaries: empty defaults, hex doubles, and exact subnormals.
+sunull nt=2 ntr=3 | sushw key=d1 a=3.5 b=0.25 | surandhw seed=73 key=d1 a= min= max= noise=flat
+sunull nt=3 ntr=3 | surandhw seed=73 key=f1 a=0x1p-1 min=-0x1.8p+1 max=0x1.4p+2 noise=gauss
+sunull nt=1 ntr=1 | surandhw seed=73 key=d1 a=0x1p-1074 min=0 max=0
+sunull nt=2 ntr=2 | surandhw key=cdp a=0 min=3 max=3 noise=flat
+[stderr] suspike nt=4 ntr=3 nspk=1 ix1=1 it1=1 | surandhw seed=73 key=d1 a=0 noise=flat min=-1 max=2 verbose=1
+
+# Invalid parameters must fail before input processing, with SU's diagnostics.
+[stderr] sunull nt=1 ntr=1 | surandhw seed=-1 noise=flat
+[stderr] sunull nt=2 ntr=1 | surandhw seed=73 key=ns noise=uniform
+[stderr] sunull nt=3 ntr=1 | surandhw seed=73 min=0x1p+1024
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=4 ntr=3 | surandhw seed=13 key=d1 a=0x1.8p-1074 min=0 max=0
+[exact] suspike nt=7 ntr=7 nspk=1 ix1=1 it1=1 | surandhw seed=1 key=trid a=0 noise=flat min=199 max=205

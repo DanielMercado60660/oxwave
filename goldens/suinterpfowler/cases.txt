@@ -17,3 +17,31 @@ suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0 v=1500 t=0
 suplane nt=3 ntr=1 | suinterpfowler ncdps=1 cdp=0 v=1500,1600 t=0 eta=0
 suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nvstack=6 cdp=0 v=1500,1600 t=0
 suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nv=2 neta=2 cdp=0 t=0 v=1700 eta=0.15
+# diff-2026-11 (round 1)
+[stderr] suplane nt=2 ntr=4 | sushw key=sx,gx,offset,igc,igi,cdpt a=101,200,77,3,4,9 b=2,4,0,0,0,0 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=1250 eta=0.1 verbose=1
+suplane nt=3 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0,0.008 v=1000,1800 eta=0,0.3
+suplane nt=4 ntr=6 | suinterpfowler ncdps=1 nv=3 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.2 cdp=0 t=0 v=1500 eta=0.1
+suplane nt=13 ntr=24 | suinterpfowler ncdps=4 nv=3 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=1 t=0,0.02,0.04 v=1050,1400,1900 eta=0.01,0.2,0.39 cdp=2 t=0,0.04 v=1800,1200 eta=0.3,0.1
+suplane nt=4097 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0,4,12 v=1200,1800,1400 eta=0.1,0.3,0.2
+suspike nt=17 ntr=6 nspk=1 k1=3 k2=2 | suinterpfowler ncdps=1 nv=3 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=1250 eta=0.1
+sunull nt=7 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 cdp=0 t=0 v=1750 eta=0.15
+suplane nt=17 ntr=3 | suinterpfowler ncdps=1 nv=3 neta=1 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=1250 eta=0.1
+suplane nt=17 ntr=3 | suinterpfowler ncdps=1 nv=3 neta=5 vmin=1000 vmax=2000 etamin=0.2 etamax=0.2 cdp=0 t=0 v=1250 eta=0.2
+suplane nt=17 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=2000 eta=0.2
+suplane nt=17 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=950 eta=-0.02
+suplane nt=17 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=1500 eta=0.4
+[stderr] suspike nt=13 ntr=14 nspk=1 k1=3 k2=2 | suinterpfowler ncdps=2 nvstack=7 vminstack=1500 vscale=1.2 cdp=0 t=0,0.04 v=1500,2200 cdp=1 t=0,0.04 v=1800,2500 verbose=1
+suplane nt=11 ntr=8 | suinterpfowler ncdps=1 nvstack=8 vminstack=1600 cdp=0 t=0,0.04 v=1500,2200
+suplane nt=9 ntr=4 | sushw key=dt,sx,gx,offset,cdp a=2000,-101,50,-99,77 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0,0.01 v=1200,1800 eta=0.1,0.3
+suplane nt=5 ntr=4 | suinterpfowler ncdps=1 nv=2 neta=2 nvstack=5 vminstack=1234 vscale=0.5 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=2500 eta=0.1
+suplane nt=5 ntr=231 | suinterpfowler ncdps=1 nv=21 neta=11 vmin=1500 vmax=2500 etamin=0.1 etamax=0.25 nvstack=0 vminstack=0.25 vscale=1 cdp=0 t=0 v=1750 eta=0.15
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nv=2 neta=2 cdp=0 t=0 v=1500 eta=0.1 cdp=1 t=0 v=1700
+suplane nt=3 ntr=1 | suinterpfowler ncdps=1 nvstack=6 cdp=0 t=0,0.1 v=1500
+suplane nt=3 ntr=2 | suinterpfowler ncdps=1 nv=2 neta=2 cdp=0 t=0 v=1600 eta=0.15
+suplane nt=1 ntr=1 | suinterpfowler ncdps=1 nv=1 neta=1 vmin=1400 vmax=2400 cdp=0 t=0 v=1800 eta=0.2
+suplane nt=7 ntr=84 | suinterpfowler ncdps=21 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=1200 eta=0.1 cdp=20 t=0 v=1800 eta=0.3
+suplane nt=101 ntr=36 | suaddnoise seed=17 noise=flat sn=2 | suinterpfowler ncdps=3 nv=4 neta=3 vmin=1200 vmax=2700 etamin=-0.2 etamax=0.4 cdp=0 t=0,0.13,0.4 v=1250,2300,2600 eta=-0.1,0.3,0.15 cdp=2 t=0,0.16,0.4 v=2500,1600,2100 eta=0.35,-0.1,0.2
+suplane nt=101 ntr=18 | suaddnoise seed=42 noise=gauss sn=3 | suinterpfowler ncdps=2 nv=3 neta=3 vmin=1400 vmax=2600 etamin=0 etamax=0.4 cdp=-1 t=0,0.2,0.4 v=1450,2300,2000 eta=0.01,0.35,0.2 cdp=2 t=0,0.2,0.4 v=2400,1700,2100 eta=0.3,0.05,0.2
+suplane nt=101 ntr=8 | suaddnoise seed=123 noise=flat sn=1 | suinterpfowler ncdps=1 nvstack=8 vminstack=1500 cdp=0 t=0,0.2,0.4 v=1550,2200,1600
+suplane nt=101 ntr=4 | suaddnoise seed=11 noise=flat sn=1 | suinterpfowler ncdps=1 nv=4 neta=1 vmin=1000 vmax=2000 cdp=0 t=0,0.2,0.4 v=1050,1750,1100 eta=0.1,0.2,0.3
+suplane nt=17 ntr=4 | suaddnoise seed=3 noise=flat sn=1 | suinterpfowler ncdps=1 nv=2 neta=2 vmin=1000 vmax=2000 etamin=0 etamax=0.4 cdp=0 t=0 v=999 eta=-0.0004

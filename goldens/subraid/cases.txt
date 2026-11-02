@@ -22,3 +22,27 @@ sunull nt=3 ntr=3 | sushw key=cdp a=3 b=-1 > a && sunull nt=3 ntr=1 | sushw key=
 sunull nt=3 ntr=1 | sushw key=cdp,tracf a=1,10 > a && sunull nt=3 ntr=2 | sushw key=cdp,tracf a=1,20 b=0,1 > b && sunull nt=3 ntr=2 | sushw key=cdp,tracf a=1,30 b=0,1 > c && subraid in0=a in33=b in99=c key=cdp trac=0
 # Signed unknown key name.
 subraid key=-bad
+# diff-2026-11 (round 1)
+# Interleaved keys with ties and distinct trace counters, using three inputs.
+suspike nt=2 ntr=3 | sushw key=cdp,tracf a=1,11 b=2,1 > a && sunull nt=2 ntr=3 | sushw key=cdp,tracf a=2,21 b=2,1 > b && suplane nt=2 ntr=2 | sushw key=cdp,tracf a=1,31 b=4,1 > c && subraid in7=c in1=a in55=b key=cdp trac=0
+# A secondary descending key breaks ties in an ascending primary key.
+sunull nt=4 ntr=4 | sushw key=cdp,offset a=1,10 b=0,-2 > a && suspike nt=4 ntr=3 | sushw key=cdp,offset a=1,9 b=0,-2 > b && subraid in0=a in9=b key=+cdp,-offset trac=1
+# Prime trace length and descending negative keys.
+suplane nt=13 ntr=3 | sushw key=offset a=-1 b=-2 > a && sunull nt=13 ntr=2 | sushw key=offset a=0 b=-3 > b && subraid in2=a in3=b key=-offset
+# Long traces and input exhaustion in the middle of the merge.
+suspike nt=4097 ntr=2 | sushw key=cdp a=1 b=4 > a && sunull nt=4097 ntr=3 | sushw key=cdp a=2 b=2 > b && subraid in0=a in99=b key=cdp trac=0
+# Single-sample single-trace inputs and explicit default trace numbering.
+suspike nt=1 ntr=1 > a && sunull nt=1 ntr=1 > b && subraid in10=a in11=b key=tracl trac=1
+# Odd length, duplicate key values and verbose diagnostics.
+[stderr] suplane nt=3 ntr=2 | sushw key=cdp a=4 b=0 > a && suspike nt=3 ntr=2 | sushw key=cdp a=4 b=0 > b && subraid in1=a in2=b key=cdp trac=0 verbose=1
+# Floating point header keys and alternating inputs.
+sunull nt=7 ntr=3 | sushw key=d1 a=0.5 b=1 > a && suspike nt=7 ntr=3 | sushw key=d1 a=1 b=1 > b && subraid in5=a in6=b key=d1
+# An input violates the secondary ordering after matching primary keys.
+sunull nt=4 ntr=3 | sushw key=cdp,offset a=1,3 b=0,-1 > a && sunull nt=4 ntr=1 | sushw key=cdp,offset a=2,0 > b && subraid in1=a in2=b key=cdp,offset trac=0
+# Invalid trace mode and key with inputs present.
+sunull nt=2 ntr=1 > a && suspike nt=2 ntr=1 > b && subraid in1=a in2=b key=cdp trac=3
+sunull nt=2 ntr=1 > a && suspike nt=2 ntr=1 > b && subraid in1=a in2=b key=cdp,notakey
+# Signed short headers and three lexicographic keys.
+sunull nt=4 ntr=3 | sushw key=cdp,delrt,offset a=5,-6,1 b=0,2,0 > a && suspike nt=4 ntr=3 | sushw key=cdp,delrt,offset a=5,-5,2 b=0,2,0 > b && subraid in4=a in8=b key=cdp,delrt,offset trac=0
+# Repeated key and trace-mode parameters use their final value.
+sunull nt=2 ntr=2 | sushw key=cdp a=1 b=2 > a && suspike nt=2 ntr=2 | sushw key=cdp a=2 b=2 > b && subraid in1=a in2=b key=bad key=cdp trac=1 trac=0

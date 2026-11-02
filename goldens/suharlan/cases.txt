@@ -98,3 +98,59 @@ suplane nt=65 ntr=3 | suharlan seed=123 anenv=1 scl=0 plot=0 norm=1 verbose=0 rg
 susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" ref="1:0,600;4000,640" | suaddnoise seed=11 sn=4 | suharlan seed=5 plot=0 verbose=0 dx=40 offref=440 np=21 nintlh=25 sditer=3 r1=4 r2=1 niter=2 pmin1=-100 pmax1=300 && cat out_signal out_noise
 susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" ref="1:0,600;4000,640" | suaddnoise seed=12 sn=3 | suharlan seed=6 plot=0 verbose=0 dx=40 offref=440 depthref=400 gopt=2 ninterp=2 np=15 nintlh=21 sditer=2 pmula=150 pmulb=200 norm=0 && cat out_signal out_noise
 susynlv nt=128 dt=0.004 nxo=12 fxo=0 dxo=40 nxs=1 fxs=0 v00=2000 dvdz=0.5 ref="1:0,300;4000,300" | suaddnoise seed=13 sn=2 | suharlan seed=7 plot=0 verbose=0 dx=40 gopt=4 np=13 nintlh=21 sditer=2 pmin1=-200 pmax1=400 pmin2=-50 pmax2=300 prewhite=0.1 rel1=0.9 rel2=0.95 && cat out_signal out_noise
+
+# diff-2026-11 (round 1)
+# Nonzero boundary samples; disable the C singleton-time smoothing overread.
+suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=3 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=5 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=7 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=17 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=31 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=257 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=1 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 sts=0 && cat out_signal out_noise
+# Small transform and histogram dimensions, including fewer slopes than traces.
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=2 nintlh=17 sditer=3 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=3 nintlh=17 sditer=3 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=2 sditer=3 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=3 sditer=3 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=4 sditer=3 && cat out_signal out_noise
+# Unusual flag values follow the C branches; reversed geometry and slope limits.
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 anenv=7 norm=-1 scl=4 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 anenv=-1 dx=0 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 dx=-25 fx=100 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 pmin1=400 pmax1=-400 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 pmin2=-100 pmax2=100 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 prewhite=0 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 prewhite=-0.5 r1=-5 r2=-2 && cat out_signal out_noise
+suspike nt=67 ntr=5 nspk=1 ix1=3 it1=15 | suharlan seed=47 plot=0 verbose=0 np=8 nintlh=17 sditer=3 ninterp=3 && cat out_signal out_noise
+# A nonzero single trace and a larger gather with seeded noise.
+suspike nt=131 ntr=1 nspk=1 ix1=1 it1=66 | suharlan seed=72 plot=0 verbose=0 np=8 nintlh=23 sditer=4 niter=2 rgt=1 scl=1 && cat out_signal out_noise
+sunull nt=263 ntr=17 | suaddnoise seed=62 | suharlan seed=73 plot=0 verbose=0 np=21 nintlh=27 sditer=4 niter=2 gopt=3 dx=35 fx=-280 offref=700 anenv=2 scl=2 rel1=0.2 rel2=0.8 && cat out_signal out_noise
+# Defaults and all explicitly supplied parameters on a different generator.
+suspike nt=128 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 && cat out_signal out_noise
+suspike nt=128 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 anenv=1 scl=0 plot=0 norm=1 verbose=0 rgt=2 sts=1 gopt=1 dx=20 fx=0 nintlh=50 sditer=5 c=0.05 rel1=0.5 rel2=0.75 niter=1 dt=0.004 r1=10 r2=2 pmin1=-400 pmax1=400 pmin2=-400 pmax2=400 np=100 prewhite=0.01 offref=2000 interoff=0 depthref=0 pmula=400 pmulb=400 ninterp=0 signal=spikes_signal noise=spikes_noise tmpdir=. && cat spikes_signal spikes_noise
+# Nondefault geometry, muted slopes, envelopes and header preservation.
+suplane nt=263 ntr=5 | sushw key=dt,delrt,offset,cdp,trid a=8000,-20,-600,200,2 b=0,5,300,1,0 | suharlan seed=91 plot=0 verbose=0 np=8 nintlh=23 sditer=3 gopt=2 depthref=600 interoff=-20 offref=1200 dx=30 fx=-60 dt=0.002 ninterp=1 pmula=100 pmulb=300 pmin1=-200 pmax1=400 pmin2=-100 pmax2=200 anenv=4 norm=0 c=0.12 r1=3 r2=0.5 niter=2 rel1=0.1 rel2=0.8 && cat out_signal out_noise
+# Each plot mode: read native float intermediates, including smoothing's report.
+[f32] suspike nt=131 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 plot=1 verbose=0 np=8 nintlh=23 sditer=0 anenv=3 && cat pd1 pn1 ps1 pspn1 Esd1 rel1 error
+[f32] suspike nt=131 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 plot=2 verbose=0 np=8 nintlh=23 sditer=3 niter=2 scl=3 gopt=4 fx=-40 && cat input input_taup rand1 rtaup1 signal1 staup1 s1scaled noise1 rand2 rtaup2 signal2 staup2 s2scaled noise2
+[f32] suspike nt=131 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 plot=3 verbose=0 np=8 nintlh=23 sditer=0 anenv=6 gopt=5 depthref=500 && cat pd1 pn1 ps1 pspn1 Esd1 rel1 input input_taup rand1 rtaup1 signal1 staup1 noise1
+[stderr] suspike nt=67 ntr=3 nspk=1 ix1=2 it1=20 | suharlan seed=94 plot=0 verbose=1 np=8 nintlh=17 sditer=2 niter=2 rgt=1 tmpdir=. && cat out_signal out_noise
+# Both file names empty, then each file streamed directly to stdout.
+suspike nt=67 ntr=3 nspk=1 ix1=2 it1=20 | suharlan seed=94 plot=0 verbose=0 np=8 nintlh=17 sditer=2 signal= noise=
+suspike nt=67 ntr=3 nspk=1 ix1=2 it1=20 | suharlan seed=94 plot=0 verbose=0 np=8 nintlh=17 sditer=2 signal=/dev/stdout noise=
+suspike nt=67 ntr=3 nspk=1 ix1=2 it1=20 | suharlan seed=94 plot=0 verbose=0 np=8 nintlh=17 sditer=2 signal= noise=/dev/stdout
+# No required numerical parameters; parser failures and validation precedence.
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suharlan seed=47 sditer=2147483648 plot=0 verbose=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suharlan seed=47 np=-2147483649 plot=0 verbose=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suharlan seed=47 dt=1e-310 plot=0 verbose=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suharlan seed=47 plot=9 verbose=2 tmpdir=.
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=64 ntr=7 | suaddnoise seed=42 | suharlan seed=433 verbose=0 plot=0 np=17 nintlh=3 sditer=5 dx=99 fx=20 offref=1000 anenv=5 scl=3 sts=0 ninterp=2 && cat out_signal out_noise
+[f32] sunull nt=64 ntr=7 | suaddnoise seed=42 | suharlan seed=433 verbose=0 plot=1 np=17 nintlh=3 sditer=5 dx=99 fx=20 offref=1000 anenv=5 scl=3 sts=0 ninterp=2 && cat pd1 pn1 ps1 pspn1 Esd1 rel1
+[f32] suspike nt=131 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 plot=1 verbose=0 np=8 nintlh=23 sditer=3 anenv=3 && cat pd1 pn1 ps1 pspn1 Esd1 rel1 error
+[f32] suspike nt=131 ntr=5 nspk=1 ix1=3 it1=30 | suharlan seed=81 plot=3 verbose=0 np=8 nintlh=23 sditer=3 anenv=6 gopt=5 depthref=500 && cat pd1 pn1 ps1 pspn1 Esd1 rel1 input input_taup rand1 rtaup1 signal1 staup1 noise1

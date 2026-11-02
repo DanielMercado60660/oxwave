@@ -28,3 +28,55 @@ suplane nt=65535 ntr=1 npl=3 len1=0 cx1=3 len2=0 cx2=3 len3=2 ct3=65534 cx3=2 di
 suplane nt=0 ntr=1
 suplane nt=-1 ntr=0
 suplane nt=-1 liner=1
+# diff-2026-11 (round 1)
+# Explicit defaults, output modes, and all geometry parameters.
+suplane nt=64 ntr=32 dt=0.004 offset=400 npl=3 taper=0 dip1=0 len1=24 ct1=32 cx1=16 dip2=4 len2=24 ct2=32 cx2=16 dip3=8 len3=24 ct3=32 cx3=16 liner=0
+suplane liner=1
+suplane liner=1 taper=1 dt=0.0025 offset=-17.75 dip1=99 len1=0 ct1=1 cx1=1 dip2=-99 len2=0 ct2=1 cx2=1 dip3=999 len3=0 ct3=1 cx3=1
+suplane liner=2 nt=7 ntr=5 npl=-1 taper=2
+# Tiny, odd, prime, and large traces with active planes.
+suplane nt=1 ntr=1 npl=1 len1=0 ct1=1 cx1=1
+suplane nt=2 ntr=1 npl=2 len1=0 ct1=1 cx1=1 len2=0 ct2=2 cx2=1 taper=1
+suplane nt=3 ntr=1 npl=3 len1=0 ct1=1 cx1=1 len2=0 ct2=2 cx2=1 len3=0 ct3=3 cx3=1
+suplane nt=4 ntr=1 npl=3 len1=0 ct1=4 cx1=1 len2=0 ct2=4 cx2=1 len3=0 ct3=4 cx3=1 taper=1
+suplane nt=19 ntr=7 npl=0 taper=1 dip1=-0.75 len1=6 ct1=9 cx1=4
+suplane nt=97 ntr=17 npl=2 dt=0.0013 dip1=-2.25 dip2=1.125 taper=1
+suplane nt=4097 ntr=5 npl=3 dt=0.000125 dip1=-3.3 len1=4 ct1=2049 cx1=3 dip2=1.1 len2=2 ct2=1000 cx2=2 dip3=0.25 len3=0 ct3=4097 cx3=5 taper=1
+# Rounding fit + 1 occurs in float before conversion to an integer in C.
+suplane nt=4 ntr=3 npl=1 len1=2 cx1=1 ct1=1 dip1=3.9999998
+suplane nt=4 ntr=3 npl=2 len1=-2 len2=2 cx2=1 ct2=1 dip2=3.9999998
+suplane nt=4 ntr=3 npl=3 len1=-2 len2=-2 len3=2 cx3=1 ct3=1 dip3=3.9999998
+suplane nt=4 ntr=3 npl=3 len1=2 cx1=1 ct1=1 dip1=3.9999998 len2=2 cx2=1 ct2=1 dip2=3.9999998 len3=2 cx3=1 ct3=1 dip3=3.9999998 taper=1
+suplane nt=2 ntr=2 npl=1 len1=2 cx1=1 ct1=1 dip1=3.9999998 taper=1
+suplane nt=7 ntr=2 npl=1 len1=2 cx1=1 ct1=1 dip1=11.999999
+suplane nt=11 ntr=2 npl=1 len1=2 cx1=1 ct1=1 dip1=27.999998 taper=1
+suplane nt=4 ntr=3 npl=1 len1=2 cx1=3 ct1=1 dip1=-3.9999998
+# Taper counters, overlapping planes, clipped extents, and non-1 flags.
+suplane nt=23 ntr=9 npl=3 taper=1 dip1=0 len1=1 cx1=3 ct1=7 dip2=0 len2=2 cx2=5 ct2=7 dip3=0 len3=3 cx3=7 ct3=7
+suplane nt=23 ntr=9 npl=3 taper=1 dip1=0 len1=4 cx1=5 ct1=7 dip2=0 len2=4 cx2=5 ct2=7 dip3=0 len3=4 cx3=5 ct3=7
+suplane nt=23 ntr=7 npl=3 taper=1 dip1=2 len1=12 cx1=1 ct1=1 dip2=-3 len2=12 cx2=7 ct2=1 dip3=0.5 len3=20 cx3=4 ct3=22
+suplane nt=23 ntr=7 npl=8 taper=-1 dip1=1.25 len1=-1 dip2=-0.5 len2=-2 dip3=0 len3=0 cx3=4
+suplane nt=13 ntr=5 npl=3 taper=2 dt=-0.002 offset=-0.9 dip1=1.75 dip2=-2.5 dip3=0.125
+suplane nt=13 ntr=5 dt=0.0655354 offset=123.99
+suplane nt=13 ntr=5 dt=0.00000049 offset=0.99
+suplane nt=13 ntr=5 dt=0.00000051 offset=-123.99
+# fit == nt and last visible fractional samples, within the fixed data array.
+suplane nt=17 ntr=3 npl=3 len1=2 cx1=2 ct1=18 dip1=0 len2=2 cx2=2 ct2=17 dip2=2 len3=2 cx3=2 ct3=1 dip3=-2 taper=1
+# Last occurrence wins; empty optional numbers preserve initialized defaults.
+suplane nt=11 nt=29 ntr=3 npl=3 dip1=99 dip1=-0.75 liner=1 liner=0
+suplane nt= ntr= dt= offset= npl= taper= dip1= len1= ct1= cx1= dip2= len2= ct2= cx2= dip3= len3= ct3= cx3= liner=
+[stderr] suplane nt=17 ntr=3 verbose=1 unknown=round1
+# suplane is a generator: input samples and headers are intentionally ignored.
+# Drain after suplane to keep upstream writers safe from scheduling-dependent SIGPIPE.
+sunull nt=3 ntr=1 | sushw key=dt,offset,tracl a=1234,-900,77 | { suplane nt=7 ntr=3 dt=0.002 offset=55 npl=1; cat >/dev/null; }
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=dt,offset,tracr a=500,888,42 | suchw key1=cdp key2=tracl a=100 b=2 | { suplane nt=11 ntr=2 npl=3 taper=1; cat >/dev/null; }
+# No required parameters; invalid sizes, integer conversion, and float parsing errors.
+[stderr] suplane nt=65537 ntr=1
+[stderr] suplane nt=2147483648 ntr=1
+[stderr] suplane nt=17 ntr=2147483648
+[stderr] suplane nt=17 ntr=1 dip2=1e-310
+[stderr] suplane nt=17 ntr=1 offset=1e999
+suplane nt=0 ntr=3 npl=3 len1=2 cx1=2 ct1=1 len2=2 cx2=2 ct2=1 len3=2 cx3=2 ct3=1 taper=1
+# ub-2026-11 (round 1)
+# Refuted: suplane.c:168 is one past data[], but guarding the += 0 leaves output unchanged.
+suplane nt=65535 ntr=1 npl=1 len1=0 ct1=65535 cx1=1

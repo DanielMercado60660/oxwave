@@ -13,3 +13,21 @@ suspike ntr=2 nt=9 | suzero itmin=0 itmax=0 value=0
 [stderr] suspike ntr=1 nt=7 | suzero itmin=4 itmax=3
 [stderr] suspike ntr=1 nt=7 | suzero itmax=-1
 [stderr] suspike ntr=1 nt=7 | suzero itmax=2 verbose=1 extra=3
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=2 k1=1 mag=3 | suzero itmax=0 value=-2
+suspike ntr=2 nt=3 k1=2 mag=5 | suzero itmin=1 itmax=2 value=1.25
+suspike ntr=3 nt=4 k1=4 mag=-3 | suzero itmin=3 itmax=4 value=7
+suplane ntr=4 nt=11 | suzero itmin=2 itmax=8 value=-0.5
+sunull ntr=3 nt=13 | suzero itmin=0 itmax=12 value=3.75
+suspike ntr=2 nt=4097 k1=4097 mag=2 | suzero itmin=4096 itmax=4096 value=-1
+suspike ntr=2 nt=17 k1=7 mag=4 | sushw key=dt a=2000 | suzero itmin=6 itmax=6 value=0
+[stderr] suplane ntr=2 nt=19 | suzero itmin=1 itmax=18 value=2 verbose=1
+[stderr] sunull ntr=1 nt=4 | suzero itmax=5 value=1
+[stderr] sunull ntr=1 nt=4 | suzero itmin=-2 itmax=0 value=1
+[stderr] sunull ntr=1 nt=4 | suzero itmin=3 itmax=2 value=1
+[stderr] sunull ntr=1 nt=4 | suzero itmax=
+suspike ntr=1 nt=5 k1=1 mag=2 | suzero itmax=0 itmax=4 itmin=2 value=0.125
+sunull ntr=2 nt=31 | suzero itmin=31 itmax=31 value=9
+sunull ntr=1 nt=65535 | suzero itmin=65534 itmax=65534 value=-3
+suspike ntr=1 nt=23 k1=12 mag=9 | suzero itmin=abc itmax=12 value=2e-3
+[stderr] sunull ntr=1 nt=4 | suzero itmax=2147483648

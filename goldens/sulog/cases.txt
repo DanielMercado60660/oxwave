@@ -18,3 +18,18 @@ suplane nt=32 ntr=1 | sulog outpar=logpar ntau=65536
 # explicit output length still uses the multiplier for the sampling interval.
 suplane nt=32 ntr=1 | sulog outpar=logpar m=1025
 suspike nt=11 ntr=1 | sulog ntmin=2 m=100000000 ntau=16 outpar=logpar
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sulog ntmin=1 m=1 ntau=1 outpar=logpar
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sulog ntmin=1 m=8 ntau=7 outpar=logpar
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sulog ntmin=1 m=6 ntau=9 outpar=logpar
+suspike nt=4 ntr=2 | sulog ntmin=1 m=6 outpar=logpar
+suplane nt=97 ntr=4 | sulog ntmin=7 m=4 ntau=389 outpar=logpar
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2050 | sulog ntmin=1 m=1 ntau=8192 outpar=logpar
+sunull nt=37 ntr=3 | sulog ntmin=4 m=2 outpar=logpar
+suplane nt=127 ntr=3 | sushw key=dt,offset a=1250,100 b=0,25 | sulog ntmin=13 m=2 outpar=logpar
+[exact] suspike nt=31 ntr=2 | sushw key=dt a=1234 | sulog ntmin=3 m=5 ntau=111 outpar=logpar > /dev/null; cat logpar
+[stderr] suplane nt=41 ntr=2 | sulog ntmin=4 m=3 ntau=100 outpar=logpar verbose=1
+suspike nt=53 ntr=2 nspk=1 ix1=1 it1=52 | sulog ntmin=52 m=1 ntau=80 outpar=logpar
+suspike nt=53 ntr=1 nspk=1 ix1=1 it1=6 | sulog ntmin=5 m=1 ntau=1 outpar=logpar
+suplane nt=32 ntr=1 | sulog ntmin=99999999999999999999 outpar=logpar
+suplane nt=32 ntr=1 | sulog m=99999999999999999999 outpar=logpar

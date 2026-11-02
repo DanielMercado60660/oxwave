@@ -15,3 +15,21 @@ sudumptrace tmpdir=/no/such/directory
 # Empty input and unknown header
 sudumptrace num=1
 suspike ntr=1 nt=3 | sudumptrace key=notakey
+
+# diff-2026-11 (round 1)
+sunull ntr=1 nt=2 | sushw key=dt,delrt a=1000,-7 | sudumptrace num=1 key=ns,dt,delrt hpf=0 tmpdir=.
+sunull ntr=2 nt=4 | sushw key=dt,offset a=2500,-123 b=0,71 | sudumptrace num=2 key=offset,dt hpf=1
+suspike ntr=1 nt=1 dt=0.001 | sudumptrace num=1 hpf=0
+suspike ntr=3 nt=11 dt=0.003 | sushw key=delrt,cdp a=15,100 b=0,2 | sudumptrace num=3 key=cdp,delrt hpf=2
+suspike ntr=1 nt=4097 dt=0.004 | sudumptrace num=1
+suplane | sudumptrace num=2 key=tracl,ns,dt
+sunull ntr=1 nt=3 | sushw key=dt a=0 | sudumptrace dt=0.0125 num=1 key=dt
+[stderr] suspike ntr=2 nt=7 dt=0.002 | sudumptrace num=2 key=tracl hpf=1 verbose=1
+suspike ntr=1 nt=17 dt=0.004 | sushw key=dt,delrt a=1,-1 | sudumptrace key=dt,delrt
+suspike ntr=1 nt=3 | sudumptrace tmpdir=/no/such/directory
+sunull ntr=1 nt=4 | sushw key=dt a=0 | sudumptrace dt=0
+suspike ntr=1 nt=3 | sudumptrace key=not_a_header
+[stderr] sunull ntr=1 nt=4 | sushw key=dt a=2000 | sudumptrace dt=0.125 num=1 verbose=1
+sunull ntr=2 nt=13 | sushw key=dt,delrt,scalco,offset a=3333,-32768,-100,16777217 b=0,0,0,1 | sudumptrace num=2 key=dt,delrt,scalco,offset hpf=0
+sunull ntr=1 nt=1999 | sushw key=dt,delrt a=12345,-333 | sudumptrace num=1 key=dt,delrt
+suspike ntr=2 nt=2 | sudumptrace num=1 key=d1,d2,f1,f2 hpf=1

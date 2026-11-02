@@ -19,3 +19,22 @@ sunull nt=2147483648
 sunull nt=3 ntr=1 verbose=1 unused=1
 # Last repeated argument wins.
 sunull nt=3 nt=5 ntr=2 dt=0.002 dt=0.003
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 dt=0.0000005
+sunull nt=3 ntr=2 dt=0.0000015
+sunull nt=4 ntr=3 dt=0.065535
+sunull nt=11 ntr=1 dt=0.065536
+sunull nt=4097 ntr=2 dt=0.0025
+sunull nt=65535 ntr=1 dt=0.004
+sunull nt=13 ntr=7 dt=-0.0000015
+sunull nt=19 ntr=1 dt=1.25
+sunull nt=5 ntr=1 dt=0.004 verbose=1
+sunull nt=6 ntr=2 dt=0.003 nt=2
+sunull nt=65536 ntr=1 dt=0.001
+sunull nt=2 ntr=2147483648
+sunull nt=2 dt=1e999
+[stderr] sunull nt=4 ntr=1 dt=0.004 verbose=1 extra=9
+sunull nt=2 ntr= dt=
+sunull nt=23 ntr=3 dt=0.000123456
+sunull nt=31 ntr=2 dt=-0.065536

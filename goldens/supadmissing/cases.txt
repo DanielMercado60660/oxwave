@@ -18,3 +18,24 @@ supadmissing keyloc=tracl < /dev/null
 suplane nt=3 ntr=1 | supadmissing minval=3 maxval=2
 suplane nt=3 ntr=3 | sushw key=cdp a=3 b=-1 | supadmissing
 suplane nt=3 ntr=3 | sushw key=cdp a=3 b=0 | supadmissing minval=5
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sushw key=cdp a=4 | supadmissing keyloc=cdp incval=1 minval=4 maxval=4
+suspike nt=3 ntr=3 | sushw key=cdp a=-4 b=3 | supadmissing incval=1 minval=-5 maxval=4
+sunull nt=4 ntr=4 | sushw key=offset a=-6 b=4 | supadmissing keyloc=offset incval=2 minval=-8 maxval=8
+suplane nt=4097 ntr=3 | sushw key=cdp a=1 b=3 | supadmissing minval=0 maxval=8
+suspike nt=11 ntr=4 | sushw key=tracf a=2 b=3 | supadmissing keyloc=tracf incval=2 minval=3 maxval=10
+sunull nt=13 ntr=3 | sushw key=year a=100 b=4 | supadmissing keyloc=year incval=2 minval=102 maxval=110
+suspike nt=7 ntr=3 | sushw key=f2 a=-1 b=1 | supadmissing keyloc=f2 incval=0.25 minval=-1.5 maxval=1.5
+suplane nt=2 ntr=2 | sushw key=nhs a=2 b=2 | supadmissing keyloc=nhs incval=1 minval=1 maxval=5
+[stderr] sunull nt=3 ntr=2 | sushw key=sx a=10 b=2 | supadmissing keyloc=sx minval=9 maxval=13 verbose=1
+sunull nt=4 ntr=3 | sushw key=cdp a=1 b=1 | supadmissing keyloc=cdp incval=1
+suplane nt=17 ntr=3 | sushw key=cdp a=10 b=2 | supadmissing minval=1 maxval=2 incval=2
+suspike nt=5 ntr=3 | sushw key=cdp a=1 b=2 | supadmissing minval=8 maxval=10 incval=1
+sunull nt=2 ntr=2 | sushw key=cdp a=5 b=0 | supadmissing maxval=4
+sunull nt=4 ntr=3 | sushw key=offset a=4 b=-2 | supadmissing keyloc=offset minval=5
+sunull nt=3 ntr=2 | sushw key=cdp a=1 b=1 | supadmissing incval=abc
+sunull nt=1 ntr=2 | sushw key=cdp a=-1 b=2 | supadmissing minval=-2 maxval=2
+sunull nt=65535 ntr=2 | sushw key=cdp a=1 b=2 | supadmissing minval=1 maxval=3
+suspike nt=19 ntr=2 | sushw key=dt a=1000 b=4 | supadmissing keyloc=dt incval=2 minval=998 maxval=1006
+sunull nt=3 ntr=1 | sushw key=cdp a=4 | supadmissing minval=4 maxval=4 incval=0.5
+sunull nt=3 ntr=2 | sushw key=cdp a=0 b=2 | supadmissing keyloc=null

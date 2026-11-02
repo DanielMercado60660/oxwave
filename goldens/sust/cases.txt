@@ -60,3 +60,39 @@ sunull nt=8 ntr=1 | suaddnoise seed=29 | sust dt=0.015625 fmin=48 fmax=56
 # An empty range outside the spectrum performs no spectrum accesses.
 suspike nt=8 ntr=1 | sust dt=0.015625 fmin=-16 fmax=-32
 suspike nt=8 ntr=1 | sust dt=0.015625 fmin=72 fmax=64
+
+# diff-2026-11 (round 1)
+# Nonzero two-sample inputs: full amplitude output, defaults and explicit parameters.
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sust
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sust dt=0.002 fmin=0 fmax=250 verbose=0
+# Empty ranges exercise padded sizes without C's result[n-lo][i] overrun
+# (sust.c:146 allocates nt samples per row; line 294 writes nfft samples).
+# Odd lengths, including 4097, cannot have nfft == nt since npfaro is even.
+sunull nt=1 ntr=1 | sust dt=0.015625 fmin=64 fmax=32
+sunull nt=3 ntr=1 | suaddnoise seed=109 | sust dt=0.015625 fmin=32 fmax=21.333334
+sunull nt=4 ntr=1 | suaddnoise seed=113 | sust dt=0.015625 fmin=32 fmax=21.333334
+sunull nt=4097 ntr=1 | suaddnoise seed=127 | sust dt=0.015625 fmin=1 fmax=0.985
+# No FFT padding at nt=30: seeded, nonzero default and explicit-default controls.
+sunull nt=30 ntr=2 | suaddnoise seed=131 | sust
+[stderr] sunull nt=30 ntr=2 | suaddnoise seed=131 | sust dt=0.004 fmin=0 fmax=125 verbose=0
+# Use the first input dt for the whole panel; retain later dt/delrt headers,
+# overwrite output axis headers, and reset tracr/gx for each input trace.
+suplane nt=70 ntr=3 npl=1 ct1=10 cx1=2 len1=3 | sushw key=dt,delrt,tracr,gx,f2,d2 a=2000,-30,777,-123,91,99 b=1000,10,1,7,1,1 | sust fmin=20 fmax=40
+# Bin zero and the legal single-wrap endpoint, with consecutive nonzero inputs.
+sunull nt=8 ntr=2 | suaddnoise seed=137 | sust dt=0.015625 fmin=-8 fmax=8
+sunull nt=8 ntr=2 | suaddnoise seed=139 | sust dt=0.015625 fmin=56 fmax=56
+# Half-bin upper-bound rounding: fmax just below and exactly at 12 Hz.
+sunull nt=8 ntr=1 | suaddnoise seed=167 | sust dt=0.015625 fmin=12 fmax=11.999
+sunull nt=8 ntr=1 | suaddnoise seed=167 | sust dt=0.015625 fmin=12 fmax=12
+# Large admissible lengths, no padding, restricted output (< 0.3 MB per case).
+sunull nt=4368 ntr=1 | suaddnoise seed=149 | sust dt=0.002 fmin=24.9 fmax=25.1
+sunull nt=65520 ntr=1 | suaddnoise seed=157 | sust fmin=5 fmax=5
+# Physical synthetic and negative dt with a valid positive selected bin.
+susynlv nt=210 dt=0.01 nxm=2 nxo=1 | sust fmin=5 fmax=10
+sunull nt=8 ntr=1 | suaddnoise seed=163 | sust dt=-0.015625 fmin=-16 fmax=-16
+# Nonseismic warning plus checkpars verbose output and missing-header dt override.
+[stderr] sunull nt=8 ntr=1 | suaddnoise seed=151 | sushw key=trid,dt a=18,0 | sust dt=0.001 fmin=0 fmax=0 verbose=1
+# Parameter conversion errors and an empty required override.
+[stderr] sunull nt=8 ntr=1 | sust fmin=1e39
+[stderr] sunull nt=8 ntr=1 | sust fmax=1e-310
+[stderr] sunull nt=8 ntr=1 | sushw key=dt a=0 | sust dt=

@@ -656,6 +656,15 @@ fn makeone(
                 ((vs0 * vg0 / (sgsd * sggd * (sgsd + sggd))) as f64).sqrt() as f32
             };
             amp *= abs(ci + cr) * ar * ds;
+            // modeling.c:520-540 truncates negative sample positions toward
+            // zero, which can select a row before the sinc table. Match the
+            // minimally bounds-checked C before calling the shared routine.
+            let tn = (time - ft) / dt;
+            let jt = tn as i32;
+            let jsinc = ((tn - jt as f32) * 100.0) as i32;
+            if jt + 4 >= 0 && jt - 3 < nt && !(0..101).contains(&jsinc) {
+                err!("addsinc: sinc index %d out of bounds", jsinc);
+            }
             addsinc(time, amp, dt, ft, &mut trace[..nt as usize]);
         }
     }

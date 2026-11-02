@@ -132,7 +132,7 @@ fn main() {
     if getparint("verbose", &mut verbose) == 0 {
         verbose = 0;
     }
-    if getpardouble("y0", &mut y[0]) == 0 {
+    if getpardouble("y0", &mut y[..]) == 0 {
         y[0] = 10.0;
     }
     if getpardouble("h", &mut h) == 0 {
@@ -167,7 +167,7 @@ fn main() {
 
     // C's callback writes y[1] despite integrating just one equation. Only
     // calls on the main state affect the output; writes to the oversized C
-    // solver work arrays are never read. The Rust callback takes an immutable
+    // solver work arrays are never read. The Rust callback takes a mutable
     // one-element slice, so record that side effect separately and copy it
     // back after each solve. Pointer equality distinguishes main/work states
     // without dereferencing raw pointers or modifying the solver library.

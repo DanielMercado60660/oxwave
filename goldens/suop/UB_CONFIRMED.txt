@@ -1,0 +1,12 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/operations/suop.c:807 (tmp allocation:244):
+# DESPIKE with nt=1,nw=3 reads tmp[1] and tmp[2] outside its one-float
+# allocation. The minimal fix checks nw>nt at entry to DESPIKE and calls
+# err("despike: nw=%d exceeds trace length nt=%d", nw, nt).
+# Built with the exact suop flags from vendor/su-build/build.log, orig
+# reproduces the saved golden exactly: rc=0, 244 stdout bytes, sample=0,
+# empty stderr. Fixed: rc=1, empty stdout, clean diagnostic
+# "suop: despike: nw=3 exceeds trace length nt=1". OxWave matches fixed
+# exactly (rc/stdout/stderr), five runs each; no Rust change required.
+# Evidence and fix.patch: diffcamp/ubx/suop/ (evidence/results.json).
+sunull nt=1 ntr=1 | suop op=despike nw=3

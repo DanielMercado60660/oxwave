@@ -1,0 +1,2 @@
+# susyncz.c:125-128,147,150: ninf=-1 allocates zero elements and writes zint[0] and dip[0] out of bounds; rejecting negative ninf changes the original 248-byte trace and rc 0 to a clean invalid ninf error and rc 1. OxWave matches fixed.
+susyncz ninf=-1 nt=2 ntr=1

@@ -14,3 +14,24 @@ supsmovie < /dev/null
 suplane nt=8 ntr=3 | env -u CWPROOT -u CWPBIN supsmovie
 suplane nt=8 ntr=3 | supsmovie n2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=8 ntr=3 | supsmovie n3=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | supsmovie d1=.003 d2=2 f1=-.25 f2=8 n2=1 n3=1 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=4 | supsmovie n2=2 n3=2 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=3 | supsmovie n2=3 style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4097 ntr=2 | supsmovie n2=2 n3=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=6 | supsmovie n3=3 d1=.01 d2=2.5 f1=1 f2=-3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=19 ntr=5 | supsmovie n2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=23 ntr=6 | sushw key=ntr,dt,delrt,tracr a=6,2000,-100,12 | supsmovie n3=2 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=11 ntr=4 | sushw key=trid,dt,d1,d2,f1,f2 a=30,0,.5,4,-2,7 | supsmovie n2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=31 ntr=6 | supsmovie n2=3 n3=2 clip=1 perc=90 title='Two frames' | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=37 ntr=4 | supsmovie n2=4 n3=1 d1=.004 d1=.002 d2=1 f1=0 f2=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4 ntr=3 | sushw key=trid,dt,tracl,tracr a=30,0,0,0 | supsmovie verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=29 ntr=4 | supsmovie tmpdir= n2=2 n3=2 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=2 ntr=1 | supsmovie n2=999999999999999999999
+sunull nt=2 ntr=1 | supsmovie d1=1e999
+sunull nt=2 ntr=1 | supsmovie tmpdir=/no/such/directory/round1
+[stderr] sunull nt=3 ntr=2 | supsmovie tmpdir=. verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=6 | supsmovie n2=3 n3=2 loopdsp=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=6 | supsmovie n2=3 n3=2 loopdsp=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=4 | sushw key=ntr a=6 | supsmovie verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=6 | sushw key=ntr a=4 | supsmovie verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

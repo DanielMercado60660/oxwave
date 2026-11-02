@@ -9,3 +9,26 @@ sufwatrim key=tracl dx=1
 sufwatrim key=tracl
 suspike nt=16 ntr=3 | sufwatrim key=badkey dx=1
 suspike nt=100 ntr=3 | sufwatrim key=tracl dx=1 padd=100000
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sufwatrim key=tracl dx=1 padd=0
+suspike nt=3 ntr=2 | sufwatrim key=tracl dx=1 padd=25
+suspike nt=4 ntr=4 | sufwatrim key=tracl dx=1 vf=0 vmin=2000 fac=3
+suplane nt=37 ntr=11 | sufwatrim key=tracl dx=2
+suplane nt=4097 ntr=5 | sufwatrim key=tracl dx=1 padd=0
+sunull nt=17 ntr=9 | sufwatrim key=tracl dx=1
+[stderr] suplane nt=101 ntr=12 | sushw key=cdp a=10 b=1 j=3 | sushw key=mark a=0 b=1 j=3 | sufwatrim key=tracl,cdp dx=2,4 keyg=cdp vf=1 vmin=4000 padd=50 fac=2 verbose=1
+suspike nt=23 ntr=15 | sushw key=mark a=1 b=0 | sufwatrim key=offset dx=10 keyg=ep
+suplane nt=47 ntr=6 | sushw key=mark a=0 b=1 | sufwatrim key=tracl dx=1 keyg=ep vf=1 vmin=5000 padd=25 fac=1
+suplane nt=47 ntr=6 | sufwatrim key=tracl dx=1 keyg=ep vf=0 vmin=-1 padd=100 fac=0
+suspike nt=31 ntr=20 | sushw key=ep a=5 b=-1 j=5 | sufwatrim key=tracl dx=-2 keyg=ep
+suspike nt=257 ntr=30 | sufwatrim key=tracl,offset dx=1,5 padd=10
+suplane nt=13 ntr=7 | sufwatrim key=tracl dx=1 keyg=tracl
+suspike nt=33 ntr=3 | sufwatrim key=tracl dx=1 padd=0 vf=2 fac=10
+suspike nt=33 ntr=3 | sufwatrim key=tracl dx=
+suspike nt=33 ntr=3 | sufwatrim key=tracl dx=1 keyg=notakey
+suspike nt=33 ntr=3 | sufwatrim key=tracl dx=1 vf=999999999999999999999
+suplane nt=127 ntr=19 | suaddnoise seed=27 sn=2 | sufwatrim key=tracl dx=1 padd=0
+suspike nt=113 ntr=40 | suaddnoise seed=123 sn=1 | sushw key=mark a=0 b=1 | sufwatrim key=tracl dx=1
+suplane nt=251 ntr=67 | suaddnoise seed=99 sn=5 | sufwatrim key=tracl dx=1 padd=15.5
+suplane nt=61 ntr=10 | suaddnoise seed=5 sn=1 | sushw key=cdp a=1 b=1 j=4 | sufwatrim key=offset dx=25 keyg=cdp

@@ -164,7 +164,10 @@ fn main() {
     let mut nx = 0;
     let mut offset = vec![0.0f32; nxmax as usize];
     let mut g = vec![0.0f32; nxmax as usize];
-    let mut mutetime = vec![0.0f32; nxmax as usize];
+    // C indexes this with interpolated trace indices. Extending its mute
+    // allocation with zeros removes the overread without changing the zero
+    // gather's output (ub-2026-11, round 1).
+    let mut mutetime = vec![0.0f32; (nxmax as usize).max(nxinterpmax)];
     let mut icount = 0;
     let mut ieod = false;
     loop {
@@ -1034,10 +1037,12 @@ fn jea_xinterpolate(
             for it in 0..nt {
                 time[it] = it as f32 - p[it] * wa;
             }
+            zero_extrapolation_coordinates(&mut time);
             ints8r(1.0, 0.0, &a[..nt], 0.0, 0.0, &time, &mut aa[..nt]);
             for it in 0..nt {
                 time[it] = it as f32 + p[it] * wb;
             }
+            zero_extrapolation_coordinates(&mut time);
             ints8r(1.0, 0.0, &b[..nt], 0.0, 0.0, &time, &mut bb[..nt]);
             for it in 0..nt {
                 aa[it] = wb * aa[it] + wa * bb[it];
@@ -1054,6 +1059,21 @@ fn jea_xinterpolate(
     write0(vndinterp, (nx - 1) * (ninterp + 1) as usize, &mut a, 122);
     VNDcl(vnda, 1);
     VNDcl(vndb, 1);
+}
+
+fn zero_extrapolation_coordinates(time: &mut [f32]) {
+    // These calls to ints8r use unit spacing, zero origin and zero tails.
+    // inttable8.c:177 cannot convert these extreme coordinates to int.
+    // The minimally fixed C returns the zero tail directly, byte-identical
+    // to the original for the lowpass-picker case (ub-2026-11, round 1).
+    // Use a representable coordinate with all eight taps in that zero tail
+    // so the shared interpolator can compute the same result safely.
+    for x in time {
+        let xoutn = (8.0f32 + *x) as f64;
+        if !(xoutn < 2147483648.0 && xoutn >= -2147483637.0) {
+            *x = -16.0;
+        }
+    }
 }
 
 fn runav(n: usize, len: i32, a: &[f32], b: &mut [f32]) {

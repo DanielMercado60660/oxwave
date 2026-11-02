@@ -336,9 +336,9 @@ fn makexzs(nu: usize, xu: &mut [f32], zu: &mut [f32], ns: usize) {
         intcub(0, &u, &zud, &[uu], &mut z);
         let dx = x[0] - xlast;
         let dz = z[0] - zlast;
-        // C reads s[-1] on iteration zero. Use zero padding for this undefined
-        // read; for some curved surfaces the original instead reads a live
-        // preceding allocation, so those cases remain heap-layout-dependent.
+        // elasyn.c:358 reads s[-1] on iteration zero. Start from zero, matching
+        // the minimal C bounds fix verified for ub/elasyn round 1: that fix
+        // changes a curved-surface waveform and prevents a flat-surface crash.
         s[iuu] = ((if iuu == 0 { 0.0 } else { s[iuu - 1] }) as f64
             + ((dx * dx + dz * dz) as f64).sqrt()) as f32;
         xlast = x[0];

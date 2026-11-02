@@ -47,3 +47,39 @@
 [stderr] printf '1500\n1600\n' | a2b n1=1 > vel; sunull nt=5 ntr=1 | sudipdivcor dxcdp=25 vfile=vel
 [stderr] sunull nt=9 ntr=3 | sudipdivcor dxcdp=25 np=4 unknown=7
 [stderr] sunull nt=9 ntr=3 | sudipdivcor dxcdp=50 dxcdp=25 np=4
+
+# diff-2026-11 (round 1)
+# Nonzero impulses at the smallest sizes; norm=0 avoids C's nt=1 normalization OOB read.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sudipdivcor dxcdp=37 np=7 norm=0
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sudipdivcor dxcdp=37 np=7 norm=0 conv=1
+[stderr] suspike nt=2 ntr=2 nspk=1 ix1=2 it1=2 | sudipdivcor dxcdp=37 np=3
+[stderr] suspike nt=3 ntr=7 nspk=1 ix1=4 it1=2 | sudipdivcor dxcdp=37 np=3
+[stderr] suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | sudipdivcor dxcdp=37 np=5 conv=1 tmig=0,0.004,0.008,0.012 vmig=1400,1600,1800,2000
+[stderr] suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | sudipdivcor dxcdp=37 np=5 conv=0 tmig=0,0.004,0.008,0.012 vmig=1400,1600,1800,2000
+# Prime and long trace lengths, padded spatial FFTs, and distant nonzero samples.
+[stderr] sunull nt=257 ntr=23 dt=0.001 | suaddnoise seed=735 | sudipdivcor dxcdp=400 np=11 trans=1 norm=0 tmig=0,0.04,0.2 vmig=1400,2500,1800
+[stderr] suspike nt=4097 ntr=13 nspk=1 ix1=7 it1=4094 | sudipdivcor dxcdp=40 np=5
+[stderr] suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=4094 | sudipdivcor dxcdp=40 np=5 conv=1 norm=0 trans=1 tmig=0,8,16 vmig=1400,2200,3000
+[stderr] suspike nt=32768 ntr=3 nspk=1 ix1=2 it1=32765 | sudipdivcor dxcdp=40 np=5
+[stderr] suspike nt=511 ntr=143 nspk=1 ix1=72 it1=257 | sudipdivcor dxcdp=400 np=9 trans=1 tmig=0,0.04,0.2 vmig=1400,2500,1800
+# Native binary velocity profiles from a second generator, including file precedence.
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=30 | sudipdivcor dxcdp=50 np=8 vfile=<(makevel nx=1 nz=37 v000=1700)
+[stderr] sunull nt=37 ntr=5 | suaddnoise seed=312 | sudipdivcor dxcdp=50 np=8 vfile=<(makevel nx=1 nz=37 v000=1700 dz=0.004 dvdz=2500) conv=1 trans=1 norm=0 verbose=1 tmig=1,0 vmig=1
+# Different physical synthetic inputs in both correction modes.
+[stderr] suimp2d nt=127 nrec=7 x0=100 z0=200 c=2000 | sudipdivcor dxcdp=100 np=9 trans=1
+[stderr] susynlv nt=101 dt=0.004 nxm=5 fxm=1 dxm=0.025 v00=2 ref="1:0,0.2;3,0.4" | sudipdivcor dxcdp=25 np=9 conv=1 trans=1 norm=0 tmig=0,0.2,0.4 vmig=1600,2000,2500
+# The first dt controls all traces; preserve varying headers and input order.
+[stderr] sunull nt=31 ntr=5 | suaddnoise seed=181 | sushw key=dt a=1000 b=500 | sudipdivcor dxcdp=75 np=8 tmig=0,0.02,0.05 vmig=1600,2000,1800
+[stderr] suspike nt=97 ntr=7 nspk=1 ix1=4 it1=49 | sushw key=delrt,cdp a=-120,900 b=10,-7 | suchw key1=offset key2=cdp a=5 b=2 | sudipdivcor dxcdp=75 np=8 verbose=1
+# Defaults, explicit defaults, and any nonzero verbose flag.
+[stderr] suspike nt=97 ntr=7 nspk=1 ix1=4 it1=49 | sudipdivcor dxcdp=75
+[stderr] suspike nt=97 ntr=7 nspk=1 ix1=4 it1=49 | sudipdivcor dxcdp=75 np=50 trans=0 norm=1 conv=0 verbose=0 tmig=0 vmig=1500
+[stderr] suspike nt=23 ntr=11 nspk=1 ix1=6 it1=12 | sudipdivcor dxcdp=200 np=6 verbose=-1 trans=2 norm=2 conv=2
+# Required/invalid arguments and short velocity files, with exact diagnostics.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sudipdivcor verbose=1
+[stderr] sunull nt=4 ntr=1 | sudipdivcor dxcdp=25 tmig=0,1 vmig=
+[stderr] sunull nt=4 ntr=1 | sudipdivcor dxcdp=25 vmig=1500,1800
+[stderr] sunull nt=4 ntr=1 | sudipdivcor dxcdp=25 tmig=-1,-2 vmig=1500,1800
+[stderr] sunull nt=13 ntr=3 | suaddnoise seed=132 | sudipdivcor dxcdp=25 np=-1
+[stderr] sunull nt=13 ntr=3 | sudipdivcor dxcdp=25 np=-2147483648 conv=1 verbose=1
+[stderr] sunull nt=17 ntr=1 | sudipdivcor dxcdp=25 vfile=<(makevel nx=1 nz=3 v000=1500)

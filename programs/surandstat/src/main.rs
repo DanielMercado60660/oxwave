@@ -99,7 +99,10 @@ fn main() {
 
         if its <= 0 {
             let mut it = 0i32;
-            while it < nt.wrapping_sub(its) {
+            // Bound the source to C's actual data array. For nt=65533,
+            // its=-2, C's invalid reads only feed un-emitted destinations
+            // 65533 and 65534; omitting those copies preserves its output.
+            while it < nt.wrapping_sub(its) && it.wrapping_sub(its) < SU_NFLTS as i32 {
                 // Like C, retain samples past ns in the full trace buffer.
                 tr.data[it as usize] = tr.data[it.wrapping_sub(its) as usize];
                 it = it.wrapping_add(1);

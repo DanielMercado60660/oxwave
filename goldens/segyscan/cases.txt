@@ -5,3 +5,15 @@
 [exact] python3 -c 'import sys; sys.stdout.buffer.write(bytes(3600+100))' | segyscan
 [exact] python3 -c 'import sys,struct; b=bytearray(3600); struct.pack_into(">HH",b,3220,1,0); struct.pack_into(">H",b,3224,3); sys.stdout.buffer.write(b+bytes(range(240))+b"xx"+bytes(reversed(range(240)))+b"xx")' | segyscan
 [exact] python3 -c 'import sys,struct; b=bytearray(3600); struct.pack_into(">H",b,3220,1); struct.pack_into(">H",b,3224,9); sys.stdout.buffer.write(b+bytes(range(240))+b"x")' | segyscan verbose=1 unknown=1
+# diff-2026-11 (round 1)
+[exact] suspike nt=2 ntr=1 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] sunull nt=3 ntr=4 | sushw key=offset a=-300 b=200 | segyhdrs hfile=header bfile=binary | segywrite tape=in.segy hfile=header bfile=binary && segyscan verbose=1 < in.segy
+[exact] suplane nt=4 ntr=2 | sushw key=tracl,cdp a=2147483640,-100 b=1,200 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] suspike nt=17 ntr=5 | sushw key=offset a=-65536 b=32768 | segyhdrs hfile=header bfile=binary | segywrite tape=in.segy hfile=header bfile=binary && segyscan ignored=123 < in.segy
+[exact] sunull nt=4097 ntr=2 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] suplane nt=31 ntr=7 | sushw key=sx,sy a=-100000,50000 b=25000,-10000 | segyhdrs hfile=header bfile=binary | segywrite tape=in.segy hfile=header bfile=binary && segyscan < in.segy
+[exact] suspike nt=13 ntr=3 | sushw key=trid a=-1 b=1 | segyhdrs hfile=header bfile=binary format=2 | segywrite tape=in.segy hfile=header bfile=binary format=2 && segyscan < in.segy
+[exact] sunull nt=5 ntr=3 | sushw key=delrt a=-32768 b=32767 | segyhdrs hfile=header bfile=binary format=4 | segywrite tape=in.segy hfile=header bfile=binary format=4 && segyscan < in.segy
+[exact] sunull nt=3 ntr=2 | sushw key=offset a=2139095040 b=0 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] sunull nt=3 ntr=2 | sushw key=offset a=2143289344 b=0 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy
+[exact] sunull nt=3 ntr=1 | sushw key=offset a=-2147483648 | segyhdrs hfile=header bfile=binary format=5 | segywrite tape=in.segy hfile=header bfile=binary conv=0 format=5 && segyscan < in.segy

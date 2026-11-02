@@ -19,3 +19,31 @@ suplane nt=45 ntr=6 dt=0.004 | sudipfilt dx=2 d2=3 slopes=-1,0,1 amps=1,0,1
 [stderr] suplane nt=25 ntr=3 dt=0.004 | CWP_TMPDIR=. sudipfilt dx=2 verbose=1 amps=1
 suplane nt=16 ntr=2 dt=0.004 | sudipfilt
 suplane nt=16 ntr=2 dt=0.004 | sudipfilt dx=1 slopes=0,0 amps=1,1
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sudipfilt dt=0.004 dx=1 amps=1
+suspike nt=3 ntr=2 | sudipfilt dt=0.004 dx=1 slopes=-1,1 amps=0,1
+suspike nt=4 ntr=3 | sudipfilt dt=0.004 dx=1 slopes=-1,0,1 amps=1,0,1 bias=0.1
+suspike nt=19 ntr=7 | sudipfilt dt=0.002 dx=2 slopes=-0.004,0,0.004 amps=0,1,0
+suspike nt=4097 ntr=3 | sudipfilt dt=0.004 dx=1 slopes=-0.01,0.01 amps=0.3,0.9 bias=0.002
+suplane nt=97 ntr=11 dt=0.002 | sudipfilt dx=12 slopes=-0.001,-0.0002,0.0003,0.002 amps=0,1,0.5,0 bias=-0.0001
+sunull nt=23 ntr=5 dt=0.003 | sudipfilt dx=3 slopes=-1,1 amps=0,1
+suplane nt=37 ntr=5 dt=0.002 | sushw key=d2 a=7 | sudipfilt slopes=-0.002,0.002 amps=1,0
+suspike nt=29 ntr=4 | sushw key=dt,d2 a=4000,5 | sudipfilt slopes=-0.01,0,0.01 amps=0,1,0
+[stderr] suplane nt=33 ntr=7 dt=0.004 | sudipfilt d2=4 tmpdir=. verbose=1 slopes=-0.01,0.01 amps=0.2,0.8 bias=0.0005
+suplane nt=53 ntr=8 dt=0.004 | sudipfilt dx=-4 slopes=-0.01,0.01 amps=0.1,0.9
+suspike nt=31 ntr=5 | sudipfilt dt=0.002 dx=2 slopes=-1,0,1 amps=0.2,1,0.5 bias=0
+suplane nt=64 ntr=13 dt=0.004 | sudipfilt dx=10 slopes=-0.002,-0.001,0,0.001,0.002 amps=0,0.5,1,0.5,0
+suspike nt=101 ntr=9 | sudipfilt dt=0.001 d2=2 slopes=-0.1,0.1 amps=-1,2 bias=-0.01
+suplane nt=16 ntr=3 dt=0.004 | sudipfilt dx=2 slopes=1,0 amps=0,1
+suspike nt=16 ntr=3 | sudipfilt dt=0 dx=1 amps=1
+suplane nt=16 ntr=3 dt=0.004 | sudipfilt dx=1 slopes=-1,0,1 amps=0,1
+suspike nt=1 ntr=7 | sudipfilt dt=0.004 dx=1 slopes=-0.1,0.1 amps=0,1 bias=0.01
+suspike nt=5 ntr=17 | sudipfilt dt=0.001 dx=2 slopes=-0.01,0,0.01 amps=0,1,0
+suplane nt=127 ntr=17 dt=0.004 | sudipfilt dx=5 slopes=-0.004,-0.001,0.001,0.004 amps=0,1,1,0 bias=0.001
+suplane nt=257 ntr=31 dt=0.002 | sudipfilt d2=6 slopes=-0.01,0,0.01 amps=1,0,1 bias=-0.002
+suspike nt=1009 ntr=13 | sudipfilt dt=0.004 dx=10 slopes=-0.002,0,0.002 amps=0,1,0 bias=0.001
+suplane nt=21 ntr=127 dt=0.004 | sudipfilt dx=1 slopes=-0.01,0,0.01 amps=0,1,0
+suspike nt=43 ntr=7 | sudipfilt dt=-0.004 dx=2 slopes=-0.01,0.01 amps=0.1,0.9 bias=0.001
+suplane nt=49 ntr=9 dt=0.004 | sudipfilt dx=10 slopes=0.2 amps=-0.5 bias=0.003
+suspike nt=61 ntr=11 | sudipfilt dt=0.003 dx=1 slopes=-10,-1,1,10 amps=2,-1,0,3 bias=0.5
+[stderr] sunull nt=7 ntr=2 dt=0.001 | sudipfilt dx=1 tmpdir= verbose=1 amps=1

@@ -76,3 +76,58 @@
 # Callback parameters are not read when the solver is never entered.
 [exact] seir_epidemic stepmax=0 b=1e999
 [f32] seir_epidemic stepmax=3 h=0 eti=1e999
+
+# diff-2026-11 (round 1)
+# This is a standalone ODE source: it never reads traces or their headers.
+# Drain each generator before running the model so ignored stdin cannot cause
+# an upstream SIGPIPE. All output below is native float32, not an SU stream.
+# Defaults and explicit defaults, then each output mode at boundary lengths.
+[f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic; }
+[f32] sunull nt=2 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=40 verbose=0 normalize=1 N=1000 s0=1000 e0=1 i0=1 r0=0 scale=0 h=1 tol=1e-8 mode=SEIR b=.5 k=.333 mu=0 nu=0 xi=0; }
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | { cat > /dev/null; seir_epidemic stepmax=1 mode=S normalize=0 N=16777217 s0=1.0000001 scale=1; }
+[f32] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | { cat > /dev/null; seir_epidemic stepmax=2 mode=E i0=30 scale=2 s0=777; }
+[f32] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | { cat > /dev/null; seir_epidemic stepmax=3 mode=I k=.75 h=.125 scale=1; }
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | { cat > /dev/null; seir_epidemic stepmax=4 mode=R r0=200 xi=.25 nu=.05 scale=2 s0=700; }
+# Prime and large input/output sizes, including output longer than SU_NFLTS.
+[f32] suplane nt=17 ntr=7 npl=1 len1=7 ct1=9 cx1=4 | { cat > /dev/null; seir_epidemic stepmax=101 h=.125 N=100 s0=90 e0=20 i0=7 r0=3 mode=SEIR scale=1 mu=.002 nu=.001 xi=.03; }
+[f32] sunull nt=4097 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4097 h=.001 mode=SEIR N=113 s0=97 i0=11 r0=5 scale=1; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=65537 h=0 mode=R normalize=0 r0=7; }
+# Header changes must have no influence on this source program.
+[f32] sunull nt=17 ntr=3 | sushw key=dt,delrt,offset,cdp a=2000,-125,-1234,100 b=0,10,100,-1 | suchw key1=tracr key2=cdp a=7 b=-2 | { cat > /dev/null; seir_epidemic stepmax=101 h=.125 N=100 s0=90 e0=20 i0=7 r0=3 mode=SEIR scale=1 mu=.002 nu=.001 xi=.03; }
+[f32] suplane nt=31 ntr=3 npl=1 len1=3 ct1=16 cx1=2 | sushw key=dt,trid a=0,2 | { cat > /dev/null; seir_epidemic stepmax=31 normalize=0 N=123 s0=12 i0=.25 e0=500 r0=2 b=.08 k=.3 h=.02 scale=2; }
+# Scaling, normalization, original initialization quirks and callback parameters.
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 normalize=-7 scale=-3 N=23 s0=17 i0=3 r0=2 h=.25; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 N=23 s0=17 e0=1e100 i0=3 r0=2 h=.25 scale=2; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 N=23 s0=17 e0=-1e100 i0=3 r0=2 h=.25 scale=2; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 eti=.9 b=.2 N=50 s0=40 i0=5 r0=5 h=.5; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 eti= k=.15 b=.2 N=50 s0=40 i0=5 r0=5 h=.5; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=19 eti=0 k=0 b=0 mu=.03 nu=.02 xi=.1 N=50 s0=40 i0=5 r0=5 h=.5; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=23 mode=S b=0 mu=.1 nu=.1 xi=.25 r0=500 h=.3; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=23 mode=E b=-.2 k=-.1 mu=-.001 nu=-.002 xi=-.003 i0=-1 r0=-3 h=-.01; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=23 N=0 normalize=0 s0=2 i0=.1 r0=.5 h=.01 scale=1; }
+[f32] sunull nt=3 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 N=0 h=.1; }
+# Solver minimum-step boundaries, both directions, and rejected-step diagnostics.
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 h=4.999999e-7 verbose=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 h=5e-7 verbose=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 h=5.000001e-7 verbose=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 h=-5.000001e-7 verbose=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=17 h=10 b=3 i0=80 tol=1e-18 verbose=2 scale=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=11 h=.125 tol=0 verbose=-2; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=5 h=.125 tol=-.001 verbose=1; }
+# A skipped solve must not parse the callback-only arguments.
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 h=1e-7 b=1e999 eti=1e999 k=1e999 mu=1e999 nu=1e999 xi=1e999 verbose=1; }
+[stderr] [exact] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=0 b=1e999 eti=1e999 k=1e999 mu=1e999 nu=1e999 xi=1e999 verbose=1; }
+# Parsing defaults, repeated parameters and intentionally ignored unknown names.
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=99 stepmax=4 h=.5 h=.125 normalize= scale= N= s0= e0= i0= r0= tol= b= eti= k= mu= nu= xi= verbose=1; }
+[stderr] [f32] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 unknown=123 mode=SEIR verbose=1; }
+# There are no required parameters. Invalid supplied values must still fail.
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 mode=SIER; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 mode=; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=-2; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=-2147483649; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic normalize=2147483648; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 tol=1e999; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 e0=1e999; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 mu=1e999; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 nu=1e999; }
+[stderr] sunull nt=1 ntr=1 | { cat > /dev/null; seir_epidemic stepmax=4 xi=1e999; }

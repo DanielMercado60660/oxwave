@@ -133,14 +133,26 @@ fn main() {
 
     /* allocate space: the C grids are contiguous, indexed [x][z]. */
     let n = nx as usize * nz as usize;
+    let solver_nz = if nz == 1 { 2 } else { nz as usize };
+    let solver_n = nx as usize * solver_nz;
     let mut v = vec![0.0f32; n];
-    let mut t = vec![0.0f32; n];
-    let mut sg = vec![0.0f32; n];
-    let mut a = vec![0.0f32; n];
-    let mut bet = vec![0.0f32; n];
+    let mut t = vec![0.0f32; solver_n];
+    let mut sg = vec![0.0f32; solver_n];
+    let mut a = vec![0.0f32; solver_n];
+    let mut bet = vec![0.0f32; solver_n];
 
     /* read velocities; like C, leave the fread count unchecked. */
     fread(&mut v, &vfp);
+
+    /* The shared solver requires two samples in each input dimension.
+     * For a singleton depth, extend velocity constantly to a second depth
+     * and retain the original depth of each output. This avoids recttopolar's
+     * zero-weight p[iy][-1] read (polar.c:140-143); fixing that read in C
+     * leaves the singleton-depth regression output unchanged.
+     */
+    if nz == 1 {
+        v = v.iter().flat_map(|&value| [value, value]).collect();
+    }
 
     /* compute times, angles, sigma, and betas */
     eiktam(
@@ -150,12 +162,20 @@ fn main() {
         fz,
         dx,
         fx,
-        &v.chunks(nz as usize).collect::<Vec<_>>(),
-        &mut t.chunks_mut(nz as usize).collect::<Vec<_>>(),
-        &mut a.chunks_mut(nz as usize).collect::<Vec<_>>(),
-        &mut sg.chunks_mut(nz as usize).collect::<Vec<_>>(),
-        &mut bet.chunks_mut(nz as usize).collect::<Vec<_>>(),
+        &v.chunks(solver_nz).collect::<Vec<_>>(),
+        &mut t.chunks_mut(solver_nz).collect::<Vec<_>>(),
+        &mut a.chunks_mut(solver_nz).collect::<Vec<_>>(),
+        &mut sg.chunks_mut(solver_nz).collect::<Vec<_>>(),
+        &mut bet.chunks_mut(solver_nz).collect::<Vec<_>>(),
     );
+    if nz == 1 {
+        for grid in [&mut t, &mut a, &mut sg, &mut bet] {
+            for ix in 0..nx as usize {
+                grid[ix] = grid[2 * ix];
+            }
+            grid.truncate(n);
+        }
+    }
 
     /* write first-arrival times */
     fwrite(&t, &tfp);

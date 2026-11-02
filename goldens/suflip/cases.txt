@@ -16,3 +16,22 @@ suflip flip=4
 suflip flip=-2
 suflip tmpdir=/nonexistent
 suflip flip=0
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=7 k1=1 k2=3 | suflip flip=0
+suspike nt=3 ntr=8 k1=2 k2=4 | suflip flip=-1 verbose=0
+suspike nt=4 ntr=9 k1=3 k2=5 | suflip flip=1 tmpdir=
+suspike nt=7 ntr=11 k1=4 k2=6 | sushw key=dt,offset a=2500,100 b=0,7 | suflip flip=2
+[stderr] suspike nt=11 ntr=13 k1=5 k2=7 | suflip flip=3 verbose=1 tmpdir=.
+sunull nt=2 ntr=1 | suflip flip=3
+sunull nt=3 ntr=1 | suflip flip=2
+sunull nt=4 ntr=1 | suflip flip=1
+suplane nt=17 ntr=19 | suflip flip=0 verbose=0
+suspike nt=4097 ntr=5 k1=2000 k2=3 | suflip flip=3
+suspike nt=4097 ntr=5 k1=2000 k2=3 | suflip flip=1
+suspike nt=5 ntr=4097 k1=3 k2=2000 | suflip flip=-1
+sunull nt=2 ntr=3 | suflip flip=99
+sunull nt=2 ntr=3 | suflip tmpdir=/nonexistent/diff-suflip
+sunull nt=1 ntr=65536 | suflip flip=0
+sunull nt=2 ntr=3 | suflip tmpdir=/dev/null
+sunull nt=2 ntr=3 | suflip flip= verbose=0

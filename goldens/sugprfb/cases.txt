@@ -12,3 +12,15 @@ sunull nt=20 ntr=3 | sugprfb nx=-3 fbt=10
 sunull nt=20 ntr=3 | sugprfb nx=3 fbt=-1
 # Zero nx is adjusted to one by the original.
 sunull nt=20 ntr=3 | sugprfb nx=0 fbt=10
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=1 | sugprfb nx=1 fbt=2
+suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=1 | sugprfb nx=1 fbt=3
+suspike nt=4 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=1 | sugprfb nx=1 fbt=4
+sunull nt=4097 ntr=5 | sugprfb nx=3 fbt=1
+suplane nt=101 ntr=9 npl=1 len1=30 cx1=5 ct1=2 dip1=0 | sugprfb nx=3 fbt=31
+suplane nt=127 ntr=17 npl=1 len1=40 cx1=9 ct1=2 dip1=0 | sushw key=cdp a=100 b=3 | sugprfb nx=7 fbt=41
+[stderr] sunull nt=67 ntr=7 | sugprfb nx=2 fbt=1 verbose=1
+sunull nt=13 ntr=2 | sugprfb nx=5 fbt=1
+suplane nt=101 ntr=55 npl=1 len1=120 cx1=28 ct1=2 dip1=0 | sugprfb
+sunull nt=10 ntr=2 | sugprfb nx=2147483648 fbt=1

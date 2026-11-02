@@ -11,3 +11,22 @@ suplane nt=16 ntr=1 | suifft
 suplane nt=16 ntr=1 | sufft | suifft sign=0
 suplane nt=16 ntr=1 | sufft | suifft sign=2
 suifft sign=-1
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sufft verbose=0 | suifft sign=1
+suspike nt=3 ntr=2 | sufft verbose=0 | suifft sign=-1
+suplane nt=4 ntr=1 | sufft verbose=0 | suifft
+suplane nt=17 ntr=4 | sufft sign=-1 verbose=0 | suifft sign=-1
+suspike nt=127 ntr=3 | sufft verbose=0 | suifft sign=1
+suplane nt=4097 ntr=1 | sufft verbose=0 | suifft
+sunull nt=33 ntr=2 | sufft verbose=0 | suifft sign=-1
+suplane nt=31 ntr=3 | sufft verbose=0 | sushw key=d1,f1 a=2.5,17 | suifft
+suspike nt=48 ntr=2 | sufft verbose=0 | sushw key=d1,dt a=0,2000 | suifft sign=1 verbose=1
+suplane nt=19 ntr=1 | sufft verbose=0 | suifft sign=abc
+suplane nt=19 ntr=1 | sufft verbose=0 | suifft sign=1 sign=-1
+suplane nt=19 ntr=1 | sufft verbose=0 | suifft sign=
+suspike nt=210 ntr=3 | suaddnoise sn=2 seed=12345 | sufft verbose=0 | suifft sign=-1
+suspike nt=997 ntr=2 | suaddnoise sn=1 seed=42 | sufft sign=-1 verbose=0 | suifft sign=1
+suplane nt=8191 ntr=2 | sufft verbose=0 | suifft sign=1
+suplane nt=37 ntr=3 | sufft verbose=0 | sushw key=d1 a=1 b=1 | suifft
+suspike nt=30 ntr=1 | sufft verbose=0 | suifft sign=-2

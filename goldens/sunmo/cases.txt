@@ -26,3 +26,20 @@ suplane nt=257 ntr=7 | sushw key=offset a=100 b=75 | sushw key=delrt a=100 | sun
 suplane nt=127 ntr=4 | sushw key=offset a=100 | sunmo upward=1 sscale=0 lmute=4
 # Very large ramp with a nonzero stretch mute index
 suplane nt=257 ntr=1 | sushw key=offset a=400 | sunmo lmute=2147483647
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 dt=0.004 | sunmo vnmo=1500 tnmo=0 smute=1.5 lmute=0 sscale=0 invert=0 upward=0
+suspike nt=3 ntr=1 dt=0.004 | sushw key=offset a=2 | sunmo lmute=1
+suspike nt=4 ntr=2 dt=0.004 | sushw key=offset a=1 b=1 | sunmo invert=1 sscale=0
+suplane nt=4097 ntr=2 dt=0.004 | sushw key=offset a=100 b=50 | sunmo vnmo=1600 lmute=0
+suplane nt=113 ntr=5 | sushw key=cdp a=0 b=2 | sushw key=offset a=50 b=75 | sunmo cdp=8,0,4 vnmo=2400 tnmo=0 vnmo=1400 tnmo=0 vnmo=1800 tnmo=0
+suplane nt=137 ntr=3 | sushw key=offset a=-200 b=200 | sushw key=delrt a=-100 | sunmo vnmo=1800 smute=2 lmute=3 sscale=0
+suplane nt=131 ntr=3 | sushw key=offset a=20 b=80 | sunmo upward=1 invert=1 sscale=1 smute=4
+sunull nt=29 ntr=3 dt=0.002 | sushw key=offset a=100 b=10 | sunmo vnmo=1700
+[f32] suspike nt=97 ntr=4 dt=0.002 | sushw key=cdp a=1 b=1 | sushw key=offset a=80 | sunmo cdp=1,4 vnmo=1200,2200 tnmo=0,0.2 vnmo=2200,3200 tnmo=0,0.2 voutfile=velocity > /dev/null; cat velocity
+[f32] suplane nt=101 ntr=4 | sushw key=cdp a=1 b=1 | sunmo cdp=1,4 vnmo=1400 tnmo=0 vnmo=2600 tnmo=0 voutfile=velocity > /dev/null; cat velocity
+[stderr] suplane nt=103 ntr=2 | sushw key=offset a=50 b=50 | sunmo verbose=1 smute=1.5 lmute=25 sscale=1 invert=0 upward=0 vnmo=1500 tnmo=0
+suspike nt=31 ntr=1 | sunmo cdp=1,2 vnmo=1500 vnmo=2000 tnmo=0
+suspike nt=31 ntr=1 | sunmo vnmo=1600,1800 tnmo=0,0
+suspike nt=31 ntr=1 | sunmo smute=-0.5
+suplane nt=251 ntr=4 | sushw key=offset a=100 b=0 | sushw key=cdp a=4 b=-1 | sunmo cdp=1,4 vnmo=1200,1900 tnmo=0,1 vnmo=2400,3000 tnmo=0,1 invert=1 lmute=2
+suplane nt=127 ntr=2 | sushw key=offset a=300 b=-600 | sushw key=scalel a=-10 | sunmo vnmo=2000 upward=1 lmute=0

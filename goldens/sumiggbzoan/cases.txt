@@ -50,3 +50,53 @@
 [stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 deltafile=/dev/null
 [stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 epsilonfile=missing
 [stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=9 ntr=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 epsilonfile=/dev/null
+
+# diff-2026-11 (round 1)
+# Short time/depth axes, with nonzero data and one trace.
+[stderr] makevel nx=1 nz=1 v000=2250000 > a && sunull nt=1 ntr=1 dt=0.004 | sugain bias=1 | sumiggbzoan a3333file=a nx=1 nz=1 dx=10 dz=5 amin=-40 amax=40 bwh=60
+[stderr] makevel nx=1 nz=2 v000=2250000 > a && sunull nt=2 ntr=1 dt=0.004 | sugain bias=1 | sumiggbzoan a3333file=a nx=1 nz=2 dx=10 dz=5 amin=-40 amax=40 bwh=60
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=3 ntr=1 dt=0.004 | sugain bias=1 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10 dz=5 amin=-40 amax=40 bwh=60
+[stderr] makevel nx=1 nz=4 v000=2250000 > a && sunull nt=4 ntr=1 dt=0.004 | sugain bias=1 | sumiggbzoan a3333file=a nx=1 nz=4 dx=10 dz=5 amin=-40 amax=40 bwh=60
+# Prime time length and explicit dt/dx overriding conflicting headers.
+[stderr] makevel nx=13 nz=23 v000=2250000 dvdx=7000 dvdz=10000 > a && suspike nt=101 ntr=13 dt=0.002 | sushw key=d2,delrt a=37,80 | sumiggbzoan a3333file=a nx=13 nz=23 dx=7 dt=0.004 dz=6 fmin=12 fmax=60 bwh=45 verbose=1
+# Long traces still produce small depth sections.
+[stderr] makevel nx=3 nz=17 v000=2250000 > a && sunull nt=4097 ntr=3 dt=0.004 | suaddnoise seed=77 | sumiggbzoan a3333file=a nx=3 nz=17 dx=10 dz=10 amin=-40 amax=40 bwh=60
+[stderr] makevel nx=1 nz=17 v000=2250000 > a && sunull nt=65521 ntr=1 dt=0.004 | suaddnoise seed=77 | sumiggbzoan a3333file=a nx=1 nz=17 dx=10 dz=10 amin=0 amax=0 bwh=60
+# Deep and wide narrow grids, and a grid spanning many interpolation cells.
+[stderr] makevel nx=1 nz=65521 v000=2250000 > a && sunull nt=127 ntr=1 dt=0.004 | suaddnoise seed=77 | sumiggbzoan a3333file=a nx=1 nz=65521 dx=10 dz=0.001 amin=0 amax=0 bwh=2000 fmin=1 fmax=2
+[stderr] makevel nx=4097 nz=1 v000=2250000 > a && sunull nt=32 ntr=4097 dt=0.004 | suaddnoise seed=77 | sumiggbzoan a3333file=a nx=4097 nz=1 dx=0.01 dz=1 amin=0 amax=0 bwh=2000 fmin=1 fmax=2
+[stderr] makevel nx=129 nz=137 v000=2250000 dvdz=4000 > a && suplane nt=257 ntr=129 dt=0.002 npl=1 | sumiggbzoan a3333file=a nx=129 nz=137 dx=3 dz=2 amin=-30 amax=40 bwh=35 fmin=10 fmax=50
+# Independent physical synthetic generators.
+[stderr] makevel nx=9 nz=25 v000=2250000 > a && suimp2d nrec=9 nshot=1 nt=257 dt=0.002 c=1500 x0=40 z0=60 dgx=10 | sumiggbzoan a3333file=a nx=9 nz=25 dx=10 dz=5 bwh=50 fmin=10 fmax=70
+[stderr] makevel nx=7 nz=29 v000=4000000 > a && susynlv nt=251 dt=0.002 nxm=7 dxm=0.01 nxo=1 v00=2 ref="1:-0.1,0.1;0.2,0.1" | sumiggbzoan a3333file=a nx=7 nz=29 dz=5 bwh=50 fmin=10 fmax=60
+# Sampling comes from the first trace; output inherits other fields from the last.
+[stderr] makevel nx=5 nz=11 v000=2250000 > a && sunull nt=37 ntr=5 dt=0.004 | suaddnoise seed=91 | sushw key=dt,d2,cdp,offset,delrt a=2000,7,300,-40,-12 b=1000,3,-7,20,4 | sumiggbzoan a3333file=a nx=123 nz=11 dz=3 bwh=35 fmin=10 fmax=60 verbose=1
+[stderr] makevel nx=7 nz=13 v000=2250000 > a && suspike nt=67 ntr=7 | sushw key=cdp,sx,scalco a=200,100,-10 b=-10,25,0 | suchw key1=gx key2=sx key3=cdp a=30 b=1 c=2 | sumiggbzoan a3333file=a nx=7 nz=13 dx=10 dz=4
+# Explicit numerical defaults and both missing-sampling fallbacks.
+[stderr] makevel nx=3 nz=5 v000=2250000 > a && sunull nt=17 ntr=3 dt=0.004 | sugain bias=1 | sumiggbzoan a3333file=a nx=3 nz=5 dt=0.004 dx=1 dz=1 fmin=6.25 fmax=62.5 amin=-60 amax=60 bwh=120 verbose=0
+[stderr] makevel nx=3 nz=5 v000=2250000 > a && sunull nt=17 ntr=3 | sugain bias=1 | sushw key=dt,d2 a=0,0 | sumiggbzoan a3333file=a nx=3 nz=5
+# Every model parameter is used on successful runs, including Thomsen overrides.
+[stderr] makevel nx=7 nz=19 v000=2250000 > a33 && makevel nx=7 nz=19 v000=450000 > a55 && makevel nx=7 nz=19 v000=0.18 dvdz=0.001 > epsilon && sunull nt=83 ntr=7 | suaddnoise seed=411 | sumiggbzoan a3333file=a33 a1313file=a55 epsilonfile=epsilon nx=7 nz=19 dx=8 dz=5 fmin=9 fmax=63 bwh=45
+[stderr] makevel nx=11 nz=23 v000=2250000 dvdx=-3000 > a33 && makevel nx=11 nz=23 v000=0.09 dvdx=0.001 > delta && suspike nt=103 ntr=11 | sumiggbzoan a3333file=a33 deltafile=delta nx=11 nz=23 dx=8 dz=7 fmin=9 fmax=63 bwh=45
+[stderr] makevel nx=9 nz=19 v000=2250000 > a33 && makevel nx=9 nz=19 v000=3500000 > a11 && makevel nx=9 nz=19 v000=1100000 > a13 && makevel nx=9 nz=19 v000=0.06 > delta && makevel nx=9 nz=19 v000=0.15 > epsilon && suplane nt=127 ntr=9 dt=0.002 npl=1 | sumiggbzoan a3333file=a33 a1111file=a11 a1133file=a13 deltafile=delta epsilonfile=epsilon nx=9 nz=19 dx=9 dz=4 amin=-40 amax=35 bwh=50
+[stderr] makevel nx=21 nz=33 v000=2250000 dvdx=10000 dvdz=15000 > a33 && makevel nx=21 nz=33 v000=3000000 dvdx=5000 dvdz=20000 > a11 && makevel nx=21 nz=33 v000=800000 dvdx=2000 > a13 && makevel nx=21 nz=33 v000=550000 dvdz=3000 > a55 && makevel nx=21 nz=33 v000=-80000 dvdx=1000 > a15 && makevel nx=21 nz=33 v000=60000 dvdz=-500 > a35 && sunull nt=193 ntr=21 dt=0.003 | suaddnoise seed=884 | sumiggbzoan a3333file=a33 a1111file=a11 a1133file=a13 a1313file=a55 a1113file=a15 a3313file=a35 nx=21 nz=33 dx=13 dz=4.5 amin=-50 amax=40 fmin=9 fmax=72 bwh=45 verbose=1
+# Reversed, one-sided, and coincident angles.
+[stderr] makevel nx=17 nz=21 v000=2250000 > a && suplane nt=113 ntr=17 npl=1 | sumiggbzoan a3333file=a nx=17 nz=21 dx=8 dz=7 amin=50 amax=-25 bwh=40
+[stderr] makevel nx=13 nz=17 v000=2250000 > a && suspike nt=97 ntr=13 | sumiggbzoan a3333file=a nx=13 nz=17 dx=7 dz=6 amin=5 amax=55 bwh=40
+[stderr] makevel nx=13 nz=17 v000=2250000 > a && suspike nt=97 ntr=13 | sumiggbzoan a3333file=a nx=13 nz=17 dx=7 dz=6 amin=-55 amax=-5 bwh=40
+[stderr] makevel nx=9 nz=13 v000=2250000 > a && sunull nt=71 ntr=9 | suaddnoise seed=113 | sumiggbzoan a3333file=a nx=9 nz=13 dx=7 dz=6 amin=20 amax=20 bwh=40
+# Extreme valid beam scales and nonbinary verbose.
+[stderr] makevel nx=5 nz=9 v000=2250000 > a && sunull nt=61 ntr=5 | suaddnoise seed=432 | sumiggbzoan a3333file=a nx=5 nz=9 dx=10 dz=5 amin=-10 amax=10 bwh=2000 fmin=1 fmax=2
+[stderr] makevel nx=17 nz=15 v000=2250000 > a && sunull nt=47 ntr=17 dt=0.001 | suaddnoise seed=432 | sumiggbzoan a3333file=a nx=17 nz=15 dx=0.25 dz=0.5 amin=-50 amax=50 bwh=2 fmin=30 fmax=60
+[stderr] makevel nx=5 nz=9 v000=2250000 > a && sunull nt=41 ntr=5 | sugain bias=1 | sumiggbzoan a3333file=a nx=5 nz=9 dx=10 dz=2 verbose=2
+# Repeated parameters use the last value; nx is replaced by the actual count.
+[stderr] makevel nx=7 nz=11 v000=2250000 > a && suspike nt=73 ntr=7 | sumiggbzoan a3333file=unused a3333file=a nx=-200 nx=999 nz=2 nz=11 dx=20 dx=7 dz=3 amin=-30 amax=30 verbose=0
+[stderr] makevel nx=17 nz=19 v000=2250000 > a && suplane nt=107 ntr=17 npl=1 | sumiggbzoan a3333file=a nx=0 nz=19 dx=10 dz=4 fmin=8 fmax=64 bwh=50
+# Extra model samples are ignored, and fractional grid spacings remain f32.
+[stderr] makevel nx=9 nz=19 v000=2250000 > a && sunull nt=59 ntr=3 | suaddnoise seed=42 | sumiggbzoan a3333file=a nx=3 nz=7 dx=4.5 dz=1.25 fmin=8 fmax=48 bwh=35
+[stderr] makevel nx=11 nz=17 v000=2250000 dvdx=-4000 dvdz=9000 > a && suspike nt=89 ntr=11 dt=0.003 | sumiggbzoan a3333file=a nx=11 nz=17 dx=12.5 dz=4.5 fmin=9 fmax=72 bwh=45
+# Empty values and short model reads; full stderr is compared.
+[stderr] sunull nt=3 ntr=1 | sumiggbzoan a3333file=missing nx= nz=3
+[stderr] sunull nt=3 ntr=1 | sumiggbzoan a3333file= nx=1 nz=3 dx=10
+[stderr] makevel nx=1 nz=3 v000=2250000 > a && sunull nt=7 ntr=2 | sumiggbzoan a3333file=a nx=1 nz=3 dx=10
+[stderr] makevel nx=1 nz=7 v000=2250000 > a && makevel nx=1 nz=6 v000=0.1 > e && sunull nt=17 ntr=1 | sumiggbzoan a3333file=a epsilonfile=e nx=1 nz=7 dx=10

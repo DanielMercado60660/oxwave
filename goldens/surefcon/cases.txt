@@ -53,3 +53,39 @@ suspike nt=32 ntr=2 k1=16 | suaddnoise seed=113 > forward.su && suspike nt=34 nt
 sunull nt=31 ntr=2 > forward.su && suspike nt=33 ntr=2 k1=17 | suaddnoise seed=131 | surefcon sufile=forward.su xy=0
 # A nonnumeric xy parses as zero, like getparint in the original.
 [stderr] suspike nt=5 ntr=1 k1=3 > forward.su && suspike nt=7 ntr=1 k1=4 | surefcon sufile=forward.su xy=abc
+
+# diff-2026-11 (round 1)
+# Short convolution boundaries, with signed deterministic samples.
+suspike nt=2 ntr=1 k1=1 | suaddnoise seed=211 > forward.su && suspike nt=2 ntr=1 k1=2 | suaddnoise seed=223 | surefcon sufile=forward.su xy=0
+suspike nt=3 ntr=2 k1=3 | suaddnoise seed=227 > forward.su && suspike nt=4 ntr=2 k1=1 | suaddnoise seed=229 | surefcon sufile=forward.su
+suspike nt=4 ntr=1 k1=4 | suaddnoise seed=233 > forward.su && suspike nt=3 ntr=1 k1=1 | suaddnoise seed=239 | surefcon sufile=forward.su xy=0
+suspike nt=1 ntr=1 k1=1 > forward.su && suspike nt=4 ntr=1 k1=4 | surefcon sufile=forward.su
+suspike nt=4 ntr=1 k1=4 > forward.su && suspike nt=1 ntr=1 k1=1 | surefcon sufile=forward.su xy=0
+# Long odd lengths and both orders of the short/long convolution paths.
+suspike nt=2 ntr=1 k1=2 | suaddnoise seed=241 > forward.su && suspike nt=4097 ntr=1 k1=4097 | suaddnoise seed=251 | surefcon sufile=forward.su
+suspike nt=4097 ntr=1 k1=4097 | suaddnoise seed=257 > forward.su && suspike nt=2 ntr=1 k1=2 | suaddnoise seed=263 | surefcon sufile=forward.su xy=0
+suspike nt=4097 ntr=1 k1=2049 | suaddnoise seed=269 > forward.su && suspike nt=4097 ntr=1 k1=2049 | suaddnoise seed=271 | surefcon sufile=forward.su
+# The largest valid SU output length, including the full long/long path.
+suspike nt=65535 ntr=1 k1=65535 > forward.su && suspike nt=1 ntr=1 k1=1 | surefcon sufile=forward.su
+suspike nt=1 ntr=1 k1=1 > forward.su && suspike nt=65535 ntr=1 k1=65535 | surefcon sufile=forward.su xy=0
+suspike nt=32768 ntr=1 k1=32768 | suaddnoise seed=277 > forward.su && suspike nt=32768 ntr=1 k1=1 | suaddnoise seed=281 | surefcon sufile=forward.su
+# Prime lengths, moving planes, nonzero offset, and other synthetic generators.
+[stderr] suplane nt=17 ntr=3 npl=1 dip1=1.5 ct1=8 cx1=2 len1=3 > forward.su && suplane nt=19 ntr=2 npl=1 dip1=-2 ct1=9 cx1=1 len1=2 | surefcon sufile=forward.su xy=1 verbose=1
+susynlv nt=101 nxm=2 fxm=2 nxo=1 > forward.su && suimp2d nt=127 nrec=2 nshot=1 | surefcon sufile=forward.su xy=0
+# Header values change for each pair; only stdin ns/dt may change on output.
+[stderr] suspike nt=11 ntr=3 k1=6 | sushw key=tracf,dt a=100,2000 b=-2,1 > forward.su && suspike nt=13 ntr=3 k1=7 | sushw key=tracf,dt,delrt,cdp,scalco,sx,gx a=-7,65535,-32768,-2147483648,-100,1200,-900 b=3,-32767,1,1,0,20,-30 | suchw key1=offset key2=gx key3=sx a=7 b=1 c=-1 | surefcon sufile=forward.su xy=0 verbose=0
+# Packed inputs retain the original raw-memory interpretation and I/O quirks.
+[stderr] suspike nt=7 ntr=3 k1=2 | supack2 > forward.su && suspike nt=5 ntr=2 k1=2 | surefcon sufile=forward.su
+[stderr] suspike nt=7 ntr=3 k1=2 > forward.su && suspike nt=5 ntr=2 k1=2 | supack2 | surefcon sufile=forward.su
+[stderr] suspike nt=8 ntr=3 k1=2 | supack1 > forward.su && suspike nt=6 ntr=2 k1=2 | surefcon sufile=forward.su
+# Short second payloads preserve the previous trace's samples, like SU gettr.
+[stderr] suspike nt=7 ntr=2 k1=3 > forward.su && { suspike nt=3 ntr=1 k1=2; suspike nt=3 ntr=1 k1=1 | dd bs=1 count=244 2>/dev/null; } | surefcon sufile=forward.su
+[stderr] { suspike nt=3 ntr=1 k1=2; suspike nt=3 ntr=1 k1=1 | dd bs=1 count=244 2>/dev/null; } > forward.su && suspike nt=3 ntr=2 k1=2 | surefcon sufile=forward.su
+# Missing first payload, directory instead of a file, and a huge offset at EOF.
+[stderr] suspike nt=3 ntr=1 | dd bs=1 count=240 2>/dev/null > forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su
+[stderr] suspike nt=3 ntr=1 | surefcon sufile=.
+[stderr] suspike nt=3 ntr=1 > forward.su && suspike nt=3 ntr=1 | surefcon sufile=forward.su xy=2147483647
+# Quoted filenames and explicit positive xy syntax.
+[stderr] suspike nt=3 ntr=2 k1=2 > 'forward shot.su' && suspike nt=4 ntr=1 k1=3 | surefcon 'sufile=forward shot.su' xy=+1
+# Zero traces in the forward file is an input error, not an empty success.
+[stderr] sunull nt=4 ntr=0 > forward.su && sunull nt=4 ntr=1 | surefcon sufile=forward.su xy=0

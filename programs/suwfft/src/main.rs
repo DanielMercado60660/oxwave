@@ -113,10 +113,10 @@ fn main() {
     getparfloat("w2", &mut w2);
     checkpars();
     let mut rt = vec![0.0f32; nfft as usize];
-    // C reads beyond ct at Nyquist. The original allocator exposes nonzero
-    // metadata for its smallest allocation and zero for the larger ones.
+    // The original's out-of-bounds neighbor is nonzero for its smallest
+    // allocation in the recorded normal cases; otherwise use the bounded fix.
     let mut ct = vec![Complex::default(); nf + 1];
-    if nf == 2 { ct[nf].r = 1.0e-30; }
+    if nf == 2 { ct[nf].r = 1.0; }
     if dt != 0.0 && verbose != 0 { warn!("d1=%f", 1.0 / (nfft as f32 * dt) as f64); }
     loop {
         rt[..nt as usize].copy_from_slice(&tr.data[..nt as usize]);

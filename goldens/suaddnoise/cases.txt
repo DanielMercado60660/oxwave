@@ -86,3 +86,63 @@ mkdir scratch; suplane nt=15 ntr=3 | suaddnoise seed=19 tmpdir=scratch && test -
 # Odd trace lengths also ensure generator state continues across trace borders.
 [exact] sunull nt=1021 ntr=3 | suaddnoise seed=32707 noise=gauss
 [exact] sunull nt=1021 ntr=3 | suaddnoise seed=4294967294 noise=flat
+
+# diff-2026-11 (round 1)
+# Explicit in-range spike locations make nt=1..4 nonzero without generator UB.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suaddnoise seed=991
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=991 noise=flat sn=0.25
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=991 noise=gauss sn=20
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | suaddnoise seed=991 noise=flat
+suspike nt=67 ntr=1 nspk=1 ix1=1 it1=67 | suaddnoise seed=991 sn=0.25
+
+# Long traces exercise normalization and generator state across trace borders.
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=4097 | suaddnoise seed=991 noise=gauss sn=0.25
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=1 | suaddnoise seed=991 noise=flat sn=20
+suspike nt=32769 ntr=3 nspk=1 ix1=2 it1=16385 | suaddnoise seed=991 noise=gauss sn=0.25
+[exact] sunull nt=65535 ntr=1 | suaddnoise seed=12345 noise=gauss
+suspike nt=65535 ntr=2 nspk=1 ix1=2 it1=65535 | suaddnoise seed=991 noise=flat sn=0.25
+
+# Global signal maximum must include the last trace, and zero traces still
+# receive noise normalized using the nonzero trace elsewhere in the gather.
+(sunull nt=43 ntr=2; suspike nt=43 ntr=1 nspk=1 ix1=1 it1=43) | suaddnoise seed=88 noise=flat sn=2
+(suspike nt=43 ntr=1 nspk=1 ix1=1 it1=1; sunull nt=43 ntr=2) | suaddnoise seed=88 noise=gauss sn=2
+susynlv nt=101 nxm=3 nxo=2 | suaddnoise seed=32819 sn=3
+suspike nt=17 ntr=4 nspk=2 ix1=1 it1=1 ix2=4 it2=17 | sugain scale=-1e30 | suaddnoise seed=88 sn=0.25
+suspike nt=17 ntr=4 nspk=2 ix1=1 it1=1 ix2=4 it2=17 | sugain scale=1e-30 | suaddnoise seed=88 sn=0.25
+
+# All required parameter names explicitly supplied on a successful run.
+# Empty f/amps select unfiltered noise; nonempty filters hit the original's
+# root-level band output failure even when tmpdir is a writable directory.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise verbose=0 tmpdir= noise=gauss sn=20 seed=991 f= amps=
+[stderr] sunull nt=4 ntr=2 | suaddnoise seed=7 f=10,20 f= amps=1,0 amps=
+[stderr] sunull nt=4 ntr=3 | suaddnoise seed=7 tmpdir=. verbose=2 noise=flat
+[stderr] sunull nt=3 ntr=1 | suaddnoise seed=7 tmpdir= verbose=-1
+sunull nt=4 ntr=1 | suaddnoise seed=7 tmpdir=. noise=flat f=0 amps=1
+
+# Sampling headers and computed offsets are preserved, with no filtering.
+sunull nt=131 ntr=3 | sushw key=trid,dt,d1,offset a=111,0,0.002,-100 b=0,0,0.001,50 | suchw key1=gx key2=offset key3=sx b=1 c=1 | suaddnoise seed=17 noise=flat
+sunull nt=29 ntr=3 | sushw key=trid,scalco,delrt,d2 a=-32768,-32768,-32768,-0.125 b=32767,32767,32767,0.25 | suaddnoise seed=17 noise=gauss
+
+# Extreme ratios and IEEE special-value parsing (inf is rejected, nan accepted).
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=2 sn=inf
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=2 sn=nan
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=2 sn=1e-45
+
+# Packed trace IDs select different shared trace I/O paths.
+suspike nt=17 ntr=3 nspk=1 ix1=2 it1=9 | supack2 | suaddnoise seed=2 sn=0.5
+suspike nt=17 ntr=3 nspk=1 ix1=2 it1=9 | supack1 | suaddnoise seed=2 sn=0.5
+
+# Additional invalid parameters and zero or partial data/header boundaries.
+[stderr] suaddnoise noise=Gauss seed=1 </dev/null
+[stderr] suaddnoise par=missing-round1-parameters seed=1 </dev/null
+[stderr] suaddnoise seed=18446744073709551616 </dev/null
+[stderr] sunull nt=1 ntr=1 | sushw key=ns a=0 | suaddnoise seed=1
+[stderr] sunull nt=7 ntr=2 | head -c 300 | suaddnoise seed=1
+[stderr] sunull nt=7 ntr=2 | head -c 521 | suaddnoise seed=1
+
+
+# ub-2026-11 (round 1)
+# Refuted: zero-initializing fgettr.c:202 leaves both outputs unchanged.
+# fputtr.c:123-130 writes the byte width saved from the first packed trace.
+sunull nt=29 ntr=3 | sushw key=trid a=202 b=-201 | suaddnoise seed=2
+sunull nt=29 ntr=3 | sushw key=trid a=201 b=-200 | suaddnoise seed=2

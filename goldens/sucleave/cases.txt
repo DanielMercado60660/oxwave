@@ -18,3 +18,27 @@
 [stderr] sucleave size=1 high=1073741823 abs=0
 [stderr] sucleave print=1
 [stderr] suplane nt=3 ntr=1 | sucleave outbase=/nonexistent/path/
+# diff-2026-11 (round 1)
+[stderr] suplane nt=2 ntr=1 | sucleave key=offset abs=1 size=100 low=50 high=100000 print=0 outbase=explicit_ && cat explicit_*.su
+[stderr] suplane nt=4 ntr=9 | sushw key=offset a=-201 b=50 | sucleave abs=0 size=100 low=50 high=150 print=1 outbase=boundary_ && cat boundary_*.su
+[stderr] suplane nt=3 ntr=8 | sushw key=offset a=-151 b=50 | sucleave abs=1 size=100 low=50 high=150 print=1 outbase=absolute_ && cat absolute_*.su
+[stderr] sunull nt=1 ntr=4 | sushw key=cdp a=-3 b=2 | sucleave key=cdp abs=0 size=2 low=0 high=2 print=1 outbase=zero_ && cat zero_*.su
+[stderr] sunull nt=2 ntr=5 | sushw key=d1 a=-1 b=0.5 | sucleave key=d1 abs=0 size=1 low=0.25 high=1.25 print=1 outbase=fraction_ && cat fraction_*.su
+[stderr] suspike nt=3 ntr=3 | sushw key=trid a=1 b=1 | sucleave key=trid size=2 low=1 high=3 print=1 outbase=short_ && cat short_*.su
+[stderr] suspike nt=4 ntr=4 | sushw key=offset a=0 b=100 | sucleave high=50 print=1 outbase=overflow_ && cat overflow_*.su
+[stderr] suplane nt=11 ntr=7 | sushw key=offset a=49 b=1 | sucleave size=100 low=50 high=150 outbase=edge_ print=1 && cat edge_*.su
+[stderr] suplane nt=4097 ntr=2 | sushw key=cdp a=1 b=1 | sucleave key=cdp size=2 high=3 print=1 outbase=long_ && cat long_*.su
+[stderr] sunull nt=17 ntr=6 | sushw key=offset a=-250 b=100 | sucleave abs=0 size=100 low=0 high=200 outbase=signed_ print=1 verbose=1 && cat signed_*.su
+[stderr] suspike nt=7 ntr=6 | sushw key=offset a=10 b=10 | sucleave size=20 low=10 high=50 outbase=spike_ print=0 && cat spike_*.su
+[stderr] suplane nt=13 ntr=3 | sucleave key=tracl size=10 low=5 high=5 outbase=single_ print=1 && cat single_*.su
+[stderr] sunull nt=3 ntr=3 | sushw key=offset a=-100 b=100 | sucleave abs=0 size=100 low=0 high=0 outbase=narrow_ print=1 && cat narrow_*.su
+[stderr] suplane nt=2 ntr=2 | sucleave key=cdp size=10 low=0 high=20 outbase=repeat_ print=1 && cat repeat_*.su
+[stderr] suplane nt=3 ntr=2 | sucleave abs=3
+[stderr] suplane nt=3 ntr=2 | sucleave size=-2
+[stderr] suplane nt=3 ntr=2 | sucleave size=4 low=3
+[stderr] suplane nt=3 ntr=2 | sucleave print=3
+[stderr] sunull nt=4 ntr=7 | sushw key=f1 a=-1.5 b=0.5 | sucleave key=f1 abs=0 size=0.5 low=0.25 high=1.25 print=1 outbase=rounded_ && cat rounded_*.su
+[stderr] suplane nt=7 ntr=3 | sucleave key=ns size=4 low=2 high=10 print=1 outbase=ns_ && cat ns_*.su
+[stderr] suspike nt=5 ntr=4 | sushw key=scalco a=-3 b=2 | sucleave key=scalco abs=0 size=2 low=1 high=3 print=1 outbase=scale_ && cat scale_*.su
+[stderr] sunull nt=13 ntr=8 | sushw key=offset a=-400 b=100 | sucleave key=offset abs=1 abs=0 size=100 low=50 high=150 print=1 outbase=duplicate_ && cat duplicate_*.su
+[stderr] suplane nt=3 ntr=3 | sushw key=offset a=149 b=1 | sucleave size=100 low=50 high=150 print=1 && cat cleave_offset_*.su

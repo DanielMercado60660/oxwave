@@ -45,3 +45,41 @@ suplane nt=127 ntr=3 | sushw key=cdp,offset a=1,0 b=1,0 | sudmovz cdpmin=1 cdpma
 suplane nt=40 ntr=3 dt=0.002 | sushw key=cdp,offset a=1,25 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vdmo=500 speed=0.25 smute=5
 [stderr] sunull nt=21 ntr=1 dt=0.004 | suaddnoise seed=420 | sushw key=cdp,offset a=1,100 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,0.08 vdmo=500,4000 smute=5 verbose=1
 suplane nt=40 ntr=5 dt=0.004 | sushw key=cdp,offset a=1,100 b=1,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 tdmo=0,0.156 vdmo=500,1500 speed=0.1 smute=5
+
+# diff-2026-11 (round 1)
+# Reversed inverse-mapping endpoints: signed counts and contiguous extrapolation.
+sunull nt=43 ntr=1 dt=0.002 | suaddnoise seed=376 | sushw key=cdp,offset a=1,150 b=1,0 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 speed=2 smute=10 tdmo=0,0.2,0.5 vdmo=1200,3500,1700
+sunull nt=257 ntr=5 dt=0.002 | suaddnoise seed=376 | sushw key=cdp,offset a=1,300 b=1,0 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 speed=0.8 smute=1.5 tdmo=0,0.2,0.5 vdmo=1200,3500,1700
+# Tiny traces, including nonzero impulses; nt=1 exits before ray-table allocation.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | sudmovz cdpmin=2 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 offset=0 | sushw key=cdp a=1 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 offset=0 | sushw key=cdp a=1 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 offset=0 | sushw key=cdp a=1 | sudmovz cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# Defaults and their explicit equivalents, with an actual impulse response.
+suspike nt=251 ntr=7 nspk=1 ix1=4 it1=100 offset=150 | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1
+suspike nt=251 ntr=7 nspk=1 ix1=4 it1=100 offset=150 | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1 fmax=125 verbose=0 speed=1 smute=1.5 tdmo=0 vdmo=1500
+# Large odd and prime traces, preserving numerical output.
+sunull nt=4097 ntr=3 dt=0.002 | suaddnoise seed=9201 | sushw key=cdp,offset a=1,200 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=20 noffmix=1 fmax=180
+suspike nt=2017 ntr=5 nspk=2 ix1=2 it1=500 ix2=4 it2=1500 offset=250 | sushw key=cdp a=-2 b=1 | sudmovz cdpmin=-2 cdpmax=2 dxcdp=12.5 noffmix=1 tdmo=0,1,4 vdmo=1500,1700,2300
+# Header order, duplicate CDPs, skipped bins and out-of-range traces.
+suspike nt=193 ntr=7 nspk=1 ix1=4 it1=110 offset=-120 | sushw key=cdp a=7 b=-1 | sudmovz cdpmin=1 cdpmax=7 dxcdp=25 noffmix=1
+suplane nt=211 ntr=7 | suchw key1=cdp key2=tracl a=-4 b=2 | sushw key=offset a=160 | sudmovz cdpmin=0 cdpmax=8 dxcdp=25 noffmix=1
+sunull nt=173 ntr=9 | suaddnoise seed=724 | sushw key=cdp,offset a=2,100 b=0,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=30 noffmix=1
+[stderr] suplane nt=191 ntr=5 | sushw key=cdp,offset a=10,100 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=1
+# Increasing, decreasing and alternating offset gathers; complete and partial mixes.
+[stderr] sunull nt=179 ntr=15 | suaddnoise seed=93 | sushw key=cdp,offset a=1,80 b=1,0 c=0,60 j=3,3 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=2 verbose=1
+suspike nt=199 ntr=12 nspk=2 ix1=2 it1=70 ix2=10 it2=140 | sushw key=cdp,offset a=1,240 b=1,0 c=0,-60 j=4,4 | sudmovz cdpmin=1 cdpmax=4 dxcdp=25 noffmix=3 fmax=90
+sunull nt=157 ntr=12 | suaddnoise seed=815 | sushw key=cdp,offset a=1,-120 b=1,80 j=3,3 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=4
+suplane nt=223 ntr=8 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=4,4 | sudmovz cdpmin=1 cdpmax=4 dxcdp=25 noffmix=10 speed=2 smute=2
+# Native float velocity files from an SU model generator, with no random perturbation.
+suspike nt=181 ntr=5 nspk=1 ix1=3 it1=100 offset=140 | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 vfile=<(makevel nz=181 nx=1 ny=1 v000=1600 dvdz=3)
+sunull nt=233 ntr=3 dt=0.002 | suaddnoise seed=331 | sushw key=cdp,offset a=1,90 b=1,0 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 tdmo=0,0.1,0.4 vdmo=2600,2200,1800 fmax=140 speed=1.5 smute=2
+# A third trace generator, plus frequency rejection and unusual verbosity values.
+susynlv nt=257 dt=0.004 nxm=3 nxo=1 fxo=0.1 ref="1:0,0.25;1,0.25" | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vdmo=2000
+suspike nt=163 ntr=3 nspk=1 ix1=2 it1=90 offset=100 | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 fmax=0
+[stderr] suspike nt=167 ntr=3 nspk=1 ix1=2 it1=90 offset=100 | sushw key=cdp a=1 b=1 | sudmovz cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 verbose=2
+# Empty required values and velocity array validation; compare diagnostic exits.
+sunull nt=4 | sudmovz cdpmin=1 cdpmax=2 dxcdp= noffmix=1
+sunull nt=4 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=
+sunull nt=4 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500,1800
+sunull nt=4 | sudmovz cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 tdmo=0,0.1,0.05 vdmo=1500,1800,2000

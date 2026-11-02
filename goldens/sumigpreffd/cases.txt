@@ -56,3 +56,70 @@
 [stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=5 | sushw key=sx,sy,gx,gy,scalco a=30,40,0,0,1 b=0,0,20,15,0 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v verbose=2
 # A source left of zero tests the sign branch in radial coordinate mapping.
 [stderr] python3 -c 'import struct; open("v","wb").write(struct.pack("=45f",*([1500.0]*45)))'; suspike nt=64 ntr=5 | sushw key=sx,sy,gx,gy a=-40,-30,0,0 b=0,0,20,15 | sumigpreffd nz=5 nxo=9 nxshot=1 dz=10 dx=25 vfile=v
+
+# diff-2026-11 (round 1)
+# Prime time length, with defaults and then every optional parameter explicit.
+[stderr] suspike nt=127 ntr=7 nspk=1 ix1=4 it1=16 | sushw key=sx,gx a=75,0 b=0,25 | sumigpreffd nz=19 nxo=7 nxshot=1 dz=7.5 dx=25 vfile=<(makevel nx=7 nz=19 v000=1500)
+[stderr] suspike nt=127 ntr=7 nspk=1 ix1=4 it1=16 | sushw key=sx,gx a=75,0 b=0,25 | sumigpreffd nz=19 nxo=7 nxshot=1 dz=7.5 dx=25 dt=0.004 vfile=<(makevel nx=7 nz=19 v000=1500) fmax=25 f1=10 f2=20 f3=40 f4=50 lpad=9999 rpad=9999 dip=45 verbose=0
+# nt=1..4 and 7: short source wavelet and a finite taper covering the whole FFT.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigpreffd nz=7 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=7 v000=1500) fmax=1000 f1=0 f2=125 f3=125 f4=125
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sumigpreffd nz=7 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=7 v000=1500) fmax=1000 f1=0 f2=125 f3=125 f4=125
+[stderr] suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | sushw key=gx a=0 b=25 | sumigpreffd nz=7 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=7 v000=1500) fmax=1000 f1=0 f2=125 f3=125 f4=125
+[stderr] suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | sushw key=gx a=0 b=25 | sumigpreffd nz=7 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=7 v000=1500) fmax=1000 f1=0 f2=125 f3=125 f4=125
+[stderr] suspike nt=7 ntr=3 nspk=1 ix1=2 it1=4 | sushw key=gx a=0 b=25 | sumigpreffd nz=7 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=7 v000=1500) fmax=1000 f1=0 f2=125 f3=125 f4=125
+# Long traces, maximum trace size, large spatial FFT, and deep continuation.
+# Variable models are transposed from makevel's [x][z] to migration's [z][x].
+[stderr] suspike nt=4097 ntr=11 nspk=1 ix1=6 it1=250 | suaddnoise seed=351 sn=5 | sushw key=sx,gx a=125,0 b=0,25 | sumigpreffd nz=17 nxo=11 nxshot=1 dz=9 dx=25 vfile=<(makevel nx=11 nz=17 v000=1200 dvdx=30 dvdz=13 | transp n1=17 n2=11) fmax=22 f1=3 f2=8 f3=55 f4=70 dip=65
+[stderr] suspike nt=65535 ntr=3 nspk=1 ix1=2 it1=17 | sushw key=gx a=0 b=25 | sumigpreffd nz=3 nxo=3 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=3 nz=3 v000=1500) f1=1 f2=3 f3=30 f4=40
+[stderr] suspike nt=64 ntr=4097 nspk=1 ix1=2049 it1=16 | sushw key=sx,gx a=51200,0 b=0,25 | sumigpreffd nz=3 nxo=4097 nxshot=1 dz=3.5 dx=25 vfile=<(makevel nx=4097 nz=3 v000=1500)
+[stderr] suspike nt=257 ntr=7 nspk=1 ix1=4 it1=16 | sushw key=sx,gx a=75,0 b=0,25 | sumigpreffd nz=1001 nxo=7 nxshot=1 dz=3.5 dx=25 vfile=<(makevel nx=7 nz=1001 v000=1200 dvdx=75 dvdz=0.5 | transp n1=1001 n2=7) dip=65
+# Independent physical synthetic generators, including their output headers.
+[stderr] suimp2d nt=127 nrec=5 nshot=1 gxmin=0 dgx=25 sxmin=50 x0=50 z0=50 c=1500 | sumigpreffd nz=17 nxo=7 nxshot=1 dz=7.5 dx=25 vfile=<(makevel nx=7 nz=17 v000=1500)
+[stderr] susynlv nt=127 dt=0.004 nxs=1 fxs=0.05 nxo=5 dxo=0.025 fxo=-0.05 v00=1.5 fpeak=30 ref='1:-0.2,0.08;0.3,0.08' | sumigpreffd nz=17 nxo=7 nxshot=1 dz=7.5 dx=25 vfile=<(makevel nx=7 nz=17 v000=1500)
+# suchw geometry, shifted origins, delay preservation, and header sampling.
+[stderr] suspike nt=97 ntr=5 nspk=1 ix1=1 it1=12 | sushw key=offset,sx,d2,delrt a=0,50,25,125 b=25,0,0,0 | suchw key1=gx key2=offset key3=sx b=1 c=1 | sumigpreffd nz=11 nxo=9 nxshot=1 dz=5 vfile=<(makevel nx=9 nz=11 v000=1500) verbose=2
+[stderr] suplane nt=103 ntr=7 dt=0.001 | sushw key=sx,gx,d2 a=25,0,12.5 b=0,12.5,0 | sumigpreffd nz=13 nxo=9 nxshot=1 dz=5 vfile=<(makevel nx=9 nz=13 v000=1800) verbose=1
+[stderr] suplane nt=101 ntr=3 | sushw key=dt,d2,gx a=0,0,0 b=0,0,1 | sumigpreffd nz=7 nxo=5 nxshot=1 dz=2 vfile=<(makevel nx=5 nz=7 v000=1500) verbose=1
+# Both ends of the signed-short scalco range; negative origins and radial mapping.
+[stderr] suspike nt=97 ntr=5 nspk=1 ix1=3 it1=12 | sushw key=sx,gx,scalco a=2,0,32767 b=0,1,0 | sumigpreffd nz=11 nxo=7 nxshot=1 dz=10 dx=32767 vfile=<(makevel nx=7 nz=11 v000=1500) verbose=2
+[stderr] suspike nt=97 ntr=5 nspk=1 ix1=3 it1=12 | sushw key=sx,gx,scalco a=1638400,0,-32768 b=0,819200,0 | sumigpreffd nz=11 nxo=7 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=7 nz=11 v000=1500) verbose=2
+[stderr] suspike nt=97 ntr=5 nspk=1 ix1=3 it1=12 | sushw key=sx,gx a=-450,-500 b=0,25 | sumigpreffd nz=11 nxo=7 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=7 nz=11 v000=1500) verbose=2
+[stderr] suspike nt=97 ntr=5 nspk=1 ix1=3 it1=12 | sushw key=sx,sy,gx,gy a=50,7,0,0 b=0,0,25,7 | sumigpreffd nz=11 nxo=9 nxshot=1 dz=10 dx=26 vfile=<(makevel nx=9 nz=11 v000=1500) verbose=2
+# Three shot gathers, retaining C's one-trace-lag gather transitions.
+[stderr] suspike nt=97 ntr=15 nspk=1 ix1=8 it1=12 | sushw key=sx,gx a=0,0 b=0,25 c=50,0 j=5,5 | sumigpreffd nz=11 nxo=9 nxshot=3 dz=5 dx=25 vfile=<(makevel nx=9 nz=11 v000=1500) verbose=2
+# Nonstandard but in-bounds frequency order, exact Nyquist, and dip != 65.
+[stderr] suspike nt=128 ntr=5 nspk=1 ix1=3 it1=16 | sushw key=gx a=0 b=25 | sumigpreffd nz=17 nxo=7 nxshot=1 dz=8 dx=25 vfile=<(makevel nx=7 nz=17 v000=1500) f1=60 f2=10 f3=20 f4=100
+[stderr] suspike nt=128 ntr=5 nspk=1 ix1=3 it1=16 | sushw key=gx a=0 b=25 | sumigpreffd nz=17 nxo=7 nxshot=1 dz=8 dx=25 vfile=<(makevel nx=7 nz=17 v000=1500) f1=0 f2=125 f3=125 f4=125
+[stderr] suplane nt=509 ntr=13 | sushw key=sx,gx a=150,0 b=0,25 | sumigpreffd nz=65 nxo=13 nxshot=1 dz=7.5 dx=25 dt=0.002 vfile=<(makevel nx=13 nz=65 v000=1000 dvdx=100 dvdz=5 | transp n1=65 n2=13) fmax=37 f1=0 f2=15 f3=45 f4=75 dip=90
+# Negative padding is accepted by C. Keep the source inside the cropped aperture.
+# A positive ix2 exercises velocity and image addressing away from column zero.
+[stderr] suplane nt=131 ntr=9 | sushw key=sx,gx a=100,0 b=0,25 | sumigpreffd nz=23 nxo=13 nxshot=1 dz=8 dx=25 vfile=<(makevel nx=13 nz=23 v000=1200 dvdx=80 dvdz=15 | transp n1=23 n2=13) lpad=-2 rpad=-1 dip=65 verbose=2
+# Last occurrence and empty optional values; null data with zero depth step.
+[stderr] suspike nt=127 ntr=5 nspk=1 ix1=3 it1=16 | sushw key=gx a=0 b=25 | sumigpreffd nz=11 nxo=7 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=7 nz=11 v000=1500) fmax=12 fmax=37 f1=2 f1=10 f2= f3= f4= dip= lpad= rpad= verbose=2
+[stderr] sunull nt=101 ntr=1 | sumigpreffd nz=11 nxo=5 nxshot=1 dz=0 dx=25 vfile=<(makevel nx=5 nz=11 v000=1500) fmax=0 verbose=1
+# Required-value and numeric-overflow errors; generators remain small enough to avoid SIGPIPE.
+[stderr] sunull nt=1 ntr=1 | sumigpreffd nz=3 nxo=5 dz=10 vfile=missing
+[stderr] sunull nt=1 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz= vfile=missing
+[stderr] sunull nt=1 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=missing fmax=1e39
+[stderr] sunull nt=1 ntr=1 | sumigpreffd nz=3 nxo=5 nxshot=1 dz=10 vfile=missing dip=2147483648
+# Receiver-order error after a valid first trace and a nonzero first receiver index.
+[stderr] sunull nt=97 ntr=3 | sushw key=sx,gx a=0,50 b=0,-25 | sumigpreffd nz=7 nxo=5 nxshot=1 dz=10 dx=25 vfile=<(makevel nx=5 nz=7 v000=1500)
+
+# ub-2026-11 (round 1)
+# Refuted: sumigpreffd.c:264 writes wl[-3], but normalized modulo leaves rc=0,
+# all 1260 stdout bytes and stderr unchanged for this null-data case.
+
+# ub-2026-11 (round 2)
+# Correction: the nt=4 case above is now Confirmed in UB_CONFIRMED.txt.
+# Rebuilt orig and vendor both crash (139); the modulo-only fix succeeds (0).
+# Its existing case line is retained solely because cases.txt is append-only;
+# removing that round-1 restoration requires the requested permission.
+
+# ub-2026-11 (round 3)
+# Refuted in current SU-flag runs: sumigpreffd.c:264 does write wl[-3],
+# but fixing the remainder alone leaves status 0, all 1260 stdout bytes,
+# and stderr unchanged (20/20 runs; also 9/9 allocator-setting checks).
+# Orig matches saved 69.out/69.err; OxWave matches orig and fixed exactly.
+# This supersedes the round-2 comment above. Its reported crash could not
+# be reproduced this round. Retain the earlier line because this file is
+# append-only; the harness deduplicates identical commands.

@@ -62,3 +62,43 @@ makevel nx=3 nz=65535 v000=1500 > v; sunull nt=1 ntr=3 | sumigfd nz=65535 dz=1 d
 [exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -QUIT "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
 [exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -HUP "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
 [exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -TERM "$pid"; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test ! -s out && test -z "$(ls -A scratch)" && ! grep -q 'panicked' log
+
+# diff-2026-11 (round 1)
+# Nonzero tiny traces exercise each short real FFT and several dip approximations.
+makevel nx=5 nz=9 v000=1800 > v; sunull nt=1 ntr=5 | suaddnoise seed=101 | sumigfd nz=9 dz=3 dt=0.002 dx=15 vfile=v dip=45
+makevel nx=7 nz=13 v000=1600 > v; sunull nt=2 ntr=7 | suaddnoise seed=102 | sumigfd nz=13 dz=2 dx=12.5 vfile=v dip=65
+makevel nx=7 nz=13 v000=1600 > v; sunull nt=3 ntr=7 | suaddnoise seed=103 | sumigfd nz=13 dz=2 dx=12.5 vfile=v dip=79
+makevel nx=7 nz=13 v000=1600 > v; sunull nt=4 ntr=7 | suaddnoise seed=104 | sumigfd nz=13 dz=2 dx=12.5 vfile=v dip=80
+# Prime and long inputs, with nonzero samples beyond the old test lengths.
+makevel nx=11 nz=31 v000=1500 dvdx=40 dvdz=25 | transp n1=31 n2=11 > v; suspike nt=97 ntr=11 nspk=3 ix1=1 ix2=6 ix3=11 it1=2 it2=30 it3=96 | sumigfd nz=31 dz=6 dx=12.5 vfile=v dip=87
+makevel nx=9 nz=37 v000=2200 > v; suplane nt=257 ntr=9 npl=2 dip1=-3 dip2=7 ct1=70 ct2=180 | sumigfd nz=37 dz=8 dx=20 vfile=v dip=89
+makevel nx=7 nz=23 v000=1500 dvdx=40 dvdz=25 | transp n1=23 n2=7 > v; sunull nt=1009 ntr=7 | suaddnoise seed=73 | sumigfd nz=23 dz=6 dx=12.5 vfile=v dip=90
+makevel nx=7 nz=23 v000=1500 dvdx=40 dvdz=25 | transp n1=23 n2=7 > v; sunull nt=4097 ntr=7 | suaddnoise seed=73 | sumigfd nz=23 dz=6 dx=12.5 vfile=v dip=90
+makevel nx=3 nz=5 v000=2000 > v; sunull nt=65535 ntr=3 | suaddnoise seed=105 | sumigfd nz=5 dz=4 dx=25 vfile=v dip=45
+# One trace and zero depth avoid the C migration routine's nx=1 invalid neighbor reads.
+sunull nt=7 ntr=1 | sushw key=dt,d2,delrt a=2500,17,23 | sumigfd nz=0 dz=2 vfile=/dev/null
+# Read sampling only from the first header; preserve subsequent varying headers and order.
+makevel nx=7 nz=17 v000=1900 > v; suspike nt=67 ntr=7 nspk=2 ix1=1 ix2=7 it1=3 it2=60 | sushw key=dt,d2,delrt,tracl a=2500,15,-20,70 b=250,2,3,-1 | suchw key1=cdp key2=tracl a=100 b=3 | sumigfd nz=17 dz=2.5 vfile=v
+[stderr] mkdir 'scratch space'; makevel nx=7 nz=17 v000=1900 > v; suspike nt=67 ntr=7 nspk=2 ix1=1 ix2=7 it1=3 it2=60 | sushw key=dt,d2,delrt a=2500,15,-20 b=250,2,3 | sumigfd nz=17 dz=2.5 vfile=v dt=0.003 dx=20 dip=90 verbose=2 tmpdir='scratch space'
+# Identical data with defaults and explicit equivalents.
+makevel nx=5 nz=19 v000=2100 > v; suplane nt=113 ntr=5 dt=0.003 | sushw key=d2 a=15 | sumigfd nz=19 dz=5 vfile=v
+makevel nx=5 nz=19 v000=2100 > v; suplane nt=113 ntr=5 dt=0.003 | sushw key=d2 a=15 | sumigfd nz=19 dz=5 vfile=v dt=0.003 dx=15 dip=65 verbose=0 tmpdir=
+# Physical synthetic generators and raw float output.
+makevel nx=7 nz=23 v000=1800 > v; susynlv nt=257 nxm=7 dxm=0.01 fxm=0.03 v00=1.8 dt=0.002 ref='1:0,0.1;0.2,0.15' | sumigfd nz=23 dz=4 dx=10 vfile=v
+makevel nx=5 nz=31 v000=2500 > v; suimp2d nt=257 nrec=5 c=2500 x0=50 z0=100 dgx=25 | sumigfd nz=31 dz=5 dx=25 vfile=v
+[f32] makevel nx=5 nz=31 v000=2500 > v; suimp2d nt=257 nrec=5 c=2500 x0=50 z0=100 dgx=25 | sumigfd nz=31 dz=5 dx=25 vfile=v dip=80 | sustrip outpar=/dev/null
+# Velocity EOF, including a final incomplete float; unread storage starts at zero.
+makevel nx=3 nz=1 v000=1500 > v; suspike nt=17 ntr=3 | sumigfd nz=7 dz=2 dx=10 vfile=v
+makevel nx=3 nz=7 v000=1500 | dd bs=1 count=27 2>/dev/null > v; suspike nt=17 ntr=3 | sumigfd nz=7 dz=2 dx=10 vfile=v
+# Empty required values, zero input samples, directory reads and unusable temporary paths.
+[stderr] sunull nt=3 ntr=1 | sumigfd nz=2 dz= dx=10 vfile=/dev/null
+[stderr] sunull nt=0 ntr=1 | sumigfd nz=2 dz=1 dx=10 vfile=/dev/null
+[stderr] makevel nx=3 nz=5 v000=1500 > v; suspike nt=17 ntr=3 | sumigfd nz=5 dz=2 dx=10 vfile=.
+[stderr] touch regular; sunull nt=3 ntr=1 | sumigfd nz=2 dz=1 dx=10 vfile=/dev/null tmpdir=regular
+[stderr] makevel nx=3 nz=5 v000=1500 > v; suspike nt=17 ntr=3 | TMPDIR=/does-not-exist sumigfd nz=5 dz=2 dx=10 vfile=v
+makevel nx=3 nz=5 v000=1500 > v; suspike nt=17 ntr=3 | TMPDIR=/does-not-exist sumigfd nz=5 dz=2 dx=10 vfile=v tmpdir=.
+# Signals must terminate and remove temporary files before the held input pipe closes.
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -INT "$pid"; for i in {1..100}; do if ! kill -0 "$pid" 2>/dev/null; then break; fi; sleep 0.01; done; if kill -0 "$pid" 2>/dev/null; then echo delayed; else echo prompt; fi; test -z "$(ls -A scratch)"; clean=$?; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test "$clean" -eq 0 && test ! -s out && test -z "$(ls -A scratch)"
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -QUIT "$pid"; for i in {1..100}; do if ! kill -0 "$pid" 2>/dev/null; then break; fi; sleep 0.01; done; if kill -0 "$pid" 2>/dev/null; then echo delayed; else echo prompt; fi; test -z "$(ls -A scratch)"; clean=$?; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test "$clean" -eq 0 && test ! -s out && test -z "$(ls -A scratch)"
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -HUP "$pid"; for i in {1..100}; do if ! kill -0 "$pid" 2>/dev/null; then break; fi; sleep 0.01; done; if kill -0 "$pid" 2>/dev/null; then echo delayed; else echo prompt; fi; test -z "$(ls -A scratch)"; clean=$?; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test "$clean" -eq 0 && test ! -s out && test -z "$(ls -A scratch)"
+[exact] mkdir scratch; mkfifo release; sunull nt=3 ntr=3 > in; { cat in; read -r done < release; } | sumigfd nz=3 dz=1 dx=10 vfile=/dev/null tmpdir=scratch verbose=1 > out 2> log & pid=$!; for i in {1..100}; do if grep -q 'putting temporary files' log; then break; fi; sleep 0.01; done; kill -TERM "$pid"; for i in {1..100}; do if ! kill -0 "$pid" 2>/dev/null; then break; fi; sleep 0.01; done; if kill -0 "$pid" 2>/dev/null; then echo delayed; else echo prompt; fi; test -z "$(ls -A scratch)"; clean=$?; echo done > release; wait "$pid"; rc=$?; test "$rc" -eq 1 && test "$clean" -eq 0 && test ! -s out && test -z "$(ls -A scratch)"

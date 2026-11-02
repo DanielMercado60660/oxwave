@@ -236,8 +236,14 @@ fn main() {
     }
     // The C program never calls checkpars(), including in its ODE callback.
 
+    // Match the fixed C's bounds check before its signed 4*stepmax products.
+    // Without this check INT_MIN wraps to zero and the output loops panic.
+    if stepmax.checked_mul(4).is_none() {
+        err!("stepmax*4 overflows int");
+    }
+
     /* Allocate space in the output array, preserving C's excess rows. */
-    let nrows = stepmax.wrapping_mul(4) as usize;
+    let nrows = (stepmax * 4) as usize;
     let mut yout: Vec<[f32; 4]> = Vec::new();
     if yout.try_reserve_exact(nrows).is_err() {
         // Negative stepmax becomes a huge size_t in ealloc2float. Rust's

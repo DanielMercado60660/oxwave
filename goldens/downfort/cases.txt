@@ -11,3 +11,14 @@ printf "      PRINT *, 'MiXeD', '(A5, I3)', 'NEXT'\n" | downfort
 printf "      X='A''B'; Y=ABC123 ! COMMENT\n" | downfort
 # Non-ASCII bytes and CRLF.
 printf '\200\377 ABC\r\n' | downfort
+
+# diff-2026-11 (round 1)
+# Generated header text is shaped into newline-terminated Fortran-like source.
+[exact] sunull nt=1 ntr=1 | sugethw key=tracl,ns output=ascii | sed 's/^/X ABC /' | downfort
+[exact] sunull nt=2 ntr=2 | sushw key=cdp a=42 b=3 | sugethw key=cdp,ns output=ascii | sed 's/^/C KEEP UPPER /' | downfort verbose=1
+[exact] sunull nt=3 ntr=1 | sugethw key=ns output=ascii | sed 's/^/* COMMENT ABC /' | downfort ignored=value
+[exact] sunull nt=4 ntr=2 | sugethw key=tracl output=ascii | sed "s/^/  PRINT *, 'MiXeD', '(F10.3,I2)' /" | downfort
+[exact] suspike nt=7 ntr=2 | sugethw key=tracl,ns output=ascii | sed "s/^/A X='ONE''TWO';Y='(HELLO)' /" | downfort
+[exact] suplane nt=13 ntr=3 | sugethw key=tracl,ns output=ascii | sed 's/^/c ABC ! XYZ /' | downfort
+[exact] sunull nt=4097 ntr=1 | sugethw key=ns output=ascii | sed 's/^/Z LONG_TRACE SIZE /' | downfort
+[exact] suspike nt=17 ntr=1 | sushw key=offset a=-123 | sugethw key=offset,ns output=ascii | sed "s/^/  X='(A(B)C)', 'Text With SPACES' /" | downfort arbitrary

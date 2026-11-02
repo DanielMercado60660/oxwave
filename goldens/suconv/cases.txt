@@ -55,3 +55,28 @@ suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=3 | sushw key=delrt a=8 b=12 > f
 # Fixed-length trace readers reject changes in input or panel-filter ns.
 [stderr] suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 > in.su && suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 >> in.su && suconv filter=1,-0.5 < in.su
 [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 > f.su && suspike nt=5 ntr=1 nspk=1 ix1=1 it1=1 >> f.su && suspike nt=7 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=7 | suconv sufile=f.su panel=1
+# diff-2026-11 (round 1)
+# Small dense inputs, operand swapping, asymmetric tails, and explicit defaults.
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise seed=1102 sn=2 | suconv filter=2,-1,0.25,3,0,-2
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | suaddnoise seed=1103 sn=2 | suconv filter=2,-1,0.25,3,0,-2 panel=0
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | suaddnoise seed=1104 sn=2 | suconv filter=2,-1,0.25,3,0,-2
+# Null and constant traces from a second generator, with non-time headers preserved.
+sunull nt=1 ntr=3 | sushw key=delrt,dt,offset,scalco a=-12,1000,-50,-100 b=4,0,25,0 | suconv filter=-1,2,-3,4 panel=0
+sunull nt=17 ntr=2 | suop op=exp | suconv filter=0.25,-1,2,-0.5
+# Large odd/prime input, including a final-sample impulse and dense long-path data.
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | suconv filter=2,-1,0.25,3
+suspike nt=31 ntr=1 nspk=1 ix1=1 it1=31 | suaddnoise seed=1131 sn=2 > f.su && suspike nt=4097 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=4097 | suaddnoise seed=1409 sn=2 | suconv sufile=f.su panel=0
+# Long filter with a shorter input swaps operands; only the first filter trace is used.
+suspike nt=4097 ntr=2 nspk=2 ix1=1 it1=4097 ix2=2 it2=1 | sushw key=delrt a=-120 b=240 > f.su && suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sushw key=delrt,dt a=17,2000 | suconv sufile=f.su
+# Panel mode at small boundaries, distinct delays, and explicit verbose diagnostics.
+[stderr] suspike nt=2 ntr=3 nspk=3 ix1=1 it1=1 ix2=2 it2=2 ix3=3 it3=1 | sushw key=delrt a=-9 b=6 > f.su && sunull nt=4 ntr=3 | suop op=exp | sushw key=delrt,offset a=7,100 b=-3,50 | suconv sufile=f.su panel=1 verbose=1
+# Maximum legal SU output lengths, both input-dominated and filter-dominated.
+suspike nt=65534 ntr=1 nspk=1 ix1=1 it1=65534 | suconv filter=1,-2
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 > f.su && suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suconv sufile=f.su panel=0
+# C treats a short second filter payload as stale data, while updating its header.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sushw key=delrt a=5 > f.su && suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=delrt a=19 | dd bs=240 count=1 2>/dev/null >> f.su && sunull nt=4 ntr=3 | suop op=exp | suconv sufile=f.su panel=1
+# Empty trace lengths and malformed numeric values must report C's diagnostics.
+[stderr] sunull nt=0 ntr=1 | suconv filter=1
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suconv filter=1e309
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suconv filter=1 panel=-2147483649
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suconv sufile=. panel=0

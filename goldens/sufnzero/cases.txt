@@ -14,3 +14,29 @@ sufnzero mode=
 sufnzero min=1e999
 sufnzero mode=both
 suspike nt=5 ntr=1 | sufnzero key=notakey
+# diff-2026-11 (round 1)
+# Short traces, explicit defaults, and the first and last sample.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sufnzero mode=first min=0 key=tracl,ns,dt
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 dt=0.0015 | sufnzero mode=last
+suspike nt=3 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=3 | sufnzero mode=both
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=3 | sufnzero min=1 mode=both
+# Prime and long sample counts, and several nonzero locations per trace.
+suspike nt=101 ntr=2 nspk=4 ix1=1 ix2=1 ix3=2 ix4=2 it1=2 it2=100 it3=1 it4=101 | sufnzero mode=both min=0.5 key=tracl,offset
+suspike nt=4097 ntr=1 nspk=2 ix1=1 ix2=1 it1=2 it2=4097 dt=0.0005 | sufnzero mode=both
+suspike nt=32767 ntr=1 nspk=1 ix1=1 it1=32767 dt=0.065 | sufnzero mode=last key=ns,dt
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 dt=0.032 | sufnzero mode=both key=ns,dt
+# Zero traces, negative threshold, changed per-trace interval and header types.
+sunull nt=4 ntr=3 | sufnzero mode=both min=0 key=tracl,ns
+sunull nt=3 ntr=2 | sufnzero mode=last min=-0.5
+suspike nt=7 ntr=3 nspk=4 ix1=1 ix2=2 ix3=3 ix4=3 it1=7 it2=7 it3=2 it4=7 | sushw key=dt,cdp,offset,d1 a=500,-20,-100,1.25 b=750,10,50,0.5 | sufnzero mode=both key=tracl,dt,cdp,offset,d1
+# Plane data and threshold comparisons, plus diagnostic output.
+suplane nt=31 ntr=8 npl=1 dip1=4 len1=8 ct1=15 cx1=4 | sufnzero mode=both min=0.5 key=tracl
+[stderr] suplane nt=29 ntr=6 npl=1 dip1=2 len1=6 ct1=14 cx1=3 | sufnzero mode=last min=0.01 verbose=1
+# Repeated and empty numeric parameters use getpar defaults and precedence.
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=5 | sufnzero mode=last mode=both min=2 min=0 key=tracl
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=5 | sufnzero min= mode=first
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=5 | sushw key=dt a=0 | sufnzero mode=both key=dt,dt
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=5 | sufnzero mode=both min=nan
+# Invalid arguments and empty input.
+sunull nt=2 ntr=1 | sufnzero mode=Both
+sufnzero mode=last min=0 key=tracl

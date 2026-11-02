@@ -474,7 +474,9 @@ fn main() {
                         as f32;
                     let mut samp = (tsd + tgd) * odt;
                     let nsamp = samp as i32;
-                    if nsamp > nt - 2 {
+                    // C can read tr.data[-1] for negative output depths. The
+                    // lower-bound fix leaves the round 1 case byte-identical.
+                    if nsamp < 0 || nsamp > nt - 2 {
                         zo += dzo;
                         continue;
                     }
@@ -626,7 +628,8 @@ fn main() {
                             as f32;
                         let mut samp = (tsd + tgd) * odt;
                         let nsamp = samp as i32;
-                        if nsamp > nt - 2 {
+                        // Same lower time bound as the non-interpolated path.
+                        if nsamp < 0 || nsamp > nt - 2 {
                             zo += dzo;
                             continue;
                         }

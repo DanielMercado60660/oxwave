@@ -1,0 +1,5 @@
+irz  # Active horizontal receivers reach C suremel2dan.c:1326 sprintf(dum[4], "_%d.su", il); fortified original traps, so no successful output run is possible.
+rxtyp  # Active horizontal receiver types require irz and reach the same four-byte suffix-buffer overflow at suremel2dan.c:1326; all four types tested in PENDING_UB.txt.
+irx  # Active vertical receivers reach C suremel2dan.c:1339 sprintf into dum[4]; original traps before output.
+rztyp  # Active vertical receiver types require irx and reach the suffix-buffer overflow at suremel2dan.c:1339; all four types tested in PENDING_UB.txt.
+sntyp  # Active snapshot types require nonzero dtsnap and reach C suremel2dan.c:1355 sprintf into dum[4]; original traps even with zero snapshots. All four types tested in PENDING_UB.txt.

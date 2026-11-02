@@ -23,3 +23,34 @@ suspike nt=1 ntr=1 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=
 [exact] suplane nt=17 ntr=5 | suaddnoise seed=6 sn=2 | segyhdrs format=5 | segywrite tape=out conv=0 buff=0 trmax=4 format=5 && cat out
 suplane nt=33 ntr=4 | suaddnoise seed=7 sn=1 | sugain scale=12345.678 | sushw key=offset,sx,gx a=-50,100,200 b=25,10,-10 | segyhdrs | segywrite tape=out trmin=2 && segyread tape=out verbose=0 | sushw key=tracr a=0
 [exact] suplane nt=17 ntr=2 | suaddnoise seed=5 | sugain scale=1e-20 | sugain scale=1e-20 | segyhdrs | segywrite tape=out && cat out
+
+# diff-2026-11 (round 1)
+[exact] suspike nt=2 ntr=1 | segyhdrs | segywrite tape=out trmin=1 trmax=1 verbose=0 vblock=50 buff=1 conv=1 ebcdic=1 endian=0 errmax=0 format=1 hfile=header bfile=binary && cat out
+[exact] suspike nt=3 ntr=2 | segyhdrs | segywrite tape=out && cat out
+[exact] suspike nt=4 ntr=3 | segyhdrs | segywrite tape=out conv=0 && cat out
+[exact] sunull nt=13 ntr=4 | segyhdrs | segywrite tape=out ebcdic=0 && cat out
+[exact] suplane nt=31 ntr=7 | segyhdrs | segywrite tape=out trmin=3 trmax=5 && cat out
+[exact] suspike nt=4097 ntr=2 | segyhdrs | segywrite tape=out && cat out
+[exact] sunull nt=2 ntr=1 | segyhdrs | segywrite tape=out buff=0 conv=0 ebcdic=0 format=5 && cat out
+[exact] suplane nt=19 ntr=3 | sushw key=cdp,offset,sx,gx a=17,-300,1000,-2000 b=2,100,25,50 | segyhdrs | segywrite tape=out && cat out
+[exact] suspike nt=11 ntr=4 | sushw key=tracl,tracr,dt,delrt a=20,99,4000,-20 b=3,2,0,1 | segyhdrs | segywrite tape=out endian=1 && cat out
+[exact] suplane nt=23 ntr=4 | segyhdrs hfile=txt bfile=bh format=5 | segywrite tape=out hfile=txt bfile=bh format=2 conv=0 && cat out
+[stderr] sunull nt=7 ntr=4 | segyhdrs | segywrite tape=out verbose=1 vblock=2 trmin=2 trmax=3 && cat out
+[exact] suplane nt=29 ntr=3 | segyhdrs | segywrite tape=out buff=0 ebcdic=2 endian=1 && cat out
+[exact] suspike nt=17 ntr=6 | segyhdrs | segywrite tape=out trmin=6 trmax=6 && cat out
+[exact] sunull nt=3 ntr=2 | segyhdrs | segywrite tape=out format=8 conv=0 endian=1 && cat out
+[exact] suplane nt=37 ntr=3 | sugain scale=-123.5 | segyhdrs | segywrite tape=out conv=1 endian=0 && cat out
+[exact] suspike nt=5 ntr=3 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=3 && suspike nt=5 ntr=3 | segywrite tape=out conv=1 && cat out
+[stderr] suspike nt=3 ntr=2 | segyhdrs | segywrite tape=out verbose=1 vblock=1 buff=0 errmax=3 && cat out
+[exact] suplane nt=41 ntr=2 | segyhdrs | segywrite tape=out trmin=4 && cat out
+suspike nt=2 ntr=1 | segywrite trmin=1
+suspike nt=2 ntr=1 | segywrite tape=out trmax=0
+suspike nt=2 ntr=1 | segyhdrs | segywrite tape=out trmin=5 trmax=4
+[exact] suspike nt=3 ntr=3 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=7 && suspike nt=3 ntr=3 | segywrite tape=out conv=1 && cat out
+[exact] suspike nt=3 ntr=2 | segyhdrs bfile=old > /dev/null && setbhed bfile=binary hns=9 && suspike nt=3 ntr=2 | segywrite tape=out conv=0 && cat out
+[exact] sunull nt=32769 ntr=1 | segyhdrs | segywrite tape=out conv=0 && cat out
+[exact] suplane nt=13 ntr=3 | sushw key=trid,scalco,ns a=2,-100,13 | segyhdrs | segywrite tape=out conv=0 && cat out
+[exact] suspike nt=11 ntr=2 | segyhdrs | segywrite tape=out hfile=/dev/null && cat out
+[exact] suspike nt=11 ntr=2 | segyhdrs | segywrite tape=out hfile=/dev/null ebcdic=0 && cat out
+suspike nt=5 ntr=1 | segyhdrs > /dev/null && head -c 20 binary > short && suspike nt=5 ntr=1 | segywrite tape=out bfile=short
+[exact] suspike nt=5 ntr=2 | segyhdrs > /dev/null && head -c 30 binary > short && suspike nt=5 ntr=2 | segywrite tape=out bfile=short && cat out

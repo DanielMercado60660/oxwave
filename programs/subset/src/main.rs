@@ -67,13 +67,13 @@ const SDOC: &[&str] = &[
     " \t\t\t\t\t\t\t\t\t",
 ];
 
-fn selection(n: i32, axis: &str) -> Vec<i32> {
+fn selection(n: i32, axis: &str) -> (Vec<i32>, i32) {
     let ixname = format!("ix{}s", axis);
     let mut ix = vec![0i32; countparval(&ixname) as usize];
-    if getparint(&ixname, &mut ix) == 0 {
+    let mut count = getparint(&ixname, &mut ix);
+    if count == 0 {
         let mut id = 1;
         let mut first = 0;
-        let mut count = 0;
         getparint(&format!("id{}s", axis), &mut id);
         getparint(&format!("if{}s", axis), &mut first);
         if getparint(&format!("n{}s", axis), &mut count) == 0 {
@@ -87,7 +87,7 @@ fn selection(n: i32, axis: &str) -> Vec<i32> {
             i = i.wrapping_add(id);
         }
     }
-    ix
+    (ix, count)
 }
 
 fn main() {
@@ -112,9 +112,9 @@ fn main() {
         if efseeko(&infp, 0, SEEK_END) == -1 { err!("input file size unknown; specify n3\n"); }
         n3 = (eftello(&infp) as u64).checked_div((n2.wrapping_mul(n1) as u64).wrapping_mul(4)).unwrap_or(0) as i32;
     }
-    let ix1s = selection(n1, "1");
-    let ix2s = selection(n2, "2");
-    let ix3s = selection(n3, "3");
+    let (ix1s, n1s) = selection(n1, "1");
+    let (ix2s, _) = selection(n2, "2");
+    let (ix3s, _) = selection(n3, "3");
     checkpars();
     for (i, &ix) in ix1s.iter().enumerate() {
         if ix < 0 || ix > n1.wrapping_sub(1) { err!("ix1s[%d]=%d is out of bounds!\n", i, ix); }
@@ -125,7 +125,9 @@ fn main() {
     for (i, &ix) in ix3s.iter().enumerate() {
         if ix < 0 || ix > n3.wrapping_sub(1) { err!("ix3s[%d]=%d is out of bounds!\n", i, ix); }
     }
-    let mut p = vec![0.0f32; n1.max(0) as usize];
+    // ealloc1float converts negative counts to size_t and fails to allocate.
+    if n1 < 0 || n1s < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
+    let mut p = vec![0.0f32; n1 as usize];
     let mut ps = vec![0.0f32; ix1s.len()];
     for (i3s, &i3) in ix3s.iter().enumerate() {
         for (i2s, &i2) in ix2s.iter().enumerate() {

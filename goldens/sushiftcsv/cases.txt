@@ -113,3 +113,76 @@ sushiftcsv skeyloc=null
 # Blank Q fields become zero; extra unrelated columns are ignored.
 printf 'C_SU_NAMES,,,,\nC_SU_ID,fldr,ignored,sstat,junk\nQ,0,garbage,,x\n' > q.csv; suspike nt=65 ntr=3 nspk=1 ix1=1 it1=32 | sushiftcsv sin=q.csv rin=none
 printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,2\n' > q.csv; suspike nt=65 ntr=3 nspk=1 ix1=1 it1=32 | sushiftcsv sin=q.csv rin=none smult=3 smult=-1
+
+# diff-2026-11 (round 1)
+# Tiny, prime and long traces: fractional shifts on both sides of the record.
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2048 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2048 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.9375\n' > q.csv; suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=32760 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-2.1875\n' > q.csv; suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=32760 | sushiftcsv sin=q.csv rin=none
+# A third generator, seeded broadband input and first-trace sampling interval.
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,3.14159\n' > q.csv; sunull nt=4097 ntr=3 dt=0.001 | suaddnoise seed=731 sn=1 | sushiftcsv sin=q.csv rin=none kdist=-0.125 kmult=1.25
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,-1.9375\n' > q.csv; suplane nt=4097 ntr=3 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.75\n' > q.csv; suspike nt=97 ntr=3 nspk=1 ix1=1 it1=48 | sushw key=dt,delrt a=1000,-73 b=1000,101 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.234567\n' > q.csv; suspike nt=257 ntr=2 nspk=1 ix1=1 it1=128 | sushw key=dt a=65535 | sushiftcsv sin=q.csv rin=none
+# Every parameter explicit, independent nearest locations, and inclusive limits.
+[stderr] printf 'C_SU_NAMES,,,,,,\nC_SU_ID,fldr,gaps,cdp,source,receiver,datum\nQ,0,20,40,1.125,-2.25,3.375\nQ,10,30,50,-1.75,2.125,-0.875\n' > q.csv; suspike nt=101 ntr=4 nspk=1 ix1=1 it1=50 | sushw key=fldr,gaps,cdp,sstat,gstat,tstat a=0,30,40,123,-234,345 b=5,-5,5,0,0,0 | sushiftcsv sin=q.csv skeyloc=fldr sstat=source smult=-1.5 slimit=5 rin=q.csv rkeyloc=gaps rstat=receiver rmult=0.5 rlimit=5 cin=q.csv ckeyloc=cdp cstat=datum cmult=2.25 climit=5 kdist=-0.125 kmult=1.5 verbose=1
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=fldr a=5 | sushiftcsv sin=q.csv rin=none skeyloc=fldr sstat=sstat slimit=4.999999
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=fldr a=5 | sushiftcsv sin=q.csv rin=none skeyloc=fldr sstat=sstat slimit=5
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=fldr a=5 | sushiftcsv sin=q.csv rin=none skeyloc=fldr sstat=sstat slimit=5.000001
+printf 'C_SU_NAMES,,\nC_SU_ID,gaps,gstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=gaps a=5 | sushiftcsv sin=none rin=q.csv rkeyloc=gaps rstat=gstat rlimit=4.999999
+printf 'C_SU_NAMES,,\nC_SU_ID,gaps,gstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=gaps a=5 | sushiftcsv sin=none rin=q.csv rkeyloc=gaps rstat=gstat rlimit=5
+printf 'C_SU_NAMES,,\nC_SU_ID,gaps,gstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=gaps a=5 | sushiftcsv sin=none rin=q.csv rkeyloc=gaps rstat=gstat rlimit=5.000001
+printf 'C_SU_NAMES,,\nC_SU_ID,cdp,tstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=cdp a=5 | sushiftcsv sin=none rin=none cin=q.csv ckeyloc=cdp cstat=tstat climit=4.999999
+printf 'C_SU_NAMES,,\nC_SU_ID,cdp,tstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=cdp a=5 | sushiftcsv sin=none rin=none cin=q.csv ckeyloc=cdp cstat=tstat climit=5
+printf 'C_SU_NAMES,,\nC_SU_ID,cdp,tstat\nQ,0,1.625\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=cdp a=5 | sushiftcsv sin=none rin=none cin=q.csv ckeyloc=cdp cstat=tstat climit=5.000001
+# Squared multidimensional distances, derived headers and noninteger header values.
+printf 'C_SU_NAMES,,,\nC_SU_ID,sx,gy,shift\nQ,3,4,1.25\nQ,-3,-4,-1.75\nQ,100,100,8\n' > q.csv; suspike nt=101 ntr=7 nspk=1 ix1=1 it1=50 | sushw key=sx,gy,scalco a=0,0,1 b=1,-1,0 | sushiftcsv sin=q.csv rin=none skeyloc=sx,gy sstat=shift slimit=5 kdist=-0.01 kmult=3
+printf 'C_SU_NAMES,,,\nC_SU_ID,sx,gy,shift\nQ,3,4,1.25\nQ,-3,-4,-1.75\nQ,100,100,8\n' > q.csv; suspike nt=101 ntr=7 nspk=1 ix1=1 it1=50 | sushw key=sx,gy,scalco a=0,0,1 b=1,-1,0 | sushiftcsv sin=none rin=q.csv rkeyloc=sx,gy rstat=shift rlimit=5 kdist=-0.01 kmult=3
+printf 'C_SU_NAMES,,,\nC_SU_ID,sx,gy,shift\nQ,3,4,1.25\nQ,-3,-4,-1.75\nQ,100,100,8\n' > q.csv; suspike nt=101 ntr=7 nspk=1 ix1=1 it1=50 | sushw key=sx,gy,scalco a=0,0,1 b=1,-1,0 | sushiftcsv sin=none rin=none cin=q.csv ckeyloc=sx,gy cstat=shift climit=5 kdist=-0.01 kmult=3
+printf 'C_SU_NAMES,,\nC_SU_ID,cdp,sstat\nQ,0,1.25\nQ,2,-1.75\nQ,4,2.5\n' > q.csv; suspike nt=101 ntr=7 nspk=1 ix1=1 it1=50 | sushw key=fldr a=0 b=1 | suchw key1=cdp key2=fldr a=0 b=2 | sushiftcsv sin=q.csv rin=none skeyloc=cdp
+printf 'C_SU_NAMES,,,\nC_SU_ID,d1,f1,shift\nQ,0.125,-0.5,1.25\nQ,0.375,0,-2.5\nQ,0.625,0.5,4.25\n' > q.csv; suspike nt=101 ntr=5 nspk=1 ix1=1 it1=50 | sushw key=d1,f1 a=0.125,-0.5 b=0.125,0.25 | sushiftcsv sin=q.csv rin=none skeyloc=d1,f1 sstat=shift kdist=0.01 kmult=2
+# Default filenames, headers used as statics and exact versus duplicate nearest records.
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,0,1.875\n' > sstat.csv; printf 'C_SU_NAMES,,\nC_SU_ID,gaps,gstat\nQ,0,-2.625\n' > rstat.csv; suspike nt=19 ntr=2 nspk=1 ix1=1 it1=9 | sushiftcsv
+printf 'C_SU_NAMES,\nC_SU_ID,fldr\nQ,0\nQ,2\nQ,4\n' > q.csv; suspike nt=19 ntr=5 nspk=1 ix1=1 it1=9 | sushw key=fldr a=0 b=1 | sushiftcsv sin=q.csv rin=none sstat=fldr
+printf 'C_SU_NAMES,,\nC_SU_ID,fldr,sstat\nQ,-1,0.5\nQ,1,-1.25\nQ,-1,2.5\nQ,1,-3.75\n' > q.csv; suspike nt=101 ntr=2 nspk=1 ix1=1 it1=50 | sushiftcsv sin=q.csv rin=none kdist=-1 kmult=2
+awk 'BEGIN { print "C_SU_NAMES,,"; print "C_SU_ID,tracl,sstat"; for (i=512;i>=0;i--) print "Q," i "," (i%19-9)/8 }' > q.csv; sunull nt=257 ntr=17 | suaddnoise seed=12345 sn=1 | sushw key=tracl a=501 b=-31 | sushiftcsv sin=q.csv rin=none skeyloc=tracl kdist=0.001 kmult=4
+awk 'BEGIN { print "C_SU_NAMES,,"; print "C_SU_ID,fldr,sstat"; for (i=0;i<5000;i++) print "Q,0," (i%7)/8 }' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+# Q-file normalization, fixed tuple metadata, and disabled parameters.
+printf 'c_su_names,,\nc_su_id,fldr,sstat\nq,0,1.75\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\r\nC_SU_ID,fldr,sstat\r\nQ,0,-1.75\r\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NAMES,,\nC_SU_ID,1_fldr_1,2_sstat_3\nQ,0,1.75\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+printf 'C_SU_NDIMS,time,,,0,1\nC_SU_NAMES,,,,\nC_SU_ID,fldr,sstat,ignored,ignored\nQ,0,1.75,broken,ignored\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none cin=none skeyloc=bogus sstat=missing smult=0 slimit=-1 rkeyloc=bogus rstat=missing rmult=0 rlimit=-1 ckeyloc=bogus cstat=missing cmult=0 climit=-1 kdist=2 kmult=0 verbose=1
+# Missing paths, invalid numbers and tuple-related error diagnostics.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=missing rin=none
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=missing
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none cin=missing
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none kdist=abc
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none kmult=-0.125
+[stderr] printf 'C_SU_NAMES,,,\nC_SU_ID,fldr,sstat,sstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+[stderr] printf 'C_SU_NDIMS,time,,0,1\nC_SU_NAMES,,,\nC_SU_ID,fldr,sstat,sstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+[stderr] printf 'C_SU_NDIMS,time,,bad,1\nC_SU_NAMES,,,\nC_SU_ID,fldr,sstat,sstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=q.csv rin=none
+[stderr] printf 'C_SU_NAMES,,,\nC_SU_ID,gaps,gstat,gstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=q.csv
+[stderr] printf 'C_SU_NDIMS,time,,0,1\nC_SU_NAMES,,,\nC_SU_ID,gaps,gstat,gstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=q.csv
+[stderr] printf 'C_SU_NDIMS,time,,bad,1\nC_SU_NAMES,,,\nC_SU_ID,gaps,gstat,gstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=q.csv
+[stderr] printf 'C_SU_NAMES,,,\nC_SU_ID,cdp,tstat,tstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none cin=q.csv
+[stderr] printf 'C_SU_NDIMS,time,,0,1\nC_SU_NAMES,,,\nC_SU_ID,cdp,tstat,tstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none cin=q.csv
+[stderr] printf 'C_SU_NDIMS,time,,bad,1\nC_SU_NAMES,,,\nC_SU_ID,cdp,tstat,tstat\nQ,0,1,2\n' > q.csv; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushiftcsv sin=none rin=none cin=q.csv
+# Deliberately deep left branch, preserving the C insertion order.
+awk 'BEGIN { print "C_SU_NAMES,,"; print "C_SU_ID,fldr,sstat"; m=0; for (r=12000;r>0;r=int(r*0.6)) { d=r>6?int(sqrt(r)):0; for (n=d+int(r/2);n<12000;n+=d+r) if (!seen[n]) { seen[n]=1; v[n]=-m; m++ } } for (n=0;n<12000;n++) print "Q," v[n] "," (n%7)/8 }' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none kdist=-20000
+
+# ub-2026-11 (round 1)
+# Refuted: headcase.c:127,380 reads uninitialized dval for numb17 (1017),
+# but zero-initializing it leaves rc, stdout, and stderr unchanged.
+printf 'C_SU_NAMES,,\nC_SU_ID,numb17,sstat\nQ,0,1.75\n' > q.csv; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=9 | sushiftcsv sin=q.csv rin=none skeyloc=numb17

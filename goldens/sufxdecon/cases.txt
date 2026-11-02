@@ -86,3 +86,116 @@ suplane nt=2976 ntr=12 | suaddnoise seed=3 sn=4 | sufxdecon twlen=0.3
 # Single spatial windows avoid the separate C negative-source-index path.
 suplane nt=151 ntr=3 | suaddnoise seed=7 sn=3 | sufxdecon ntrw=2 ntrf=5
 suplane nt=151 ntr=1 | suaddnoise seed=7 sn=3 | sufxdecon ntrw=1 ntrf=3
+# diff-2026-11 (round 1)
+# Tiny traces: coarse dt makes nt=2..4 actually reach the FFT and Wiener solve.
+# Specify every spike index so the generator itself never writes sample -1.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sufxdecon verbose=1
+[stderr] suspike nt=2 ntr=6 nspk=4 ix1=1 ix2=2 ix3=3 ix4=5 it1=1 it2=2 it3=1 it4=2 | sufxdecon dt=0.5 taper=0.1 fmin=0 fmax=1 twlen=0.5 ntrw=3 ntrf=1 verbose=1 tmpdir=
+suspike nt=3 ntr=6 nspk=4 ix1=1 ix2=2 ix3=3 ix4=5 it1=1 it2=2 it3=1 it4=2 | sufxdecon dt=0.5 ntrw=3 ntrf=1 fmin=0 fmax=1
+suspike nt=4 ntr=6 nspk=4 ix1=1 ix2=2 ix3=3 ix4=5 it1=1 it2=2 it3=1 it4=2 | sufxdecon dt=0.1 ntrw=3 ntrf=1 fmin=0 fmax=5
+sunull nt=4 ntr=3 | sufxdecon
+# Defaults versus their explicit values on a prime-length spike gather.
+suspike nt=127 ntr=12 | sufxdecon
+suspike nt=127 ntr=12 | sufxdecon dt=0.004 taper=0.1 fmin=6 fmax=75 twlen=0.504 ntrw=10 ntrf=4 verbose=0 tmpdir=
+# Nonzero synthetic reflection data from a third generator and two sampling rates.
+susynlv nt=127 nxm=6 nxo=1 dt=0.04 | sufxdecon ntrw=3 ntrf=1 fmin=0 fmax=12.5
+susynlv nt=257 nxm=9 nxo=1 dt=0.008 | suaddnoise seed=53 sn=3 | sufxdecon ntrw=4 ntrf=2 fmin=0 fmax=62.5
+# Only the first header determines sampling; later dt values and other headers survive.
+[stderr] suplane nt=257 ntr=12 | suaddnoise seed=101 sn=2 | sushw key=dt,cdp,offset a=2000,401,-100 b=1000,1,25 | sufxdecon ntrw=4 ntrf=2 fmin=0 fmax=250 tmpdir=. verbose=1
+[stderr] suspike nt=127 ntr=12 | sushw key=dt a=0 | sufxdecon dt=0.008 ntrw=4 ntrf=2 fmin=0 fmax=62.5 verbose=1
+# Large odd transforms, including the largest representable trace length.
+# Correlated spikes ensure nonzero output instead of a trivially zero filter.
+suspike nt=4097 ntr=6 nspk=4 ix1=1 ix2=2 ix3=3 ix4=5 it1=1 it2=2 it3=1 it4=2 | sufxdecon dt=0.004 ntrw=3 ntrf=1 fmin=0 fmax=1000
+suspike nt=65535 ntr=6 nspk=4 ix1=1 ix2=2 ix3=3 ix4=5 it1=1 it2=2 it3=1 it4=2 | sufxdecon dt=0.004 ntrw=3 ntrf=1 fmin=0 fmax=1000
+# Many time/space windows with seeded broadband energy and a partial final space window.
+suplane nt=4097 ntr=13 | suaddnoise seed=13 sn=3 | sufxdecon ntrw=4 ntrf=2 twlen=0.5 taper=0.012 fmin=0 fmax=125
+suplane nt=307 ntr=13 | suaddnoise seed=13 sn=3 | sufxdecon ntrw=4 ntrf=2 twlen=0.3 taper=0.012 fmin=0 fmax=125
+# Zero-dimensional filter, empty numeric option, and zero temporal-window count.
+[stderr] suspike nt=151 ntr=1 nspk=1 ix1=1 it1=75 | sufxdecon ntrw=1 ntrf=0 verbose=1
+[stderr] suplane nt=127 ntr=12 | sufxdecon ntrf= verbose=1
+[stderr] suspike nt=127 ntr=12 | sufxdecon twlen=10 verbose=1
+# Error exits before processing: valid writable object that is not a directory,
+# numeric underflow, and the transform-size limit.
+[stderr] suspike nt=127 ntr=12 | sufxdecon tmpdir=/dev/null
+[stderr] suspike nt=127 ntr=12 | sufxdecon taper=1e-310
+[stderr] suspike nt=127 ntr=12 | sufxdecon twlen=2000
+# Repeated dt overrides and explicit empty tmpdir overriding the environment.
+[stderr] suspike nt=127 ntr=12 | CWP_TMPDIR=/nonexistent/diff-sufxdecon sufxdecon dt=0.008 dt=0.002 tmpdir= verbose=1
+
+# diff-2026-11 (round 2)
+# Tiny and single-trace inputs, including explicit zero fallbacks.
+[stderr] sunull nt=1 ntr=1 | sufxdecon dt=0 taper=0 fmin=0 fmax=0 twlen=0 ntrw=1 ntrf=0 verbose=1 tmpdir=
+sunull nt=2 ntr=2 | sufxdecon dt=0.3 ntrw=2 ntrf=1 fmin=0 fmax=4
+sunull nt=3 ntr=3 | sufxdecon dt=0.15 ntrw=3 ntrf=1 fmin=0 fmax=8
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sufxdecon dt=0.1 ntrw=1 ntrf=1 fmin=0 fmax=10
+# Defaults and explicit defaults on a new prime-length gather.
+suplane nt=137 ntr=17 | sufxdecon
+suplane nt=137 ntr=17 | sufxdecon dt=0.004 taper=0.1 fmin=6 fmax=75 twlen=0.544 ntrw=10 ntrf=4 verbose=0 tmpdir=
+# Reflection and sparse-spike generators, and a large odd transform.
+susynlv nt=173 nxm=15 nxo=1 dt=0.008 | sufxdecon ntrw=7 ntrf=3 fmin=0 fmax=125
+suspike nt=211 ntr=19 nspk=3 ix1=1 ix2=9 ix3=17 it1=32 it2=41 it3=50 | sufxdecon ntrw=7 ntrf=4 fmin=0 fmax=125
+suplane nt=4097 ntr=7 | suaddnoise seed=2718 sn=2 | sufxdecon ntrw=4 ntrf=3 fmin=0 fmax=125
+[stderr] sunull nt=4097 ntr=1 | sufxdecon ntrw=1 ntrf=0 fmin=0 fmax=125 verbose=1
+# Repeated time/space windows with evenized tapers and incomplete spatial windows.
+suplane nt=1021 ntr=15 | suaddnoise seed=211 sn=0.3 | sufxdecon ntrw=7 ntrf=5 twlen=1.024 taper=0.008 fmin=0 fmax=125
+[stderr] suplane nt=305 ntr=17 | suaddnoise seed=299 sn=0.5 | sufxdecon ntrw=5 ntrf=3 twlen=0.3 taper=0.01 fmin=0 fmax=125 verbose=1 tmpdir=.
+suplane nt=381 ntr=23 | suaddnoise seed=109 sn=2 | sufxdecon ntrw=7 ntrf=4 twlen=0.3 taper=0 fmin=0 fmax=125
+# First-header sampling, varying preserved headers, and explicit dt with a missing header dt.
+[stderr] suplane nt=211 ntr=17 | suaddnoise seed=117 sn=3 | sushw key=dt,delrt,cdp,offset a=1500,-30,99,-500 b=500,3,-1,75 | sufxdecon ntrw=5 ntrf=3 fmin=0 fmax=667 verbose=1
+[stderr] suspike nt=173 ntr=11 nspk=1 ix1=6 it1=87 | sushw key=dt a=0 | sufxdecon dt=0.002 ntrw=4 ntrf=3 fmin=0 fmax=500 verbose=-1
+# Very small and large finite amplitudes exercise the matrix solve's scaling.
+suplane nt=257 ntr=13 | suaddnoise seed=157 sn=2 | sugain scale=1e-18 | sufxdecon ntrw=5 ntrf=4 fmin=0 fmax=125
+suplane nt=257 ntr=13 | suaddnoise seed=157 sn=2 | sugain scale=1e12 | sufxdecon ntrw=5 ntrf=4 fmin=0 fmax=125
+# Packed output paths on zero-valued input (C retains the packed trace identifier).
+sunull nt=83 ntr=8 | supack1 | sufxdecon dt=0.02 ntrw=4 ntrf=0 fmin=0 fmax=50
+sunull nt=83 ntr=8 | supack2 | sufxdecon dt=0.02 ntrw=4 ntrf=0 fmin=0 fmax=50
+# Stable errors: FFT limit, negative allocation, numeric underflow/overflow, and bad tmpdir.
+[stderr] suplane nt=137 ntr=3 | sufxdecon twlen=3000
+[stderr] suplane nt=137 ntr=3 | sufxdecon ntrw=-13
+[stderr] sunull nt=4 ntr=1 | sufxdecon dt=1e-320
+[stderr] sunull nt=4 ntr=1 | sufxdecon ntrf=2147483648
+[stderr] sunull nt=4 ntr=1 | sufxdecon tmpdir=/nonexistent/diff-sufxdecon-round2
+
+# diff-2026-11 (round 3)
+# Tiny inputs, with explicit sampling that reaches the FFT for nt=2..4.
+[stderr] sunull nt=1 ntr=3 | sufxdecon verbose=1 dt=0 taper=0 fmin=0 fmax=0 twlen=0 ntrw=1 ntrf=0 tmpdir=
+[stderr] suspike nt=2 ntr=3 nspk=2 ix1=1 ix2=3 it1=1 it2=2 | sufxdecon dt=0.3 taper=0.1 twlen=0.3 ntrw=3 ntrf=2 fmin=0 fmax=2 verbose=1
+suspike nt=3 ntr=5 nspk=2 ix1=1 ix2=5 it1=1 it2=3 | sufxdecon dt=0.2 ntrw=2 ntrf=2 fmin=0 fmax=3
+suspike nt=4 ntr=7 nspk=2 ix1=1 ix2=7 it1=1 it2=4 | sufxdecon dt=0.125 ntrw=3 ntrf=2 fmin=0 fmax=4
+# A new generator, prime sample count, defaults and their explicit equivalents.
+suimp2d nt=193 nrec=13 | sufxdecon
+suimp2d nt=193 nrec=13 | sufxdecon dt=0.004 taper=0.1 fmin=6 fmax=75 twlen=0.768 ntrw=10 ntrf=4 verbose=0 tmpdir=
+susynlv nt=97 nxm=7 nxo=1 dt=0.016 | sufxdecon ntrw=3 ntrf=2 fmin=0 fmax=64
+# Long odd transforms, single traces, and filters up to the allocated pivot capacity.
+suimp2d nt=4097 nrec=5 | sufxdecon ntrw=2 ntrf=2 fmin=0 fmax=125
+[stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2049 | sufxdecon ntrw=1 ntrf=1 fmin=0 fmax=125 verbose=1
+suspike nt=193 ntr=1 nspk=1 ix1=1 it1=97 | sufxdecon ntrw=1 ntrf=2 fmin=0 fmax=125
+suplane nt=193 ntr=5 | suaddnoise seed=1305 sn=2 | sufxdecon ntrw=3 ntrf=6 fmin=0 fmax=125
+# Valid overlap windows: rounded even taper, zero-sample taper, and no spatial window.
+suplane nt=4097 ntr=17 | suaddnoise seed=1306 sn=2 | sufxdecon twlen=1 taper=0.03 ntrw=5 ntrf=4 fmin=0 fmax=125
+[stderr] suplane nt=769 ntr=11 | suaddnoise seed=1307 sn=2 | sufxdecon twlen=0.512 taper=0.001 ntrw=4 ntrf=3 fmin=0 fmax=125 verbose=1
+[stderr] suspike nt=193 ntr=3 nspk=1 ix1=2 it1=97 | sufxdecon ntrw=4 ntrf=2 fmin=0 fmax=125 verbose=1
+# First-header sampling and preservation of nonseismic identifiers and derived headers.
+[stderr] suplane nt=193 ntr=13 | suaddnoise seed=1308 sn=2 | sushw key=dt,trid,delrt,d1,f1,cdp a=3333,13,-300,0.5,4,700 b=555,0,1,1,2,-3 | sufxdecon ntrw=4 ntrf=3 fmin=0 fmax=1000 verbose=1 tmpdir=.
+[stderr] suspike nt=193 ntr=11 nspk=2 ix1=2 ix2=9 it1=31 it2=97 | sushw key=dt a=0 | suchw key1=cdp key2=tracl a=100 b=3 | sufxdecon dt=0.015625 ntrw=3 ntrf=2 fmin=0 fmax=64 verbose=1
+# Repeated and empty options, zero fallback, and explicit named-directory override.
+[stderr] suimp2d nt=193 nrec=13 | sufxdecon dt=0.002 dt=0.008 taper= ntrw=0 ntrf=2 fmin=0 fmax=62.5 verbose=2 tmpdir=
+[stderr] suimp2d nt=193 nrec=13 | CWP_TMPDIR=/nonexistent/diff-sufxdecon-round3 sufxdecon tmpdir=. ntrw=4 ntrf=2 fmin=0 fmax=125 verbose=1
+# Both packed trace identifiers, with deterministic zero-valued filter output.
+sunull nt=67 ntr=6 | supack1 | sufxdecon dt=0.02 ntrw=3 ntrf=0 fmin=0 fmax=50
+sunull nt=67 ntr=6 | supack2 | sufxdecon dt=0.02 ntrw=3 ntrf=0 fmin=0 fmax=50
+# Subnormal autocorrelation and large amplitudes across nontrivial spatial windows.
+suplane nt=193 ntr=11 | suaddnoise seed=1309 sn=2 | sugain scale=1e-21 | sufxdecon ntrw=4 ntrf=3 fmin=0 fmax=125
+suplane nt=193 ntr=11 | suaddnoise seed=1309 sn=2 | sugain scale=1e18 | sufxdecon ntrw=4 ntrf=3 fmin=0 fmax=125
+# Empty generator output, bad path, numeric overflow, FFT limit, and inconsistent ns.
+[stderr] sunull nt=1 ntr=0 | sufxdecon
+[stderr] suimp2d nt=193 nrec=3 | sufxdecon tmpdir=/nonexistent/diff-sufxdecon-round3
+[stderr] sunull nt=3 ntr=1 | sufxdecon dt=1e309
+[stderr] suimp2d nt=193 nrec=3 | sufxdecon twlen=4096
+[stderr] sunull nt=3 ntr=1 | sufxdecon ntrf=-2147483649
+[stderr] sunull nt=9 ntr=2 | sushw key=ns a=9 b=-1 | sufxdecon verbose=1
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+suplane nt=127 ntr=8 | suaddnoise seed=991 sn=2 | supack1 | sufxdecon dt=0.02 ntrw=4 ntrf=1 fmin=0 fmax=50 verbose=1
+suplane nt=83 ntr=8 | suaddnoise seed=991 sn=2 | supack2 | sufxdecon dt=0.02 ntrw=4 ntrf=1 fmin=0 fmax=50 verbose=1
+suplane nt=4097 ntr=8 | suaddnoise seed=991 sn=2 | supack2 | sufxdecon dt=0.02 ntrw=4 ntrf=1 fmin=0 fmax=50 verbose=1

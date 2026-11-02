@@ -15,3 +15,21 @@ suplane nt=32 ntr=1 | sushw key=dt a=0 | suacorfrac
 suplane nt=32 ntr=1 | sushw key=trid,d1 a=110,0 | suacorfrac verbose=1
 suplane nt=32 ntr=1 | suacorfrac a=1e999
 sunull nt=65535 ntr=1 | suacorfrac
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suacorfrac a=1 b=-1 sym=0 ntout=2
+suspike nt=3 ntr=2 | suacorfrac a=0.5 b=0.5 sym=1 ntout=5
+suspike nt=4 ntr=1 | suacorfrac a=-1 b=-2
+suplane nt=127 ntr=3 | suacorfrac a=1 b=1 sym=0
+suplane nt=4097 ntr=1 | suacorfrac a=0.5 b=-0.5 sym=1
+sunull nt=23 ntr=2 | suacorfrac a=-0.5 b=3 ntout=10
+[stderr] suspike nt=19 ntr=2 | sushw key=trid,d1 a=110,0.002 | suacorfrac verbose=1 a=1 b=-1 sym=1 ntout=7
+[stderr] suplane nt=41 ntr=2 | sushw key=trid,dt a=1,2000 | suacorfrac verbose=1 a=0 b=0 sym=0 ntout=41
+suspike nt=97 ntr=3 | suacorfrac a=2 b=0.25
+suplane nt=13 ntr=1 | suacorfrac a=0.25 b=-1.5
+suplane nt=20 ntr=1 | suacorfrac sym=abc ntout=abc
+suspike nt=9 ntr=1 | suacorfrac verbose=1e999
+suspike nt=9 ntr=1 | suacorfrac sym=999999999999999999999
+[stderr] suspike nt=29 ntr=1 | sushw key=trid,dt,d1 a=109,1000,0 | suacorfrac verbose=1 a=0.8 b=0.3
+[stderr] suspike nt=29 ntr=1 | sushw key=trid,dt,d1 a=18,0,0.003 | suacorfrac verbose=1 a=0.8 b=0.3
+suspike nt=53 ntr=2 k1=3,12,26 mag=1,-2,0.5 | suacorfrac a=0.7 b=-0.9 sym=1

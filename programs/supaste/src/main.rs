@@ -82,12 +82,13 @@ fn main() {
     let input = stdin();
     let mut ntr = 0i32;
     while !(feof(&headfp) || ferror(&headfp) || feof(&input) || ferror(&input)) {
-        if efread(tr.hdr.as_bytes_mut(), &headfp) < HDRBYTES {
+        // C reads one HDRBYTES-sized item, not HDRBYTES byte items.
+        if efread(std::slice::from_mut(&mut tr.hdr), &headfp) == 0 {
             if verbose != 0 { warn!("ntr=%d", ntr); }
             break;
         }
         tr.ns = ns as u16;
-        if ftn != 0 { efread(&mut junk, &input); }
+        if ftn != 0 { efread(std::slice::from_mut(&mut junk), &input); }
         let nread = if (ns as usize) <= tr.data.len() {
             efread(&mut tr.data[..ns as usize], &input)
         } else {
@@ -111,7 +112,7 @@ fn main() {
         }
         puttr(&mut tr);
         ntr += 1;
-        if ftn != 0 { efread(&mut junk, &input); }
+        if ftn != 0 { efread(std::slice::from_mut(&mut junk), &input); }
     }
     exit(CWP_Exit());
 }

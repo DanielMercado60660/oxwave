@@ -1,0 +1,2 @@
+pslabel t=$'\377' f=Helvetica > a.ps && psmerge in=a.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# oxwave-core, cio::fgets: converts input bytes lossily to UTF-8, replacing the PostScript string's 0xff byte with a UTF-8 replacement character.

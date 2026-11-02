@@ -23,3 +23,28 @@ suutm zkey=notakey
 suutm
 sunull nt=1 ntr=1 | sushw key=gx,gy,counit a=181,0,3 | suutm
 sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,90,0,0,3 | suutm
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy,counit a=10,-10,10,10,3 | suutm idx=23 counit=3 zkey=cdp xoff=500000 ynoff=0 ysoff=10000000
+sunull nt=4 ntr=2 | sushw key=sx,sy,gx,gy,counit a=10,10,10,-10,3 | suutm ynoff=-20000000 ysoff=50
+sunull nt=11 ntr=3 | sushw key=sx,sy,gx,gy,counit a=3,56,3,56,3 | suutm zkey=trid
+sunull nt=13 ntr=1 | sushw key=sx,sy,gx,gy,counit a=9,72,9,72,3 | suutm zkey=cdp
+sunull nt=17 ntr=1 | sushw key=sx,sy,gx,gy,counit a=21,75,21,75,3 | suutm zkey=d1
+sunull nt=19 ntr=1 | sushw key=sx,sy,gx,gy,counit a=33,83,33,83,3 | suutm zkey=trid
+sunull nt=4097 ntr=1 | sushw key=sx,sy,gx,gy,counit a=-180,-89,-180,-89,3 | suutm idx=0
+suspike nt=3 ntr=2 | sushw key=sx,sy,gx,gy,scalco,counit a=-1053000,403000,-1041500,401500,1,4 | suutm idx=5 xoff=0 ynoff=10 ysoff=20
+suplane nt=29 ntr=3 | sushw key=sx,sy,gx,gy,scalco,counit a=12345,-4567,12345,-4567,-100,3 | suutm a=6371000 f=0 lon0=123
+sunull nt=2 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,0,0,0,2 | suutm counit=2 idx=22 zkey=nhs
+[stderr] sunull nt=4 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,0,0,0,3 | suutm verbose=1 idx=3
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,counit a=-179,1,-179,1,3 | suutm lon0=-180 zkey=cdp
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,counit a=-1,-1,-1,-1,3 | suutm zkey=gx
+sunull nt=3 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=3600,-3600,-3600,3600,-2,2 | suutm
+sunull nt=2 ntr=4 | sushw key=sx,sy,gx,gy,counit a=0,0,0,0,3 b=1,1,1,1,0 | suutm zkey=cdp
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,0,0,0,1 | suutm counit=1 xoff=0
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,-90,0,0,3 | suutm
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=-181,0,0,0,3 | suutm
+sunull nt=1 ntr=1 | sushw key=sx,sy,gx,gy,counit a=0,0,0,91,3 | suutm
+sunull nt=5 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=-179999,89999,-179999,89999,-1000,3 | suutm zkey=sy
+sunull nt=5 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=179999,-89999,179999,-89999,-1000,3 | suutm zkey=scalco
+sunull nt=5 ntr=1 | sushw key=sx,sy,gx,gy,counit a=12,64,12,64,3 | suutm zkey=counit
+sunull nt=5 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=-123595999,45595999,-123595999,45595999,-100,4 | suutm idx=17
+sunull nt=5 ntr=1 | sushw key=sx,sy,gx,gy,scalco,counit a=0,90000,0,0,-1000,3 | suutm

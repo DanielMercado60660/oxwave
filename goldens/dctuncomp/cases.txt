@@ -39,3 +39,48 @@
 [stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import sys;b=sys.stdin.buffer.read();sys.stdout.buffer.write(b[:29])' | dctuncomp
 # Only one compressed image is consumed; trailing bytes are ignored.
 [f32] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | python3 -c 'import sys;sys.stdout.buffer.write(sys.stdin.buffer.read()+b"trailing bytes")' | dctuncomp
+
+# diff-2026-11 (round 1)
+# No decoder parameters or output modes; argv is ignored and settings come from
+# the native compressed header. All successful outputs use the default tolerance.
+# Nonzero impulses at nt=1..4; explicit indices avoid generator edge-case writes.
+# error=0.05 keeps the original compressor's bounded Huffman buffer from filling.
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | dctcomp n1=1 n2=1 error=0.05 | dctuncomp
+[f32] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | dctcomp n1=2 n2=1 error=0.05 | dctuncomp
+[f32] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sustrip outpar=/dev/null | dctcomp n1=3 n2=1 error=0.05 | dctuncomp
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sustrip outpar=/dev/null | dctcomp n1=4 n2=1 blocksize1=16 blocksize2=16 error=0.05 | dctuncomp
+# Long fast/slow axes, maximum SU trace length, prime blocks, and unit blocks.
+[f32] suplane nt=4097 ntr=3 | suaddnoise seed=931 sn=2 | sustrip outpar=/dev/null | dctcomp n1=4097 n2=3 blocksize1=17 blocksize2=7 error=0.05 | dctuncomp
+[f32] suspike nt=3 ntr=4097 it1=1 it2=3 it3=2 it4=3 | sustrip outpar=/dev/null | dctcomp n1=3 n2=4097 blocksize1=7 blocksize2=17 error=0.05 | dctuncomp
+[f32] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 | sustrip outpar=/dev/null | dctcomp n1=65535 n2=1 | dctuncomp
+[f32] suplane nt=29 ntr=17 | sustrip outpar=/dev/null | dctcomp n1=29 n2=17 blocksize1=1 blocksize2=17 | dctuncomp
+[f32] suspike nt=17 ntr=29 | sustrip outpar=/dev/null | dctcomp n1=17 n2=29 blocksize1=17 blocksize2=1 | dctuncomp
+# Independent deterministic seismic generators and modified SU headers before stripping.
+[f32] susynlv nt=67 nxm=3 nxo=2 | sustrip outpar=/dev/null | dctcomp n1=67 n2=6 blocksize1=11 blocksize2=3 error=0.02 | dctuncomp
+[f32] suimp2d nt=127 nshot=2 nrec=3 x0=150 z0=150 | sustrip outpar=/dev/null | dctcomp n1=127 n2=6 blocksize1=9 blocksize2=5 | dctuncomp
+[f32] [stderr] suspike nt=31 ntr=5 | sushw key=dt,delrt,tracl a=2000,-12,100 b=0,0,-2 | suchw key1=cdp key2=tracl a=7 b=3 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | dctuncomp
+# Even par=, malformed numeric arguments, and help arguments are never parsed.
+[f32] [stderr] suspike nt=19 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=19 n2=5 error=0.1 | dctuncomp par=/no/such/dctuncomp.par verbose=1 blocksize1=abc --help
+# Change output cropping without changing the padded coefficient count.
+[f32] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2i",b,4,31,15);sys.stdout.buffer.write(b)' | dctuncomp
+# Change inverse block geometry while retaining the same 32x32 allocation.
+[f32] suplane nt=32 ntr=32 | sustrip outpar=/dev/null | dctcomp n1=32 n2=32 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2i",b,12,8,32);sys.stdout.buffer.write(b)' | dctuncomp
+# Header-driven dequantization: negative scale, very small reciprocal, and IEEE zero.
+[f32] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2f",b,20,0.125,-3.25);sys.stdout.buffer.write(b)' | dctuncomp
+[f32] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2f",b,20,-1e20,1e30);sys.stdout.buffer.write(b)' | dctuncomp
+[f32] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2f",b,20,0.,0.);sys.stdout.buffer.write(b)' | dctuncomp
+# Coarse quantization and a negative quantization scale, both finite.
+[f32] suplane nt=47 ntr=23 | suaddnoise seed=319 sn=1 | sustrip outpar=/dev/null | dctcomp n1=47 n2=23 error=1 | dctuncomp
+[f32] suplane nt=47 ntr=23 | suaddnoise seed=319 sn=1 | sustrip outpar=/dev/null | dctcomp n1=47 n2=23 error=-0.1 | dctuncomp
+# Fully supplied declared payloads: no unchecked reads of uninitialized malloc bytes.
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read()[:29]);struct.pack_into("i",b,0,1);sys.stdout.buffer.write(b)' | dctuncomp
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read()[:-1]);struct.pack_into("i",b,0,len(b)-28);sys.stdout.buffer.write(b)' | dctuncomp
+# Too few coefficients: the C consistency check rejects before using missing values.
+[stderr] suspike nt=17 ntr=3 | sustrip outpar=/dev/null | dctcomp n1=17 n2=3 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("i",b,8,17);sys.stdout.buffer.write(b)' | dctuncomp
+
+# ub-2026-11 (round 1)
+# Refuted UB dependence: pcoding.c:166,179,183 overrun qx before :187;
+# a minimal bounds check preserves exit 1, empty stdout, and full stderr.
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("i",b,4,7);sys.stdout.buffer.write(b)' | dctuncomp
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("i",b,8,1);sys.stdout.buffer.write(b)' | dctuncomp
+[stderr] suspike nt=31 ntr=5 | sustrip outpar=/dev/null | dctcomp n1=31 n2=5 blocksize1=8 blocksize2=4 error=0.05 | python3 -c 'import struct,sys;b=bytearray(sys.stdin.buffer.read());struct.pack_into("2i",b,12,1,1);sys.stdout.buffer.write(b)' | dctuncomp

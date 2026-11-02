@@ -369,7 +369,13 @@ fn makeds(ns: i32, ts: &[f32], amps: &[f32], ifds: i32, ds: &mut [f32]) {
     d[ld as usize - 1] = amps[0];
     for is in 1..ns as usize {
         let i = ts[is] as i32;
-        d[(ld - i - 1) as usize] = (d[(ld - i - 1) as usize] as f64 + 2.0 * amps[is] as f64) as f32;
+        // C sudmotx.c:419 writes before d for shifts >= 400. A bounds
+        // check in C leaves the round 1 case's output byte-identical;
+        // retain only the response samples within this fixed window.
+        if i >= 0 && i < ld {
+            d[(ld - i - 1) as usize] =
+                (d[(ld - i - 1) as usize] as f64 + 2.0 * amps[is] as f64) as f32;
+        }
     }
     let lds = ds.len();
     xcor(ifd, &d, ifd, &d, 0, &mut dd[..lds]);

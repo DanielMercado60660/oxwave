@@ -17,3 +17,23 @@ sucommand key=notakey
 sucommand verbose=999999999999999999999
 sucommand </dev/null
 suplane nt=3 ntr=1 | sucommand bogus=1
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sucommand key=cdp dir=0 verbose=0 command='suop nop'
+sunull nt=3 ntr=4 | sucommand command='sugain scale=3'
+suspike nt=4 ntr=3 | sucommand key=tracl command='suop neg'
+suspike nt=17 ntr=4 | sucommand key=tracl dir=1 command='suop nop'
+sunull nt=4097 ntr=2 | sucommand key=tracl command='suop nop'
+[stderr] sunull nt=2 ntr=8 | sushw key=cdp a=5 c=1 j=2 | sucommand verbose=1 dir=0 command='suop nop'
+[stderr] sunull nt=3 ntr=7 | sushw key=cdp a=3 b=1 j=3 | sucommand verbose=1 dir=1
+[stderr] sunull nt=4 ntr=7 | sushw key=cdp a=3 b=-1 j=3 | sucommand verbose=1 dir=-1
+[stderr] suspike nt=11 ntr=5 | sushw key=d1 a=0.5 b=0.25 | sucommand key=d1 dir=0 verbose=1
+[stderr] sunull nt=2 ntr=5 | sushw key=trid a=-2 b=1 | sucommand key=trid dir=-1 verbose=1
+[exact] sunull nt=2 ntr=6 | sushw key=cdp a=1 c=1 j=2 | sucommand key=cdp command='sustack key=cdp' | sugethw key=cdp
+[stderr] sunull nt=3 ntr=4 | sucommand key=tracl dir=0 verbose=1 command='suop nop'
+sunull nt=2 ntr=1 | sucommand key=invalid_header
+sunull nt=2 ntr=1 | sucommand dir=999999999999999999999
+sunull nt=4097 ntr=60 | sucommand key=cdp command='cat'
+[stderr] sunull nt=1 ntr=6 | sushw key=cdp a=1 b=1 j=2 | sucommand key=cdp dir=1 verbose=1 command='suop nop'
+[exact] suspike nt=17 ntr=6 | sushw key=cdp a=10 c=2 j=3 | sucommand key=cdp command='sustack key=cdp' | sugethw key=cdp,nhs
+[stderr] sunull nt=4 ntr=5 | sushw key=d1 a=-0.5 b=0.25 | sucommand key=tracl key=d1 dir=-1 verbose=1
+sunull nt=2 ntr=1 | sucommand key=

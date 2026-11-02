@@ -13,3 +13,20 @@
 [stderr] segyhdrmod text= data=missing
 # checkpars diagnostics and last-parameter-wins behavior.
 [stderr] python3 -c 'open("text", "wb").write(b"B"*3200); open("data", "wb").write(b"tail")' && segyhdrmod text=missing text=text data=data verbose=1 unused=1 && cat data
+# diff-2026-11 (round 1)
+# Replacement and destination sizes, trace header patterns, and same-file input.
+[exact] sunull nt=1 ntr=14 | sushw key=cdp a=17 b=3 > text && sunull nt=1 ntr=1 > data && segyhdrmod text=text data=data && cat data
+[exact] suspike nt=2 ntr=14 > text && sunull nt=2 ntr=20 > data && segyhdrmod data=data text=text && cat data
+[exact] sunull nt=3 ntr=13 > text && suspike nt=3 ntr=2 > data && segyhdrmod text=text data=data && cat data
+[exact] [stderr] sunull nt=4 ntr=13 | sushw key=offset a=-50 b=7 > text && suspike nt=4 ntr=21 > data && segyhdrmod text=text data=data verbose=1 && cat data
+[exact] suspike nt=7 ntr=13 > text && suplane nt=7 ntr=3 > data && segyhdrmod text=text data=data && cat data
+[exact] sunull nt=4097 ntr=1 > text && sunull nt=4097 ntr=1 | sushw key=cdp a=23 > data && segyhdrmod text=text data=data && cat data
+[exact] sunull nt=740 ntr=1 > text && suspike nt=3 ntr=1 > data && segyhdrmod text=text data=data && cat data
+[exact] suspike nt=17 ntr=12 > data && segyhdrmod text=data data=data && cat data
+[exact] suplane nt=17 ntr=12 > text && sunull nt=17 ntr=16 > data && ln text alias && segyhdrmod text=alias data=data && cat data
+# Short generated replacement and invalid destination.
+[stderr] sunull nt=739 ntr=1 > text && sunull nt=1 ntr=1 > data && segyhdrmod text=text data=data
+[stderr] sunull nt=740 ntr=1 > text && segyhdrmod text=text data=.
+[stderr] sunull nt=740 ntr=1 > data && segyhdrmod text=. data=data
+[stderr] sunull nt=1 ntr=1 > text && segyhdrmod text=text data=missing
+[exact] suspike nt=13 ntr=13 > text && sunull nt=5 ntr=14 > data && segyhdrmod text=missing text=text data=missing data=data && cat data

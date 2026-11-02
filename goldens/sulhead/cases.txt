@@ -13,3 +13,26 @@ sulhead cf=missing key=not_a_header
 printf '1\n' > col; sulhead cf=col key=cdp
 # Unknown argument reporting.
 [stderr] printf '0 5\n' > col; sunull nt=3 ntr=1 | sulhead cf=col key=cdp,ep other=1
+# diff-2026-11 (round 1)
+# Explicit default master column, multiple matches and unmatched traces.
+printf '1 101\n2 202\n' > col; suplane nt=2 ntr=3 | sushw key=cdp a=1 b=1 | sulhead cf=col key=cdp,ep mc=1 verbose=0
+# Match on the last of three columns, including negative and fractional values.
+printf '17 -3.6 4\n22 5.5 5\n' > col; sunull nt=4 ntr=2 | sushw key=cdp a=4 b=1 | sulhead cf=col key=sx,offset,cdp mc=3
+# Large prime trace length and unsigned short conversion.
+printf '0 65536\n' > col; suspike nt=4097 ntr=1 | sulhead cf=col key=cdp,dt
+# Odd trace length, duplicate keys, and mixed matched and unmatched diagnostics.
+[stderr] printf '1 8\n1 9\n' > col; suplane nt=11 ntr=3 | sushw key=cdp a=1 b=1 | sulhead cf=col key=cdp,ep verbose=1
+# Single trace with an explicit nondefault master index.
+printf '7 12\n' > col; sunull nt=1 ntr=1 | sushw key=ep a=12 | sulhead cf=col key=cdp,ep mc=2
+# Match a float header after truncation, and assign float and short headers.
+printf '2 3.6 -4.6\n' > col; sunull nt=3 ntr=1 | sushw key=d1 a=2.9 | sulhead cf=col key=d1,f1,trid
+# Rows are whitespace-delimited; a final partial row without newline is ignored.
+printf '0  14\n0  99' > col; suspike nt=13 ntr=1 | sulhead cf=col key=cdp,ep
+# Empty table produces dummy traces with explicit verbosity disabled.
+: > col; sunull nt=2 ntr=2 | sulhead cf=col key=cdp mc=1 verbose=0
+# Missing cf and invalid header are error exits with generated input.
+sunull nt=1 ntr=1 | sulhead key=cdp
+sunull nt=1 ntr=1 | sulhead cf=missing key=bogus
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+printf '0 0x1p2\n' > col; sunull nt=1 ntr=1 | sulhead cf=col key=cdp,ep

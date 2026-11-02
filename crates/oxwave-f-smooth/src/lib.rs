@@ -192,19 +192,21 @@ pub fn gaussian2d_smoothing(nsx: usize, nst: usize, data: &mut [Vec<f32>]) {
 ///
 /// C prototype: `void smooth_histogram(int nintlh, float *pdf);`
 pub fn smooth_histogram(pdf: &mut [f32]) {
-    let input = pdf.to_vec();
-    let mut sum = 0.0_f32;
-    for (i, out) in pdf.iter_mut().enumerate() {
-        let mut v = 0.0_f32;
-        for (j, &item) in input.iter().enumerate() {
-            let k = i as f64 - j as f64;
-            v += item * (-std::f64::consts::PI * k * k).exp() as f32;
-        }
-        *out = v;
-        sum += v;
+    let mut filter = [0.0_f32; 11];
+    for (i, weight) in filter.iter_mut().enumerate() {
+        let r = i as f32 - 5.0;
+        // C stores the exponent in float before passing it to double exp.
+        let exponent = ((-r * r / 1.0 / 1.0) as f64 * 3.141592653589793_f64) as f32;
+        *weight = (exponent as f64).exp() as f32;
     }
-    for out in pdf {
-        *out /= sum;
+    let mut smoothed = vec![0.0; pdf.len()];
+    oxwave_f_convolution::convolve_cwp(-5, &filter, 0, pdf, 0, &mut smoothed);
+    let mut sum = 0.0_f32;
+    for &value in &smoothed {
+        sum += value;
+    }
+    for (out, value) in pdf.iter_mut().zip(smoothed) {
+        *out = value / sum;
     }
 }
 
@@ -218,24 +220,101 @@ pub fn smooth_histogram(pdf: &mut [f32]) {
 pub fn smooth_1(x: &[f32], z: &mut [f32], r: f32) {
     assert_eq!(x.len(), z.len());
     let n = z.len();
-    if n < 2 {
+    if n == 0 {
         return;
     }
-    let strength = (0.5 * (r * r) as f64 / (5.19 * 5.19)) as f32;
+    // Both C assignments round to float, but their unsuffixed constants
+    // make the multiplication and division use double intermediates.
+    let scaled = (0.5 * r as f64 * r as f64) as f32;
+    let strength = (scaled as f64 / (5.19 * 5.19)) as f32;
     let mut inverse_squared = vec![0.0; n - 1];
     for i in 0..n - 1 {
         let inverse = 1.0 / (x[i + 1] - x[i]);
         inverse_squared[i] = inverse * inverse;
     }
     let mut diagonal = vec![0.0; n];
-    for i in 0..n {
-        let left = if i > 0 { inverse_squared[i - 1] } else { 0.0 };
+    diagonal[0] = 1.0 + strength * inverse_squared.first().copied().unwrap_or(0.0);
+    for i in 1..n {
+        let left = inverse_squared[i - 1];
         let right = if i + 1 < n { inverse_squared[i] } else { 0.0 };
         diagonal[i] = 1.0 + strength * (left + right);
     }
     let edge: Vec<f32> = inverse_squared.iter().map(|&v| -strength * v).collect();
     for _ in 0..2 {
         oxwave_tridiag::tripd(&mut diagonal.clone(), &mut edge.clone(), z);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn singleton_smoothing_still_solves_with_nan_strength() {
+        let mut z = [2.0];
+        smooth_1(&[0.0], &mut z, f32::NAN);
+        assert!(z[0].is_nan());
+    }
+
+    #[test]
+    fn large_strength_is_scaled_before_float_overflow() {
+        let mut z = [2.0, 3.0, 4.0, 5.0];
+        smooth_1(&[0.0, 0.3, 0.6, 0.9], &mut z, 2e19);
+        assert!(z.iter().all(|v| *v == 0.0));
+    }
+
+    #[test]
+    fn two_point_large_strength_matches_c_infinities() {
+        let mut z = [2.0, 3.0];
+        smooth_1(&[0.0, 1.0], &mut z, 2e19);
+        // The finite coefficient leads to a singular solve in float.
+        // Premature overflow of r*r would produce NaNs instead.
+        assert_eq!(z, [f32::INFINITY; 2]);
+    }
+
+    #[test]
+    fn histogram_matches_c_with_fewer_bins_than_filter() {
+        let mut pdf = [0.125, 0.625, 0.25];
+        smooth_histogram(&mut pdf);
+        // Recorded from this Mac's original smooth_histogram. Convolution
+        // swaps the inputs when the histogram is shorter than the filter.
+        assert_eq!(pdf.map(f32::to_bits), [0x3e1171b4, 0x3f1960b4, 0x3e8485be]);
+    }
+
+    #[test]
+    fn histogram_matches_c_with_more_bins_than_filter() {
+        let mut pdf = [0.0; 23];
+        for (i, value) in pdf.iter_mut().enumerate() {
+            *value = ((i * 17) % 31 + 1) as f32 / 256.0;
+        }
+        smooth_histogram(&mut pdf);
+        // Original C output bits fix the accumulation order at the edges
+        // and in the middle, as well as the float-rounded Gaussian weights.
+        assert_eq!(
+            pdf.map(f32::to_bits),
+            [
+                0x3b96b111, 0x3d40fff9, 0x3c70f220, 0x3d638861, 0x3cbd899a, 0x3d830853, 0x3d014d12,
+                0x3d944c75, 0x3d23d557, 0x3da59072, 0x3d382c1a, 0x3c14dd40, 0x3d4c82dd, 0x3c8f7e94,
+                0x3d6f0b23, 0x3cd48f1d, 0x3d88c9b3, 0x3d0ccfd3, 0x3d9a0dd6, 0x3d2f5818, 0x3dab51d3,
+                0x3d43aead, 0x3c1e4741,
+            ]
+        );
+    }
+
+    #[test]
+    fn histogram_uses_rounded_exponent_and_finite_filter() {
+        let mut pdf = [0.0; 13];
+        pdf[0] = 1.0;
+        smooth_histogram(&mut pdf);
+        let exponent = (-std::f64::consts::PI as f32) as f64;
+        let weight = exponent.exp() as f32;
+        let mut sum = 0.0_f32;
+        for i in 0..=5 {
+            let e = (-(i * i) as f64 * 3.141592653589793_f64) as f32;
+            sum += (e as f64).exp() as f32;
+        }
+        assert_eq!(pdf[1].to_bits(), (weight / sum).to_bits());
+        assert_eq!(pdf[6], 0.0);
     }
 }
 

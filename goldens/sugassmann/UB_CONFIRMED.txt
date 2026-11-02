@@ -1,0 +1,2 @@
+# vendor/su-original/src/su/main/well_logs/sugassmann.c:152: converting 2148000000.0f to unsigned short is undefined; clamping to 65535 changes the dt header from 57600 to 65535. OxWave matches fixed.
+sunull nt=1 ntr=1 | sugassmann dt=2148 mode=0

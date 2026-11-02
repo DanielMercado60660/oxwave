@@ -9,3 +9,13 @@ printf '%%!PS\n%%%%BoundingBox: 0 0 0 0\n%%%%EndComments\nshowpage\n' | psepsi |
 printf '%%!PS\n%%%%BoundingBox: (atend)\n%%%%EndComments\nshowpage\n%%%%BoundingBox: 0 0 1 1\n' | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 printf '%%!PS\n%%%%BoundingBox: 0 0 1 1\nshowpage\n' | psepsi verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=32 ntr=4 | sustrip | psgraph n=32 d1=1 | psepsi | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=1 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: 0 0 broken 4/' | psepsi 2>/dev/null
+suspike nt=3 ntr=2 | sushw key=offset a=100 b=20 | sustrip outpar=/dev/null | psgraph n=3 d1=1 | sed '/^%%BoundingBox:/d' | psepsi verbose=1 2>/dev/null
+sunull nt=4 ntr=3 | sustrip outpar=/dev/null | psgraph n=4 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: (atend)/' | psepsi 2>/dev/null
+suplane nt=17 ntr=2 | sustrip outpar=/dev/null | psgraph n=17 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: 1 2 3/' | psepsi 2>/dev/null
+suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | psgraph n=4097 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: x 2 3 4/' | psepsi 2>/dev/null
+suplane nt=2 ntr=1 | sustrip outpar=/dev/null | psgraph n=2 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: 1 2 + 4/' | psepsi 2>/dev/null
+sunull nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: 0 0 1x 4/' | psepsi 2>/dev/null
+suspike nt=4 ntr=1 | sustrip outpar=/dev/null | psgraph n=4 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox:/' | psepsi 2>/dev/null

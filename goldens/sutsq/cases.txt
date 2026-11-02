@@ -13,3 +13,17 @@ suplane nt=128 ntr=1 | sutsq tmin=-0.08
 suplane nt=128 ntr=1 | sutsq tmin=0.000001
 [stderr] suplane nt=51 ntr=1 | sutsq verbose=1
 [stderr] suplane nt=51 ntr=1 | sutsq dt=0.002
+
+# diff-2026-11 (round 1)
+[stderr] suspike nt=2 ntr=1 | sutsq flag=1 tmin=0.004 dt=0.002
+[stderr] suspike nt=3 ntr=2 | sutsq
+[stderr] sunull nt=4 ntr=1 | sutsq flag=-1
+[stderr] suplane nt=31 ntr=2 | sushw key=dt a=2000 | sutsq tmin=0.02
+[stderr] suspike nt=4097 ntr=1 | sutsq flag=1 tmin=1
+[stderr] suplane nt=37 ntr=2 | sushw key=dt a=1000 | sutsq flag=0 verbose=1
+[stderr] suspike nt=101 ntr=2 | sutsq flag=-1 tmin=0.02
+[stderr] sunull nt=11 ntr=2 | sushw key=dt a=8000 | sutsq flag=1
+
+# ub-2026-11 (round 1)
+[stderr] suspike nt=17 ntr=1 | sutsq tmin=10
+[stderr] suplane nt=43 ntr=2 | sushw key=dt a=50000 | sutsq tmin=2

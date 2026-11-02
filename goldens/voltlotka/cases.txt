@@ -86,3 +86,58 @@ printf 'stepmax=5 h=0.1 x0=75 y0=12 mode=R\n' > params; voltlotka par=params > o
 [f32] [stderr] voltlotka stepmax=7 h=0.1 tol=1 x0=100 y0=1.001 p=0 mode=Y verbose=1
 [f32] [stderr] voltlotka stepmax=7 h=0.001 tol=1 x0=100 y0=1.001 p=0 mode=R verbose=1
 [f32] [stderr] voltlotka stepmax=7 h=0.001 tol=1 x0=100 y0=1.001 p=0 mode=Y verbose=1
+
+# diff-2026-11 (round 1)
+# This generator never reads stdin. Drain after it exits to prevent upstream
+# SIGPIPE (especially nt=4097); preserve voltlotka's own exit status.
+# Defaults, every explicit parameter, all output modes, and 1..4 step sizes.
+[f32] sunull nt=1 ntr=1 | { voltlotka; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | { voltlotka stepmax=100 verbose=0 x0=500 y0=25 h=1 tol=1e-8 mode=PP a=0.5 b=0.02 c=0.75 p=0.005 K=1000000 thresh=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=2 ntr=1 | { voltlotka stepmax=1 verbose=0 x0=75 y0=12 h=0.05 tol=1e-9 mode=PP a=0.4 b=0.01 c=0.6 p=0.004 K=1000 thresh=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | { voltlotka stepmax=2 mode=R h=0.25 x0=75 y0=12; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { voltlotka stepmax=3 mode=Y h=-0.25 x0=75 y0=12; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | { voltlotka stepmax=4 mode=PP h=0.25 a=0 b=0 c=0 p=0 x0=3 y0=2 thresh=0; rc=$?; cat >/dev/null; exit "$rc"; }
+# Odd/prime sizes, pure logistic growth, low capacity, and long output arrays.
+[f32] suplane nt=17 ntr=3 npl=1 | { voltlotka stepmax=17 h=0.2 x0=10 y0=2 K=50 a=0.8 b=0 c=0 p=0 thresh=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=67 ntr=2 nspk=1 ix1=2 it1=67 | { voltlotka stepmax=257 h=0.02 x0=150 y0=20 a=0.6 b=0.015 c=0.3 p=0.002 K=2000 thresh=0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=67 ntr=1 | { voltlotka stepmax=67 h=0.05 x0=5 y0=0 K=1 a=0.5 thresh=0 mode=R; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4097 ntr=1 | { voltlotka stepmax=4097 h=0.001 mode=PP; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suplane nt=4097 ntr=1 npl=1 len1=1 cx1=1 ct1=2049 | { voltlotka stepmax=4097 h=0.001 mode=R; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | { voltlotka stepmax=4097 h=0.001 mode=Y; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4097 ntr=1 | { voltlotka stepmax=65521 h=0.0001 a=0 b=0 c=0 p=0 x0=3 y0=2 thresh=0; rc=$?; cat >/dev/null; exit "$rc"; }
+# Header changes must have no influence: voltlotka has no gettr/header path.
+[f32] sunull nt=4 ntr=3 | sushw key=dt,delrt,trid,tracl a=1000,-40,2,101 | { voltlotka stepmax=17 h=0.025; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] suspike nt=17 ntr=3 nspk=1 ix1=2 it1=9 | suchw key1=offset key2=tracl a=-100 b=25 | { voltlotka stepmax=17 h=0.025 mode=Y; rc=$?; cat >/dev/null; exit "$rc"; }
+# Solver minimum-step boundary and lazy callback parameter parsing.
+[f32] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=4 h=0.0000005 x0=0.5 y0=0.25 a=1e999 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { voltlotka stepmax=4 h=0.000000500001 tol=0 x0=1.001 y0=25 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=3 ntr=1 | { voltlotka stepmax=4 h=-0.000000500001 tol=0 x0=1.001 y0=25 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=4 ntr=1 | { voltlotka stepmax=4 h=0 a=1e999 b=1e999 c=1e999 p=1e999 K=1e999 thresh=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+# Negative populations, extinction, rejected trials, and backward integration.
+[f32] sunull nt=17 ntr=1 | { voltlotka stepmax=17 h=0.05 x0=-0.1 y0=-0.25 thresh=-1 a=0.1 b=0 c=0.1 p=0 K=10; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=4 ntr=1 | { voltlotka stepmax=4 h=0.01 x0=1 y0=1 thresh=1 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=3 ntr=1 | { voltlotka stepmax=17 h=0.2 tol=1 x0=1.0001 y0=80 thresh=1 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=2 ntr=1 | { voltlotka stepmax=4 h=0.01 tol=1e-20 x0=10000 y0=1000 a=100 c=100 K=100 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] suplane nt=17 ntr=3 npl=1 | { voltlotka stepmax=17 h=-0.2 x0=150 y0=20 a=0.6 b=0.015 c=0.3 p=0.002 K=2000 thresh=0 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+# Finite hexadecimal doubles, duplicate/empty parameters, unknown arguments.
+[f32] sunull nt=1 ntr=1 | { voltlotka stepmax=17 x0=0x1.f4p8 y0=0x1.9p4 h=0x1p-4 tol=0x1p-30 a=0x1p-1 b=0x1.47ae147ae147bp-6 c=0x1.8p-1 p=0x1.47ae147ae147bp-8 K=0x1.e848p19 thresh=0x1p0; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=2 ntr=1 | { voltlotka stepmax=2 stepmax=17 mode=R mode=Y x0=5 x0=100 a=0 a=0.4 h=0.025; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=3 ntr=1 | { voltlotka stepmax=4 h=0.05 x0= y0= tol= a= b= c= p= K= thresh= verbose= mode=PP; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] [stderr] sunull nt=4 ntr=1 | { voltlotka stepmax=4 h=0.05 verbose=2 unused=7 d=123; rc=$?; cat >/dev/null; exit "$rc"; }
+# No parameters are required. Empty mode and numeric errors must fail explicitly.
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka mode=pp; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka mode=; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=4 h=1e-320; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=4 a=1e-320; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka tol=1e999; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=-17; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=-2147483649; rc=$?; cat >/dev/null; exit "$rc"; }
+# Just below the minimum-step boundary, the callback is never invoked.
+[f32] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=4 h=0.000000499999 a=1e999 verbose=1; rc=$?; cat >/dev/null; exit "$rc"; }
+# Exact hexadecimal subnormals are accepted; inexact cases are in PENDING_LIB.
+[f32] sunull nt=1 ntr=1 | { voltlotka stepmax=4 h=0x1p-1074; rc=$?; cat >/dev/null; exit "$rc"; }
+[f32] sunull nt=1 ntr=1 | { voltlotka stepmax=4 h=0 x0=0x1p-1023; rc=$?; cat >/dev/null; exit "$rc"; }
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=2 h=0x1.0000000000001p-1023; rc=$?; cat >/dev/null; exit "$rc"; }
+[exact] [stderr] sunull nt=1 ntr=1 | { voltlotka stepmax=2 h=0 x0=0x1.1p-1074; rc=$?; cat >/dev/null; exit "$rc"; }

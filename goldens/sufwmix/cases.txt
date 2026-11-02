@@ -10,3 +10,25 @@
 [stderr] suplane nt=20 ntr=4 | sufwmix key=tracl
 [stderr] suplane nt=20 ntr=4 | sufwmix key=invalid dx=1
 [stderr] suplane nt=20 ntr=4 | sufwmix key=tracl dx=1 padd=1000000
+# diff-2026-11 (round 1)
+[stderr] suspike nt=1 ntr=3 nspk=1 ix1=1 it1=1 | sufwmix key=tracl dx=1 vf=0
+[stderr] suspike nt=2 ntr=4 nspk=1 ix1=1 it1=1 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=2 vf=0
+[stderr] suspike nt=3 ntr=5 nspk=1 ix1=1 it1=1 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=1 vf=1 vmin=25
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sufwmix key=tracl dx=1 padd=0
+[stderr] suspike nt=37 ntr=9 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=3 fac=4 vf=0 padd=30
+[stderr] suplane nt=43 ntr=7 | sushw key=offset a=-30 b=10 | sushw key=mark a=0 b=1 | sufwmix key=tracl,offset dx=2,15 fac=2 vf=1 vmin=100 padd=50
+[stderr] suplane nt=53 ntr=10 | sushw key=cdp a=1 b=1 c=3 | sufwmix keyg=cdp key=tracl dx=4 vf=0 verbose=1
+[stderr] suspike nt=4097 ntr=2 | sufwmix key=tracl dx=1 vf=0 padd=0
+[stderr] sunull nt=29 ntr=4 | sufwmix key=tracl dx=1 vf=1
+[stderr] suplane nt=19 ntr=5 | sufwmix key=tracl dx=1 vf=1 vmin=5000 padd=25 fac=1 keyg=ep
+[stderr] suplane nt=23 ntr=5 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=-2 fac=0 vf=0
+[stderr] suspike nt=31 ntr=4 | sushw key=mark a=1 | sufwmix key=tracl dx=1 vf=2 vmin=-100
+[stderr] suplane nt=21 ntr=3 | sufwmix key=tracl dx=1 keyg=invalid
+[stderr] suspike nt=12 ntr=2 | sufwmix key=tracl dx=1 unknown=1
+[stderr] suplane nt=32 ntr=4 | sufwmix key=tracl dx=1 padd=1000000
+[stderr] suspike nt=127 ntr=12 | suaddnoise sn=2 seed=12345 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=1 vf=0 fac=2
+[stderr] suspike nt=127 ntr=12 | suaddnoise sn=2 seed=12345 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=1 vf=1 vmin=20 fac=2
+[stderr] suspike nt=101 ntr=8 dt=0.002 | sushw key=ep a=1 b=1 c=3 | sushw key=mark a=0 b=1 | sufwmix keyg=ep key=tracl dx=0.5 padd=75 vf=0
+[stderr] suspike nt=256 ntr=8 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=1 vf=1 vmin=10
+[stderr] suspike nt=67 ntr=6 | sushw key=offset a=100 b=-20 | sushw key=mark a=0 b=1 | sufwmix key=offset dx=15 vf=0 fac=1.5
+[stderr] suspike nt=97 ntr=6 | sushw key=mark a=0 b=1 | sufwmix key=tracl dx=1 vf=0 padd=0

@@ -66,10 +66,18 @@
 //!   (and the next call returns 0).
 //! * stdin a tty: `fgettr.c: segy input can't be tty`; stdout a tty:
 //!   `fputtr.c: segy output can't be tty`.
-//! * fputtr writes the header then exactly nsfirst samples (first trace's
-//!   ns), whatever later headers say; fvputtr writes each trace's own ns.
+//! * fputtr uses nsfirst (first trace's ns) for data output, whatever later
+//!   headers say; fvputtr uses each trace's own ns.
+//!   The first trace's trid also fixes bytes per sample: later float traces
+//!   are XDR encoded in full, but only that byte count's prefix is written.
 //! * The state is per stream (a `CFile`), separately for reading and
 //!   writing, so `fputtr(tmp) .. erewind(tmp) .. fgettr(tmp)` works.
+//!
+//! Reopening a file starts fresh state here. SU never removes its FILE-pointer
+//! entries after fclose, so Darwin libc reusing a FILE slot can make a newly
+//! opened file inherit an unrelated file's trace state. We do not emulate that
+//! slot allocation: CFile has its own identity, and neither a reused file
+//! descriptor nor a reused Rust allocation identifies a Darwin FILE slot.
 
 use crate::cio::{efread, efseeko, efwrite, eftello, fileno, filestat, stdin, stdout, CFile, FileType, TrIn, TrOut, SEEK_END, SEEK_SET};
 use crate::header::{SegyHeader, HDRBYTES, SU_NFLTS};
@@ -355,11 +363,13 @@ fn datawrite(fp: &CFile, st: &TrOut, tp: &mut Trace, fixed_length: bool) -> i32 
             nwritten = efwrite(&tp.data_bytes()[..databytes], fp) as i32;
         }
         _ => {
-            let mut buf = Vec::with_capacity(databytes);
+            let mut buf = Vec::with_capacity(XDR_UNIT as usize * nstobewritten as usize);
             for k in 0..nstobewritten as usize {
                 buf.extend_from_slice(&tp.data[k].to_bits().to_be_bytes());
             }
-            nwritten = efwrite(&buf[..], fp) as i32;
+            // C encodes all samples, then writes the byte count fixed by the
+            // first trace, even when its packed trid selected fewer bytes.
+            nwritten = efwrite(&buf[..databytes], fp) as i32;
             if nwritten as usize != databytes {
                 nwritten = 0;
             }
@@ -427,7 +437,39 @@ pub fn vputtr(tp: &mut Trace) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cio::{erewind, etmpfile};
+    use crate::cio::{efclose, efopen, erewind, etmpfile};
+
+    #[test]
+    fn reopened_file_starts_with_fresh_input_state() {
+        // Keep the closed handles alive: a new CFile, even for the same path,
+        // must not inherit nsfirst, itr or the disk trace count from them.
+        let path = std::env::temp_dir().join(format!("oxwave_trace_reopen_{}", std::process::id()));
+        let name = path.to_str().unwrap();
+        let mut tr = Trace::new();
+        tr.ns = 3;
+        tr.data[..4].copy_from_slice(&[1.0, 2.0, 3.0, 4.0]);
+        let out = efopen(name, "w");
+        fputtr(&out, &mut tr);
+        efclose(&out);
+        let first = efopen(name, "r");
+        let mut actual = Trace::new();
+        assert_eq!(fgettr(&first, &mut actual), 252);
+        assert_eq!(fgettr(&first, &mut actual), 0);
+        efclose(&first);
+
+        tr.ns = 4;
+        let out = efopen(name, "w");
+        fputtr(&out, &mut tr);
+        fputtr(&out, &mut tr);
+        efclose(&out);
+        let second = efopen(name, "r");
+        assert_eq!(fgettra(&second, &mut actual, 1), 2);
+        assert_eq!(actual.ns, 4);
+        assert_eq!(&actual.data[..4], &[1.0, 2.0, 3.0, 4.0]);
+        assert_eq!(second.with(|i| i.trin.as_ref().unwrap().itr), 2);
+        efclose(&second);
+        std::fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn roundtrip_tmpfile() {
@@ -480,5 +522,68 @@ mod tests {
         assert_eq!(t.tracl, 9);
         assert_eq!(&t.data[..2], &[5.0, 6.0]);
         assert_eq!(fgettr(&fp, &mut t), 0);
+    }
+
+    fn mixed_output_prefix(first_trid: i16, fixed_length: bool) {
+        let fp = etmpfile();
+        let mut tr = Trace::new();
+        tr.ns = 7;
+        tr.trid = first_trid;
+        tr.data_bytes_mut()[..14].copy_from_slice(&[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+        let mut expected = tr.hdr.to_xdr().to_vec();
+        match first_trid {
+            CHARPACK => expected.extend_from_slice(&[1, 2, 3, 4, 5, 6, 7, 2, 1, 4, 3, 6, 5, 7]),
+            SHORTPACK => expected.extend_from_slice(&[2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13]),
+            _ => unreachable!(),
+        }
+        if fixed_length {
+            fputtr(&fp, &mut tr);
+        } else {
+            fvputtr(&fp, &mut tr);
+        }
+
+        tr.ns = 5;
+        tr.trid = 1;
+        tr.data[..7].copy_from_slice(&[1.0, -2.5, 3.0, 4.0, 5.0, 6.0, 7.0]);
+        expected.extend_from_slice(&tr.hdr.to_xdr());
+        let xdr = [
+            0x3f, 0x80, 0, 0, 0xc0, 0x20, 0, 0, 0x40, 0x40, 0, 0, 0x40, 0x80, 0, 0,
+            0x40, 0xa0, 0, 0, 0x40, 0xc0, 0, 0, 0x40, 0xe0, 0, 0,
+        ];
+        let prefix_len = match (first_trid, fixed_length) {
+            (CHARPACK, true) => 7,
+            (CHARPACK, false) => 5,
+            (SHORTPACK, true) => 14,
+            (SHORTPACK, false) => 10,
+            _ => unreachable!(),
+        };
+        expected.extend_from_slice(&xdr[..prefix_len]);
+        if fixed_length {
+            fputtr(&fp, &mut tr);
+        } else {
+            fvputtr(&fp, &mut tr);
+        }
+        assert_eq!(&tr.data[..7], &[1.0, -2.5, 3.0, 4.0, 5.0, 6.0, 7.0]);
+        assert_eq!(eftello(&fp), expected.len() as i64);
+        erewind(&fp);
+        let mut actual = vec![0; expected.len() + 1];
+        assert_eq!(efread(&mut actual, &fp), expected.len());
+        assert_eq!(&actual[..expected.len()], &expected);
+    }
+
+    #[test]
+    fn fixed_output_float_after_shortpack_writes_xdr_prefix() {
+        mixed_output_prefix(SHORTPACK, true);
+    }
+
+    #[test]
+    fn fixed_output_float_after_charpack_writes_xdr_prefix() {
+        mixed_output_prefix(CHARPACK, true);
+    }
+
+    #[test]
+    fn variable_output_float_after_packed_uses_current_ns() {
+        mixed_output_prefix(CHARPACK, false);
+        mixed_output_prefix(SHORTPACK, false);
     }
 }

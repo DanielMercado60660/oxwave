@@ -1,0 +1,11 @@
+# diff-2026-11 (round 1)
+# oxwave-core, par::parse_hexfloat (via strtod/eatod): an inexact hexadecimal
+# conversion to a nonzero subnormal does not set ERANGE. C strtod rounds
+# 0x1.8p-1074 and sets ERANGE, so eatod exits 1 with 'atopkge.c: eatod: overflow';
+# the port accepts tol and exits 0 with 32 output bytes.
+
+[exact] [stderr] sunull nt=1 ntr=1 | { sird_epidemic stepmax=2 par=/dev/stdin; rc=$?; cat >/dev/null; exit "$rc"; }
+# oxwave-core, par::getparinit: std::fs::read replaces the C parameter-file
+# efseek(SEEK_END)/eftello/rewind sequence. A pipe at /dev/stdin must fail
+# efseek with ESPIPE ('subcalls.c: efseek: fseek failed', exit 1); the port
+# reads the nonseekable file instead and exits 0 with 32 output bytes.

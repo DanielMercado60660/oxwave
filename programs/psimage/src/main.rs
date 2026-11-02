@@ -334,12 +334,25 @@ fn main() {
             }
             curvecolor.resize(curve, curvecolor[ncurvecolor - 1].clone());
         } else if ncurvecolor != 0 {
-            getparstringarray("curvecolor", &mut curvecolor);
+            // Empty curvecolor= counts as one value but writes no strings.
+            // Match the minimal C fix: initialize the unused slot to black.
+            if getparstringarray("curvecolor", &mut curvecolor) == 0 {
+                curvecolor = vec!["black".into()];
+            }
         }
         for j in 0..curve {
             let curvefp = efopen(&curvefile[j], "r");
-            let mut x1 = vec![0f32; npair[j] as usize];
-            let mut x2 = vec![0f32; npair[j] as usize];
+            let mut x1 = Vec::<f32>::new();
+            if x1.try_reserve_exact(npair[j] as usize).is_err() {
+                // ealloc1float rejects negative counts converted to size_t.
+                err!("ealloc.c: malloc failed (Cannot allocate memory)");
+            }
+            x1.resize(npair[j] as usize, 0.0);
+            let mut x2 = Vec::<f32>::new();
+            if x2.try_reserve_exact(npair[j] as usize).is_err() {
+                err!("ealloc.c: malloc failed (Cannot allocate memory)");
+            }
+            x2.resize(npair[j] as usize, 0.0);
             for i in 0..npair[j] as usize {
                 if let Some(x) = fscanf_f32(&curvefp) {
                     x1[i] = x;
@@ -553,7 +566,9 @@ fn main() {
     let mut lmax = -f32::MAX;
     if legend != 0 {
         for lz in 0..nz as usize {
-            lmin = min(lmin, z[lz]);
+            // psimage.c's FMIN is x > y ? y : x, retaining x for
+            // unordered or equal operands (including NaNs and signed zero).
+            lmin = if lmin > z[lz] { z[lz] } else { lmin };
             lmax = max(lmax, z[lz]);
         }
         if verbose == 2 {
@@ -576,7 +591,7 @@ fn main() {
         lend = lmax;
         lendsup = getparfloat("lend", &mut lend) != 0;
         wclip = max(lbeg, wclip);
-        bclip = min(lend, bclip);
+        bclip = if lend > bclip { bclip } else { lend }; // FMIN(lend,bclip)
         if !lbegsup {
             let rangeperc = ((bclip - wclip) as f64 / 20.0) as f32;
             lbeg = wclip - rangeperc;
@@ -762,6 +777,21 @@ fn main() {
         ly = (ly as f64 * 72.0) as f32;
         lwidth = (lwidth as f64 * 72.0) as f32;
         lheight = (lheight as f64 * 72.0) as f32;
+    }
+    // Guard the library's panicking font lookup. The selfdoc lists the same
+    // supported names as basic.c:250-285; its "Unknown" entry is also valid.
+    // The fixed C rejects the null table entry before strcmp, with this error.
+    for name in [&labelfont, &titlefont] {
+        let supported = name == "Unknown"
+            || SDOC
+                .iter()
+                .skip_while(|line| !line.starts_with(" Legal font names are:"))
+                .skip(1)
+                .flat_map(|line| line.split_whitespace())
+                .any(|font| font == name);
+        if !supported {
+            err!("unknown font: %s", name);
+        }
     }
     let mut bbox = [0i32; 4];
     psAxesBBox(

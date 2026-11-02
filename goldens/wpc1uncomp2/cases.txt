@@ -12,3 +12,14 @@
 [f32] sunull nt=257 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=257 error=0.001 | wpc1uncomp2 verbose=1
 [f32] sunull nt=512 ntr=2 | sustrip outpar=/dev/null | wpc1comp2 n1=512 error=0.1 | wpc1uncomp2 ignored=1
 [f32] suplane nt=1 ntr=2 | suaddnoise seed=123 | sustrip outpar=/dev/null | wpc1comp2 n1=1 | wpc1uncomp2
+
+# diff-2026-11 (round 1)
+[f32] sunull nt=2 ntr=1 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=2 | wpc1uncomp2
+[f32] sunull nt=3 ntr=2 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=3 error=0.01 | wpc1uncomp2
+[f32] sunull nt=4 ntr=3 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=4 | wpc1uncomp2 verbose=1
+[f32] suspike nt=2 ntr=1 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=2 | wpc1uncomp2
+[f32] suspike nt=3 ntr=1 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=3 error=0.1 | wpc1uncomp2
+[f32] suspike nt=4 ntr=2 | sushw key=offset a=100 b=10 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=4 | wpc1uncomp2
+[f32] sunull nt=127 ntr=3 | sushw key=cdp a=5 b=2 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=127 error=0.05 | wpc1uncomp2 ignored=1
+[f32] sunull nt=31 ntr=2 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=31 > data; cat data data | wpc1uncomp2
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sugain bias=1 | sustrip outpar=/dev/null | wpc1comp2 n1=4 error=0.05 | wpc1uncomp2

@@ -32,3 +32,35 @@ suplane nt=64 ntr=4 | suaddnoise seed=2 sn=3 | sushw key=trid,d1 a=130,5 | sumut
 suplane nt=64 ntr=4 | suaddnoise seed=2 sn=3 | sushw key=muts,delrt a=40,20 b=30,0 | sumute hmute=muts ntaper=4
 suplane nt=128 ntr=5 | suaddnoise seed=2 sn=3 | sushw key=offset,delrt a=-200,8 b=100,0 | sumute xmute=-200,200 tmute=0.02,0.03 mode=3 linvel=2000 tm0=0.1 ntaper=4
 suplane nt=128 ntr=5 | suaddnoise seed=2 sn=3 | sushw key=sx a=0 b=150 | sumute key=sx xmute=0,600 tmute=0.02,0.06 mode=2 linvel=3000 tm0=0.05 ntaper=3
+
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | sumute xmute=0 tmute=0 mode=0 ntaper=0 absolute=1
+suplane nt=3 ntr=1 | sumute xmute=0 tmute=0.004 mode=1
+suplane nt=4 ntr=1 | sumute xmute=0 tmute=0.004 ntaper=1
+suplane nt=4097 ntr=1 | suaddnoise seed=13 sn=3 | sumute xmute=0 tmute=0.02 ntaper=8
+suspike nt=97 ntr=5 k1=20,40 k2=1,3 | sushw key=offset a=-40 b=20 | sumute xmute=-40,0,40 tmute=0.02,0.08,0.04 ntaper=5
+sunull nt=31 ntr=3 | sushw key=offset a=-20 b=20 | sumute xmute=-10,10 tmute=0.01,0.03 mode=0
+suplane nt=101 ntr=4 | suaddnoise seed=7 sn=5 | sushw key=offset,delrt a=-30,20 b=20,0 | sumute xmute=-30,30 tmute=0.04,0.08 absolute=0 mode=1 ntaper=4
+suplane nt=101 ntr=4 | suaddnoise seed=7 sn=5 | sushw key=offset a=-30 b=20 | sumute xmute=-30,30 tmute=0.04,0.08 absolute=1 mode=2 linvel=1000 tm0=0.06 ntaper=4
+suplane nt=101 ntr=4 | suaddnoise seed=7 sn=5 | sushw key=offset a=-30 b=20 | sumute xmute=-30,30 tmute=0.04,0.08 absolute=0 mode=3 linvel=1000 tm0=0.06 ntaper=4
+suplane nt=101 ntr=3 | suaddnoise seed=8 sn=5 | sumute key=tracl xmute=1,3 tmute=0.08,0.12 twindow=0.04,0.04 mode=4 below=0 ntaper=3
+suplane nt=79 ntr=4 | suaddnoise seed=5 sn=4 | sushw key=cdp a=10 b=10 | sumute key=cdp xmute=10,40 tmute=0.04,0.12 ntaper=2
+suplane nt=79 ntr=3 | sushw key=mute a=20 b=30 | sumute hmute=mute mode=0 ntaper=3
+[stderr] suplane nt=41 ntr=2 | sumute xmute=0 tmute=0.04 below=0 verbose=1
+python3 -c 'import struct;open("x","wb").write(struct.pack("fff",-10,0,10));open("t","wb").write(struct.pack("fff",.02,.04,.06))' && suplane nt=51 ntr=3 | sushw key=offset a=-10 b=10 | sumute xfile=x tfile=t nmute=3 mode=1 ntaper=2
+suplane nt=37 ntr=3 | sushw key=trid,d1 a=130,0.01 | sumute key=tracl xmute=1,3 tmute=0.05,0.15 mode=0 ntaper=2
+suplane nt=37 ntr=1 | sushw key=delrt a=100 | sumute xmute=0 tmute=0.08 mode=0 ntaper=3
+suplane nt=37 ntr=1 | sumute xmute=0 tmute=2 mode=1 ntaper=3
+suplane nt=53 ntr=2 | sushw key=offset a=100 b=100 | sumute xmute=0,50 tmute=0.01,0.06 mode=0
+suplane nt=53 ntr=2 | sushw key=offset a=-100 b=10 | sumute xmute=0,50 tmute=0.01,0.06 mode=0
+suplane nt=23 ntr=1 | sushw key=trid,d1 a=130,0 | sumute xmute=0 tmute=0
+suplane nt=23 ntr=1 | sumute xmute=0 tmute=0 key=notakey
+python3 -c 'open("x","wb").write(b"")' && sumute xfile=x tfile=missing nmute=1 </dev/null
+sumute xmute=0 tmute=0 mode=4 twindow=0 linvel=0 </dev/null
+suplane nt=71 ntr=7 | suaddnoise seed=21 sn=4 | sushw key=offset a=-30 b=10 | sumute xmute=30,10,-10,-30 tmute=0.08,0.04,0.06,0.02 ntaper=3
+suplane nt=71 ntr=5 | suaddnoise seed=22 sn=4 | sushw key=offset a=0 b=10 | sumute xmute=0,20,20,40 tmute=0.02,0.04,0.08,0.1
+suplane nt=61 ntr=3 | suaddnoise seed=23 sn=4 | sushw key=offset a=0 b=10 | sumute xmute=0,20 tmute=0.02,0.06 ntaper=80
+suplane nt=41 ntr=3 | suaddnoise seed=24 sn=4 | sushw key=offset a=0 b=10 | sumute xmute=0,20 tmute=-0.02,-0.004 ntaper=8
+suplane nt=89 ntr=3 | suaddnoise seed=25 sn=4 | sushw key=f1 a=10 b=20 | sumute hmute=f1 mode=1 ntaper=2
+suplane nt=89 ntr=3 | suaddnoise seed=26 sn=4 | sushw key=trid a=109 | sumute xmute=0 tmute=0.04 mode=1
+suplane nt=43 ntr=1 | sumute xmute=0 tmute=0 mode=-1

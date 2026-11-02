@@ -17,3 +17,40 @@ suimp3d nrec=-1
 suimp3d nt=65535
 suimp3d nt=999999999999999999999
 suimp3d nt=64 verbose=1 unknown=1
+# diff-2026-11 (round 1)
+suimp3d nt=1 x0=10 z0=20 c=1000 dt=.001
+suimp3d nt=2
+suimp3d nt=3
+suimp3d nt=4
+suimp3d nt=5 x0=1 z0=2 c=1000 dt=.001
+suimp3d nt=17 x0=10 y0=2 z0=5 c=1500 dt=.002
+suimp3d nt=31 nshot=2 nrec=2 x0=15 y0=3 z0=10 c=1000 dt=.004 sxmin=-2 symin=1 szmin=3 gxmin=4 gymin=5 gzmin=6 dsx=3 dsy=2 dsz=1 dgx=4 dgy=3 dgz=2
+suimp3d nt=4097 x0=100 z0=100 c=2000 dt=.001
+suimp3d nt=257 nrec=4 x0=100 z0=75 c=1200 dt=.002 gxmin=-50 dgx=30 dsx=10
+suimp3d nt=127 nshot=3 nrec=2 x0=-30 y0=20 z0=50 c=1500 dt=.001 sxmin=-15 symin=-10 szmin=-5 gxmin=20 gymin=30 gzmin=4 dsx=-5 dsy=8 dsz=3 dgx=0 dgy=-12 dgz=0
+suimp3d nt=61 nshot=2 nrec=4 x0=50 y0=-25 z0=30 c=1100 dt=.003 sxmin=5 symin=7 szmin=9 gxmin=6 gymin=8 gzmin=10 dsx=0 dsy=0 dsz=-4 dgx=0 dgy=0 dgz=5
+suimp3d nt=83 nshot=2 nrec=3 dir=1 x0=40 y0=10 z0=30 c=2000 dt=.001 sxmin=2 symin=3 szmin=4 gxmin=15 gymin=20 gzmin=25 dsx=2 dsy=3 dsz=4 dgx=5 dgy=6 dgz=7
+suimp3d nt=101 dir=1 gxmin=10 gymin=20 gzmin=30 x0=100 z0=50 c=1000 dt=.002
+suimp3d nt=97 dir=-1 x0=60 z0=30 c=1500 dt=.001
+suimp3d nt=101 dir=3 x0=60 z0=30 c=1500 dt=.001
+suimp3d nt=128 nshot=2 nrec=3 x0=50 z0=50 c=2000 dt=.002 sxmin=-1.5 symin=-2.5 szmin=-3.5 gxmin=4.5 gymin=5.5 gzmin=6.5 dsx=1.5 dsy=-2.5 dsz=3.5 dgx=-4.5 dgy=5.5 dgz=-6.5
+suimp3d nt=113 nrec=3 x0=40 z0=40 c=1000 dt=.002 gxmin=-10 dgx=-10 dsx=-1
+suimp3d nt=89 nrec=3 x0=40 z0=40 c=1000 dt=.002 gymin=-10 dgx=0 dgy=-10 dsy=-1
+suimp3d nt=79 nrec=3 x0=40 z0=40 c=1000 dt=.002 gzmin=-10 dgx=0 dgz=-10 dsz=-1
+suimp3d nt=128 nshot=1 nrec=1 c=5000 dt=.004 x0=1000 y0=0 z0=1000 dir=0 sxmin=0 symin=0 szmin=0 gxmin=0 gymin=0 gzmin=0 dsx=100 dsy=0 dsz=0 dgx=100 dgy=0 dgz=0
+suimp3d nt=64 c=-1500 dt=.002 x0=40 z0=40
+suimp3d nt=64 c=1500 dt=-.002 x0=40 z0=40
+suimp3d nt=103 nshot=3 nrec=4 c=1600 dt=.002 x0=35 y0=17 z0=24 sxmin=1 symin=2 szmin=3 gxmin=12 gymin=13 gzmin=14 dsx=7 dsy=-3 dsz=2 dgx=9 dgy=4 dgz=-2 dir=1
+suimp3d nt=211 dt=.0005 c=3000 x0=45 y0=7 z0=80 gxmin=16 gymin=-9 gzmin=3 dir=1
+suimp3d nt=37 dt=.01 c=600 x0=5 z0=8 sxmin=1 gxmin=7 dir=1
+suimp3d nt=64 nshot=0 nrec=2 dir=1
+suimp3d nt=64 nshot=2 nrec=0 dir=1
+suimp3d nt=64 nshot=-2 nrec=2
+suimp3d nt=65534
+suimp3d nt=2147483648
+suimp3d c=1e999
+[stderr] suimp3d nt=32 verbose=1
+suimp3d nt=127 nt=19 x0=5 z0=5 c=1000 dt=.002
+sunull nt=1 ntr=1 | suimp3d nt=23 x0=5 z0=10 c=1000 dt=.002
+suspike nt=4 ntr=1 | sushw key=sx a=123 | suimp3d nt=29 x0=5 z0=10 c=1000 dt=.002
+suplane nt=8 ntr=1 | suimp3d nt=41 x0=5 z0=10 c=1000 dt=.002

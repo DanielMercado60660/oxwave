@@ -256,8 +256,12 @@ fn main() {
     }
 
     let mut skeyloc = vec!["fldr".to_string()];
-    if countparval("skeyloc") > 0 {
-        getparstringarray("skeyloc", &mut skeyloc);
+    let num_skeyloc = countparval("skeyloc");
+    if num_skeyloc > 0 {
+        // The fixed C checks the count before using otherwise uninitialized pointers.
+        if getparstringarray("skeyloc", &mut skeyloc) != num_skeyloc {
+            err!("**** Error: skeyloc must not be empty");
+        }
     }
     let mut skaseloc = Vec::new();
     let mut swriteloc = Vec::new();
@@ -466,7 +470,12 @@ fn main() {
         avoff += ((sx - rx) * (sx - rx) + (sy - ry) * (sy - ry)).sqrt();
         let mut sguy = vec![0.0; skaseloc.len()];
         for i in 0..skaseloc.len() {
-            sguy[i] = fromhead(&tr, skaseloc[i]);
+            // Match headcase.c with dval zero-initialized for non-header cases (numb*).
+            sguy[i] = if (1..=80).contains(&skaseloc[i]) {
+                fromhead(&tr, skaseloc[i])
+            } else {
+                0.0
+            };
         }
         let ihere = bhighdd(&sunqlocs, &sguy);
         if ihere > 0 && comparedd(&sguy, &sunqlocs[ihere - 1]) == 0 {
@@ -487,7 +496,12 @@ fn main() {
         }
         let mut rguy = vec![0.0; rkaseloc.len()];
         for i in 0..rkaseloc.len() {
-            rguy[i] = fromhead(&tr, rkaseloc[i]);
+            // Match the same zero-initialized C return as for source identifiers.
+            rguy[i] = if (1..=80).contains(&rkaseloc[i]) {
+                fromhead(&tr, rkaseloc[i])
+            } else {
+                0.0
+            };
         }
         let jhere = bhighdd(&runqlocs, &rguy);
         if jhere > 0 && comparedd(&rguy, &runqlocs[jhere - 1]) == 0 {
@@ -508,7 +522,13 @@ fn main() {
         }
         let mut cguy = vec![0.0; ckaseloc.len()];
         for i in 0..ckaseloc.len() {
-            cguy[i] = (fromhead(&tr, ckaseloc[i]) / cdivider[i]).floor();
+            // For the single-CDP numb1 regression, zeroing dval preserves C output.
+            let value = if (1..=80).contains(&ckaseloc[i]) {
+                fromhead(&tr, ckaseloc[i])
+            } else {
+                0.0
+            };
+            cguy[i] = (value / cdivider[i]).floor();
         }
         let khere = bhighdd(&cunqlocs, &cguy);
         if khere > 0 && comparedd(&cguy, &cunqlocs[khere - 1]) == 0 {

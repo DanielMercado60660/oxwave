@@ -110,3 +110,45 @@ suspike nt=17 ntr=3 | sumigps dx=10 np=5 ntflag=4
 [stderr] suspike nt=9 ntr=3 | sumigps dx=10 tmig=1,0 vmig=1500,2000 unknown=1
 # Empty fields within a filter array are parsed as zeros, with four entries.
 suspike nt=65 ntr=5 | sumigps dx=20 np=17 ffil=,,60,100
+# diff-2026-11 (round 1)
+# Different generator with omitted versus explicit program defaults.
+[stderr] suplane nt=61 ntr=7 | sumigps
+[stderr] suplane nt=61 ntr=7 | sumigps dt=0.004 dx=1 ffil=0,0,125,125 nxpad=0 ltaper=0 verbose=0 np=200 ntflag=1 tmpdir= tmig=0 vmig=1500
+# Nonzero inputs at each very short trace length, including singleton gathers.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sumigps dx=25 np=3
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sumigps dx=25 np=3
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sumigps dx=25 np=3
+suspike nt=4 ntr=2 nspk=1 ix1=2 it1=2 | sumigps dx=40 np=3 nxpad=1 ltaper=1
+# Only the first trace supplies migration sampling; preserve varying headers.
+sunull nt=67 ntr=11 | suaddnoise seed=811 sn=1 | sushw key=dt,d2,cdp,delrt a=2500,-37.5,100,80 b=500,1,-2,20 | sumigps np=17
+[stderr] suplane nt=43 ntr=7 | sushw key=dt,d2 a=0,0 | sumigps
+suplane nt=101 ntr=11 dip1=-3 dip2=7 dip3=13 taper=1 | sumigps dx=25 np=31 nxpad=3 ltaper=2 ffil=2,10,70,100 tmig=0,0.1,0.4 vmig=900,1200,6000 ntflag=3
+# Same strongly turning velocity model in all three image modes.
+sunull nt=127 ntr=11 | suaddnoise seed=42 sn=1 | sumigps dx=50 np=31 tmig=0,0.1 vmig=500,15000 ntflag=1
+sunull nt=127 ntr=11 | suaddnoise seed=42 sn=1 | sumigps dx=50 np=31 tmig=0,0.1 vmig=500,15000 ntflag=2
+sunull nt=127 ntr=11 | suaddnoise seed=42 sn=1 | sumigps dx=50 np=31 tmig=0,0.1 vmig=500,15000 ntflag=3
+suplane nt=71 ntr=13 | sumigps dx=25 np=13 ntflag=0
+suplane nt=71 ntr=13 | sumigps dx=25 np=13 ntflag=5
+# Native binary velocity files made by a second deterministic model generator.
+makevel nx=1 nz=67 v000=850 dvdz=20 > vel; suplane nt=67 ntr=7 | sumigps dx=30 np=11 vfile=vel ntflag=2
+makevel nx=1 nz=101 v000=4000 dvdz=-25 > vel; suplane nt=101 ntr=7 | sumigps dx=30 np=19 vfile=vel ntflag=3
+# Waveform generators beyond spikes, planes, and seeded noise.
+suimp2d nt=127 nrec=7 dt=0.002 c=1800 x0=30 z0=80 dgx=10 | sumigps dt=0.002 dx=10 vmig=1800 np=29 ntflag=1
+susynlv nt=127 nxm=5 dxm=0.02 fxm=0.1 nxo=1 dt=0.004 v00=1.5 ref="1:0,0.1;1,0.1" | sumigps np=19 tmig=0,0.5 vmig=1500,2500 ntflag=3
+# Long temporal FFTs. The low-pass band keeps the maximum ns case fast.
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=2048 | sumigps dx=25 np=7
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=32767 | sumigps dx=25 np=3 ffil=0,0,0.03,0.05
+# Larger spatial FFT and overlapping tapers.
+suplane nt=61 ntr=97 dip1=-2 dip2=3 dip3=6 | sumigps dx=12.5 nxpad=11 ltaper=7 np=23
+suspike nt=29 ntr=2 nspk=1 ix1=2 it1=15 | sumigps dx=25 ltaper=5 nxpad=3 np=3
+# Named temporary files, full diagnostics, and directory cleanup.
+[stderr] mkdir scratch; suplane nt=37 ntr=5 | sumigps dx=25 np=3 tmpdir=scratch verbose=1 > migrated && rmdir scratch && cat migrated
+# Filter clipping, constant extrapolation, and a signed image bit mask.
+suplane nt=73 ntr=11 | sumigps dt=0.0025 dx=25 np=17 ffil=-10,8,180,300
+suplane nt=83 ntr=7 | sumigps dx=25 np=19 tmig=0.1,0.2 vmig=2500,1200 ntflag=3
+sunull nt=127 ntr=11 | suaddnoise seed=919 sn=1 | sumigps dx=50 np=31 tmig=0,0.1 vmig=500,15000 ffil=5,10,70,90 ntflag=-2
+# Program validation errors, plus the velocity-file read error.
+[stderr] suplane nt=31 ntr=5 | sumigps dx=25 tmig=0,0.1 vmig=
+[stderr] suplane nt=31 ntr=5 | sumigps dx=25 tmig=0,0.2,0.1 vmig=1000,2000,3000
+[stderr] suplane nt=31 ntr=5 | sumigps dx=25 ffil=0,20
+[stderr] makevel nx=1 nz=30 v000=1500 > vel; suplane nt=31 ntr=5 | sumigps dx=25 vfile=vel

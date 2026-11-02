@@ -68,3 +68,43 @@
 [stderr] makevel nx=1 nz=1 v000=1500 > v1; suspike nt=1 ntr=3 nspk=1 ix1=2 it1=1 | sudatumfd nt=2 nx=1 nz=1 nsx=3 dz=1 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=1
 # Excess traces and ns greater than allocated nt are checked separately against
 # Rust's err! diagnostics: the reference accesses memory out of bounds for them.
+
+# diff-2026-11 (round 1)
+# Single-receiver short transforms; padded width three initializes the recurrence.
+[stderr] makevel nx=1 nz=2 v000=1600 dvdz=80 > v1; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sudatumfd nt=1 nx=1 nz=2 nsx=1 dz=1.5 x_0=0 buff=1 tap_len=0 mx=1 mz=2 vfile1=v1 vfile2=v1 dx=12 dt=.002 v=1000
+[stderr] makevel nx=1 nz=2 v000=1600 dvdz=80 > v1; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sudatumfd nt=2 nx=1 nz=2 nsx=1 dz=1.5 x_0=0 buff=1 tap_len=1 mx=1 mz=2 vfile1=v1 vfile2=v1 dx=12 dt=.002
+[stderr] makevel nx=1 nz=2 v000=1600 dvdz=80 > v1; suspike nt=3 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=3 | sudatumfd nt=3 nx=1 nz=2 nsx=1 dz=1.5 x_0=0 buff=2 tap_len=0 mx=1 mz=2 vfile1=v1 vfile2=v1 dx=12 dt=.002
+[stderr] makevel nx=1 nz=2 v000=1600 dvdz=80 > v1; suspike nt=4 ntr=1 nspk=2 ix1=1 ix2=1 it1=2 it2=4 | sudatumfd nt=4 nx=1 nz=2 nsx=1 dz=1.5 x_0=0 buff=2 tap_len=2 mx=1 mz=2 vfile1=v1 vfile2=v1 dx=12 dt=.002
+# Odd/prime lengths, including FFTs well beyond the old goldens.
+[stderr] makevel nx=5 nz=3 v000=1600 dvdx=123 dvdz=77 > v1; suspike nt=37 ntr=5 nspk=1 ix1=3 it1=12 | sushw key=gx,d2 a=0,13 b=13,0 | sudatumfd nt=37 nx=5 nz=3 nsx=1 dz=7.3 x_0=0 buff=2 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1
+[stderr] makevel nx=5 nz=3 v000=1600 dvdx=123 dvdz=77 > v1; suspike nt=257 ntr=5 nspk=1 ix1=3 it1=85 | sushw key=gx,d2 a=0,13 b=13,0 | sudatumfd nt=257 nx=5 nz=3 nsx=1 dz=7.3 x_0=0 buff=2 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1
+[stderr] makevel nx=5 nz=3 v000=1600 dvdx=123 dvdz=77 > v1; suspike nt=1009 ntr=5 nspk=1 ix1=3 it1=336 | sushw key=gx,d2 a=0,13 b=13,0 | sudatumfd nt=1009 nx=5 nz=3 nsx=1 dz=7.3 x_0=0 buff=2 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1
+[stderr] makevel nx=5 nz=3 v000=1600 dvdx=123 dvdz=77 > v1; suspike nt=4097 ntr=5 nspk=1 ix1=3 it1=1365 | sushw key=gx,d2 a=0,13 b=13,0 | sudatumfd nt=4097 nx=5 nz=3 nsx=1 dz=7.3 x_0=0 buff=2 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1
+[stderr] makevel nx=1 nz=1 v000=1900 > v1; suspike nt=65535 ntr=1 nspk=2 ix1=1 ix2=1 it1=1 it2=65535 | sudatumfd nt=65535 nx=1 nz=1 nsx=1 dz=2 x_0=0 buff=1 tap_len=0 mx=1 mz=1 vfile1=v1 vfile2=v1 dx=25
+# Distinct model axes and files, deep recurrence, broad waveforms and seeded noise.
+[stderr] makevel nx=7 nz=40 v000=900 dvdx=35 dvdz=20 > v1; makevel nx=7 nz=40 v000=2400 dvdx=-50 dvdz=-5 > v2; suplane nt=131 ntr=7 taper=1 | sushw key=gx a=0 b=20 | sudatumfd nt=131 nx=7 nz=40 nsx=1 dz=3.3 x_0=0 buff=3 tap_len=3 mx=7 mz=40 vfile1=v1 vfile2=v2 dx=20 dt=.001337
+[stderr] makevel nx=5 nz=7 v000=1500 dvdx=75 dvdz=10 > v1; suplane nt=127 ntr=10 | suaddnoise seed=20261102 | sushw key=gx,sx,d2 a=0,0,10 b=10,0,0 j=5,5,10 c=0,100,0 | sudatumfd nt=127 nx=5 nz=7 nsx=2 dz=4 x_0=0 buff=2 tap_len=2 mx=5 mz=7 vfile1=v1 vfile2=v1
+[stderr] makevel nx=5 nz=3 v000=2000 dvdx=30 dvdz=20 > v1; susynlv nt=127 dt=.004 nxs=5 dxs=.01 nxo=1 ref="1:0,0.1;0.1,0.1" | sudatumfd nt=127 nx=5 nz=3 nsx=1 dz=5 x_0=0 buff=2 tap_len=1 mx=5 mz=3 vfile1=v1 vfile2=v1 dx=10
+[stderr] makevel nx=3 nz=5 v000=1700 > v1; sunull nt=4097 ntr=6 | sushw key=gx,d2 a=0,10 b=10,0 j=3,6 | sudatumfd nt=4097 nx=3 nz=5 nsx=2 dz=8 x_0=0 buff=1 tap_len=0 mx=3 mz=5 vfile1=v1 vfile2=v1 v=12345
+# Receiver order drives model lookup; source, cdp and offset must keep input order.
+[stderr] makevel nx=7 nz=3 v000=1000 dvdx=140 dvdz=90 > v1; suspike nt=43 ntr=7 nspk=2 ix1=2 ix2=6 it1=8 it2=31 | sushw key=gx,sx,offset,scalco a=160,-30,-20,-100 b=-10,3,7,0 | suchw key1=cdp key2=gx key3=sx b=1 c=1 d=2 | sudatumfd nt=43 nx=7 nz=3 nsx=1 dz=4 x_0=100 buff=2 tap_len=2 mx=7 mz=3 vfile1=v1 vfile2=v1 dx=10
+[stderr] makevel nx=5 nz=3 v000=1700 dvdx=200 dvdz=100 > v1; suspike nt=41 ntr=5 nspk=2 ix1=1 ix2=5 it1=6 it2=29 | sushw key=gx a=-10 b=10 | sudatumfd nt=41 nx=5 nz=3 nsx=1 dz=4 x_0=-10.5 buff=3 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1 dx=10
+[stderr] makevel nx=5 nz=3 v000=1700 dvdx=100 dvdz=100 > v1; suspike nt=41 ntr=5 nspk=2 ix1=1 ix2=5 it1=6 it2=29 | sushw key=gx a=0 b=-10 | sudatumfd nt=41 nx=5 nz=3 nsx=1 dz=-4 x_0=0 buff=3 tap_len=2 mx=5 mz=3 vfile1=v1 vfile2=v1 dx=-10
+# dt/d2 are queried for every trace; the final trace supplies processing sampling.
+[stderr] makevel nx=9 nz=2 v000=1800 dvdx=100 > v1; suspike nt=47 ntr=3 nspk=1 ix1=2 it1=17 | sushw key=dt,d2,gx,tracl,delrt a=1000,10,0,101,-20 b=1000,5,20,7,3 | sudatumfd nt=47 nx=3 nz=2 nsx=1 dz=3 x_0=0 buff=2 tap_len=0 mx=9 mz=2 vfile1=v1 vfile2=v1 verbose=1
+[stderr] makevel nx=3 nz=2 v000=1800 dvdx=100 > v1; suspike nt=47 ntr=3 nspk=1 ix1=2 it1=17 | sushw key=dt,d2,gx a=1000,10,0 b=1000,5,10 | sudatumfd nt=47 nx=3 nz=2 nsx=1 dz=3 x_0=0 buff=2 tap_len=0 mx=3 mz=2 vfile1=v1 vfile2=v1 dt=.002 dx=10 verbose=1
+# Positive, overlapping taper lengths; nx_pad >= 3 even without padding.
+[stderr] makevel nx=5 nz=2 v000=2100 > v1; suplane nt=59 ntr=5 | sudatumfd nt=59 nx=5 nz=2 nsx=1 dz=2 x_0=0 buff=0 tap_len=5 mx=5 mz=2 vfile1=v1 vfile2=v1 dx=10
+[stderr] makevel nx=3 nz=2 v000=2100 > v1; suplane nt=59 ntr=3 | sudatumfd nt=59 nx=3 nz=2 nsx=1 dz=2 x_0=0 buff=4 tap_len=11 mx=3 mz=2 vfile1=v1 vfile2=v1 dx=10
+# Default v versus explicit default; this parameter is replaced by each velocity model.
+[stderr] makevel nx=3 nz=2 v000=1650 > v1; suspike nt=53 ntr=3 nspk=1 ix1=2 it1=19 | sudatumfd nt=53 nx=3 nz=2 nsx=1 dz=2 x_0=0 buff=2 tap_len=0 mx=3 mz=2 vfile1=v1 vfile2=v1 dx=10
+[stderr] makevel nx=3 nz=2 v000=1650 > v1; suspike nt=53 ntr=3 nspk=1 ix1=2 it1=19 | sudatumfd nt=53 nx=3 nz=2 nsx=1 dz=2 x_0=0 buff=2 tap_len=0 mx=3 mz=2 vfile1=v1 vfile2=v1 dx=10 v=1000
+# Header ns replaces nt even for long, overallocated input storage.
+[stderr] makevel nx=3 nz=2 v000=1650 > v1; suspike nt=67 ntr=3 nspk=1 ix1=2 it1=23 | sudatumfd nt=4097 nx=3 nz=2 nsx=1 dz=2 x_0=0 buff=2 tap_len=0 mx=3 mz=2 vfile1=v1 vfile2=v1 dx=10
+# Last parameter occurrence wins; fractional output microseconds truncate.
+[stderr] makevel nx=3 nz=2 v000=1650 > v1; suspike nt=61 ntr=3 nspk=1 ix1=2 it1=21 | sudatumfd nt=3 nt=61 nx=3 nz=2 nsx=1 dz=2 x_0=0 buff=2 tap_len=0 mx=3 mz=2 vfile1=v1 vfile2=v1 dx=1 dx=10 dt=.0013379
+# Parameter conversion and missing-value errors, with deterministic generated stdin.
+[stderr] sunull nt=3 ntr=1 | sudatumfd nt=3 nx=
+[stderr] sunull nt=3 ntr=1 | sudatumfd nt=3 nx=1 nz=1 nsx=1 dz=
+[stderr] sunull nt=3 ntr=1 | sudatumfd nt=3 nx=1 nz=1 nsx=1 dz=1 x_0=0 buff=2147483648
+[stderr] sunull nt=3 ntr=1 | sudatumfd nt=3 nx=1 nz=1 nsx=1 v=1e999

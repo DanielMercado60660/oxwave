@@ -15,3 +15,18 @@ printf '%%%%BoundingBox: 1 2 3 4\n' | psbbox llx=999999999999999999999 verbose=0
 python3 -c 'print("x"*2051); print("%%BoundingBox: 1 2 3 4", end="")' | psbbox verbose=0
 # Generated PostScript with nondeterministic comments removed.
 suplane nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 > in.ps && psbbox lly=10 urx=500 verbose=0 < in.ps | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+[stderr] suplane nt=1 ntr=1 | sustrip outpar=/dev/null | psgraph n=1 d1=1 | psbbox verbose=1 llx=-23 lly=14 urx=201 ury=333 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | psgraph n=2 d1=1 | psbbox verbose=0 llx=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=3 ntr=1 | sushw key=tracl,offset a=17,-100 | sustrip outpar=/dev/null | psgraph n=3 d1=1 | psbbox lly=-21 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=2 | sustrip outpar=/dev/null | psgraph n=4 d1=1 | psbbox urx=-7 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=2 | sustrip outpar=/dev/null | psgraph n=7 d1=1 | psbbox ury=0 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=4097 ntr=1 | sustrip outpar=/dev/null | psgraph n=4097 d1=1 | psbbox verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=11 ntr=1 | sustrip outpar=/dev/null | psgraph n=11 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: -1.6 2.5 3.6 -4.6/' | psbbox verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=1 | sustrip outpar=/dev/null | psgraph n=13 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: (atend)/' | psbbox verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=5 ntr=1 | sustrip outpar=/dev/null | psgraph n=5 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: invalid/' | psbbox verbose=0
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 | psbbox llx=999999999999999999999 verbose=0
+suspike nt=19 ntr=1 | sustrip outpar=/dev/null | psgraph n=19 d1=1 | sed 's/^%%BoundingBox:.*/%%BoundingBox: 12 34 56 78.9/' | psbbox verbose=0 llx= | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=23 ntr=1 | sustrip outpar=/dev/null | psgraph n=23 d1=1 | python3 -c 'import sys; d=sys.stdin.buffer.read(); sys.stdout.buffer.write(b"x"*2047+b"%%BoundingBox: 1 2 3 4\n"+d)' | psbbox verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=3 ntr=1 | sustrip outpar=/dev/null | psgraph n=3 d1=1 | python3 -c 'import sys; d=sys.stdin.buffer.read(); sys.stdout.buffer.write(b"prefix\x00hidden\n"+d)' | psbbox verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=5 ntr=1 | sustrip outpar=/dev/null | psgraph n=5 d1=1 | sed 's/^%%BoundingBox:.*/not a comment %%BoundingBox: 1 2 3 4/' | psbbox verbose=0 ury=17 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'

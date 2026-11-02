@@ -21,3 +21,27 @@ suwellrf nval=-1 ntr=0
 # The most negative input count must also fail without allocation overflow.
 suwellrf nval=-2147483648 ntr=0
 suwellrf nval=3 dvfile=/dev/null
+# diff-2026-11 (round 1)
+printf '0 2000 2\n1 2100 2.1\n2 2200 2.2\n3 2300 2.3\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.006 ntr=1
+printf '0 2000 2\n1 2100 2.1\n2 2200 2.2\n3 2300 2.3\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.003
+printf '0 2000 2\n1 2100 2.1\n2 2200 2.2\n3 2300 2.3\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.002
+printf '0 2000 2\n1 2100 2.1\n2 2200 2.2\n3 2300 2.3\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.0015
+printf '0 2000 2\n10 2400 2.3\n30 1800 2.1\n55 2700 2.5\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.003 ntr=3
+printf '0 2000 2\n10 2400 2.3\n30 1800 2.1\n55 2700 2.5\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.00001
+[stderr] printf '0 2000 2\n10 2400 2.3\n30 1800 2.1\n55 2700 2.5\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.002 ntr=2 verbose=1
+printf '0 2000\n10 2200\n30 2500\n' | a2b n1=2 > dv && printf '8 2\n9 2.3\n10 2.5\n' | a2b n1=2 > dr && suwellrf nval=3 dvfile=dv drfile=dr dtout=.002 ntr=1
+printf '0\n10\n20\n40\n' | a2b n1=1 > d && printf '1500\n1800\n2100\n2400\n' | a2b n1=1 > v && printf '1.8\n2\n2.2\n2.4\n' | a2b n1=1 > r && suwellrf nval=4 dfile=d vfile=v rhofile=r dtout=.004 ntr=2
+printf '100 2500 2.5\n110 2400 2.4\n120 2300 2.3\n130 2200 2.2\n140 2100 2.1\n' | a2b n1=3 > dvr && suwellrf nval=5 dvrfile=dvr
+printf '0 2000 2\n10 2000 2\n20 2000 2\n30 2000 2\n' | a2b n1=3 > dvr && suwellrf nval=4 dvrfile=dvr dtout=.0025
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.0000048828125
+suwellrf nval=3 dfile=missing vfile=missing rhofile=missing
+suwellrf nval=3 dvfile=/dev/null drfile=missing
+printf '0 2000 2\n10 2200 2.1\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.0064
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.0048
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.00273
+printf '0 2000 2\n10 2000 2.1\n20 2000 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=.00000488162
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=-.004
+printf '0 2000 2\n10 2200 2.1\n20 2400 2.2\n' | a2b n1=3 > dvr && suwellrf nval=3 dvrfile=dvr dtout=0
+printf '0 2000 2\n' | a2b n1=3 > dvr && suwellrf nval=1 dvrfile=dvr dtout=.004 ntr=1
+printf '0\n10\n20\n' | a2b n1=1 > d && printf '2000\n2200\n2400\n' | a2b n1=1 > v && suspike nt=3 ntr=1 nspk=3 ix1=1 ix2=1 ix3=1 it1=1 it2=2 it3=3 | sushw key=dt a=1000 | sustrip outpar=par > r && suwellrf nval=3 dfile=d vfile=v rhofile=r dtout=.003 ntr=2

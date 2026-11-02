@@ -11,3 +11,41 @@ printf '' | psmovie n1=2 n2=1
 suplane nt=4 ntr=2 | sustrip outpar=/dev/null > data; psmovie n1=4 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 [stderr] suplane nt=7 ntr=3 | sustrip outpar=/dev/null | psmovie n1=7 n2=3 n3=1 clip=0 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suplane nt=7 ntr=3 | sustrip outpar=/dev/null | psmovie n1=7 n2=3 n3=1 bclip=1 wclip=-1 d1s=2 d2s=2 grid1=dash grid2=dot | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sustrip outpar=/dev/null | psmovie n1=2 n2=1 n3=1 clip=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=2 | sustrip outpar=/dev/null | psmovie n1=3 n2=2 n3=1 clip=2 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4 ntr=3 | sustrip outpar=/dev/null | psmovie n1=4 n2=3 n3=1 perc=75 verbose=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=6 | sustrip outpar=/dev/null | psmovie n1=11 n2=2 n3=3 loopdsp=1 clip=1 title2=Slice | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=13 ntr=6 | sustrip outpar=/dev/null | psmovie n1=13 n2=3 n3=2 loopdsp=2 clip=1 title2=Frame | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=17 ntr=4 | sustrip outpar=/dev/null | psmovie n1=17 n2=2 n3=2 loopdsp=3 bperc=70 wperc=30 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | psmovie n1=4097 n2=1 n3=1 clip=1 d1s=4 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull nt=5 ntr=3 | sustrip outpar=/dev/null | psmovie n1=5 n2=3 n3=1 clip=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=7 ntr=4 | sushw key=dt,delrt a=2000,100 | sustrip outpar=/dev/null | psmovie n1=7 n2=2 n3=2 d1=.002 f1=.1 d2=2 f2=10 clip=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=6 | sustrip outpar=/dev/null | psmovie n1=7 n2=3 n3=2 d3=.25 f3=-2 loopdsp=3 title2=Time clip=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=4 | sustrip outpar=/dev/null | psmovie n1=9 n2=4 n3=1 bclip=.5 wclip=-.5 d1s=.5 d2s=.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=4 | sustrip outpar=/dev/null | psmovie n1=9 n2=4 n3=1 bclip=1 perc=80 wperc=20 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=9 ntr=4 | sustrip outpar=/dev/null | psmovie n1=9 n2=4 n3=1 wclip=-1 perc=80 bperc=80 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=5 | sustrip outpar=/dev/null | psmovie n1=11 n2=5 n3=1 clip=1 d1=-.1 f1=1 d2=-2 f2=10 x1beg=.8 x1end=.2 x2beg=8 x2end=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=5 | sustrip outpar=/dev/null | psmovie n1=11 n2=5 n3=1 clip=1 x1beg=8 x1end=2 x2beg=4 x2end=1 d1s=-2 d2s=-2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=8 ntr=4 | sustrip outpar=/dev/null | psmovie n1=8 n2=4 n3=1 clip=1 xbox=.2 ybox=.3 wbox=3 hbox=4 label1=Depth label2=Distance title=Survey title2=Panel labelfont=Courier titlefont=Times-Roman labelsize=10 titlesize=14 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=8 ntr=4 | sustrip outpar=/dev/null | psmovie n1=8 n2=4 n3=1 clip=1 d1num=2 f1num=1 n1tic=2 grid1=dot d2num=1 f2num=0 n2tic=3 grid2=dash style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=8 ntr=4 | sustrip outpar=/dev/null | psmovie n1=8 n2=4 n3=1 clip=1 grid1=solid grid2=solid style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=6 | sustrip outpar=/dev/null > data; psmovie n1=5 n2=3 clip=1 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=6 | sustrip outpar=/dev/null > data; psmovie n1=5 n3=1 clip=1 < data | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+[stderr] suplane nt=7 ntr=4 | sustrip outpar=/dev/null | psmovie n1=7 n2=2 n3=2 perc=60 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=6 | sustrip outpar=/dev/null | psmovie n1=3 n2=2 n3=3 loopdsp=1 clip=1 d1s=.5 d2s=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=6 | sustrip outpar=/dev/null | psmovie n1=3 n2=2 n3=3 loopdsp=2 clip=1 d1s=2 d2s=.5 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=5 ntr=2 | sustrip outpar=/dev/null | psmovie n1=5 n2=2 n3=1 clip=-1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psmovie n2=1 n3=1
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psmovie n1=3 n3=1
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psmovie n1=3 n2=1
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psmovie n1=4 n2=1 n3=1
+suplane nt=31 ntr=8 | suaddnoise sn=2 seed=123 | sustrip outpar=/dev/null | psmovie n1=31 n2=4 n3=2 loopdsp=3 d1=-0.25 d2=2 d1s=1 d2s=2 bperc=100 wperc=70 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=31 ntr=5 | suaddnoise sn=2 seed=123 | sustrip outpar=/dev/null | psmovie n1=31 n2=5 n3=1 loopdsp=1 d1=0.3 d2=1 d1s=1 d2s=0.8 bperc=80 wperc=0 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=15 | suaddnoise sn=2 seed=123 | sustrip outpar=/dev/null | psmovie n1=7 n2=5 n3=3 loopdsp=1 d1=0.1 d2=0.2 d1s=0.7 d2s=0.8 bperc=50 wperc=40 style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=8 | suaddnoise sn=2 seed=123 | sustrip outpar=/dev/null | psmovie n1=11 n2=4 n3=2 loopdsp=3 d1=0.1 d2=2 d1s=0.7 d2s=1.5 bperc=100 wperc=70 style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=11 ntr=5 | suaddnoise sn=2 seed=123 | sustrip outpar=/dev/null | psmovie n1=11 n2=5 n3=1 loopdsp=1 d1=1 d2=-0.5 d1s=2 d2s=2 bperc=80 wperc=0 style=seismic | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=1 ntr=2 | sustrip outpar=/dev/null | psmovie n1=1 n2=2 n3=1 clip=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane nt=7 ntr=4 | sustrip outpar=/dev/null | psmovie n1=7 n2=4 n3=1 clip=2 bclip=.5 wclip=-.25 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike nt=3 ntr=1 | sustrip outpar=/dev/null | psmovie n1=999999999999999999999 n2=1 n3=1

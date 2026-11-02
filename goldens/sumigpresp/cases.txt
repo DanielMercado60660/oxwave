@@ -79,3 +79,58 @@
 [stderr] makevel nx=1 nz=3 v000=1500 >vel; suspike nt=32 ntr=1 nspk=1 ix1=1 it1=10 >data; sumigpresp nz=3 dz=5 vfile=vel nxo=1 nxshot=1 dx=25 dt=0.002 fmax=50 <data
 # fmax=0 uses 30 Hz, giving 19 samples in an FFT padded to 20.
 [stderr] makevel nx=1 nz=3 v000=1500 >vel; suspike nt=19 ntr=1 nspk=1 ix1=1 it1=10 >data; sumigpresp nz=3 dz=5 vfile=vel nxo=1 nxshot=1 dx=25 fmax=0 <data
+# diff-2026-11 (round 1)
+# nt=1..4: a negative peak makes the defined one-sample Ricker wavelet.
+# Frequency corners stay inside Nyquist and avoid zero-width taper divisions.
+[stderr] makevel nx=3 nz=9 v000=1500 >vel; suspike nt=1 ntr=3 nspk=1 ix1=1 it1=1 | suaddnoise seed=1789 sn=2 | sushw key=sx,gx a=0,0 b=0,25 >data; sumigpresp nz=9 dz=10 vfile=vel nxo=3 nxshot=1 dx=25 fmax=-1000 f1=0 f2=125 f3=0 f4=125 verbose=2 <data
+[stderr] makevel nx=3 nz=9 v000=1500 >vel; suspike nt=2 ntr=3 nspk=1 ix1=1 it1=1 | suaddnoise seed=1789 sn=2 | sushw key=sx,gx a=0,0 b=0,25 >data; sumigpresp nz=9 dz=10 vfile=vel nxo=3 nxshot=1 dx=25 fmax=-1000 f1=0 f2=125 f3=0 f4=125 <data
+[stderr] makevel nx=3 nz=9 v000=1500 >vel; suspike nt=3 ntr=3 nspk=1 ix1=1 it1=1 | suaddnoise seed=1789 sn=2 | sushw key=sx,gx a=0,0 b=0,25 >data; sumigpresp nz=9 dz=10 vfile=vel nxo=3 nxshot=1 dx=25 fmax=-1000 f1=0 f2=62.5 f3=62.5 f4=125 <data
+[stderr] makevel nx=3 nz=9 v000=1500 >vel; suspike nt=4 ntr=3 nspk=1 ix1=1 it1=1 | suaddnoise seed=1789 sn=2 | sushw key=sx,gx a=0,0 b=0,25 >data; sumigpresp nz=9 dz=10 vfile=vel nxo=3 nxshot=1 dx=25 fmax=-1000 f1=0 f2=62.5 f3=62.5 f4=125 <data
+# Independent plane generator: defaults versus all parameters explicitly set.
+[stderr] makevel nx=7 nz=17 v000=1650 >vel; suplane nt=131 ntr=7 | sushw key=sx,gx,d2 a=75,0,25 b=0,25,0 >data; sumigpresp nz=17 dz=7 vfile=vel nxo=7 nxshot=1 <data
+[stderr] makevel nx=7 nz=17 v000=1650 >vel; suplane nt=131 ntr=7 | sushw key=sx,gx,d2 a=75,0,25 b=0,25,0 >data; sumigpresp nz=17 dz=7 vfile=vel nxo=7 nxshot=1 dx=25 dt=0.004 fmax=25 f1=10 f2=20 f3=40 f4=50 lpad=9999 rpad=9999 dip=65 verbose=0 <data
+# Long and prime records, nonzero broadband data, varying depth and x velocity.
+[stderr] makevel nx=7 nz=31 v000=1400 dvdx=19 dvdz=8 | transp n1=31 n2=7 >vel; suspike nt=4097 ntr=7 nspk=1 ix1=1 it1=1 | suaddnoise seed=1789 sn=2 | sushw key=sx,gx a=75,0 b=0,25 >data; sumigpresp nz=31 dz=11 vfile=vel nxo=7 nxshot=1 dx=25 f1=0 f2=10 f3=40 f4=50 <data
+[stderr] makevel nx=3 nz=7 v000=1400 >vel; suspike nt=16385 ntr=3 nspk=1 ix1=1 it1=1 | suaddnoise seed=991 sn=3 | sushw key=sx,gx a=25,0 b=0,25 >data; sumigpresp nz=7 dz=11 vfile=vel nxo=3 nxshot=1 dx=25 <data
+[stderr] makevel nx=17 nz=127 v000=100 dvdx=19 dvdz=8 | transp n1=127 n2=17 >vel; suspike nt=1009 ntr=17 nspk=1 ix1=1 it1=1 | suaddnoise seed=79 sn=2 | sushw key=sx,gx a=56,0 b=0,7 >data; sumigpresp nz=127 dz=1.3 vfile=vel nxo=17 nxshot=1 dx=7 dt=0.003 fmax=200 f1=0 f2=3 f3=100 f4=130 <data
+# Large input over a pipe: rewind fails silently and the first trace is consumed.
+[stderr] makevel nx=5 nz=13 v000=1700 >vel; suplane nt=4097 ntr=5 | sushw key=sx,gx a=50,0 b=0,25 | sumigpresp nz=13 dz=9 vfile=vel nxo=5 nxshot=1 dx=25 verbose=1
+# Null data tests zero preservation and the header sampling fallbacks.
+[stderr] makevel nx=5 nz=11 v000=1800 >vel; sunull nt=67 ntr=5 | sushw key=sx,gx,dt,d2 a=0,0,0,0 b=0,1,0,0 >data; sumigpresp nz=11 dz=3 vfile=vel nxo=5 nxshot=1 verbose=1 <data
+# Actual modeled reflections and three shot gathers, with receiver resets.
+[stderr] makevel nx=5 nz=21 v000=1500 >vel; susynlv nt=257 dt=0.004 nxs=3 dxs=25 fxs=0 nxo=3 dxo=25 kilounits=0 v00=1500 ref="1:0,100;500,100" >data; sumigpresp nz=21 dz=5 vfile=vel nxo=5 nxshot=3 dx=25 verbose=2 <data
+# Strongest negative scalco is promoted before taking its absolute value.
+[stderr] makevel nx=5 nz=19 v000=1550 >vel; suplane nt=137 ntr=5 | sushw key=sx,gx,scalco a=0,0,-32768 b=0,819200,0 >data; sumigpresp nz=19 dz=6 vfile=vel nxo=5 nxshot=1 dx=25 verbose=2 <data
+# suchw computes coordinates from trace sequence; unrelated headers survive.
+[stderr] makevel nx=7 nz=23 v000=1600 >vel; suplane nt=139 ntr=7 | suchw key1=gx key2=tracl a=-25 b=25 | sushw key=sx,dt,d2,delrt,fldr,scalel a=75,2000,25,37,701,-10 >data; sumigpresp nz=23 dz=4 vfile=vel nxo=7 nxshot=1 <data
+# Explicit dt and dx override conflicting trace header values.
+[stderr] makevel nx=7 nz=23 v000=1600 >vel; suplane nt=139 ntr=7 | sushw key=sx,gx,dt,d2 a=75,0,2000,3 b=0,25,0,0 >data; sumigpresp nz=23 dz=4 vfile=vel nxo=7 nxshot=1 dt=0.004 dx=25 <data
+# Fractional receiver spacing truncates to integer grid indices.
+[stderr] makevel nx=7 nz=29 v000=1600 >vel; suspike nt=149 ntr=5 | suaddnoise seed=491 sn=2 | sushw key=sx,gx a=15,0 b=0,7 >data; sumigpresp nz=29 dz=0.125 vfile=vel nxo=7 nxshot=1 dx=7.5 dt=0.001 fmax=200 f1=0 f2=20 f3=100 f4=150 <data
+# One trace, zero padding, one output column and nontrivial depth continuation.
+[stderr] makevel nx=1 nz=41 v000=1600 dvdz=9 >vel; suspike nt=157 ntr=1 nspk=1 ix1=1 it1=10 >data; sumigpresp nz=41 dz=5 vfile=vel nxo=1 nxshot=1 dx=25 lpad=0 rpad=0 <data
+# An aperture strictly inside the full model exercises both nonzero boundaries.
+[stderr] makevel nx=19 nz=43 v000=1200 dvdx=31 dvdz=13 | transp n1=43 n2=19 >vel; suplane nt=167 ntr=5 | sushw key=sx,gx a=200,150 b=0,25 >data; sumigpresp nz=43 dz=7 vfile=vel nxo=19 nxshot=1 dx=25 lpad=2 rpad=1 dip=0 verbose=2 <data
+# C compares receivers with the first receiver, so this later decrease is legal.
+[stderr] makevel nx=7 nz=13 v000=1700 >vel; suplane nt=173 ntr=5 | sushw key=gx a=0 b=25 | sushw key=gx a=0 b=25 c=25 j=3 >data; sumigpresp nz=13 dz=9 vfile=vel nxo=7 nxshot=1 dx=25 verbose=2 <data
+# Duplicate parameter names use the final value.
+[stderr] makevel nx=5 nz=15 v000=1500 >vel; suplane nt=179 ntr=5 | sushw key=sx,gx a=50,0 b=0,25 >data; sumigpresp nz=15 dz=8 vfile=vel nxo=5 nxshot=1 dx=3 dx=25 fmax=10 fmax=40 verbose=1 <data
+# Nonstandard verbosity is parsed, but only levels one and two emit diagnostics.
+[stderr] makevel nx=5 nz=17 v000=1500 >vel; suplane nt=181 ntr=5 | sushw key=sx,gx a=50,0 b=0,25 >data; sumigpresp nz=17 dz=8 vfile=vel nxo=5 nxshot=1 dx=25 verbose=3 dip=-90 <data
+# Negative dz and zero dz keep the image zero with independent nonzero data.
+[stderr] makevel nx=3 nz=7 v000=1500 >vel; suplane nt=191 ntr=3 | sushw key=sx,gx a=25,0 b=0,25 >data; sumigpresp nz=7 dz=-1 vfile=vel nxo=3 nxshot=1 dx=25 <data
+[stderr] makevel nx=3 nz=7 v000=1500 >vel; suplane nt=193 ntr=3 | sushw key=sx,gx a=25,0 b=0,25 >data; sumigpresp nz=7 dz=0 vfile=vel nxo=3 nxshot=1 dx=25 <data
+# Bad numeric options and missing required values, with generator input present.
+[stderr] sunull nt=17 ntr=1 | sumigpresp nz=7 dz=5 vfile=missing nxo=3
+[stderr] sunull nt=17 ntr=1 | sumigpresp nz=7 dz=5 vfile=missing nxo=3 nxshot=1 lpad=2147483648
+[stderr] sunull nt=17 ntr=1 | sumigpresp nz=7 dz=5 vfile=missing nxo=3 nxshot=1 f4=inf
+# Sorting error after a valid first trace; compares the program's own diagnostic.
+[stderr] makevel nx=7 nz=9 v000=1500 >vel; suplane nt=197 ntr=3 | sushw key=sx,gx a=0,100 b=0,-25 >data; sumigpresp nz=9 dz=5 vfile=vel nxo=7 nxshot=1 dx=25 <data
+
+# ub-2026-11 (round 1)
+# Refuted: C sumigpresp.c:255-256 overruns wl, but bounding the copy
+# leaves stdout, stderr, and rc byte-identical (three runs, SU build flags).
+[stderr] makevel nx=1 nz=3 v000=1500 >vel; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 >data; sumigpresp nz=3 dz=5 vfile=vel nxo=1 nxshot=1 dx=25 <data
+# Refuted: C sumigpresp.c:405-420 reads beyond frequency arrays; zero
+# extension leaves stdout, stderr, and rc byte-identical (three runs).
+[stderr] makevel nx=1 nz=3 v000=1500 >vel; suspike nt=64 ntr=1 nspk=1 ix1=1 it1=1 >data; sumigpresp nz=3 dz=5 vfile=vel nxo=1 nxshot=1 dx=25 f4=200 <data

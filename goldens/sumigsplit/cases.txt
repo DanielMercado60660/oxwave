@@ -72,3 +72,43 @@ python3 -c 'import struct; open("v","wb").write(struct.pack("=15f",*([1500.0]*15
 # Synchronize on checkpars' verbose message, then interrupt while awaiting the
 # next input trace. All four C signal handlers must exit 1 and remove the files.
 python3 -c 'import os, signal, subprocess, sys; os.mkdir("spool"); data=subprocess.check_output(["sunull","nt=7","ntr=1"]); exec("for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGHUP, signal.SIGTERM):\n p=subprocess.Popen(sys.argv[1:],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)\n p.stdin.write(data); p.stdin.flush(); line=b\"\"\n while b\"Using Big Endian\" not in line:\n  line=p.stderr.readline(); assert line\n p.send_signal(sig); p.wait(timeout=5); p.communicate(); print(int(sig),p.returncode,len(os.listdir(\"spool\")))")' sumigsplit nz=2 dz=1 vfile=missing dx=1 tmpdir=spool verbose=1
+# diff-2026-11 (round 1)
+# Depth-sampled SU is the only output mode. All new cases use default tolerance.
+# Exact-size velocity files from makevel are transposed to v[iz][ix].
+# Nonzero inputs at nt=1..4, including one trace and padded spatial transforms.
+makevel nx=2 nz=4 v000=1675 | transp n1=4 n2=2 >v; suspike nt=1 ntr=2 nspk=1 ix1=1 it1=1 | sumigsplit nz=4 dz=0.5 vfile=v dt=0.003 dx=12 ft=0.125 fz=7 verbose=0 tmpdir=
+makevel nx=1 nz=8 v000=1300 dvdz=37 >v; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | suaddnoise seed=123 sn=2 | sumigsplit nz=8 dz=3 dx=10 vfile=v
+makevel nx=2 nz=9 v000=1450 dvdx=19 dvdz=37 | transp n1=9 n2=2 >v; suspike nt=3 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=3 | sumigsplit nz=9 dz=2.25 dx=11 vfile=v
+[stderr] makevel nx=7 nz=7 v000=1500 | transp n1=7 n2=7 >v; suspike nt=4 ntr=7 nspk=1 ix1=4 it1=2 | sushw key=dt,d2 a=0,-7.5 | sumigsplit nz=7 dz=1.5 vfile=v
+# Prime and long time axes; broadband input, late impulses, maximum legal ns.
+makevel nx=23 nz=40 v000=1300 dvdx=19 dvdz=37 | transp n1=40 n2=23 >v; suspike nt=31 ntr=23 nspk=1 ix1=1 it1=1 | suaddnoise seed=123 sn=2 | sumigsplit nz=40 dz=5 dx=16 vfile=v
+makevel nx=7 nz=21 v000=1300 dvdx=19 dvdz=37 | transp n1=21 n2=7 >v; suspike nt=4097 ntr=7 nspk=1 ix1=1 it1=1 | suaddnoise seed=123 sn=2 | sumigsplit nz=21 dz=2.3 dx=7.5 vfile=v
+makevel nx=2 nz=20 v000=1800 dvdx=21 dvdz=9 | transp n1=20 n2=2 >v; suspike nt=8191 ntr=2 nspk=2 ix1=1 it1=4097 ix2=2 it2=8191 | sumigsplit nz=20 dz=4 dx=25 dt=0.002 vfile=v
+makevel nx=2 nz=3 v000=1500 | transp n1=3 n2=2 >v; suspike nt=65535 ntr=2 nspk=2 ix1=1 it1=32769 ix2=2 it2=65535 | sumigsplit nz=3 dz=3 dx=10 vfile=v
+# Large depth axes also exercise output ns independently of input ns.
+makevel nx=1 nz=4097 v000=1800 >v; suspike nt=17 ntr=1 | sumigsplit nz=4097 dz=0.025 dx=15 vfile=v
+makevel nx=1 nz=65535 v000=1500 >v; suspike nt=2 ntr=1 | sumigsplit nz=65535 dz=0.001 dx=10 vfile=v
+# Plane and reflector generators provide coherent and bandlimited waveforms.
+makevel nx=7 nz=12 v000=1500 dvdx=11 dvdz=23 | transp n1=12 n2=7 >v; suplane nt=101 ntr=7 taper=1 dip1=-2 dip2=3 dip3=9 | sumigsplit nz=12 dz=3 dx=12.5 vfile=v
+makevel nx=17 nz=31 v000=1800 dvdx=3.5 dvdz=7 | transp n1=31 n2=17 >v; suplane nt=113 ntr=17 npl=1 dip1=-7.5 ct1=57 cx1=8 len1=17 | sumigsplit nz=31 dz=7.25 dt=0.001 dx=100 vfile=v
+makevel nx=7 nz=15 v000=2000 | transp n1=15 n2=7 >v; susynlv nt=257 nxm=7 dxm=0.025 dt=0.004 ref="1:0,0.3;1,0.3" | sumigsplit nz=15 dz=5 dx=25 vfile=v
+makevel nx=5 nz=13 v000=1800 dvdx=4 dvdz=13 | transp n1=13 n2=5 >v; susynlv nt=127 nxm=5 dxm=0.02 dt=0.004 ref="1:0,0.2;1,0.25" | sumigsplit nz=13 dz=3 vfile=v ft=1.25 fz=-25
+# First trace supplies sampling; later sampling and descending CDPs are preserved.
+makevel nx=5 nz=11 v000=1750 dvdx=11 dvdz=17 | transp n1=11 n2=5 >v; suplane nt=59 ntr=5 | sushw key=dt,d2,delrt,cdp,tracl,f1,f2 a=3000,17.5,-35,500,99,2.25,-7 b=1000,2.5,3,-7,-2,0.5,3 | sumigsplit nz=11 dz=2.75 vfile=v
+makevel nx=5 nz=11 v000=1750 dvdx=11 dvdz=17 | transp n1=11 n2=5 >v; suplane nt=59 ntr=5 | sushw key=dt,d2,delrt,cdp,tracl,f1,f2 a=3000,17.5,-35,500,99,2.25,-7 b=1000,2.5,3,-7,-2,0.5,3 | sumigsplit nz=11 dz=2.75 vfile=v dt=0.002 dx=8 ft=-2 fz=12
+# Deep continuation with varied velocities and nontrivial phase increments.
+makevel nx=29 nz=211 v000=1327 dvdx=13.25 dvdz=3.75 | transp n1=211 n2=29 >v; suspike nt=239 ntr=29 nspk=1 ix1=1 it1=1 | suaddnoise seed=7381 sn=1 | sumigsplit nz=211 dz=24 dx=12.75 dt=0.0025 vfile=v
+# Successful verbose paths, explicit named temp directory and environment path.
+[stderr] makevel nx=3 nz=7 v000=1550 dvdx=7 | transp n1=7 n2=3 >v; suplane nt=43 ntr=3 | sumigsplit nz=7 dz=2 dx=9 vfile=v verbose=-1 tmpdir=
+[stderr] makevel nx=3 nz=7 v000=1550 dvdx=7 | transp n1=7 n2=3 >v; mkdir spool; suplane nt=43 ntr=3 | sumigsplit nz=7 dz=2 dx=9 vfile=v verbose=1 tmpdir=spool
+[stderr] makevel nx=3 nz=7 v000=1550 dvdx=7 | transp n1=7 n2=3 >v; mkdir spool; suplane nt=43 ntr=3 | CWP_TMPDIR=spool sumigsplit nz=7 dz=2 dx=9 vfile=v verbose=1
+# Genuine all-zero wavefield with a varying velocity model.
+makevel nx=19 nz=17 v000=1410 dvdx=23 dvdz=43 | transp n1=17 n2=19 >v; sunull nt=4097 ntr=19 | sumigsplit nz=17 dz=3.5 dx=10 vfile=v
+# Required-parameter errors without a preceding sampling warning.
+[stderr] sunull nt=2 ntr=1 | sumigsplit dx=1
+[stderr] sunull nt=2 ntr=1 | sumigsplit dx=1 nz=2
+[stderr] sunull nt=2 ntr=1 | sumigsplit dx=1 nz=2 dz=1
+[stderr] sunull nt=2 ntr=1 | sumigsplit dx=1 nz=2 dz=1 vfile=missing dz=1e-310
+# Read errors and zero-length first trace have defined early failures.
+[stderr] sunull nt=7 ntr=2 | sumigsplit nz=9 dz=1 dx=1 vfile=.
+[stderr] sunull nt=0 ntr=1 | sumigsplit nz=2 dz=1 dx=1 vfile=missing

@@ -1,0 +1,2 @@
+# ub-2026-11 (round 1): no confirmed output-dependent UB cases.
+# Both pending claims were refuted by minimal C fixes and restored to cases.txt.

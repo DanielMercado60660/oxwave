@@ -103,9 +103,9 @@ fn main() {
     let nz = tr.ns as usize;
     let mut vs = vec![0.0f32; nz];
     let mut rhoo = vec![0.0f32; nz];
-    if gettr(&mut tr) == 0 { err!("can't get Vs trace"); }
+    gettr(&mut tr);
     for i in 0..nz { vs[i] = tr.data[i]; }
-    if gettr(&mut tr) == 0 { err!("can't get density trace"); }
+    gettr(&mut tr);
     for i in 0..nz { rhoo[i] = tr.data[i]; }
     let mut lo = vec![0.0f32; nz];
     let mut lb = vec![0.0f32; nz];

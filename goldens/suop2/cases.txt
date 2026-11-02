@@ -29,3 +29,67 @@ suplane nt=32767 ntr=1 > a && suplane nt=32767 ntr=1 > b && suop2 a b op=zippol
 # Explicit zero weights and trace id, and the single-sample polar path.
 suplane nt=1 ntr=1 > a && suplane nt=1 ntr=1 > b && suop2 a b op=zippol trid=0 w1=0 w2=0
 
+# diff-2026-11 (round 1)
+# Dense nonzero data at tiny sizes; weights are parameters of suop2 itself.
+sunull nt=1 ntr=1 | sugain bias=2.5 > a && sunull nt=1 ntr=1 | sugain bias=-0.75 > b && suop2 a b
+sunull nt=2 ntr=1 | sugain bias=2.5 > a && sunull nt=2 ntr=1 | sugain bias=-0.75 > b && suop2 a b op=diff w1=1 w2=1
+sunull nt=3 ntr=2 | sugain bias=2.5 > a && sunull nt=3 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=sum w1=0 w2=-3
+sunull nt=4 ntr=2 | sugain bias=2.5 > a && sunull nt=4 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=prod w1=-1.25 w2=0.75
+sunull nt=7 ntr=2 | sugain bias=2.5 > a && suspike nt=7 ntr=2 nspk=1 ix1=1 it1=3 > b && suop2 a b op=quo w1=-2 w2=3
+sunull nt=13 ntr=3 | sugain bias=2.5 > a && sunull nt=13 ntr=3 | sugain bias=-0.75 > b && suop2 a b op=sum w1=2 w2=0
+sunull nt=13 ntr=3 | sugain bias=2.5 > a && sunull nt=13 ntr=3 | sugain bias=-0.75 > b && suop2 a b op=diff w1=-2
+sunull nt=13 ntr=3 | sugain bias=2.5 > a && sunull nt=13 ntr=3 | sugain bias=-0.75 > b && suop2 a b op=prod w2=3
+# Long prime traces and seeded, nonconstant data.
+sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=13 sn=0.5 > a && sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=29 sn=0.5 > b && suop2 a b op=diff w1=-1.25 w2=0.75
+sunull nt=65535 ntr=1 | sugain bias=1.25 > a && sunull nt=65535 ntr=1 | sugain bias=0.75 > b && suop2 a b op=quo
+# Interleaving and polar conversion, including output header conversion.
+sunull nt=2 ntr=2 | sugain bias=2.5 > a && sunull nt=2 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=zipper trid=42 w1=-2 w2=3
+sunull nt=3 ntr=2 | sugain bias=2.5 > a && sunull nt=3 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=zippol trid=-1 w1=-2 w2=3
+sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=13 sn=0.5 > a && sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=29 sn=0.5 > b && suop2 a b op=zipper trid=32768
+sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=13 sn=0.5 > a && sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=29 sn=0.5 > b && suop2 a b op=zippol
+sunull nt=4 ntr=2 | sugain bias=2.5 > a && sunull nt=4 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=zipper trid=202
+sunull nt=3 ntr=2 | sugain bias=2.5 > a && sunull nt=3 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=zippol trid=201
+# Panel versus trace: extra traces in file 2 are ignored; first-trace scaling
+# uses nt=0 in the original, and w2 consequently never scales the template.
+[stderr] sunull nt=4 ntr=3 | sugain bias=2.5 > a && sunull nt=4 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=ptdiff w1=-2 w2=3 verbose=1
+sunull nt=3 ntr=3 | sugain bias=2.5 > a && sunull nt=3 ntr=1 | sugain bias=-0.75 > b && suop2 a b op=ptprod w1=-2 w2=3
+sunull nt=2 ntr=3 | sugain bias=2.5 > a && sunull nt=2 ntr=1 | sugain bias=-0.75 > b && suop2 a b op=ptquo w1=-2 w2=3
+sunull nt=1 ntr=3 | sugain bias=2.5 > a && sunull nt=1 ntr=1 > b && suop2 a b op=ptquo w1=0 w2=0
+sunull nt=4097 ntr=3 | sugain bias=1 | suaddnoise seed=13 sn=0.5 > a && sunull nt=4097 ntr=1 | sugain bias=1 | suaddnoise seed=29 sn=0.5 > b && suop2 a b op=ptprod w1=-1.25 w2=0.75
+# Header-driven complex arithmetic: all four divisor branches, skipped DC
+# samples and trailing pairs, and the distinction between panel/trace loops.
+[stderr] sunull nt=10 ntr=2 | sugain bias=2.5 | sushw key=trid a=111 > a && suspike nt=10 ntr=2 nspk=4 ix1=1 it1=3 ix2=1 it2=6 ix3=1 it3=7 ix4=1 it4=8 | sushw key=trid a=111 > b && suop2 a b op=quo
+sunull nt=10 ntr=3 | sugain bias=2.5 | sushw key=trid a=111 > a && suspike nt=10 ntr=1 nspk=4 ix1=1 it1=3 ix2=1 it2=6 ix3=1 it3=7 ix4=1 it4=8 | sushw key=trid a=111 > b && suop2 a b op=ptquo
+[stderr] sunull nt=4 ntr=2 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=4 ntr=2 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=prod w1=-2 w2=3
+[stderr] sunull nt=6 ntr=2 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=6 ntr=2 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=prod
+sunull nt=2 ntr=3 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=2 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=ptprod
+[stderr] sunull nt=1 ntr=1 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=1 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=quo
+[stderr] sunull nt=3 ntr=2 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=3 ntr=2 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=sum
+[stderr] sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=13 sn=0.5 | sushw key=trid a=111 > a && sunull nt=4097 ntr=2 | sugain bias=1 | suaddnoise seed=29 sn=0.5 | sushw key=trid a=111 > b && suop2 a b op=prod
+[stderr] sunull nt=4 ntr=2 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=4 ntr=2 | sugain bias=-0.75 > b && suop2 a b op=prod
+# Preserve file 1 headers even when file 2 geometry and sampling differ.
+sunull nt=17 ntr=3 | sugain bias=2.5 | sushw key=cdp,offset,dt,delrt a=17,-100,2000,-8 b=1,50,0,0 | suchw key1=tracf key2=tracl a=2 b=3 > a && suspike nt=17 ntr=3 nspk=1 ix1=2 it1=5 dt=0.008 offset=900 > b && suop2 a b op=sum
+[stderr] sunull nt=2 ntr=1 > a && sunull nt=2 ntr=3 > b && suop2 a b op=zipper trid=1 verbose=1
+[stderr] sunull nt=3 ntr=3 > a && sunull nt=3 ntr=1 > b && suop2 a b op=zippol trid=1
+# Error exits: missing positional files, unknown operation, parser
+# overflow, unequal ns in both operation families, and the original ptsum bug.
+sunull nt=1 ntr=1 > a && suop2 a
+sunull nt=1 ntr=1 > a && suop2 a absent
+sunull nt=1 ntr=1 > a && sunull nt=1 ntr=1 > b && suop2 a b op=SUM
+sunull nt=1 ntr=1 > a && sunull nt=1 ntr=1 > b && suop2 a b op=zipper trid=2147483648
+sunull nt=1 ntr=1 > a && sunull nt=1 ntr=1 > b && suop2 a b w1=1e999
+[stderr] sunull nt=2 ntr=1 > a && sunull nt=3 ntr=1 > b && suop2 a b op=zipper
+[stderr] sunull nt=2 ntr=1 > a && sunull nt=3 ntr=1 > b && suop2 a b op=ptquo
+sunull nt=1 ntr=1 | sugain bias=2.5 > a && sunull nt=1 ntr=1 | sugain bias=-0.75 > b && suop2 a b op=ptsum
+# Long filenames keep the original getpars.c token table large enough for
+# an empty op value; the short-filename version was unstable and removed.
+sunull nt=1 ntr=1 > first.su && sunull nt=1 ntr=1 > second.su && suop2 first.su second.su op=
+# Largest even complex length: i+1 remains inside the trace array.
+sunull nt=65534 ntr=1 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=65534 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=quo
+sunull nt=65534 ntr=1 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=65534 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=ptprod
+
+
+# ub-2026-11 (round 1)
+# Refuted UB dependence: suop2.c:221-235 accesses data[65535], but
+# bounding i+1 by SU_NFLTS leaves stdout/stderr/rc byte-identical.
+sunull nt=65535 ntr=1 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=65535 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=quo

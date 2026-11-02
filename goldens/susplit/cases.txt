@@ -21,3 +21,44 @@ sunull nt=1 ntr=1 | susplit stem=missing/part_
 # Unknown argument and numeric conversion failure.
 [stderr] sunull nt=1 ntr=1 | susplit unused=1; cat split_*.su
 sunull nt=1 ntr=1 | susplit numlength=999999999999999999999
+# diff-2026-11 (round 1)
+# Explicit defaults and two-sample traces.
+sunull nt=2 ntr=3 | susplit key=cdp stem=split_ middle=cdp suffix=.su numlength=7 verbose=0 close=1; cat split_cdp0000000.su
+# Four-sample spike traces and a changing integer header.
+suspike nt=4 ntr=4 k1=2 | sushw key=ep a=8 b=-2 | susplit key=ep stem=e_ middle=g suffix=.bin numlength=3; cat e_*.bin
+# Long non-power-of-two trace.
+suspike nt=4097 ntr=1 k1=4097 | susplit; cat split_cdp0000000.su
+# Odd prime length and signed short keys.
+[stderr] sunull nt=11 ntr=4 | sushw key=trid a=-2 b=1 | susplit key=trid numlength=2 verbose=1; cat split_trid*.su
+# Unsigned short keys.
+sunull nt=4 ntr=2 | sushw key=dt a=60000 b=1000 | susplit key=dt numlength=1; cat split_dt*.su
+# Negative floats truncate toward zero.
+[stderr] sunull nt=7 ntr=5 | sushw key=d1 a=-2.8 b=0.9 | susplit key=d1 verbose=1; cat split_d1*.su
+# Empty middle and suffix.
+sunull nt=3 ntr=2 | sushw key=cdp a=123 b=1 | susplit stem=z middle= suffix= numlength=10; cat z*
+# Empty stem and default middle.
+sunull nt=2 ntr=3 | sushw key=cdp a=9 b=1 | susplit stem= numlength=1 suffix=.out; cat cdp*.out
+# Width smaller than negative and positive values.
+sunull nt=1 ntr=3 | sushw key=offset a=-123 b=123 | susplit key=offset numlength=1; cat split_offset*.su
+# Repeated keys interleaved while closing streams.
+suspike nt=17 ntr=8 k1=5 | sushw key=cdp a=1 b=1 j=3 | susplit close=1; cat split_cdp*.su
+# Repeated keys with open streams and custom names.
+[stderr] suspike nt=13 ntr=9 k1=3 | sushw key=cdp a=-1 b=1 j=3 | susplit close=0 verbose=1 stem=keep_ middle=v suffix=.s numlength=3; cat keep_*.s
+# Alternate generator and custom filename.
+suplane ntr=1 nt=31 | susplit key=tracl stem=plane_ middle=id suffix=.su numlength=4; cat plane_*.su
+# Value larger than requested width.
+sunull nt=2 ntr=1 | sushw key=cdp a=12345678 | susplit numlength=3; cat split_*.su
+# Empty numeric parameters use defaults.
+sunull nt=4 ntr=1 | susplit numlength= verbose= close=; cat split_*.su
+# Missing key value is an invalid header key.
+sunull nt=2 ntr=1 | susplit key=
+# Numeric overflow in another option.
+sunull nt=2 ntr=1 | susplit close=99999999999999999999
+# Directory output path cannot be opened as a file.
+sunull nt=2 ntr=1 | susplit stem=/ middle= suffix= numlength=0
+# Negative field width produces left-justified filenames containing spaces.
+[stderr] sunull nt=2 ntr=2 | sushw key=cdp a=-1 b=2 | susplit numlength=-4 verbose=1; cat split_*.su
+# Maximum trace length representable by the SU header.
+sunull nt=65535 ntr=1 | susplit key=ns numlength=1; cat split_ns*.su
+# A file name that alternates after adjacent equal key values.
+[stderr] suspike nt=3 ntr=12 k1=2 | sushw key=cdp a=2 b=1 j=3 | susplit close=-1 verbose=1; cat split_cdp*.su

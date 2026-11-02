@@ -17,3 +17,12 @@ target/
 __pycache__/
 *.pyc
 .DS_Store
+/diffcamp/pristine/
+/diffcamp/prompts/
+/diffcamp/sweep/
+/diffcamp/ubx/*/orig/
+/diffcamp/ubx/*/fixed/
+/diffcamp/ubx/*/src/
+/diffcamp/.test_baseline_target/
+/diffcamp/ubx/*/*
+!/diffcamp/ubx/*/fix.patch

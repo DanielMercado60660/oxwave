@@ -115,17 +115,22 @@ fn main() {
         if nt > SU_NFLTS as i32 {
             err!("nt=%d exceeds SU_NFLTS=%d", nt, SU_NFLTS as i32);
         }
+        // With a negative taptype and taplen >= nt1+nt2, every C sample
+        // loop is skipped. Even a null allocation for negative nt is unused;
+        // puttr writes the original (globally initialized) intrace1 data.
+        let unused_outtrace = taptype < 0 && taplen >= nt1 + nt2;
         // Preserve the sample-limit error above before rejecting undefined C
-        // accesses: taplen > nt1 starts before intrace1.data, and taplen > nt2
-        // writes past outtrace. Negative overlaps also index before intrace2.
-        if taplen < 0 || taplen > nt1 || taplen > nt2 {
+        // accesses: otherwise taplen > nt1 starts before intrace1.data, and
+        // taplen > nt2 writes past outtrace. Negative overlaps also index
+        // before intrace2.
+        if !unused_outtrace && (taplen < 0 || taplen > nt1 || taplen > nt2) {
             err!("taplen=%d must be between 0 and both input trace lengths (%d, %d)", taplen, nt1, nt2);
         }
-        // A negative taper type leaves the C overlap buffer uninitialized.
-        if taplen > 0 && taptype < 0 {
+        // A negative taper type leaves a nonempty C output uninitialized.
+        if !unused_outtrace && taplen > 0 && taptype < 0 {
             err!("taptype must be 0, 1, 2, or 3!\n");
         }
-        let mut outtrace = vec![0.0f32; nt as usize];
+        let mut outtrace = if unused_outtrace { Vec::new() } else { vec![0.0f32; nt as usize] };
         for i in 0..nt1-taplen {
             outtrace[i as usize] = intrace1.data[i as usize];
         }

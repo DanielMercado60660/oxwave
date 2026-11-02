@@ -75,3 +75,96 @@ makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 npv=1 pvfile=missing
 [f32] [stderr] makevel nx=5 nz=5 v000=1500 | rayt2d nx=5 nz=5 nt=51 nxs=3 ms=0
 # Empty perturbation file has the C error text and exit status.
 [stderr] makevel nx=5 nz=5 v000=1500 > v; touch pv; rayt2d vfile=v nx=5 nz=5 npv=1 pvfile=pv
+# diff-2026-11 (round 1)
+# Three or more sources avoid zcoorTopog's small-source out-of-bounds reads.
+# Short ray histories, minimum spatial dimensions, and a prime time count.
+[f32] [stderr] makevel nx=3 nz=3 v000=1500 | rayt2d nx=3 nz=3 nxs=3 fxs=50 dxs=50 nt=1
+[f32] [stderr] makevel nx=5 nz=4 v000=1750 dvdz=0.4 | rayt2d nx=5 nz=4 nxs=3 fxs=100 dxs=100 nt=2
+[f32] [stderr] suplane nt=7 ntr=9 npl=1 dip1=0 ct1=3 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=9 nz=7 nxs=3 fxs=200 dxs=200 nt=3 ek=0
+[f32] [stderr] suspike nt=7 ntr=11 nspk=1 ix1=6 it1=4 | suop op=exp | sugain scale=1500 | sustrip outpar=/dev/null | rayt2d nx=11 nz=7 nxs=3 fxs=200 dxs=250 nt=4
+# A single SU trace supplies an entire raw model. Headers are stripped, not interpreted.
+[f32] [stderr] sunull nt=35 ntr=1 | suop op=exp | sugain scale=1900 | sushw key=dt,delrt,sx,gx,scalco a=1000,-25,9876,-4321,-100 | suchw key1=offset key2=gx key3=sx b=1 c=-1 | sustrip outpar=/dev/null | rayt2d nx=7 nz=5 nxs=3 fxs=100 dxs=200 nt=17 dt=0.01
+[f32] [stderr] makevel nx=11 nz=13 dx=30 dz=25 v000=1600 dvdx=0.2 dvdz=0.6 | rayt2d nx=11 nz=13 dx=30 dz=25 nxs=3 fxs=60 dxs=90 nt=4097 dt=0.0002
+# Default model/ray/output geometry, with a defined three-source surface lookup.
+[f32] [stderr] makevel nx=101 nz=101 v000=1500 | rayt2d nxs=3 fxs=200 dxs=200
+# Every input/output parameter explicitly supplied; only the time table goes to stdout.
+[f32] [stderr] makevel nx=9 nz=9 v000=1800 dvdx=0.1 dvdz=0.4 > v; makevel nx=9 nz=9 v000=0.25 > pv; rayt2d vfile=v nx=9 nz=9 fx=0 fz=0 dx=100 dz=100 nxo=9 nzo=9 fxo=0 fzo=0 dxo=100 dzo=100 nxs=3 fxs=100 dxs=200 aperx=400 nt=401 dt=0.008 fa=-60 da=2 na=61 amin=0 amax=90 fac=0.01 ek=1 restart=n ms=1 npv=1 tfile=t jpfile=log pvfile=pv tvfile=tv csfile=cs 'surf=0,0;99999,0' verbose=1; cat t
+# Compare auxiliary arrays separately: INITIAL_T in a time table must not inflate their tolerance.
+[f32] [stderr] makevel nx=13 nz=11 dx=50 dz=40 v000=1700 dvdx=0.3 dvdz=0.7 xlens=300 zlens=200 dlens=350 tlens=250 vlens=150 > v; makevel nx=13 nz=11 v000=0.3 dvdx=0.0003 dvdz=-0.0001 > p; rayt2d vfile=v nx=13 nz=11 dx=50 dz=40 nxs=3 fxs=100 dxs=150 npv=1 pvfile=p tfile=t tvfile=tv csfile=cs nt=307 dt=0.002; cat tv
+[f32] [stderr] makevel nx=13 nz=11 dx=50 dz=40 v000=1700 dvdx=0.3 dvdz=0.7 xlens=300 zlens=200 dlens=350 tlens=250 vlens=150 > v; makevel nx=13 nz=11 v000=0.3 > p; rayt2d vfile=v nx=13 nz=11 dx=50 dz=40 nxs=3 fxs=100 dxs=150 npv=1 pvfile=p tfile=t tvfile=tv csfile=cs nt=307 dt=0.002; cat cs
+[f32] [stderr] makevel nx=9 nz=9 v000=1800 > v; sunull nt=9 ntr=9 | sustrip outpar=/dev/null > pvfile; rayt2d vfile=v nx=9 nz=9 nxs=3 fxs=100 dxs=200 npv=2 tfile=t nt=127; cat tvfile
+[f32] [stderr] makevel nx=9 nz=9 v000=1800 > v; makevel nx=9 nz=9 v000=-0.5 > p; rayt2d vfile=v nx=9 nz=9 nxs=3 fxs=100 dxs=200 npv=-1 pvfile=p tfile=t nt=127; cat tvfile
+# Dense and sparse output grids; shifted origins; topography and normals.
+[f32] [stderr] makevel nx=11 nz=11 dx=60 dz=50 v000=1600 dvdx=0.4 dvdz=0.8 > v; makevel nx=11 nz=11 v000=1 > p; rayt2d vfile=v nx=11 nz=11 dx=60 dz=50 nxo=19 nzo=17 dxo=30 dzo=25 fxo=30 fzo=25 nxs=3 fxs=120 dxs=120 npv=1 pvfile=p tfile=t nt=503 dt=0.002 'surf=-60,0;300,25;660,0'; cat csfile
+[f32] [stderr] makevel nx=17 nz=13 dx=50 dz=50 v000=1800 dvdz=0.5 | rayt2d nx=17 nz=13 dx=50 dz=50 nxo=3 nzo=3 fxo=100 fzo=100 dxo=300 dzo=200 nxs=3 fxs=200 dxs=200 nt=257 dt=0.004
+[f32] [stderr] makevel nx=13 nz=11 fx=-200 fz=-150 dx=50 dz=50 v000=1800 dvdx=0.2 dvdz=0.5 | rayt2d nx=13 nz=11 fx=-200 fz=-150 dx=50 dz=50 nxo=9 nzo=9 fxo=-175 fzo=-125 dxo=65 dzo=55 nxs=3 fxs=-100 dxs=150 nt=251 dt=0.003 'surf=-250,-50;100,0;450,20'
+[f32] [stderr] makevel nx=15 nz=13 dx=50 dz=50 v000=2000 dvdz=0.5 | rayt2d nx=15 nz=13 dx=50 dz=50 nxs=5 fxs=100 dxs=100 nt=251 dt=0.003 'surf=-50,150;200,100;450,150;750,100' fa=-90 da=2 na=91 amin=0 amax=180 ek=0
+[f32] [stderr] makevel nx=13 nz=9 v000=1900 | rayt2d nx=13 nz=9 nxs=3 fxs=200 dxs=300 nt=151 'surf=-100,100;600,300;1300,100' fa=80 da=1 na=21 amax=180
+# Narrow aperture, fractional source locations, sparse and reverse ray fans.
+[f32] [stderr] makevel nx=21 nz=17 dx=25 dz=25 v000=1500 dvdx=0.1 dvdz=0.5 | rayt2d nx=21 nz=17 dx=25 dz=25 nxs=3 fxs=200 dxs=25 aperx=25 nt=257 dt=0.001
+[f32] [stderr] makevel nx=13 nz=11 dx=25.3 dz=15.7 v000=1700 dvdx=0.3 dvdz=1 | rayt2d nx=13 nz=11 dx=25.3 dz=15.7 nxs=7 fxs=40.25 dxs=30.125 nt=503 dt=0.001 ms=2 fac=0.1
+[f32] [stderr] makevel nx=9 nz=9 v000=1500 dvdz=0.3 | rayt2d nx=9 nz=9 nxs=3 fxs=100 dxs=200 fa=0 da=0 na=1 nt=401 ek=0 fac=0.05
+[f32] [stderr] makevel nx=11 nz=9 v000=1500 dvdx=0.2 dvdz=0.3 | rayt2d nx=11 nz=9 nxs=3 fxs=200 dxs=200 fa=60 da=-2 na=61 nt=257 fac=0.02
+[f32] [stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=200 amin=100 amax=30 nt=37
+[f32] [stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=200 na=0 nt=19 ek=0
+[f32] [stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=200 nt=3 dt=0 ek=-1
+# Exact logs and full stderr preserve checkpars, repeated values, and progress reports.
+[exact] [stderr] makevel nx=9 nz=7 v000=1750 > v; rayt2d vfile=v nx=9 nz=7 nxs=5 fxs=100 dxs=100 ms=2 nt=67 jpfile=job tfile=t verbose=1 'surf=-100,0;900,0'; cat job
+[f32] [stderr] makevel nx=7 nz=7 v000=1750 | rayt2d nx=1 nx=7 nz=7 nxs=3 fxs=100 dxs=200 nt=7 nt=71 unused=9 verbose=1
+# Restart with more pre-existing complete tables than requested, and one partial table.
+[f32] [stderr] makevel nx=7 nz=7 v000=1600 > v; rayt2d vfile=v nx=7 nz=7 nxs=5 fxs=100 dxs=100 tfile=t nt=101; rayt2d vfile=v nx=7 nz=7 nxs=3 fxs=100 dxs=100 tfile=t nt=101 restart=y; cat t
+[f32] [stderr] makevel nx=7 nz=7 v000=1600 > v; rayt2d vfile=v nx=7 nz=7 nxs=3 fxs=100 dxs=100 tfile=base nt=101; dd if=base of=t bs=1 count=203 2>/dev/null; rayt2d vfile=v nx=7 nz=7 nxs=3 fxs=100 dxs=100 tfile=t nt=101 restart=yes; cat t
+# Invalid numeric/geometry/surface values fail before unsafe input reads.
+[stderr] sunull nt=1 ntr=1 | rayt2d nx=2 nz=7 nxs=3
+[stderr] rayt2d nx=7 nz=7 nxo=0
+[stderr] rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=300
+[stderr] rayt2d nx=7 nz=7 amax=180.01
+[stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=100 'surf=-100,0;700'
+[stderr] rayt2d nx=2147483648 nz=7
+
+# diff-2026-11 (round 2)
+# decodeSurface treats commas and semicolons alike. Comma-only surf= arguments
+# expose parameter coverage directly and avoid shell quoting or escaping.
+# Explicit defaults and every requested parameter; compare only the time table.
+[f32] [stderr] makevel nx=9 nz=9 v000=1750 dvdx=0.2 dvdz=0.5 > v; makevel nx=9 nz=9 v000=0.2 > p; rayt2d vfile=v nx=9 nz=9 fx=0 fz=0 dx=100 dz=100 nxo=9 nzo=9 fxo=0 fzo=0 dxo=100 dzo=100 nxs=5 fxs=100 dxs=100 aperx=400 nt=401 dt=0.008 fa=-60 da=2 na=61 amin=0 amax=90 fac=0.01 ek=1 restart=n ms=1 npv=1 tfile=t jpfile=job pvfile=p tvfile=tv csfile=cs surf=0,0,99999,0 verbose=1; cat t
+# Default model and ray geometry, with enough sources for defined endpoint reads.
+[f32] [stderr] makevel nx=101 nz=101 v000=1800 | rayt2d nxs=3 fxs=100 dxs=300 surf=0,0,99999,0
+# Small ray histories with flat, sloped and curved recording surfaces.
+[f32] [stderr] makevel nx=3 nz=3 v000=1600 | rayt2d nx=3 nz=3 nxs=3 fxs=50 dxs=50 nt=1 surf=-100,0,300,0
+[f32] [stderr] makevel nx=5 nz=4 v000=1700 dvdz=0.3 | rayt2d nx=5 nz=4 nxs=3 fxs=100 dxs=100 nt=2 surf=-100,20,500,60
+[f32] [stderr] suplane nt=7 ntr=9 npl=1 dip1=0 ct1=3 | suop op=exp | sugain scale=1600 | sustrip outpar=/dev/null | rayt2d nx=9 nz=7 nxs=3 fxs=200 dxs=200 nt=3 ek=0 surf=-100,50,400,75,900,30
+[f32] [stderr] suspike nt=7 ntr=11 nspk=1 ix1=6 it1=4 | suop op=exp | sugain scale=1600 | sustrip outpar=/dev/null | rayt2d nx=11 nz=7 nxs=3 fxs=200 dxs=250 nt=4 surf=-100,25,1100,25
+# One trace supplies the complete raw velocity grid; strip edited SU headers.
+[f32] [stderr] sunull nt=63 ntr=1 | suop op=exp | sugain scale=1850 | sushw key=dt,delrt,sx,gx,scalco a=2000,-50,-100,700,-10 | suchw key1=offset key2=gx key3=sx b=1 c=-1 | sustrip outpar=/dev/null | rayt2d nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=17 dt=0.01 surf=-100,10,900,60
+# Long ray history with fractional sampling and an asymmetric spline surface.
+[f32] [stderr] makevel nx=17 nz=13 dx=25 dz=20 v000=1650 dvdx=0.3 dvdz=0.7 | rayt2d nx=17 nz=13 dx=25 dz=20 nxs=5 fxs=50.5 dxs=60.25 nt=4097 dt=0.0001 surf=-50,20,100,35,275,10,450,45
+# Compare each auxiliary array independently of the large INITIAL_T sentinel.
+[f32] [stderr] makevel nx=17 nz=13 dx=40 dz=30 v000=1700 dvdx=0.2 dvdz=0.7 xlens=300 zlens=180 dlens=250 tlens=200 vlens=125 > v; makevel nx=17 nz=13 v000=0.3 dvdx=0.0002 dvdz=-0.0001 > p; rayt2d vfile=v nx=17 nz=13 dx=40 dz=30 nxs=7 fxs=80 dxs=70 npv=1 pvfile=p tfile=t nt=509 dt=0.001 surf=-40,50,160,20,400,65,680,30; cat tvfile
+[f32] [stderr] makevel nx=17 nz=13 dx=40 dz=30 v000=1700 dvdx=0.2 dvdz=0.7 xlens=300 zlens=180 dlens=250 tlens=200 vlens=125 > v; makevel nx=17 nz=13 v000=0.3 > p; rayt2d vfile=v nx=17 nz=13 dx=40 dz=30 nxs=7 fxs=80 dxs=70 npv=1 pvfile=p tfile=t nt=509 dt=0.001 surf=-40,50,160,20,400,65,680,30; cat csfile
+# Rising/falling straight surfaces rotate the ray fan in opposite directions.
+[f32] [stderr] makevel nx=11 nz=9 v000=1800 dvdz=0.5 | rayt2d nx=11 nz=9 nxs=5 fxs=100 dxs=175 nt=251 dt=0.003 surf=-100,0,1100,240 fa=-85 da=2 na=86 amin=5 amax=120
+[f32] [stderr] makevel nx=11 nz=9 v000=1800 dvdz=0.5 | rayt2d nx=11 nz=9 nxs=5 fxs=100 dxs=175 nt=251 dt=0.003 surf=-100,240,1100,0 fa=-85 da=2 na=86 amin=5 amax=120
+# A surface crossing z=0 in a shifted model, with output resampling.
+[f32] [stderr] makevel nx=13 nz=11 fx=-200 fz=-200 dx=50 dz=50 v000=1800 dvdz=0.4 | rayt2d nx=13 nz=11 fx=-200 fz=-200 dx=50 dz=50 nxo=7 nzo=7 fxo=-150 fzo=-150 dxo=80 dzo=70 nxs=5 fxs=-100 dxs=100 nt=257 dt=0.002 surf=-250,-75,100,0,450,75
+# Multiple occurrences are parsed in order; rayt2d uses the first surface.
+[f32] [stderr] makevel nx=9 nz=9 v000=1900 dvdx=0.1 | rayt2d nx=9 nz=9 nxs=5 fxs=100 dxs=100 nt=199 surf=-100,30,900,30 surf=-100,200,400,300,900,100 verbose=1
+# Leading/trailing delimiters, scientific notation and C atof numeric prefixes.
+[f32] [stderr] makevel nx=9 nz=7 v000=1750 | rayt2d nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=127 surf=-100,20,900,60,
+[f32] [stderr] makevel nx=9 nz=7 v000=1750 | rayt2d nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=127 surf=,-100,20,900,60
+[f32] [stderr] makevel nx=9 nz=7 v000=1750 | rayt2d nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=127 surf=-1e2,2e1,9e2,6e1
+[f32] [stderr] makevel nx=9 nz=7 v000=1750 | rayt2d nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=127 surf=-100x,20z,900x,60z
+# A narrow aperture and boundary shots exercise takeoff-angle clipping.
+[f32] [stderr] makevel nx=21 nz=17 dx=25 dz=25 v000=1600 dvdx=0.2 dvdz=0.5 | rayt2d nx=21 nz=17 dx=25 dz=25 nxs=5 fxs=150 dxs=25 aperx=0 nt=307 dt=0.001 fac=0.05 surf=-25,20,200,50,525,20
+[f32] [stderr] makevel nx=7 nz=9 v000=1700 dvdz=0.4 | rayt2d nx=7 nz=9 nxs=7 fxs=0 dxs=100 nt=211 surf=-100,30,700,70 fa=-80 da=2 na=81 amax=180 ek=0
+# Resume at source 1 after a partial table; surface must match the saved table.
+[f32] [stderr] makevel nx=9 nz=7 v000=1800 > v; rayt2d vfile=v nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=131 tfile=base surf=-100,20,400,60,900,20; dd if=base of=t bs=1 count=259 2>/dev/null; rayt2d vfile=v nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=131 tfile=t restart=yes surf=-100,20,400,60,900,20; cat t
+# Exact parameter/progress logs; source elevation/normal warnings go to stderr.
+[exact] [stderr] makevel nx=9 nz=7 v000=1700 > v; rayt2d vfile=v nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=131 ms=1 jpfile=job tfile=t surf=-100,20,900,60 verbose=1; cat job
+# Negative perturbation and an empty ray fan, using the auxiliary output modes.
+[f32] [stderr] makevel nx=11 nz=9 v000=1800 > v; makevel nx=11 nz=9 v000=-0.25 > p; rayt2d vfile=v nx=11 nz=9 nxs=5 fxs=100 dxs=175 nt=263 npv=-1 pvfile=p tfile=t surf=-100,30,500,75,1100,30; cat tvfile
+[f32] [stderr] makevel nx=9 nz=7 v000=1750 > v; makevel nx=9 nz=7 v000=0.5 > p; rayt2d vfile=v nx=9 nz=7 nxs=5 fxs=100 dxs=125 nt=31 na=0 ek=0 npv=1 pvfile=p tfile=t surf=-100,20,900,60; cat csfile
+# Invalid first/second surfaces and geometry errors: compare complete stderr.
+[stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=100 surf=-100,0,700
+[stderr] makevel nx=7 nz=7 v000=1500 | rayt2d nx=7 nz=7 nxs=3 fxs=100 dxs=100 surf=-100,0,700,0 surf=0,0
+[stderr] rayt2d nx=7 nz=7 nzo=1 surf=-100,0,700,0
+[stderr] rayt2d nx=7 nz=7 amin=-0.01 surf=-100,0,700,0

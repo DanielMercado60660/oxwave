@@ -166,13 +166,17 @@ fn main() {
         let time_nw = ntfft / 2 + 1;
         let dw = (2.0 * PI / (ntfft as f32 * dt) as f64) as f32;
         let mut fw = (2.0 * PI * f1 as f64) as f32;
-        let nf1 = ((fw / dw) as f64 + 0.5) as i32;
+        let nf1 = frequency_index(fw, dw);
         fw = (2.0 * PI * f2 as f64) as f32;
-        let nf2 = ((fw / dw) as f64 + 0.5) as i32;
+        let nf2 = frequency_index(fw, dw);
         fw = (2.0 * PI * f3 as f64) as f32;
-        let nf3 = ((fw / dw) as f64 + 0.5) as i32;
+        let nf3 = frequency_index(fw, dw);
         fw = (2.0 * PI * f4 as f64) as f32;
-        let nf4 = ((fw / dw) as f64 + 0.5) as i32;
+        let nf4 = frequency_index(fw, dw);
+        // Match the minimal C bounds fix before indexing cq and wlsp.
+        if nf1 < 0 || nf4 < nf1 || nf4 >= time_nw {
+            err!("frequency window is outside the FFT spectrum");
+        }
         let truenw = nf4 - nf1 + 1;
         fw = (0.0 + (nf1 as f32 * dw) as f64) as f32;
         if verbose == 2 {
@@ -187,8 +191,14 @@ fn main() {
         let wtmp = ricker(fmax, dt);
         let ntw = wtmp.len() as i32;
         // Center the source wavelet at time zero (Chris Stolk's correction).
+        // C's negative remainder writes before wl for short FFTs. Match the
+        // minimal C bounds check before accessing the wavelet buffer.
         for it in 0..ntw {
-            wl[((it - ntw / 2 + ntfft) % ntfft) as usize] = wtmp[it as usize];
+            let index = (it - ntw / 2 + ntfft) % ntfft;
+            if index < 0 {
+                err!("source wavelet index is outside the FFT buffer");
+            }
+            wl[index as usize] = wtmp[it as usize];
         }
         pfarc(-1, &wl, &mut wlsp);
 
@@ -423,6 +433,15 @@ fn main() {
     exit(CWP_Exit());
 }
 
+fn frequency_index(fw: f32, dw: f32) -> i32 {
+    let index = (fw / dw) as f64 + 0.5;
+    // Check before the cast, like the minimal C fix for NaN/out-of-range UB.
+    if !(index >= -2147483648.0 && index < 2147483648.0) {
+        err!("frequency index is not representable");
+    }
+    index as i32
+}
+
 fn ricker(mut freq: f32, mut dt: f32) -> Vec<f32> {
     if freq == 0.0 {
         freq = 30.0;
@@ -458,6 +477,10 @@ fn fdmig(
     vc: f32,
     dip: i32,
 ) {
+    // The C boundary stencil reads data[2] and data[nx-3].
+    if nx < 3 {
+        err!("fdmig requires at least three columns");
+    }
     let nx = nx as usize;
     let mut p = vec![0.0f32; nx];
     let mut s1 = vec![0.0f32; nx];

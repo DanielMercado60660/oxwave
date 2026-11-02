@@ -61,3 +61,38 @@ python3 -c 'import struct;open("vel","wb").write(struct.pack("=f",-1500)*17*5)';
 # A short velocity file leaves the allocated tail uninitialized in C; use an
 # empty time aperture so that it is never used to contribute output samples.
 [stderr] printf '' > vel; suspike nt=1 ntr=1 | sushw key=cdp a=1 | suktmig2d dx=25 vfile=vel
+# diff-2026-11 (round 1)
+# Tiny axes with no travel times inside the recording: no uninitialized sinc tails.
+[stderr] makevel nz=1 nx=1 v000=1500 > vel; sunull nt=1 ntr=1 | sushw key=cdp a=1 | suktmig2d dx=12 vfile=vel verbose=1
+makevel nz=2 nx=5 v000=1800 > vel; suspike nt=2 ntr=3 nspk=1 ix1=2 it1=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=12 vfile=vel hoffset=50
+makevel nz=3 nx=5 v000=1800 > vel; suspike nt=3 ntr=3 nspk=1 ix1=2 it1=2 | sushw key=cdp a=1 b=2 | suktmig2d dx=12 vfile=vel hoffset=50
+makevel nz=4 nx=5 v000=1800 > vel; suspike nt=4 ntr=3 nspk=1 ix1=2 it1=3 | sushw key=cdp a=1 b=2 | suktmig2d dx=12 vfile=vel hoffset=50
+# Prime/long time axes, dense nonzero data and fully specified valid velocity rows.
+makevel nz=4097 nx=5 v000=1800 dvdx=50 dvdz=0.1 > vel; sunull nt=4097 ntr=3 | suaddnoise seed=801 sn=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel hoffset=3 angmax=65 nfc=7 fwidth=40
+makevel nz=8191 nx=9 v000=2200 > vel; suspike nt=8191 ntr=5 offset=12 | sushw key=cdp a=1 b=2 | suktmig2d dx=30 vfile=vel nfc=4 fwidth=80
+# Default half offset from the first header versus an explicit matching value.
+[stderr] makevel nz=257 nx=9 v000=1600 > vel; suplane nt=257 ntr=5 offset=6 dip1=2 dip2=-4 taper=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=10 vfile=vel verbose=1
+[stderr] makevel nz=257 nx=9 v000=1600 > vel; suplane nt=257 ntr=5 offset=6 dip1=2 dip2=-4 taper=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=10 vfile=vel angmax=40 firstcdp=1 lastcdp=9 fcdpdata=1 dcdp=1 hoffset=3 nfc=16 fwidth=5 verbose=1
+# Both signs of offset with asymmetric input; the first header alone sets h and dt.
+makevel nz=127 nx=13 v000=1250 dvdx=60 dvdz=2 > vel; sunull nt=127 ntr=7 dt=0.002 | suaddnoise seed=802 sn=1 | sushw key=cdp,offset a=1,-14 b=2,10 | suktmig2d dx=15 vfile=vel angmax=80 nfc=25 fwidth=11
+makevel nz=127 nx=13 v000=1250 dvdx=60 dvdz=2 > vel; sunull nt=127 ntr=7 dt=0.002 | suaddnoise seed=802 sn=1 | sushw key=cdp,offset a=1,-14 b=2,10 | suktmig2d dx=15 vfile=vel hoffset=7 angmax=80 nfc=25 fwidth=11
+makevel nz=101 nx=9 v000=1700 > vel; sunull nt=101 ntr=5 | suaddnoise seed=803 sn=1 | sushw key=cdp,dt,delrt,scalco a=1,4000,-25,-10 b=2,1000,10,0 | suktmig2d dx=22.5 vfile=vel hoffset=2 fwidth=19
+# Nonunit, reversed, repeated and changing CDP headers with in-range velocity indices.
+[stderr] makevel nz=131 nx=13 v000=1100 dvdx=125 dvdz=3 > vel; suplane nt=131 ntr=5 offset=8 | sushw key=cdp a=5 b=3 | suktmig2d dx=20 vfile=vel firstcdp=5 lastcdp=17 fcdpdata=2 dcdp=2 verbose=1
+[stderr] makevel nz=131 nx=9 v000=1400 dvdx=125 > vel; sunull nt=131 ntr=5 | suaddnoise seed=804 sn=1 | sushw key=cdp a=9 b=-2 | suktmig2d dx=20 vfile=vel firstcdp=1 lastcdp=9 fcdpdata=9 dcdp=-2 hoffset=5 verbose=1
+[stderr] makevel nz=131 nx=5 v000=1900 dvdz=2 > vel; suplane nt=131 ntr=5 offset=10 | sushw key=cdp a=1 b=0 | suktmig2d dx=20 vfile=vel lastcdp=5 dcdp=0 verbose=1
+[stderr] makevel nz=131 nx=21 v000=1300 dvdx=55 > vel; sunull nt=131 ntr=7 | suaddnoise seed=805 sn=1 | sushw key=cdp a=1 b=2 c=1 j=3 | suktmig2d dx=20 vfile=vel lastcdp=21 dcdp=1 hoffset=3 verbose=1
+# A third trace generator produces a reflection record with physical offset headers.
+makevel nz=251 nx=9 v000=2000 > vel; susynlv nt=251 dt=0.004 nxm=5 dxm=0.025 nxo=1 fxo=0.02 ref='1:-1,0.2;1,0.2' | sushw key=cdp a=1 b=2 | suktmig2d dx=25 vfile=vel fwidth=21 nfc=9
+# Filter extremes with a nonempty aperture (one filter and no Fourier terms).
+makevel nz=113 nx=9 v000=1700 > vel; sunull nt=113 ntr=5 | suaddnoise seed=806 sn=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=9 vfile=vel hoffset=1 angmax=70 nfc=0 fwidth=1000
+makevel nz=113 nx=9 v000=1700 > vel; sunull nt=113 ntr=5 | suaddnoise seed=806 sn=1 | sushw key=cdp a=1 b=2 | suktmig2d dx=9 vfile=vel hoffset=1 angmax=70 nfc=1 fwidth=1
+# Fractional spacing and a fine sample interval; output retains all input headers.
+makevel nz=509 nx=7 v000=6000 dvdx=20 > vel; suplane nt=509 ntr=4 dt=0.0005 offset=2 | sushw key=cdp,trid,mark a=1,2,1 b=2,0,0 | suktmig2d dx=0.75 vfile=vel angmax=25 fwidth=125 nfc=3
+# Singleton cannot migrate to any image point even with a long input record.
+[stderr] makevel nz=4097 nx=1 v000=1500 > vel; suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2000 | sushw key=cdp a=1 | suktmig2d dx=20 vfile=vel dcdp=0 verbose=1
+# Error paths with different generators and argument parse failures.
+[stderr] sunull nt=3 ntr=1 | suktmig2d vfile=vel
+[stderr] sunull nt=4 ntr=1 | suktmig2d dx=1 vfile=missing-velocity verbose=1
+[stderr] suplane nt=17 ntr=2 | suktmig2d dx=1 vfile=vel fwidth=2147483648
+[stderr] sunull nt=11 ntr=1 | suktmig2d dx=1 vfile=vel firstcdp=-2147483649

@@ -634,7 +634,6 @@ pub unsafe fn addVertexToModel(mut m: *mut Model, mut x: f32, mut y: f32) -> *mu
         let mut eu: *mut EdgeUse = std::ptr::null_mut();
         let mut euo: *mut EdgeUse = std::ptr::null_mut();
         let mut f: *mut Face = std::ptr::null_mut();
-        let mut fs: *mut Face = std::ptr::null_mut();
         let mut f1: *mut Face = std::ptr::null_mut();
         let mut f2: *mut Face = std::ptr::null_mut();
         let mut f3: *mut Face = std::ptr::null_mut();
@@ -708,8 +707,7 @@ pub unsafe fn addVertexToModel(mut m: *mut Model, mut x: f32, mut y: f32) -> *mu
                         (*m).tDel.unwrap()(m, (*(*e).eu).f);
                         (*m).tDel.unwrap()(m, (*(*(*e).eu).euMate).f);
                     }
-                    killEdge(e, &raw mut fs);
-                    makeEdgeFace(v, vo, &raw mut e, &raw mut f);
+                    swapEdge(e, v, vo, &raw mut e, &raw mut f);
                     if (*m).tAdd.is_some() {
                         (*m).tAdd.unwrap()(m, (*(*e).eu).f);
                         (*m).tAdd.unwrap()(m, (*(*(*e).eu).euMate).f);
@@ -750,5 +748,74 @@ pub unsafe fn addVertexToModel(mut m: *mut Model, mut x: f32, mut y: f32) -> *mu
             (*m).vAdd.unwrap()(m, v);
         }
         return v;
+    }
+}
+
+// A two-edge face makes killEdge's eu->euCW->euCW equal to the
+// edge-use being freed. makeEdgeFace can split another common face of
+// v1 and v2, leaving that root untouched. Redirect it to the corresponding
+// replacement edge-use, as in successful SU runs that reuse the allocation.
+// Only compare retired pointers; never dereference them after killEdge.
+unsafe fn swapEdge(
+    e: *mut Edge,
+    v1: *mut Vertex,
+    v2: *mut Vertex,
+    enew: *mut *mut Edge,
+    fnew: *mut *mut Face,
+) {
+    unsafe {
+        let old_eu = (*e).eu;
+        let old_eum = (*old_eu).euMate;
+        let survivor = (*old_eu).f;
+        let mut fs = std::ptr::null_mut();
+        killEdge(e, &raw mut fs);
+        makeEdgeFace(v1, v2, enew, fnew);
+        if (*survivor).eu == old_eu {
+            (*survivor).eu = (**enew).eu;
+        } else if (*survivor).eu == old_eum {
+            (*survivor).eu = (*(**enew).eu).euMate;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::ptr::null_mut;
+
+    #[test]
+    fn swap_two_edge_face_keeps_a_live_root() {
+        unsafe {
+            // Duplicate the rectangle's diagonal to create a two-edge face
+            // directly, without depending on a particular rounding history.
+            let m = makeModel(0.0, 0.0, 1.0, 1.0);
+            let mut eu = (*(*m).f).eu;
+            while (*(*eu).euMate).f.is_null() {
+                eu = (*eu).euCW;
+            }
+            let v1 = (*(*eu).vu).v;
+            let v2 = (*(*(*eu).euCW).vu).v;
+            (*v1).vu = (*eu).vu;
+            let (mut e, mut f) = (null_mut(), null_mut());
+            makeEdgeFace(v1, v2, &raw mut e, &raw mut f);
+            let old_eu = (*e).eu;
+            let survivor = (*old_eu).f;
+            assert_eq!((*(*old_eu).euCW).euCW, old_eu);
+
+            // Select the other triangle as the common face for the new edge.
+            (*v1).vu = (*(*(*eu).euMate).euCW).vu;
+            let retired_edge = e;
+            swapEdge(e, v1, v2, &raw mut e, &raw mut f);
+            assert_eq!((*survivor).eu, (*e).eu);
+            assert_eq!(nearestVertexInModel(m, null_mut(), (*v1).x, (*v1).y), v1);
+
+            // SU leaves the two-edge survivor rooted in the replacement's
+            // face. Restore its own live ring before using killModel, which
+            // requires disjoint face rings. The swap itself must preserve
+            // SU's root choice for subsequent insertion/search operations.
+            (*survivor).eu = eu;
+            free(retired_edge.cast());
+            killModel(m);
+        }
     }
 }

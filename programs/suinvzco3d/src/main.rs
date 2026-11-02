@@ -38,7 +38,7 @@
 #![allow(unused_parens)]
 
 use oxwave_core::prelude::*;
-use oxwave_cwp::cwp::{PI, abs, nint};
+use oxwave_cwp::cwp::{abs, nint, PI};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -110,6 +110,15 @@ struct Grid {
 }
 impl Grid {
     fn new(ny: i32, nx: i32, nz: i32) -> Self {
+        // Negative dimensions become enormous size_t allocations in C and
+        // fail in ealloc before any array is used. Do not clamp them to zero.
+        if ny < 0 || nx < 0 || nz < 0 {
+            err!(
+                "%s: malloc failed (%s)",
+                "ealloc.c",
+                oxwave_core::err::strerror(12)
+            );
+        }
         Self {
             data: vec![
                 0.0;
@@ -253,6 +262,14 @@ fn main() {
     let mut ts = Grid::new(nyo, nxo, nzo);
     let mut amp = Grid::new(nyo, nxo, nzo);
     let mut p3 = Grid::new(nyo, nxo, nzo);
+    // Match the ealloc1float(nz) failure before opening the velocity file.
+    if nz < 0 {
+        err!(
+            "%s: malloc failed (%s)",
+            "ealloc.c",
+            oxwave_core::err::strerror(12)
+        );
+    }
     let mut v = vec![0.0f32; nz.max(0) as usize + 1];
     let mut vnew = vec![0.0f32; nzo.max(0) as usize + 1];
     // fopen is deliberately unchecked by the C program.
@@ -348,8 +365,8 @@ fn main() {
                                 // reads; sins/sing only feed a disabled filter
                                 // and cannot affect the output.
                                 let velocity = v.get(iz as usize).copied().unwrap_or(0.0);
-                                let mut sins = ((p3[(iy, ix, iz)] * p3[(iy, ix, iz)])
-                                    * (velocity * velocity));
+                                let mut sins =
+                                    ((p3[(iy, ix, iz)] * p3[(iy, ix, iz)]) * (velocity * velocity));
                                 if sins >= 1.0 {
                                     sins = ((1.0f64 / (sins as f64)) as f32);
                                     sins = ((1.0f64 - (sins as f64)).sqrt() as f32);
@@ -391,8 +408,8 @@ fn main() {
                                                         as f64))))))
                                     as f32);
                                 let velocity = v.get(iz as usize).copied().unwrap_or(0.0);
-                                let mut sing = ((p3[(iy, ix, iz)] * p3[(iy, ix, iz)])
-                                    * (velocity * velocity));
+                                let mut sing =
+                                    ((p3[(iy, ix, iz)] * p3[(iy, ix, iz)]) * (velocity * velocity));
                                 if sing >= 1.0 {
                                     sing = ((1.0f64 / (sing as f64)) as f32);
                                     sing = ((1.0f64 - (sing as f64)).sqrt() as f32);

@@ -14,3 +14,16 @@ sunull nt=20 ntr=1 dt=0.004 | suaddevent t0=1e999
 # The original does not call checkpars, including for verbose and unknown options.
 sunull nt=33 ntr=1 dt=0.004 | suaddevent verbose=1 unused=1 t0=0.03
 sunull nt=33 ntr=1 dt=0.004 | suaddevent type=lmo t0=0 vel=1000 amp=0
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 dt=0.004 | suaddevent type=lmo t0=0.002 vel=1500 amp=2
+sunull nt=3 ntr=1 dt=0.004 | suaddevent type=nmo t0=0.004 vel=2000 amp=-1
+suspike nt=4 ntr=2 dt=0.004 | sushw key=offset,delrt a=-5,-4 b=10,0 | suaddevent type=lmo t0=0.001 vel=1000 amp=0.5
+sunull nt=97 ntr=5 dt=0.002 | sushw key=offset,delrt a=-80,-20 b=40,0 | suaddevent type=nmo t0=0.015 vel=1250 amp=1.5
+suplane nt=101 ntr=4 | sushw key=offset a=-90 b=60 | suaddevent type=lmo t0=0.023 vel=1800 amp=-0.7
+suspike nt=4097 ntr=2 dt=0.004 | sushw key=offset a=-123 b=246 | suaddevent type=nmo t0=4.321 vel=2500 amp=0.25
+sunull nt=23 ntr=2 dt=0.004 | sushw key=dt,delrt a=0,12 | suaddevent dt=0.002 type=lmo t0=0.012 vel=1200 amp=3
+[stderr] sunull nt=31 ntr=1 dt=0.004 | suaddevent type=nmo t0=0.05 vel=3000 amp=1 verbose=1
+sunull nt=13 ntr=1 dt=0.004 | suaddevent type=lmo t0=-0.003 vel=-1000 amp=2
+sunull nt=19 ntr=1 dt=0.004 | suaddevent amp=1e999
+sunull nt=21 ntr=1 dt=0.004 | sushw key=dt a=0 | suaddevent type=lmo
+sunull nt=257 ntr=3 dt=0.001 | sushw key=offset,delrt a=0,50 b=100,0 | suaddevent type=unknown t0=0.1 vel=1700 amp=0.8

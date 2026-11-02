@@ -320,7 +320,10 @@ fn main() {
     let n1bits = (nbpi as f32 * if style == 0 { wbox } else { hbox }) as i32;
     let n2bits = (nbpi as f32 * if style == 0 { hbox } else { wbox }) as i32;
     let nbpr = 1 + (n2bits - 1) / 8;
-    let mut bits = vec![0u8; (nbpr * n1bits) as usize];
+    let bitmap_len = (nbpr * n1bits) as usize;
+    // Grey-fill stepping can advance one byte beyond the final raster row.
+    // Keep that byte out of the emitted image while allowing the C behavior.
+    let mut bits = vec![0u8; bitmap_len + 1];
     x2min = if x2beg < x2end { x2beg } else { x2end };
     x2max = if x2beg > x2end { x2beg } else { x2end };
     let n2in = x2.iter().filter(|&&x| x >= x2min && x <= x2max).count();
@@ -366,6 +369,7 @@ fn main() {
             0,
         );
     }
+    bits.truncate(bitmap_len);
     for b in &mut bits {
         *b = !b.reverse_bits();
     }

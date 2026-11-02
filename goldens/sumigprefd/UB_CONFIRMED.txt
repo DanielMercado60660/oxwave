@@ -1,0 +1,3 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/migration_inversion/sumigprefd.c:527,597-600: nx=1 allocates one complex but fdmig reads data[1], data[2], data[-1], data[-2]; further invalid accesses occur at 633-636,650-651 and retris:695. Minimal fix: reject nx<3 at fdmig entry before allocations/accesses. SU build.log flags: orig matches installed SU byte for byte (rc=0, 244 stdout bytes, one +0 sample); fixed returns rc=1, no stdout, "migration aperture must contain at least 3 positions". OxWave matches fixed rc/stdout/stderr exactly. Three identical runs per binary; evidence and fix.patch: diffcamp/ubx/sumigprefd/.
+sunull nt=1 ntr=1 | sugain bias=1500 | sustrip outpar=vp > v; suspike nt=128 ntr=1 | sumigprefd nz=1 nxo=1 dz=10 vfile=v nxshot=1

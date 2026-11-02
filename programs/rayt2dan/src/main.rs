@@ -525,7 +525,9 @@ fn main() {
                 dx, fx, nz, dz, fz, amax, amin,
             );
             it = 1i32;
-            while (it < NRS) {
+            // The auxiliary ray can terminate before the central ray. Only
+            // initialized auxiliary steps may be used for extrapolation.
+            while it < NRS && it < ray.nrs {
                 if adjacent && it == nt - 1 {
                     // C allocation order: tt,xx,zz,t,s,cc,ss,vv,dvdx1,dvdz1.
                     let end = nt as usize;

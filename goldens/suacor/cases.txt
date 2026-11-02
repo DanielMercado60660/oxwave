@@ -23,3 +23,43 @@ suplane nt=17 ntr=1 | suacor ntout=65534 norm=0 sym=1
 # Nonzero boundary data: two spikes give zero-lag energy 2 and off-zero lags.
 suspike nt=17 ntr=2 nspk=2 ix1=1 it1=1 ix2=1 it2=9 | suacor ntout=65535 norm=1 sym=1
 suspike nt=17 ntr=2 nspk=2 ix1=1 it1=1 ix2=1 it2=9 | suacor ntout=65535 norm=0 sym=0
+
+# diff-2026-11 (round 1)
+# Nonzero small traces, including both endpoints and padding outside the input.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | suacor ntout=3 norm=1 sym=1
+suspike nt=2 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=2 | suacor ntout=5 norm=0 sym=0
+sunull nt=3 ntr=1 | sugain bias=-2.5 | suacor ntout=6 norm=0 sym=1
+suspike nt=4 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | suacor ntout=8 norm=1 sym=1
+# Defaults versus explicit defaults on a nonzero trace; empty values use defaults.
+suspike nt=7 ntr=1 nspk=2 ix1=1 it1=2 ix2=1 it2=6 | suacor
+suspike nt=7 ntr=1 nspk=2 ix1=1 it1=2 ix2=1 it2=6 | suacor ntout=101 norm=1 sym=1
+suspike nt=7 ntr=1 nspk=2 ix1=1 it1=2 ix2=1 it2=6 | suacor ntout= norm= sym=
+# Dense signed data around the short/long convolution boundary; seeded noise.
+sunull nt=29 ntr=2 | sugain bias=0.125 | suaddnoise seed=173 sn=0.7 | suacor ntout=61 norm=0 sym=1
+sunull nt=30 ntr=2 | sugain bias=0.125 | suaddnoise seed=173 sn=0.7 | suacor ntout=64 norm=1 sym=0
+sunull nt=31 ntr=2 | sugain bias=0.125 | suaddnoise seed=173 sn=0.7 | suacor ntout=63 norm=-2 sym=-3
+sunull nt=32 ntr=2 | sugain bias=0.125 | suaddnoise seed=173 sn=0.7 | suacor ntout=66 norm=0 sym=1
+# Long and maximum-size inputs, with short output windows to keep these fast.
+sunull nt=4097 ntr=2 | sugain bias=0.25 | suacor ntout=257 norm=1 sym=1
+sunull nt=4097 ntr=1 | sugain bias=-0.5 | suaddnoise seed=421 sn=0.7 | suacor ntout=258 norm=0 sym=0
+suspike nt=65535 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=65535 | suacor ntout=3 norm=1 sym=0
+# A distinct synthetic generator provides nontrivial wavelet amplitudes.
+susynlv nt=127 nxm=2 nxo=1 | suacor ntout=31 norm=0 sym=1
+# dt is captured from the first trace; delrt is reset and f1 is replaced.
+suspike nt=11 ntr=3 nspk=3 ix1=1 it1=1 ix2=2 it2=6 ix3=3 it3=11 | sugain bias=-0.25 | sushw key=dt,delrt,f1,offset a=1250,-123,7.25,-900 b=750,41,0.5,300 | suacor ntout=6 norm=1 sym=0
+sunull nt=5 ntr=2 | sugain bias=2 | sushw key=dt,delrt,f1 a=0,300,12.5 | suacor ntout=7 norm=0 sym=1
+# Very small energy, rounded-to-zero energy, and non-unit energy.
+sunull nt=4 ntr=1 | sugain bias=1e-20 | suacor ntout=7 norm=1 sym=1
+sunull nt=4 ntr=1 | sugain bias=1e-30 | suacor ntout=7 norm=1 sym=0
+sunull nt=4 ntr=2 | sugain bias=3.5 | suacor ntout=1 norm=0 sym=0
+# Zero output with normalization disabled avoids reading the empty workspace.
+sunull nt=4 ntr=1 | suacor ntout=0 norm=0 sym=0
+# Last occurrence wins, and malformed numeric strings convert to zero.
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | suacor ntout=99 ntout=5 norm=0 norm=1 sym=1 sym=0
+sunull nt=4 ntr=1 | sugain bias=2 | suacor ntout=7 norm=abc sym=abc
+# Whole stderr is compared for verbose and unknown-argument diagnostics.
+[stderr] sunull nt=3 ntr=1 | sugain bias=1 | suacor ntout=5 norm=0 sym=0 verbose=1 extra=2
+# Error exits belong to suacor, rather than to an upstream generator.
+[stderr] sunull nt=4 ntr=1 | suacor ntout=1 norm=2147483648
+[stderr] sunull nt=4 ntr=1 | suacor ntout=1 sym=-2147483649
+[stderr] sunull nt=4 ntr=0 | suacor ntout=3 norm=1 sym=1

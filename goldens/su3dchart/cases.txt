@@ -10,3 +10,26 @@ suplane nt=3 ntr=3 | su3dchart outpar=count.par > pairs.bin; cat count.par
 [stderr] su3dchart < /dev/null
 [stderr] su3dchart degree=999999999999999999999 < /dev/null
 [stderr] suplane nt=3 ntr=1 | su3dchart outpar=/nonexistent/path/count > /dev/null
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=1 | sushw key=sx,gx,sy,gy,scalco,counit a=2147483000,-2147483000,-123456789,987654321,32767,2 | su3dchart degree=1
+[f32] suspike nt=4 ntr=5 | sushw key=sx,gx,sy,gy,scalco,counit a=-1001,2002,3003,-4004,-32768,2 b=13,-17,19,-23,0,0 | su3dchart degree=1
+[f32] suplane nt=4097 ntr=3 | sushw key=sx,gx,sy,gy,scalco,counit a=100000001,200000002,-300000003,400000004,3,2 b=1,-2,3,-4,0,0 | su3dchart degree=0
+[f32] suplane nt=11 ntr=7 | sushw key=sx,gx,sy,gy,scalco,counit a=-7,10,21,-24,-3,2 b=2,4,-6,8,0,0 | su3dchart degree=2
+[f32] suspike nt=3 ntr=4 | sushw key=sx,gx,sy,gy,scalco,counit a=3601,7202,-10803,14404,1,2 b=10,20,30,40,0,0 | su3dchart degree=1
+[f32] suplane nt=2 ntr=2 | sushw key=sx,gx,sy,gy,scalco,counit a=11,-12,-13,14,-1,1 | su3dchart
+suplane nt=4 ntr=7 | su3dchart degree=1 outpar=chart.par > chart.bin; cat chart.par
+[stderr] suspike nt=1 ntr=2 | su3dchart degree=0 verbose=1 > /dev/null
+[stderr] suplane nt=3 ntr=1 | su3dchart degree=2147483648 > /dev/null
+[stderr] suplane nt=3 ntr=1 | su3dchart outpar= > /dev/null
+[exact] suplane nt=3 ntr=2 | sushw key=sx,gx,sy,gy a=101,202,-303,404 | su3dchart outpar=/dev/stdout
+[f32] suspike nt=13 ntr=3 | sushw key=sx,gx,sy,gy,scalco,counit a=1234567,-2345678,3456789,-4567890,0,2 | su3dchart degree=1
+[f32] suplane nt=4 ntr=3 | sushw key=sx,gx,sy,gy,scalco,counit a=10,20,30,40,2,3 b=11,-12,13,-14,1,-1 | su3dchart degree=1
+# diff-2026-11 (round 2)
+[f32] sunull nt=1 ntr=1 | sushw key=sx,gx,sy,gy,scalco,counit a=-2147483648,2147483647,123,-124,1,2 | su3dchart degree=1
+[f32] sunull nt=2 ntr=6 | sushw key=sx,gx,sy,gy,scalco,counit a=3600,-7200,10800,-14400,-100,2 b=37,41,-43,47,0,0 | su3dchart degree=1
+[f32] sunull nt=3 ntr=5 | sushw key=sx,gx,sy,gy,scalco,counit a=100,300,-200,-400,0,2 b=7,11,13,17,0,0 | su3dchart degree=0
+[f32] suspike nt=4 ntr=3 | sushw key=sx,gx,sy,gy,scalco,counit a=-9,8,-7,6,32767,0 | su3dchart degree=1
+[f32] sunull nt=17 ntr=4 | sushw key=sx,gx,sy,gy,scalco,counit a=10000000,-30000000,50000000,-70000000,-32768,2 | su3dchart degree=1 degree=0
+sunull nt=4097 ntr=2 | su3dchart degree=0 outpar=round2.par > round2.bin; cat round2.par
+[stderr] sunull nt=4 ntr=2 | su3dchart degree=1 verbose=1 > /dev/null
+[stderr] sunull nt=1 ntr=1 | su3dchart degree=-2147483649 > /dev/null

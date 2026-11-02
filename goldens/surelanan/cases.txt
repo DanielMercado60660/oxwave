@@ -67,3 +67,51 @@ printf '20 0\n30 10\n' > refl.txt && suplane nt=47 ntr=3 | sushw key=d1,offset a
 [stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,22 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=akima
 [stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,-2 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=spline
 [stderr] printf '20 0\n27 4\n23 11\n40 20\n' > refl.txt && suplane nt=83 ntr=4 | suaddnoise seed=41 | sushw key=d1,offset,cdp a=1,3,22 b=0,5,0 | surelanan refl=refl.txt npicks=4 nr1=3 nr2=5 nsmooth=5 method=spline
+# diff-2026-11 (round 1)
+# Short traces, with explicitly valid spike locations even at nt=1.
+[stderr] printf '0.5 0\n' > refl.txt && suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=2 nr2=3 nsmooth=1
+[stderr] printf '0.3 0\n' > refl.txt && suspike nt=2 ntr=3 nspk=1 ix1=1 it1=1 | sushw key=d1,offset a=1,1 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=5 nsmooth=1 fr1=-1 fr2=0.1
+[stderr] printf '1.25 0\n' > refl.txt && suspike nt=3 ntr=4 nspk=1 ix1=1 it1=2 | suaddnoise seed=101 sn=1 | sushw key=d1,offset a=1,-3 b=0,2 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 nsmooth=2 fr1=0 fr2=0
+[stderr] printf '1.5 0\n' > refl.txt && suspike nt=4 ntr=4 nspk=2 ix1=1 it1=2 ix2=4 it2=3 | sushw key=d1,offset a=1,3 b=0,-2 | surelanan refl=refl.txt npicks=1 nr1=2 nr2=5 nsmooth=3 dr1=0.1 dr2=0.2
+# Single trace and actual nonzero data, implicit versus explicit default grids.
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=51 nr2=51 dr1=0.01 dr2=0.01 fr1=-0.25 fr2=-0.25 dzratio=5 nsmooth=11 verbose=0 method=linear
+# Long traces, maximum SU trace length, a wide output panel, and a long window.
+[stderr] printf '2048 0\n' > refl.txt && suspike nt=4097 ntr=7 nspk=1 ix1=1 it1=2049 | suaddnoise seed=103 sn=1 | sushw key=d1,f1,offset a=1,0,-101 b=0,0,34 | surelanan refl=refl.txt npicks=1 nr1=17 nr2=31 dr1=0.037 dr2=-0.051 fr1=-0.2 fr2=0.7 nsmooth=17 verbose=1
+[stderr] printf '16383.5 0\n' > refl.txt && suspike nt=65535 ntr=2 nspk=1 ix1=1 it1=32768 | suaddnoise seed=107 sn=1 | sushw key=d1,offset a=0.5,7 | surelanan refl=refl.txt npicks=1 nr1=2 nr2=3 nsmooth=4
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | suaddnoise seed=109 sn=1 | sushw key=d1,offset a=1,7 | surelanan refl=refl.txt npicks=1 nr1=2 nr2=4097 dr2=0.0001 nsmooth=3
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=2 nr2=3 nsmooth=4097
+# Zero window, explicit window precedence, and a window derived from dzratio.
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=2 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,3 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 nsmooth=0 verbose=1
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=2 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,3 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 dzratio=-17 nsmooth=2
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | suaddnoise seed=113 sn=1 | sushw key=d1,offset a=1,3 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 dzratio=3
+# All-zero input and unusual preserved headers; first trace controls depth sampling.
+[stderr] printf '3 0\n' > refl.txt && sunull nt=7 ntr=3 dt=0.002 | sushw key=d1,f1,offset,cdp,trid,delrt,scalco a=0.5,1,9,2147483647,30,-123,-100 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=11 dr2=-0.05 fr2=0.3 nsmooth=4 verbose=2
+[stderr] printf '12 0\n20 10\n' > refl.txt && suspike nt=31 ntr=5 nspk=1 ix1=1 it1=16 | suaddnoise seed=127 sn=1 | sushw key=d1,f1,offset,cdp a=1,0,5,7 b=0.5,2,2,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=6
+# Descending and repeating CDPs: the C retains the first depth and accumulated sums.
+[stderr] printf '8 -5\n20 5\n' > refl.txt && suspike nt=31 ntr=6 nspk=1 ix1=1 it1=16 | suaddnoise seed=131 sn=1 | sushw key=d1,offset,cdp a=1,-7,3 b=0,3,-1 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=5 verbose=1
+[stderr] printf '8 0\n20 10\n' > refl.txt && suplane nt=37 ntr=9 | suaddnoise seed=137 sn=1 | sushw key=d1,offset a=1,5 b=0,2 | suchw key1=cdp key2=tracl a=0 b=1 c=0 d=3 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4 verbose=1
+# Fractional interpolation, the f1 threshold, and large negative residual moveout.
+[stderr] printf '0.012345 0\n' > refl.txt && suspike nt=29 ntr=4 nspk=1 ix1=1 it1=13 | suaddnoise seed=139 sn=1 | sushw key=d1,f1,offset a=0.001,0.0001,1 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 nsmooth=4 dr1=0.2 dr2=0.3
+[stderr] printf '12 0\n' > refl.txt && suspike nt=29 ntr=4 nspk=1 ix1=1 it1=1 | suaddnoise seed=149 sn=1 | sushw key=d1,f1,offset a=0.5,10,7 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=5 nsmooth=8 fr1=-5 dr1=5 fr2=-2 dr2=1
+[stderr] printf '8 0\n' > refl.txt && suspike nt=29 ntr=4 nspk=1 ix1=1 it1=13 | suaddnoise seed=151 sn=1 | sushw key=d1,f1,offset a=1,-4,-11 b=0,0,6 | surelanan refl=refl.txt npicks=1 nr1=5 nr2=7 nsmooth=5 fr1=0.2 dr1=-0.1 fr2=0.1 dr2=-0.03
+# Reflector text: whitespace, no trailing newline, scientific notation, adjacent signs.
+[stderr] printf '\t8e0\t-1e1\r\n\n +1.6e1+1e1' > refl.txt && suspike nt=31 ntr=4 nspk=1 ix1=1 it1=13 | suaddnoise seed=157 sn=1 | sushw key=d1,offset,cdp a=1,3,0 | surelanan refl=refl.txt npicks=2 nr1=3 nr2=5 nsmooth=4 method=linear
+# Nonlinear pick tables and each cubic output mode at large CDP coordinates.
+[stderr] printf '8 16777216\n19 16777220\n13 16777228\n24 16777240\n' > refl.txt && suspike nt=47 ntr=4 nspk=1 ix1=1 it1=17 | suaddnoise seed=163 sn=1 | sushw key=d1,offset,cdp a=1,-7,16777222 b=0,4,0 | surelanan refl=refl.txt npicks=4 nr1=5 nr2=7 nsmooth=6 method=mono verbose=1
+[stderr] printf '8 16777216\n19 16777220\n13 16777228\n24 16777240\n' > refl.txt && suspike nt=47 ntr=4 nspk=1 ix1=1 it1=17 | suaddnoise seed=163 sn=1 | sushw key=d1,offset,cdp a=1,-7,16777222 b=0,4,0 | surelanan refl=refl.txt npicks=4 nr1=5 nr2=7 nsmooth=6 method=akima verbose=1
+[stderr] printf '8 16777216\n19 16777220\n13 16777228\n24 16777240\n' > refl.txt && suspike nt=47 ntr=4 nspk=1 ix1=1 it1=17 | suaddnoise seed=163 sn=1 | sushw key=d1,offset,cdp a=1,-7,16777222 b=0,4,0 | surelanan refl=refl.txt npicks=4 nr1=5 nr2=7 nsmooth=6 method=spline verbose=1
+# Empty optional numeric arguments restore defaults; the last occurrence wins.
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1= nr2= dr1= dr2= fr1= fr2= dzratio= nsmooth= verbose= method=linear
+[stderr] printf '8 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,7 | surelanan refl=refl.txt npicks=1 nr1=4 nr1=2 nr2=9 nr2=3 method=spline method=linear nsmooth=5 nsmooth=2
+# Physical synthetic generator, retaining its acquisition headers.
+[stderr] printf '25 0\n' > refl.txt && susynlv nt=101 nxm=2 nxo=3 fxo=0 dxo=0.004 | sushw key=d1 a=1 | surelanan refl=refl.txt npicks=1 nr1=3 nr2=7 nsmooth=9 method=mono verbose=1
+# Error exits occur before allocations and before any missing pick data is used.
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | surelanan npicks=99999999999999999999
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | surelanan dr1=1e400
+[stderr] printf '1 0\n' > refl.txt && suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | surelanan refl=refl.txt npicks=1 nr1=1 nr2=1 method=Linear
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] printf '0x1p+3 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=1 nr2=3 fr1=0 fr2=0 dr2=0 nsmooth=1
+[stderr] printf '8.00000047683715820312500000001 0\n' > refl.txt && suspike nt=17 ntr=2 nspk=2 ix1=1 it1=9 ix2=2 it2=10 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=1 nr2=3 fr1=0 fr2=0 dr2=0 nsmooth=1
+[stderr] printf 'nan 0\n' > refl.txt && suspike nt=17 ntr=3 nspk=1 ix1=1 it1=9 | sushw key=d1,offset a=1,2 | surelanan refl=refl.txt npicks=1 nr1=1 nr2=3 nsmooth=1

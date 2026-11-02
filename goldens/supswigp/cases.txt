@@ -22,3 +22,24 @@ suspike ntr=4 nt=17 | env CWP_TMPDIR=. supswigp verbose=1 | sed -e '/^%%Creation
 suspike ntr=4 nt=17 | supswigp n2=4 ntr=2 style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suspike ntr=4 nt=17 | sushw key=offset a=-100 b=50 | supswigp key=offset style=vsp fill=0 clip=2 label1=Time label2=Offset | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
 suspike ntr=2 nt=11 | supswigp n2=2 d1=0 d2=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=2 | supswigp ntr=1 fill=0 style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=3 | supswigp n2=2 fill=-1 d1=0.003 f1=-0.2 d2=2.5 f2=-3 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=4 | supswigp verbose=1 tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=1 nt=7 | supswigp n2=1 style=seismic fill=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=4097 | supswigp n2=2 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+sunull ntr=3 nt=17 dt=0.002 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suplane ntr=5 nt=43 | supswigp style=normal fill=0 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=5 nt=29 | sushw key=offset a=30 b=-7 | supswigp key=offset style=normal verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=31 | sushw key=gelev,scalel a=20,-2 b=5,0 | supswigp key=gelev style=vsp fill=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=37 | sushw key=gy,scalco a=20,2 b=5,0 | supswigp key=gy style=vsp tmpdir=. | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=23 | sushw key=cdp a=4 b=0 | supswigp key=cdp ntr=4 verbose=1 | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=19 | sushw key=trid,dt,d1,delrt,tracl,tracr a=30,0,0,-125,9,0 | supswigp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=13 | sushw key=ntr,d1,d2,f1,f2 a=3,0.005,3,-0.1,7 | supswigp style=normal | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=11 | supswigp n2=3 ntr=3 d1=0.004 f1=0 d2=1 f2=1 fill=1 style=seismic verbose=0 tmpdir= | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=3 nt=41 | supswigp style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=4 nt=17 | sushw key=offset a=10 b=10 | supswigp key=offset style=vsp | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=13 | supswigp n2=2 title='Test plot' label1=Time label2=Trace | sed -e '/^%%CreationDate/d' -e '/^%%Creator/d'
+suspike ntr=2 nt=15 | supswigp key=notakey
+suspike ntr=2 nt=15 | supswigp tmpdir=/no/such/directory
+suspike ntr=2 nt=15 | supswigp d1=1e999

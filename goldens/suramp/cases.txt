@@ -31,3 +31,60 @@ suspike nt=17 ntr=1 | suramp dt=1 tmin=65535
 [stderr] suspike nt=17 ntr=1 | suramp tmax=-inf
 # Undefined C cases (tmax=-0.00601 or -1 for nt=17, tmin=65536 dt=1)
 # are checked separately against clean Rust errors, not C memory corruption.
+
+# diff-2026-11 (round 1)
+# Nonzero short traces: defaults, explicit defaults, one/both ramps, overlap.
+sunull nt=1 ntr=1 | sugain bias=1 | suramp
+sunull nt=1 ntr=1 | sugain bias=1 | suramp dt=0.004 tmin=0 tmax=0
+sunull nt=1 ntr=1 | sugain bias=1 | suramp tmin=0.008 tmax=-0.004
+sunull nt=2 ntr=1 | sugain bias=1 | suramp tmin=0.008 tmax=-0.004
+sunull nt=3 ntr=1 | sugain bias=-2 | suramp tmin=0.012 tmax=-0.004
+sunull nt=4 ntr=2 | sugain bias=3 | suramp tmin=0.012 tmax=0
+sunull nt=17 ntr=3 | sugain bias=1 | suramp dt=0.004 tmin=0 tmax=0.064
+# Half-sample boundaries expose ramp rounding; each sample is nonzero.
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=0.00599999 tmax=0.01800001
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=0.006 tmax=0.018
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=0.00600001 tmax=0.01799999
+sunull nt=7 ntr=1 | sugain bias=1 | suramp dt=0.002 tmin=0.005 tmax=0.007
+# Header interval, explicit override, and positive/negative delayed traces.
+sunull nt=19 ntr=2 | sugain bias=1 | sushw key=dt a=3333 | suramp tmin=0.02 tmax=0.04
+sunull nt=19 ntr=2 | sugain bias=1 | sushw key=dt a=0 | suramp dt=0.003333 tmin=0.02 tmax=0.04
+sunull nt=19 ntr=2 | sugain bias=1 | sushw key=dt a=65000 | suramp dt=0.001 tmin=0.007 tmax=0.011
+sunull nt=31 ntr=3 | sugain bias=1 | sushw key=delrt a=20 | suramp
+sunull nt=31 ntr=3 | sugain bias=1 | sushw key=delrt a=-20 | suramp
+sunull nt=31 ntr=3 | sugain bias=1 | sushw key=delrt a=20 | suramp tmin=0.04 tmax=0.10
+sunull nt=31 ntr=3 | sugain bias=1 | sushw key=delrt a=-20 | suramp tmin=0 tmax=0.06
+# Ramps are fixed by the first trace even when later dt/delrt change.
+sunull nt=31 ntr=4 | sugain bias=1 | sushw key=dt,delrt a=4000,10 b=1000,10 | suramp tmin=0.03 tmax=0.08
+sunull nt=31 ntr=4 | sugain bias=1 | sushw key=dt,delrt a=4000,-10 b=-1000,-10 | suramp
+# Full-buffer starting ramp and long traces with dense, varying samples.
+sunull nt=3 ntr=1 | sugain bias=1 | suramp dt=1 tmin=65535 tmax=2
+sunull nt=4097 ntr=3 | sugain bias=1 | suaddnoise seed=20261102 sn=1 | suramp tmin=8 tmax=4
+sunull nt=65535 ntr=1 | sugain bias=1 | suramp dt=0.001 tmin=65.535 tmax=-0.001
+suspike nt=4097 ntr=1 nspk=4 ix1=1 it1=1 ix2=1 it2=1024 ix3=1 it3=3073 ix4=1 it4=4097 | suramp tmin=8 tmax=4
+suplane nt=127 ntr=5 | suramp dt=0.003 tmin=0.15 tmax=0.2
+# Negative interval, disabled ramps, empty numeric defaults, repeated arguments.
+sunull nt=7 ntr=1 | sugain bias=1 | suramp dt=-0.004 tmin=-0.008 tmax=-0.016
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=-1 tmax=1
+sunull nt=7 ntr=1 | sugain bias=1 | suramp dt= tmin= tmax=
+sunull nt=7 ntr=1 | sugain bias=1 | suramp dt=0.002 dt=0.004 tmin=0.004 tmin=0.016 tmax=0.008
+# Full stderr checks include verbose/checkpars and parameter errors.
+[stderr] sunull nt=7 ntr=1 | sugain bias=1 | suramp verbose=1 dt=0.002 tmin=0.008 tmax=0.004
+[stderr] sunull nt=7 ntr=1 | sugain bias=1 | suramp verbose=1 surprise=9
+[stderr] sunull nt=7 ntr=1 | suramp dt=abc
+[stderr] sunull nt=7 ntr=1 | suramp dt=1e-50
+[stderr] sunull nt=7 ntr=1 | sushw key=dt a=0 | suramp dt=
+[stderr] sunull nt=7 ntr=1 | suramp tmin=1e999
+# Exact hexadecimal subnormals are accepted by the original.
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=0x1p-1023
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmax=0x1p-1074
+
+# ub-2026-11 (round 1)
+# The pending NaN notes supplied no commands. These representative probes
+# still match after replacing NaN-to-int conversion with a defined zero.
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=nan
+sunull nt=7 ntr=1 | sugain bias=1 | suramp dt=nan
+sunull nt=7 ntr=1 | sugain bias=1 | suramp tmax=nan
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=7 ntr=1 | sugain bias=1 | suramp tmin=0x1.0000000000001p-1023

@@ -15,3 +15,22 @@
 [exact] transp n1=1 n2=0 </dev/null
 [exact] transp n1=1 n2=1 nbpe=0 </dev/null
 [stderr] transp n1=1 n2=1 extra=1 </dev/null
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 nspk=1 k1=1 k2=1 | sustrip head=headers.bin outpar=params.txt | transp n1=1 n2=1
+[exact] sunull nt=2 ntr=3 | sustrip head=headers.bin outpar=params.txt | transp n1=2 n2=3 nbpe=4
+[exact] suspike nt=3 ntr=5 nspk=1 k1=2 k2=3 | sustrip head=headers.bin outpar=params.txt | transp n1=3 n2=5
+[exact] suspike nt=4 ntr=1 nspk=1 k1=4 k2=1 | sustrip head=headers.bin outpar=params.txt | transp n1=4 n2=1 nbpe=4
+[exact] [stderr] suplane nt=17 ntr=13 | sustrip head=headers.bin outpar=params.txt | transp n1=17 n2=13 nbpe=4 verbose=1
+[exact] suspike nt=4097 ntr=3 nspk=1 k1=4097 k2=2 | sustrip head=headers.bin outpar=params.txt | transp n1=4097 n2=3
+[exact] suspike nt=7 ntr=19 nspk=1 k1=3 k2=10 | sustrip head=headers.bin outpar=params.txt > matrix.bin && transp n1=7 < matrix.bin
+[exact] sunull nt=3 ntr=2 | sushw key=cdp a=123 b=7 | transp n1=252 n2=2 nbpe=1
+[exact] suspike nt=5 ntr=7 nspk=1 k1=2 k2=4 | sustrip head=headers.bin outpar=params.txt | transp n1=10 n2=7 nbpe=2
+[exact] suplane nt=37 ntr=41 | sustrip head=headers.bin outpar=params.txt | transp n1=37 n2=41 nbpe=4 | transp n1=41 n2=37 nbpe=4
+[exact] suspike nt=3 ntr=7 nspk=1 k1=2 k2=4 | sustrip head=headers.bin outpar=params.txt | transp n1=4 n2=3 nbpe=7
+[stderr] sunull nt=1 ntr=1 | transp n2=1
+[stderr] sunull nt=1 ntr=1 | transp n1=100 n2=1
+[stderr] sunull nt=2 ntr=2 | sustrip head=headers.bin outpar=params.txt | transp n1=2
+[exact] suspike nt=11 ntr=9 nspk=1 k1=5 k2=6 | sustrip head=headers.bin outpar=params.txt | transp n1=11 n2=9 nbpe=4 verbose=0
+[exact] suspike nt=7 ntr=5 nspk=1 k1=4 k2=3 | sustrip head=headers.bin outpar=params.txt | transp n1=7 n2=2 nbpe=8
+[exact] suspike nt=7 ntr=5 nspk=1 k1=4 k2=3 | sustrip head=headers.bin outpar=params.txt > matrix.bin && transp n1=6 nbpe=4 verbose=1 < matrix.bin
+[stderr] sunull nt=2 ntr=2 | transp n1=61 n2=3 nbpe=4

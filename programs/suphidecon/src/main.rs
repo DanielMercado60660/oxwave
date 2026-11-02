@@ -39,6 +39,8 @@ use oxwave_array_wrap::wrapArray;
 use oxwave_core::prelude::*;
 use oxwave_cwp::complex::*;
 use oxwave_cwp::cwp::{closeto, nint};
+// SU's complexf.c logarithm rounds the unscaled squared magnitude in float.
+use oxwave_f_complexf::cwp_clog;
 use oxwave_hilbert::hilbert;
 use oxwave_pfa_fft::{npfao, pfacc, pfacr, pfarc};
 use oxwave_sblas::sscal;

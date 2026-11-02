@@ -111,3 +111,43 @@ sunull nt=2 ntr=1 | sugoupillaud k=4
 # Header preservation and parity delay overwrite.
 printf -- '0.5 0.2 -0.3 0.1 0.2\n' | a2b n1=5 | suaddhead ns=5 | sushw key=dt,delrt,trid,fldr,offset a=3999,123,5,7,-300 | sugoupillaud k=2
 printf -- '0.5 0.2 -0.3 0.1 0.2\n' | a2b n1=5 | suaddhead ns=5 | sushw key=dt,delrt,trid,fldr,offset a=3999,123,5,7,-300 | sugoupillaud k=3
+
+# diff-2026-11 (round 1)
+# Minimum sizes; keep the first subsurface coefficient nonzero so porder
+# never scans backwards out of a zero polynomial's allocation.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sugoupillaud k=1 l=1 tmax=1 pV=1 verbose=1
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.4 | sugoupillaud
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.4 | sugoupillaud k=1 l=1 tmax=2 pV=1 verbose=0
+sunull nt=3 ntr=1 | sugain bias=0.2 | sugoupillaud
+sunull nt=3 ntr=1 | sugain bias=0.2 | sugoupillaud k=2 l=3 tmax=7 pV=-1
+suplane nt=4 ntr=1 npl=1 ct1=2 cx1=1 len1=1 dip1=0 | sugain scale=0.3 | sugoupillaud
+[stderr] suplane nt=4 ntr=1 npl=1 ct1=2 cx1=1 len1=1 dip1=0 | sugain scale=0.3 | sugoupillaud k=2 l=2 pV=-1 verbose=1
+# Prime-length dense reflectivity, seeded signed reflectivity, and short outputs.
+sunull nt=17 ntr=1 | sugain bias=0.05 | sugoupillaud k=16 l=17 tmax=2 pV=1
+sunull nt=17 ntr=1 | sugain bias=0.05 | sugoupillaud k=21 l=3 tmax=23 pV=-1
+sunull nt=17 ntr=1 | sugain bias=0.05 | sugoupillaud k=1 l=17 tmax=1 pV=-1
+sunull nt=3 ntr=1 | sugain bias=0.2 | sugoupillaud k=1 l=2 tmax=0
+suspike nt=31 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise noise=flat sn=2 seed=20261102 | sugain scale=0.1 | sugoupillaud k=4 l=8 tmax=37 pV=-1
+suspike nt=31 ntr=1 nspk=1 ix1=1 it1=2 | suaddnoise noise=gauss sn=2 seed=20261102 | sugain scale=0.1 | sugoupillaud k=8 l=4 tmax=37 pV=1
+# Long output with a short model, including the largest representable ns.
+suplane nt=4 ntr=1 npl=1 ct1=2 cx1=1 len1=1 dip1=0 | sugain scale=0.3 | sugoupillaud tmax=4097
+suplane nt=4 ntr=1 npl=1 ct1=2 cx1=1 len1=1 dip1=0 | sugain scale=0.3 | sugoupillaud tmax=65535
+# Large model: defaults, buried propagation, half-space, near-bottom source.
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud k=2 l=3 tmax=31 pV=-1
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud k=4099 l=1 tmax=4097
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=0.25 | sugoupillaud k=4096 l=4097 tmax=3
+# Header-derived half-sample delay: zero dt and maximum unsigned-short dt.
+sunull nt=5 ntr=1 | sugain bias=0.125 | sushw key=dt,delrt,trid,offset,scalco a=65535,-123,5,-777,-10 | suchw key1=cdp key2=offset a=100 b=-2 | sugoupillaud k=2 l=1 tmax=7
+sunull nt=5 ntr=1 | sugain bias=0.125 | sushw key=dt,delrt,trid a=0,123,5 | sugoupillaud k=1 l=2 tmax=7 pV=-1
+# Only the first reflectivity trace is consumed; preserve its trace headers.
+sunull nt=11 ntr=4 | sugain bias=0.1 | sushw key=fldr,offset a=17,-100 b=3,50 | sugoupillaud k=3 l=2
+# Numeric defaults, duplicate values, and ignored unknown options.
+[stderr] sunull nt=3 ntr=1 | sugain bias=0.2 | sugoupillaud k= l= tmax= pV= verbose=
+[stderr] sunull nt=5 ntr=1 | sugain bias=0.1 | sugoupillaud k=0 k=3 l=2 pV=0 pV=-1 tmax=-1 tmax=3 verbose=2 unused=7
+# Validation errors must occur before recursion or reflectivity arithmetic.
+[stderr] sunull nt=3 ntr=1 | sugain bias=0.2 | sugoupillaud l=4
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sugoupillaud pV=2
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sugain scale=1.0001 | sugoupillaud
+[stderr] sunull nt=3 ntr=1 | sugoupillaud k=2147483648
+[stderr] sunull nt=3 ntr=1 | sugoupillaud tmax=-1

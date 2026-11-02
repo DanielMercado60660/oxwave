@@ -11,3 +11,16 @@
 [stderr] suplane nt=9 ntr=3 | sulprime nonsense=1 nmax=1
 [stderr] (suplane nt=5 ntr=1; suplane nt=7 ntr=1) | sulprime nmax=1
 [stderr] (suplane nt=5 ntr=2; suplane nt=7 ntr=1) | sulprime nmax=1
+
+# diff-2026-11 (round 1)
+[stderr] suplane nt=2 ntr=1 | sugain bias=1200 | sulprime nmax=3 verbose=1
+[stderr] suplane nt=3 ntr=2 | sugain bias=1500 | sulprime b=0.1 dz=2 f=35 nmax=5 verbose=1
+[stderr] suspike nt=4 ntr=3 | sugain bias=1800 | sulprime b=2 dz=1 f=60 nmax=3 verbose=0
+[stderr] suspike nt=13 ntr=4 | sugain bias=1200 | sulprime b=0.02 dz=3 f=70 nmax=11 verbose=1
+[stderr] sunull nt=17 ntr=3 | sugain bias=2100 | sulprime nmax=7 verbose=1
+[stderr] suplane nt=4097 ntr=3 | suop op=abs | sugain bias=1800 | sulprime b=0.5 dz=0.25 f=100 nmax=9 verbose=1
+[stderr] suplane nt=23 ntr=3 | sushw key=dt,d1,f1 a=4000,2,100 | sugain bias=1700 | sulprime nmax=5 verbose=1
+[stderr] suspike nt=31 ntr=3 | sugain bias=1600 | sulprime b=0 dz=0 f=0 nmax=1 verbose=1
+[stderr] sunull nt=2 ntr=1 | sulprime nmax=0
+[stderr] suplane nt=19 ntr=3 | sugain bias=1000 | sulprime b=bad dz=1 f=60 nmax=2 verbose=1
+[stderr] suplane nt=7 ntr=3 | sulprime f=1e999

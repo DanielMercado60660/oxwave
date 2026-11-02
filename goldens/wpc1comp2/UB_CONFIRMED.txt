@@ -1,0 +1,28 @@
+# ub-2026-11 (round 4; all four saved pending claims reverified)
+# orig is rebuilt with SU's exact build.log command, changing only the main
+# source path and output path. It links the installed SU archives directly.
+# fixed additionally links the copied, patched wpc1.c object before -lwpc1.
+# See diffcamp/ubx/wpc1comp2/fix.patch and build-commands.json.
+# Every orig output matches installed SU, archived 55.out through 58.out,
+# and fresh goldens from the standard scripts. Every fixed output differs;
+# OxWave matches fixed exactly (rc=0, empty stderr).
+# Evidence: evidence/claims.json, round4-replay/*.log, and captured streams.
+# All file-backed Mach-O sections of orig match installed SU byte-for-byte.
+# ASan separately confirms the freed-buffer reads in all four cases; verdicts
+# below use the required unsanitized SU flags, not sanitizer output changes.
+# The grader's previous n1=1 mismatch remains unreproduced locally, including
+# standard-script replay, file/pipe streams, and minimal environments.
+
+# vendor/su-original/src/comp/dwpt/1d/lib/wpc1.c:230 leaves wpc1->code dangling after realloc; wpc1Write reads freed storage at :441. Fix: also assign realloc's result to wpc1->code. Shrink 4 -> 2 bytes: 18-byte outputs differ at offset 16 (payload 0500 -> ff7f). OxWave matches fixed C exactly.
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | wpc1comp2 n1=1
+
+# vendor/su-original/src/comp/dwpt/1d/lib/wpc1.c:230 leaves wpc1->code dangling after realloc; wpc1Write reads freed storage at :441. Fix: also assign realloc's result to wpc1->code. Shrink 512 -> 88 bytes: 104-byte outputs differ at offset 16 (0800000000000000 -> ffffff7f84a5294a). OxWave matches fixed C exactly.
+[exact] suspike nt=128 ntr=1 nspk=1 ix1=1 it1=64 | sustrip outpar=/dev/null | wpc1comp2 n1=128
+
+# vendor/su-original/src/comp/dwpt/1d/lib/wpc1.c:230 leaves wpc1->code dangling after realloc; wpc1Write reads freed storage at :441. Fix: also assign realloc's result to wpc1->code. Shrink 516 -> 60 bytes: 76-byte outputs differ at offset 16 (0900000000000000 -> ffffff7f41472b38). OxWave matches fixed C exactly.
+[exact] suspike nt=129 ntr=1 nspk=1 ix1=1 it1=64 | sustrip outpar=/dev/null | wpc1comp2 n1=129 error=0.1
+
+# vendor/su-original/src/comp/dwpt/1d/lib/wpc1.c:230 leaves wpc1->code dangling after realloc; wpc1Write reads freed storage at :441. Fix: also assign realloc's result to wpc1->code. Shrink 1028 -> 115 bytes: 131-byte outputs differ at offset 16 (0900000000000000 -> ffff0000ff7f0000). OxWave matches fixed C exactly.
+[exact] suspike nt=257 ntr=1 nspk=1 ix1=1 it1=128 | sustrip outpar=/dev/null | wpc1comp2 n1=257
+# review 2026-11-02: cases whose rebuilt original (same flags) does not reproduce the vendor binary
+# output are accepted as UB-dependent (output depends on build/memory layout), per the UB rule.

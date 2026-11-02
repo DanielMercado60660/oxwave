@@ -13,3 +13,24 @@ suplane nt=17 ntr=2 | supws pwr=-1 ps=1
 suplane nt=17 ntr=2 | supws dt=-0.004 sl=0.008
 suplane nt=127 ntr=9 | suaddnoise seed=17 | sushw key=cdp a=2 | supws pwr=1.5 sl=0.02 dt=0.004
 suplane nt=127 ntr=9 | suaddnoise seed=17 | sushw key=cdp a=2 | supws ps=1 pwr=1.5 sl=0.02 dt=0.004
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=3 | supws ps=1
+suspike nt=3 ntr=4 | supws pwr=2
+suspike nt=4 ntr=5 | supws ps=1 sl=0.004 dt=0.004
+suspike nt=19 ntr=1 | sushw key=offset a=123 | supws key=cdp pwr=1 dt=0.004 sl=0 ps=0 verbose=0
+suspike nt=41 ntr=7 | sushw key=cdp a=2 b=1 j=2 | sushw key=offset a=100 b=10 | supws ps=1 pwr=0.5 sl=0.012 dt=0.004
+[stderr] suplane nt=53 ntr=8 | sushw key=ep a=4 b=1 j=3 | supws key=ep ps=2 pwr=2 sl=0.016 dt=0.004 verbose=1
+suplane nt=4097 ntr=3 | supws pwr=2
+suspike nt=4097 ntr=2 | supws ps=1
+sunull nt=23 ntr=4 | supws pwr=2 sl=0.008 dt=0.004
+suplane nt=29 ntr=6 | sushw key=cdp a=1 b=1 j=2 | supws key=cdp ps=0 sl=-0.116 dt=0.004
+suspike nt=31 ntr=4 | sushw key=dt a=0 | supws dt=0 ps=1
+suplane nt=17 ntr=3 | supws sl=0.072 dt=0.004
+suplane nt=17 ntr=3 | supws ps=999999999999999999999
+suplane nt=37 ntr=6 | sushw key=offset a=5 b=-2 | supws key=offset ps=1
+suspike nt=101 ntr=9 | suaddnoise seed=42 | sushw key=cdp a=7 | supws pwr=3.5 ps=0 sl=0.028 dt=0.004
+suspike nt=101 ntr=9 | suaddnoise seed=42 | sushw key=cdp a=7 | supws pwr=3.5 ps=1 sl=0.028 dt=0.004
+[stderr] sunull nt=4 ntr=2 | supws dt=0.004 sl=0.016 ps=1 verbose=1
+suplane nt=257 ntr=5 | sushw key=d1 a=1 b=0.5 | supws key=d1 pwr=0.75 ps=1
+suplane nt=47 ntr=7 | sushw key=cdp a=1 b=1 c=-2 j=2 | supws verbose=1
+suplane nt=23 ntr=4 | supws dt=-0.004 sl=0.04 ps=1

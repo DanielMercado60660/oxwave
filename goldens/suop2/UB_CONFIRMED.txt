@@ -1,0 +1,9 @@
+# ub-2026-11 (round 1)
+# vendor/su-original/src/su/main/operations/suop2.c:331-337 (reads at 333,335; write at 337):
+# complex ptprod at ns=65535 accesses data[65535] outside data[SU_NFLTS].
+# Minimal fix: require i+1 < SU_NFLTS in the loop, skipping the final
+# unpaired sample. Original rc=0 and final sample=-1.875; fixed rc=0
+# and final sample=2.5; only sample 65534 changes, stderr is unchanged.
+# OxWave now uses the same bound and matches fixed C byte for byte.
+# Evidence and exact SU-flag builds: diffcamp/ubx/suop2/.
+sunull nt=65535 ntr=1 | sugain bias=2.5 | sushw key=trid a=111 > a && sunull nt=65535 ntr=1 | sugain bias=-0.75 | sushw key=trid a=111 > b && suop2 a b op=ptprod

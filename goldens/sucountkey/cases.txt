@@ -15,3 +15,19 @@ suplane nt=7 ntr=3 | sucountkey key=cdp,cdp verbose=0
 [stderr] sucountkey key=not_a_header < /dev/null
 [stderr] sucountkey key=cdp verbose=999999999999999999999 < /dev/null
 [stderr] suplane nt=7 ntr=3 | sucountkey key=cdp verbose=0 unknown=1
+# diff-2026-11 (round 1)
+[stderr] sunull nt=2 ntr=1 | sucountkey key=tracl,ns verbose=1
+sunull nt=4 ntr=11 | sushw key=cdp a=10 b=2 j=3 | sucountkey key=cdp,tracl verbose=0
+suspike nt=13 ntr=9 | sushw key=offset a=-4 b=1 j=2 | sucountkey key=offset,ns verbose=0
+suplane nt=4097 ntr=3 | sucountkey key=tracl,tracr,offset verbose=0
+sunull nt=3 ntr=8 | sushw key=d1 a=0.5 b=0.25 j=3 | sucountkey key=d1,dt verbose=2
+[stderr] suspike nt=2 ntr=4 | sucountkey key=tracl,cdp verbose=1
+sunull nt=1 ntr=5 | sushw key=cdp a=3 b=-1 j=2 | sucountkey key=cdp,cdp verbose=-1
+[stderr] suplane nt=11 ntr=4 | sucountkey verbose=1
+sunull nt=2 ntr=4 | sucountkey key=ns verbose=0
+[stderr] sunull nt=2 ntr=1 | sucountkey key=not_a_header verbose=0
+[stderr] sunull nt=2 ntr=1 | sucountkey key=cdp verbose=999999999999999999999
+sunull nt=1 ntr=1200 | sushw key=cdp a=-600 b=1 | sucountkey key=cdp verbose=0
+sunull nt=4 ntr=10 | sushw key=ep a=4 b=-1 j=3 c=2 | suchw key1=offset key2=ep a=1 b=2 | sucountkey key=ep,offset verbose=0
+sunull nt=2 ntr=4 | sucountkey key=cdp key=tracl verbose=0
+[stderr] sunull nt=1 ntr=1 | sucountkey key=cdp,invalid verbose=1

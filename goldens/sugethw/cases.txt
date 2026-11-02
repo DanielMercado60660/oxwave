@@ -27,3 +27,21 @@ sunull nt=1 ntr=1 | sugethw key=ns,dt output=binary
 sugethw output=geom < /dev/null
 sugethw key=tracl output=invalid < /dev/null
 sugethw key=tracl output=geom < /dev/null
+
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sugethw key=tracl,ns,dt
+sunull nt=3 ntr=4 | sushw key=tracl,offset,scalco a=10,-20,-2 b=3,7,1 | sugethw key=offset,tracl,scalco output=ascii verbose=0
+[stderr] suspike nt=4 ntr=2 | sugethw key=tracl,ns,dt output=geom verbose=1
+[f32] suspike nt=11 ntr=3 | sushw key=sx,gx,d1 a=-123,456,0.125 b=5,-7,0.25 | sugethw key=sx,gx,d1,ns output=binary
+suplane nt=4097 ntr=1 | sugethw key=tracl,ns,dt output=geom
+sunull nt=17 ntr=2 | sugethw key=tracl key=ns,dt output=ascii
+sunull nt=2 ntr=1 | sugethw tracl ns output=geom
+sunull nt=3 ntr=1 | sugethw output=bad key=ns
+sunull nt=4 ntr=1 | sugethw key=not_a_header output=geom
+sunull nt=2 ntr=1 | sugethw output=geom
+sunull nt=3 ntr=1 | sushw key=cdp,offset a=17,-30 | suchw key1=cdp key2=cdp key3=offset a=1 b=2 c=1 | sugethw key=cdp,offset output=geom
+sunull nt=2 ntr=1 | sushw key=dt,trid,mark,shortpad a=65535,-32768,32767,-3 | sugethw key=dt,trid,mark,shortpad output=geom
+[f32] sunull nt=3 ntr=1 | sushw key=dt,trid,mark,d1,f1 a=65535,-32768,32767,-0.125,12345.5 | sugethw key=dt,trid,mark,d1,f1 output=binary
+sunull nt=4 ntr=1 | sugethw key=tracl,tracr,fldr,tracf,ep,cdp,cdpt,trid,nvs,nhs,duse,offset,gelev,selev,sdepth,gdel,sdel,swdep,gwdep,scalel,scalco,sx,sy,gx,gy,counit,wevel,swevel,sut,gut,sstat,gstat,tstat,laga,lagb,delrt,muts,mute,ns,dt,gain,igc,igi,corr,sfs,sfe,slen,styp,stas,stae,tatyp,afilf,afils,nofilf,nofils,lcf,hcf,lcs,hcs,year,day,hour,minute,sec,timbas,trwf,grnors,grnofr,grnlof,gaps,otrav,d1,f1,d2,f2,ungpow,unscale,ntr,mark,shortpad output=geom
+sunull nt=16381 ntr=1 | sugethw key=ns,tracl output=ascii
+[stderr] sunull nt=2 ntr=1 | sugethw tracl output=geom verbose=1

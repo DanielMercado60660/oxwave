@@ -13,3 +13,36 @@
 [stderr] suplane nt=7 ntr=3 | sustrip head=header outpar=outpar > in.bin && subset n1=7 n2=4 n3=1 < in.bin
 [stderr] subset n1=1 n2=1 n3=1 < /dev/null
 [stderr] suplane nt=7 ntr=3 | sustrip head=header outpar=outpar | subset n1=7 n2=3 n3=1
+# diff-2026-11 (round 1)
+[f32] sunull nt=2 ntr=1 | sustrip head=header outpar=outpar > in.bin && subset n1=2 n2=1 n3=1 < in.bin
+[f32] sunull nt=3 ntr=1 | sustrip head=header outpar=outpar > in.bin && subset n1=3 n2=1 n3=1 ix1s=2,1,0,2 < in.bin
+[f32] sunull nt=4 ntr=2 | sustrip head=header outpar=outpar > in.bin && subset n1=4 n2=2 n3=1 if1s=1 id1s=2 < in.bin
+[f32] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 if1s=16 id1s=-3 n1s=6 if2s=2 id2s=-1 n2s=3 if3s=1 id3s=-1 n3s=2 < in.bin
+[f32] suspike nt=13 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=13 n2=2 n3=3 ix1s=12,0,5,5 ix2s=1,0,1 ix3s=2,0,1 < in.bin
+[f32] suplane nt=4097 ntr=2 | sustrip head=header outpar=outpar > in.bin && subset n1=4097 n2=2 n3=1 ix1s=4096,2048,0 ix2s=1,0 < in.bin
+[f32] suspike nt=11 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=11 n2=2 < in.bin
+[f32] suspike nt=11 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=11 < in.bin
+[f32] suspike nt=11 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset < in.bin
+[f32] suplane nt=19 ntr=8 | sustrip head=header outpar=outpar > in.bin && subset n1=19 n2=4 n3=2 id1s=3 if1s=2 id2s=2 if2s=1 id3s=1 if3s=1 < in.bin
+[f32] suspike nt=7 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=7 n2=3 n3=2 id1s=0 if1s=3 n1s=4 id2s=0 if2s=2 n2s=2 id3s=0 if3s=1 n3s=2 < in.bin
+[f32] suplane nt=17 ntr=6 | sushw key=offset a=100 b=10 | suchw key1=cdp key2=offset a=0 b=2 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 ix2s=2,0 ix3s=1,0 < in.bin
+[f32] suspike nt=23 ntr=4 | sustrip head=header outpar=outpar > in.bin && subset n1=23 n2=2 n3=2 ix1s=1,,3 ix2s=1,0 ix3s=0,1 < in.bin
+[f32] suspike nt=23 ntr=4 | sustrip head=header outpar=outpar > in.bin && subset n1=23 n2=2 n3=2 n1s=0 < in.bin
+[f32] suspike nt=23 ntr=4 | sustrip head=header outpar=outpar > in.bin && subset n1=23 n2=2 n3=2 n2s=0 < in.bin
+[f32] suspike nt=23 ntr=4 | sustrip head=header outpar=outpar > in.bin && subset n1=23 n2=2 n3=2 n3s=0 < in.bin
+[f32] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 ix1s=0,16 n1s=1 ix2s=2,0 n2s=1 ix3s=1,0 n3s=1 < in.bin
+[f32] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 n1=17 ix1s=16,0 ix1s=3,8 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 verbose=1 ix1s=1,0 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 if1s=16 n1s=2 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 if2s=-1 n2s=1 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 if3s=1 id3s=1 n3s=2 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=3 ix3s=2 < in.bin
+[stderr] suspike nt=17 ntr=2 | sustrip head=header outpar=outpar | subset n2=2 n3=1
+[stderr] suspike nt=17 ntr=2 | sustrip head=header outpar=outpar | subset n1=17 n3=1
+[stderr] suspike nt=17 ntr=2 | sustrip head=header outpar=outpar | subset n1=17 n2=2
+[f32] suspike nt=17 ntr=6 ix1=1 it1=1 ix2=2 it2=4 ix3=4 it3=9 ix4=6 it4=17 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 ix1s=16,8,3,0,8 ix2s=2,0,1 ix3s=1,0 < in.bin
+[f32] suspike nt=17 ntr=6 ix1=1 it1=1 ix2=2 it2=4 ix3=4 it3=9 ix4=6 it4=17 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 if1s=16 id1s=-1 n1s=17 if2s=2 id2s=-1 n2s=3 if3s=1 id3s=-1 n3s=2 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 n1s=-1 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 n2s=-1 < in.bin
+[stderr] suspike nt=17 ntr=6 | sustrip head=header outpar=outpar > in.bin && subset n1=17 n2=3 n3=2 n3s=-1 < in.bin
+[stderr] sunull nt=2 ntr=1 | sustrip head=header outpar=outpar > in.bin && subset n1=-1 n2=1 n3=1 n1s=0 < in.bin

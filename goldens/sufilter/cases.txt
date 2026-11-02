@@ -18,3 +18,110 @@ suspike nt=32 ntr=1 | sufilter f=10,20 amps=1
 suspike nt=32 ntr=1 | sufilter f=10,20 amps=-1,1
 suspike nt=32 ntr=1 | sufilter f=10,20 amps=0,0
 suspike nt=32 ntr=1 | sufilter f=10
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 nspk=1 | sufilter f=0,60,125 amps=1,0,1
+suspike nt=3 ntr=1 nspk=1 | sufilter f=0,30,90 amps=0,1,0
+suspike nt=4 ntr=1 nspk=1 | sufilter f=0,30,90 amps=1,1,0
+suspike nt=17 ntr=3 nspk=1 | sufilter
+suspike nt=257 ntr=2 nspk=1 dt=0.002 | sufilter f=0,15,45,80,120,250 amps=1,0.3,0.3,1,0,0.5
+suspike nt=4097 ntr=1 nspk=1 | sufilter f=4,8,40,60
+suplane nt=101 ntr=4 | sufilter f=5,15,40,60 amps=0,1,1,0
+sunull nt=97 ntr=2 dt=0.002 | sufilter f=0,10,100 amps=1,0,1
+[stderr] suspike nt=53 ntr=1 nspk=1 | sushw key=dt a=0 | sufilter dt=0.003 f=5,20,60 amps=0,1,0 verbose=1
+[stderr] suspike nt=53 ntr=1 nspk=1 | sushw key=trid,d1 a=30,0.003 | sufilter f=0,20,80 amps=1,0,1 verbose=1
+[stderr] suspike nt=67 ntr=1 nspk=1 | sufilter dt=0.002 f=0,125 amps=1,1 verbose=1
+suspike nt=89 ntr=1 nspk=1 | sufilter f=0,10,10,30,60 amps=1,1,0,0,1
+suspike nt=127 ntr=1 nspk=1 | sufilter f=0,20,40 amps=1,2,3
+suspike nt=127 ntr=1 nspk=1 | sufilter f=30,20,40 amps=1,1,1
+suspike nt=127 ntr=1 nspk=1 | sufilter f=0,20,40 amps=0,-1,1
+suspike nt=127 ntr=1 nspk=1 | sufilter f=0,20,40 amps=1,1
+suspike nt=32749 ntr=1 nspk=1 | sufilter f=0,12,25,62 amps=1,0,1,0
+suspike nt=65535 ntr=1 nspk=1 | sufilter
+suspike nt=199 ntr=1 nspk=1 | sushw key=trid,dt,d1 a=109,2000,0.008 | sufilter f=10,20,60,100
+[stderr] suspike nt=199 ntr=1 nspk=1 | sushw key=trid,dt,d1 a=18,2000,0.008 | sufilter f=10,20,40,60 verbose=1
+suplane nt=251 ntr=8 | sufilter f=0,3,12,21,38,50,125 amps=0,1,0.5,0.5,0,1,1
+# diff-2026-11 (round 2)
+suspike nt=2 ntr=1 dt=0.002 | sufilter f=0,80,200 amps=1,0,1
+suspike nt=3 ntr=2 dt=0.004 | sufilter f=0,1,2,125 amps=0,1,0,1
+suspike nt=4 ntr=1 dt=0.004 | sufilter f=0,125 amps=1,1
+suplane nt=103 ntr=3 | sufilter f=0,5,15,15,30,90 amps=0,1,1,0,0,1
+suspike nt=4097 ntr=2 dt=0.001 | sufilter f=0,20,40,200,500 amps=1,0.25,1,0.25,1
+[stderr] sunull nt=1 ntr=1 dt=0.004 | sufilter verbose=1 f=0,125 amps=1,1
+[stderr] suplane nt=127 ntr=3 | sushw key=dt a=0 | sufilter dt=0.002 verbose=1 f=0,25,75,250 amps=0,1,1,0
+suspike nt=97 ntr=3 dt=0.004 | sushw key=dt a=4000 b=1000 | sufilter f=0,20,60,125 amps=1,0,0,1
+suspike nt=101 ntr=1 | sufilter f=0,40,90 amps=0,0,0
+suspike nt=101 ntr=1 | sufilter f=0,40,90 amps=1,-0.5,1
+suspike nt=101 ntr=1 | sufilter f=0,40,90 amps=1,1
+# diff-2026-11 (round 3)
+# Explicit one-based spike positions keep even ntr=1 and nt=1 inputs nonzero.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sufilter
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sufilter
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | sufilter f=0,30,90 amps=1,0,1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sufilter f=0,125 amps=1,1 verbose=1
+suspike nt=5 ntr=1 nspk=1 ix1=1 it1=5 | sufilter f=10,20,40,500 amps=0,0,1,1
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | sufilter f=0,0,0,125 amps=0,1,1,0
+# Match default and explicit corners; a nonzero header dt takes precedence.
+suspike nt=257 ntr=1 nspk=1 ix1=1 it1=129 | sufilter
+suspike nt=257 ntr=1 nspk=1 ix1=1 it1=129 | sufilter dt=0.002 f=12.5,18.75,56.25,62.5 amps=0,1,1,0
+# Edge impulses, long FFTs, and each advertised filter shape.
+suspike nt=103 ntr=4 nspk=4 ix1=1 it1=1 ix2=2 it2=103 ix3=3 it3=51 ix4=4 it4=75 | sufilter f=10,12.5,35,50,60 amps=1,.5,0,.5,1
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 dt=0.001 | sufilter f=10,20,100,200 amps=0,0,1,1
+suspike nt=32749 ntr=1 nspk=1 ix1=1 it1=16375 | sufilter f=0,10,20,30,60,125 amps=1,2,2,0.5,0.5,1
+suspike nt=50021 ntr=1 nspk=1 ix1=1 it1=1 | sufilter f=0,125 amps=1,1
+suplane nt=263 ntr=5 | suaddnoise seed=825 sn=0.5 noise=gauss | sufilter f=10,20,40,50 amps=1,1,0,0
+suplane nt=4097 ntr=4 | suaddnoise seed=223 sn=0.2 noise=flat | sufilter f=10,20,30,40 amps=1,0,0,1
+susynlv nt=257 dt=0.008 nxm=3 nxo=1 | sufilter f=1,3,15,25
+suimp2d nt=257 nrec=3 | sufilter
+# Header branches and first-trace sampling retained across changing headers.
+[stderr] suspike nt=67 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=trid,dt,d1 a=-1,0,0 | sufilter dt=0.003 f=0,10,80 amps=1,0,1 verbose=1
+[stderr] suspike nt=71 ntr=1 nspk=1 ix1=1 it1=36 | sushw key=trid,dt,d1 a=17,0,0.002 | sufilter verbose=1
+[stderr] suspike nt=73 ntr=1 nspk=1 ix1=1 it1=73 | sushw key=trid,dt,d1 a=109,2000,0.008 | sufilter dt=0.003 verbose=1
+[stderr] suspike nt=79 ntr=1 nspk=1 ix1=1 it1=40 | sushw key=trid,dt,d1 a=130,4000,0.002 | sufilter dt=0.003 verbose=1
+suspike nt=101 ntr=4 nspk=4 ix1=1 it1=1 ix2=2 it2=101 ix3=3 it3=51 ix4=4 it4=75 | sushw key=trid,dt,d1 a=17,4000,0.002 b=1,1000,0.001 | sufilter f=0,20,60,125 amps=1,0,0,1
+# Last parameter occurrence, hexadecimal values, empty fields, and high gains.
+[stderr] suspike nt=97 ntr=1 nspk=1 ix1=1 it1=49 | sushw key=dt a=0 | sufilter dt=0.004 dt=0.002 f=30,10 f=0x0p0,0x1p3,0x1p4,0x1p5 amps=1,0 amps=1,0.5,2,1 verbose=0 verbose=1
+suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 | sufilter f=0,10,30,60 amps=1,,1,1
+suspike nt=131 ntr=1 nspk=1 ix1=1 it1=66 | sufilter f=0,10,30,60 amps=0,1000,0.001,0
+# Error paths use valid, nonzero generator input.
+suspike nt=107 ntr=1 nspk=1 ix1=1 it1=54 | sufilter f=0,40,30 amps=1,1,1
+suspike nt=109 ntr=1 nspk=1 ix1=1 it1=55 | sufilter f=0,40,90 amps=1,-1,1
+suspike nt=113 ntr=1 nspk=1 ix1=1 it1=57 | sufilter f=0,40,90 amps=1,1
+suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 | sufilter f=0,40,90 amps=0,0,0
+suspike nt=127 ntr=1 nspk=1 ix1=1 it1=64 | sufilter verbose=2147483648
+suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=32768 | sufilter f=0,125 amps=1,1
+# diff-2026-11 (round 4)
+# Nonzero short traces cover lowpass, highpass, bandreject, and notch shapes.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sufilter f=0,0 amps=1,2
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sufilter f=0,125 amps=0,1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sufilter f=0,40,80,125 amps=1,0,0,1
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sufilter f=0,31.25,62.5,93.75,125 amps=1,.5,0,.5,1
+# Default versus explicit bandpass on an oscillating deterministic signal.
+sunull nt=509 ntr=1 | suop op=exp | suop op=sum | sugain scale=0.0712345 | suop op=cos | sufilter
+sunull nt=509 ntr=1 | suop op=exp | suop op=sum | sugain scale=0.0712345 | suop op=cos | sufilter verbose=0 f=12.5,18.75,56.25,62.5 amps=0,1,1,0
+# Adjacent rounded bins, clamped corners, seeded noise, and maximum accepted nt.
+suspike nt=257 ntr=1 nspk=1 ix1=1 it1=129 | sushw key=dt a=0 | sufilter dt=0.00390625 f=9.599999,9.6,9.600001 amps=0,1,0
+suspike nt=139 ntr=2 nspk=2 ix1=1 it1=1 ix2=2 it2=139 | sufilter f=125,200,300 amps=1,0,1
+suplane nt=4097 ntr=3 | suaddnoise seed=46011 sn=0.2 noise=flat | sufilter f=0,10,35,60 amps=1,1,0,0
+suspike nt=65520 ntr=1 nspk=1 ix1=1 it1=65520 | sufilter f=0,10,20,30,60,125 amps=1,2,2,0.5,0.5,1
+# d1 computed from another header; non-seismic fallback; first-trace precedence.
+[stderr] suspike nt=137 ntr=1 nspk=1 ix1=1 it1=137 | sushw key=dt,trid a=0,130 | suchw key1=d1 key2=tracl b=0.0025 | sufilter dt=0.004 verbose=1
+[stderr] suspike nt=149 ntr=1 nspk=1 ix1=1 it1=75 | sushw key=trid,dt,d1 a=18,2000,0 | sufilter dt=0.006 f=0,5,25,60 amps=0,1,1,0 verbose=1
+[stderr] suspike nt=151 ntr=1 nspk=1 ix1=1 it1=76 | sushw key=trid,dt,d1 a=0,0,0.002 | sufilter verbose=-1
+[stderr] suplane nt=131 ntr=3 | sushw key=trid,dt,d1 a=18,4000,0.008 b=-1,1000,-0.002 | sufilter dt=0.002 f=0,1,30,40 amps=1,0,0,1 verbose=1
+[stderr] suspike nt=131 ntr=1 nspk=1 ix1=1 it1=66 | sufilter f=0,125 amps=0.25,0.25 verbose=1
+susynlv nt=509 dt=0.008 nxm=3 nxo=1 fxm=2 | sufilter f=0,10,20,30,62.5 amps=1,0.5,0,0.5,1
+suimp2d nt=263 nshot=2 nrec=2 | sufilter f=5,15,40,60 amps=0,0,1,1
+[stderr] suspike nt=157 ntr=1 nspk=1 ix1=1 it1=79 | sushw key=dt a=0 | sufilter dt= verbose=1
+# Errors: FFT limit, negative interval, conversion overflow/underflow, and arrays.
+suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=65521 | sufilter f=0,125 amps=1,1
+suspike nt=163 ntr=1 nspk=1 ix1=1 it1=82 | sushw key=dt a=0 | sufilter dt=-0.004
+suspike nt=167 ntr=1 nspk=1 ix1=1 it1=84 | sufilter f=0,1e39 amps=1,0
+suspike nt=173 ntr=1 nspk=1 ix1=1 it1=87 | sufilter f=0,125 amps=1e-320,1
+suspike nt=179 ntr=1 nspk=1 ix1=1 it1=90 | sufilter f=30
+suspike nt=181 ntr=1 nspk=1 ix1=1 it1=91 | sufilter f=0,125 amps=1,0,1
+# Empty input, zero ns, truncated header/data, and a later inconsistent ns.
+sunull nt=3 ntr=0 | sufilter
+sunull nt=0 ntr=1 | sufilter
+sunull nt=3 ntr=1 | head -c 239 | sufilter
+sunull nt=3 ntr=1 | head -c 251 | sufilter
+suspike nt=7 ntr=2 nspk=2 ix1=1 it1=4 ix2=2 it2=7 | sushw key=ns a=7 b=4 | sufilter

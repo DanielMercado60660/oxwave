@@ -9,3 +9,23 @@ sucvs4fowler ncdps=1
 suplane nt=32 ntr=1 | sucvs4fowler nvstack=8
 suplane nt=32 ntr=3 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=8 mxfold=1
 [stderr] suplane nt=31 ntr=1 | sucvs4fowler ncdps=0 nvstack=7 lmute=-1 nonhyp=0
+# diff-2026-11 (round 1)
+[stderr] suspike nt=2 ntr=1 | sushw key=cdp a=4 | sucvs4fowler ncdps=1 nvstack=6 lmute=0
+[stderr] suspike nt=3 ntr=1 | sucvs4fowler ncdps=1 nvstack=7 dtout=0.004 nonhyp=0
+[stderr] suspike nt=4 ntr=1 | sucvs4fowler ncdps=1 nvstack=8 dtout=0.002 lmute=2
+[stderr] suspike nt=127 ntr=4 | sushw key=cdp a=12 b=1 j=2 | sushw key=offset a=0 b=35 | sucvs4fowler ncdps=2 nvstack=12 vminstack=1800 vhyp=1900 nonhyp=1
+[stderr] suplane nt=4097 ntr=2 | sushw key=cdp a=10 | sushw key=offset a=0 b=50 | sucvs4fowler ncdps=1 nvstack=6 dtout=0.004 lmute=4
+[stderr] sunull nt=53 ntr=3 | sushw key=cdp a=7 | sushw key=offset a=0 b=10 | sucvs4fowler ncdps=1 nvstack=7 mxfold=3 salias=0.25
+[stderr] suplane nt=79 ntr=6 | sushw key=cdp a=1 b=1 j=2 | sushw key=offset a=20 b=40 | sucvs4fowler ncdps=3 nvstack=10 lstaper=1 lbtaper=30
+[stderr] suspike nt=101 ntr=5 | sushw key=cdp a=9 | sushw key=offset a=0 b=40 | sucvs4fowler ncdps=1 nvstack=9 salias=1 dtout=0.003 vminstack=2400 vhyp=3000 lmute=12 nonhyp=0 mxfold=5
+[stderr] suplane nt=61 ntr=4 | sushw key=cdp a=3 b=1 j=2 | sucvs4fowler ncdps=1 nvstack=7
+[stderr] suplane nt=67 ntr=4 | sushw key=cdp a=8 b=1 j=2 | sucvs4fowler ncdps=5 nvstack=7 lstaper=2
+[stderr] suspike nt=73 ntr=3 | sushw key=cdp a=5 | sushw key=offset a=25 b=25 | sucvs4fowler ncdps=1 nvstack=11 salias=0 nonhyp=0 lmute=0
+[stderr] suplane nt=97 ntr=3 | sushw key=cdp a=2 | sushw key=offset a=5 b=15 | sucvs4fowler ncdps=1 nvstack=8 lbtaper=500 lstaper=3 verbose=1
+[stderr] suspike nt=37 ntr=2 | sushw key=cdp a=20 b=1 | sucvs4fowler ncdps=2 nvstack=6 dtout=0.008
+[stderr] sunull nt=17 ntr=1 | sucvs4fowler ncdps=1 nvstack=9 salias=1.5 lmute=1
+[stderr] suplane nt=113 ntr=4 | sushw key=cdp a=6 | sushw key=offset a=10 b=20 | sucvs4fowler ncdps=1 nvstack=13 vminstack=1000 vhyp=5000 dtout=0.0015 lmute=5
+suplane nt=12 ntr=1 | sucvs4fowler nvstack=6 dtout=0.004
+sucvs4fowler ncdps=2 nvstack=6
+[stderr] suspike nt=29 ntr=2 | sushw key=cdp a=1 | sucvs4fowler ncdps=1 nvstack=1
+suplane nt=16 ntr=1 | sucvs4fowler ncdps=9999999999999999999999

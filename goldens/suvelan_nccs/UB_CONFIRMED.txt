@@ -1,0 +1,2 @@
+# suvelan_nccs.c:250: converting output interval 80000 microseconds to unsigned short is out of range and undefined; cap it at 65535 before conversion. The fixed output header has dt=65535 instead of 14464; OxWave matches fixed byte for byte.
+suplane nt=101 ntr=3 | suvelan_nccs nx=3 nv=2 dtratio=20

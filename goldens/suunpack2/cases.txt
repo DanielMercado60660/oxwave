@@ -9,3 +9,20 @@ suplane nt=31 ntr=2 | suaddnoise seed=123 | supack2 gpow=0.7 | suunpack2
 suplane nt=7 ntr=1 | supack2 | suunpack2 verbose=1
 suunpack2
 suplane nt=7 ntr=1 | suunpack2
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | supack2 gpow=1 | suunpack2
+suspike nt=3 ntr=2 | supack2 gpow=0.5 | suunpack2
+suspike nt=4 ntr=3 | supack2 gpow=0.7 | suunpack2
+suplane nt=4097 ntr=2 | supack2 gpow=1 | suunpack2
+suplane nt=127 ntr=4 | suaddnoise seed=123 | supack2 gpow=2 | suunpack2
+sunull nt=13 ntr=3 | supack2 gpow=1 | suunpack2
+suplane nt=17 ntr=3 | sushw key=offset,cdp a=-200,10 b=100,1 | supack2 | suunpack2 verbose=1
+suplane nt=23 ntr=3 | supack2 gpow=1 | sushw key=unscale a=0.25 b=0.25 | suunpack2
+suplane nt=29 ntr=3 | supack2 gpow=0.5 | sushw key=ungpow a=2 b=1 | suunpack2
+suplane nt=19 ntr=2 | supack2 gpow=0.7 | sushw key=ungpow a=0 | suunpack2
+suplane nt=11 ntr=1 | sushw key=trid a=2 | suunpack2 ignored=1
+suplane nt=32767 ntr=1 | supack2 gpow=0.5 | suunpack2
+suplane nt=37 ntr=3 | suaddnoise seed=9 | supack2 gpow=1 | sushw key=unscale a=-0.01 b=0.01 | suunpack2
+suplane nt=41 ntr=2 | supack2 gpow=0.7 | sushw key=ungpow a=1.000001 | suunpack2
+suplane nt=43 ntr=2 | supack2 gpow=0.7 | sushw key=ungpow a=1.999999 | suunpack2
+suplane nt=47 ntr=3 | supack2 gpow=1 | sushw key=ungpow a=1 b=1 | suunpack2

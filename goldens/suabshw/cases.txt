@@ -14,3 +14,16 @@ suplane nt=7 ntr=3 | sushw key=dt a=2000 b=1 | suabshw key=dt
 [stderr] suabshw key=notakey
 [stderr] suabshw key=
 [stderr] suabshw
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | sushw key=offset a=-123 | suabshw key=offset
+suspike nt=3 ntr=3 it1=1 it3=1 | sushw key=cdp a=-10 b=10 | suabshw key=cdp
+sunull nt=4 ntr=4 | sushw key=scalco a=-3 b=2 | suabshw key=scalco
+suspike nt=11 ntr=5 | sushw key=d2 a=-2.25 b=1.125 | suabshw key=d2
+sunull nt=4097 ntr=2 | sushw key=gelev a=-500 b=1000 | suabshw key=gelev
+suspike nt=13 ntr=1 | suabshw key=ns
+sunull nt=1 ntr=3 | sushw key=offset a=-7 b=7 | suabshw
+sunull nt=3 ntr=3 | sushw key=offset a=-3 b=3 | sushw key=delrt a=-9 b=9 | suabshw key=offset key=delrt
+[stderr] suspike nt=4 ntr=2 | sushw key=trid a=-2 b=1 | suabshw key=trid verbose=1
+[stderr] sunull nt=2 ntr=1 | suabshw key=invalid_header
+[stderr] sunull nt=2 ntr=1 | suabshw key=
+[stderr] sunull nt=2 ntr=1 | suabshw key=offset unexpected=1

@@ -19,3 +19,23 @@ suplane nt=32 ntr=1 | sutaupnmo vnmo=1500,1600 tnmo=1,0
 suplane nt=32 ntr=1 | sutaupnmo smute=0
 suplane nt=32 ntr=1 | sutaupnmo smute=-1
 suplane nt=64 ntr=1 | sutaupnmo lmute=-2 sscale=-1
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sutaupnmo lmute=0
+suspike nt=3 ntr=1 | sutaupnmo lmute=0 smute=2
+suspike nt=4 ntr=1 | sutaupnmo lmute=0 smute=1 sscale=0
+suplane nt=4097 ntr=1 | sutaupnmo lmute=0 vnmo=1500
+suplane nt=103 ntr=3 | sushw key=f2,d2,tracr a=0.00015,0.00001,1 b=0,0,1 | sutaupnmo lmute=0 smute=2 vnmo=1200,2200,1800 tnmo=0,0.2,1
+suspike nt=113 ntr=3 k1=20,60,90 | sushw key=f2,tracr a=0.0002,1 b=0,1 | sutaupnmo lmute=3 smute=3 vnmo=1400 sscale=0
+sunull nt=71 ntr=4 dt=0.002 | sushw key=cdp,f2,tracr a=30,0.0001,1 b=20,0,1 | sutaupnmo cdp=90,30 vnmo=2000,2400 vnmo=1200,1600 tnmo=0,1 tnmo=0,1 lmute=0 smute=2 sscale=1
+suplane nt=151 ntr=4 | sushw key=cdp,f2,d2,tracr,delrt a=10,0.0001,0.00002,1,200 b=15,0,0,1,0 | sutaupnmo cdp=10,40,70 vnmo=1400 vnmo=1700 vnmo=2000 tnmo=0 tnmo=0 tnmo=0 lmute=0 smute=2
+[stderr] suspike nt=37 ntr=2 | sutaupnmo verbose=1 lmute=0 vnmo=1800 smute=2 sscale=0
+suplane nt=83 ntr=2 | sushw key=f2 a=0.001 b=0 | sutaupnmo lmute=0 smute=0.5 vnmo=1500
+suplane nt=67 ntr=2 | sutaupnmo lmute=0 smute=1.5 sscale=1 vnmo=1500 tnmo=0
+suplane nt=31 ntr=1 | sutaupnmo cdp=1,2 vnmo=1500 vnmo=1600 tnmo=0
+suplane nt=31 ntr=1 | sutaupnmo vnmo=1500,1600 tnmo=0,0
+suspike nt=401 ntr=5 k1=50,100,200,300 mag=1,2,-1,3 | sushw key=cdp,f2,d2,tracr a=10,0.00012,0.000015,1 b=20,0,0,1 | sutaupnmo cdp=80,20,50 vnmo=2400,1800 vnmo=1000,1600 vnmo=1400,2200 tnmo=0,1 tnmo=0,1 tnmo=0,1 lmute=0 smute=1.5
+suspike nt=257 ntr=3 k1=30,80,140 mag=1,-2,3 | sushw key=delrt,f2,d2,tracr a=100,0.0002,0.00002,1 b=0,0,0,1 | sutaupnmo vnmo=1200,2000,3000 tnmo=0,0.3,0.8 lmute=10 smute=2 sscale=0
+suspike nt=257 ntr=2 k1=30,80,140 mag=1,-2,3 | sushw key=f2 a=0.0003 b=0 | sutaupnmo lmute=5 smute=1.2 vnmo=1800
+suplane nt=257 ntr=3 | suaddnoise sn=5 seed=12345 | sushw key=f2,d2,tracr a=0.0002,0.00002,1 b=0,0,1 | sutaupnmo lmute=0 smute=2 vnmo=1800 sscale=0
+suspike nt=101 ntr=2 k1=50 | sushw key=dt,f2 a=1000,0.0004 b=0,0 | sutaupnmo lmute=0 smute=1.1 vnmo=2200
+suspike nt=101 ntr=2 k1=50 | sushw key=f2 a=0.0004 b=0 | sutaupnmo lmute=0 smute=1.01 vnmo=2200

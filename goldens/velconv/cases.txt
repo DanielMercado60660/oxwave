@@ -23,3 +23,29 @@
 [stderr] velconv intype=othert outtype=zt nt=3
 [stderr] velconv intype=otherz outtype=othert nt=3 otherfile=missing
 [f32] vtlvz nt=1 dt=0.004 v0=2000 a=0 > in && velconv < in intype=vintz outtype=zt nz=1 nt=3 dz=4 dt=0.004 fz=1
+# diff-2026-11 (round 1)
+[f32] makevel nx=1 nz=2 v000=2000 dvdz=25 > in && velconv < in intype=vintt outtype=zt nt=2 dt=0.004 dz=4 nx=1
+[f32] makevel nx=1 nz=3 v000=1800 dvdz=20 > in && velconv < in intype=vrmst outtype=vintt nt=3 dt=0.004 dz=4 ft=0.002 fz=1
+[f32] makevel nx=1 nz=4 v000=1500 dvdz=50 > in && velconv < in intype=vintz outtype=tz nz=4 nt=4 dz=3 dt=0.004
+[f32] makevel nx=1 nz=7 v000=2000 dvdz=30 > in && velconv < in intype=vintt outtype=vintz nt=7 nz=7 dt=0.004 dz=4
+[f32] makevel nx=3 nz=11 v000=1800 dvdz=15 dvdx=100 > in && velconv < in intype=vintz outtype=vrmst nz=11 nt=11 dz=3 dt=0.003 nx=2
+[f32] makevel nx=1 nz=4097 v000=2000 dvdz=0.01 > in && velconv < in intype=vintt outtype=zt nt=4097 nz=4097 dt=0.004 dz=4
+[f32] vtlvz nt=13 dt=0.002 v0=1800 a=0.2 > in && velconv < in intype=vrmst outtype=tz nt=13 nz=13 dt=0.002 dz=2
+[f32] vtlvz nt=17 dt=0.004 v0=2100 a=0.3 > in && velconv < in intype=vintz outtype=vintt nz=17 nt=17 dz=4 dt=0.004 ft=0.001 fz=1
+[f32] makevel nx=1 nz=9 v000=2 dvdz=0.1 > in && velconv < in intype=vintt outtype=zt
+[f32] makevel nx=1 nz=9 v000=2 dvdz=0.1 > in && velconv < in intype=vintt outtype=zt nt=9 nz=9 dt=1 ft=0 dz=1 fz=0 nx=1 verbose=0
+[f32] makevel nx=1 nz=9 v000=2000 dvdz=10 > in && velconv < in intype=vintt outtype=zt nt=9 dt=0.004 dz=4 > depth && velconv < depth intype=zt outtype=vrmst nt=9 dt=0.004 dz=4
+[f32] makevel nx=1 nz=9 v000=2000 dvdz=10 > in && velconv < in intype=vintz outtype=tz nz=9 dz=4 dt=0.004 > time && velconv < time intype=tz outtype=vintz nz=9 dz=4 dt=0.004
+[f32] makevel nx=1 nz=7 v000=2000 dvdz=20 > in && makevel nx=1 nz=7 v000=5 dvdz=0.5 > other && velconv < in intype=othert outtype=otherz nt=7 nz=7 dt=0.004 dz=4 otherfile=other nx=1 verbose=1
+[f32] makevel nx=1 nz=7 v000=2000 dvdz=20 > in && makevel nx=1 nz=7 v000=5 dvdz=0.5 > other && velconv < in intype=otherz outtype=othert nt=7 nz=7 dt=0.004 dz=4 otherfile=other nx=1
+[f32] makevel nx=1 nz=1 v000=2000 > in && velconv < in intype=vintz outtype=zt nz=1 nt=3 dz=4 dt=0.004 fz=1 nx=1
+[f32] makevel nx=2 nz=5 v000=1900 dvdx=100 dvdz=20 > in && velconv < in intype=vrmst outtype=zt nt=5 dt=0.004 dz=4 nx=1
+[stderr] makevel nx=1 nz=4 v000=-100 > in && velconv < in intype=vrmst outtype=zt nt=4 dt=0.004 dz=4
+[stderr] makevel nx=1 nz=4 v000=-100 > in && velconv < in intype=vintz outtype=tz nz=4 dt=0.004 dz=4
+[stderr] makevel nx=1 nz=4 v000=2000 > in && velconv < in outtype=zt nt=4
+[stderr] makevel nx=1 nz=4 v000=2000 > in && velconv < in intype=othert outtype=otherz nt=4
+[f32] makevel nx=1 nz=1 v000=2000 > in && velconv < in intype=vintt outtype=zt nt=1 nz=3 dt=0.004 dz=4 fz=-4 nx=1
+[stderr] makevel nx=1 nz=7 v000=2000 > in && makevel nx=1 nz=7 v000=5 > other && velconv < in intype=othert outtype=otherz nt=7 nz=7 dt=0.004 dz=4 otherfile=other verbose=1 > /dev/null
+[f32] suspike nt=7 ntr=2 k1=1 mag=2000 | sushw key=dt,delrt a=4000,10 | sustrip outpar=/dev/null > in && velconv < in intype=vrmst outtype=zt nt=7 nz=7 dt=0.004 dz=4 nx=2
+[f32] makevel nx=1 nz=9 v000=2000 dvdz=10 > in && makevel nx=1 nz=9 v000=5 dvdz=1 > other && velconv < in intype=othert outtype=otherz nt=9 nz=5 dt=0.004 dz=4 otherfile=other
+[f32] makevel nx=1 nz=9 v000=2000 dvdz=10 > in && makevel nx=1 nz=9 v000=5 dvdz=1 > other && velconv < in intype=otherz outtype=othert nz=9 nt=5 dt=0.004 dz=4 otherfile=other

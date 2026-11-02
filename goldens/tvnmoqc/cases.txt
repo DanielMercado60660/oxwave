@@ -16,3 +16,22 @@
 [stderr] tvnmoqc cdp=1 tnmo=0,1 vnmo=1500
 [stderr] tvnmoqc cdp=1 tnmo= vnmo=
 [stderr] tvnmoqc mode=2 prefix=missing/path cdp=1 tnmo=0 vnmo=1
+# diff-2026-11 (round 1)
+[stderr] suspike nt=1 ntr=1 | (cat >/dev/null; tvnmoqc cdp=7 tnmo=0 vnmo=1500)
+[stderr] sunull nt=2 ntr=1 | (cat >/dev/null; tvnmoqc mode=1 cdp=2 tnmo=0,0.5 vnmo=1400,1600)
+[stderr] suplane nt=3 ntr=1 | sushw key=cdp a=99 | (cat >/dev/null; tvnmoqc mode=1 cdp=8,4 tnmo=0,1,2 vnmo=1000,2000,3000 tnmo=0.2,0.7 vnmo=1100,1900 verbose=1)
+[stderr] suspike nt=4 ntr=1 | (cat >/dev/null; tvnmoqc mode=1 cdp=-20 tnmo=1,1,0,-1 vnmo=1500,1600,1700,1800)
+[stderr] sunull nt=7 ntr=3 | (cat >/dev/null; tvnmoqc mode=2 prefix=pick cdp=10,-4 tnmo=0,0.125,2 vnmo=1500.5,2000,3e3 tnmo=-1,4 vnmo=-200,0 && cat pick.10 pick.-4)
+[stderr] suspike nt=4097 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 prefix=dup cdp=5,5 tnmo=0 vnmo=1 tnmo=1,2 vnmo=3,4 && cat dup.5)
+[stderr] suplane nt=11 ntr=2 | (cat >/dev/null; tvnmoqc mode=3 cdp=1 tnmo=-2,-1,0,1,2 vnmo=1,2,3,4,5)
+[stderr] sunull nt=13 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 prefix=prec cdp=0 tnmo=0.000001234567,1.23456789,12345678 vnmo=0.00001234567,1234567,-123.456789 && cat prec.0)
+[stderr] suspike nt=3 ntr=1 | (cat >/dev/null; tvnmoqc cdp=1,2 tnmo=0 vnmo=1 tnmo=1 vnmo=2 cdp=9,10)
+[stderr] sunull nt=4 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 cdp=1 tnmo=0 vnmo=1)
+[stderr] suplane nt=7 ntr=1 | (cat >/dev/null; tvnmoqc cdp=1,2 tnmo=0 vnmo=1 tnmo=0,1 vnmo=2)
+[stderr] suspike nt=2 ntr=1 | (cat >/dev/null; tvnmoqc cdp=1 tnmo=0,1 vnmo=)
+[stderr] sunull nt=1 ntr=1 | (cat >/dev/null; tvnmoqc cdp=1 tnmo=0 vnmo=1 vnmo=2)
+[stderr] sunull nt=3 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 prefix=special cdp=-7 tnmo=-inf,0,inf,nan vnmo=nan,inf,-inf,-0 && cat special.-7)
+[stderr] suspike nt=7 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 prefix=commas cdp=1 tnmo=0,,2, vnmo=1000,,2000, && cat commas.1)
+[stderr] sunull nt=3 ntr=1 | (cat >/dev/null; tvnmoqc mode=1 cdp=1,2,3 tnmo=0 vnmo=1 tnmo=0,1 vnmo=2,3 tnmo=0,1,2,3,4,5,6,7,8,9,10 vnmo=1,2,3,4,5,6,7,8,9,10,11)
+[stderr] suspike nt=4 ntr=1 | (cat >/dev/null; tvnmoqc mode=2 prefix=missing/dir/pick cdp=1 tnmo=0 vnmo=1)
+[stderr] sunull nt=2 ntr=1 | (cat >/dev/null; tvnmoqc mode=1 cdp=1 tnmo=0,1 vnmo=1500,not_a_number)

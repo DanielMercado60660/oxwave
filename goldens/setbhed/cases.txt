@@ -11,3 +11,31 @@
 [exact] printf 'jobid=3\n' > params && setbhed par=params jobid=4 jobid=5 bfile=out && cat out
 [stderr] setbhed bfile=
 [stderr] setbhed par=missing-params
+# diff-2026-11 (round 1)
+[exact] suplane ntr=1 nt=1 > input.su && setbhed bfile=out jobid=1 lino=2 reno=3 < input.su && cat out
+[exact] suspike ntr=1 nt=2 > input.su && setbhed ntrpr=1 nart=2 hdt=1000 dto=2000 < input.su && cat binary
+[exact] sunull ntr=1 nt=3 > input.su && setbhed hns=3 nso=4 format=1 fold=5 < input.su && cat binary
+[exact] suplane ntr=2 nt=4 > input.su && setbhed tsort=4 vscode=32 hsfs=10 hsfe=90 < input.su && cat binary
+[exact] suspike ntr=2 nt=7 > input.su && setbhed hslen=1000 hstyp=2 schn=3 hstas=4 hstae=5 < input.su && cat binary
+[exact] suplane ntr=1 nt=4097 > input.su && setbhed bfile=out hns=4097 hdt=4000 < input.su && cat out
+[exact] sunull ntr=2 nt=17 | sushw key=dt a=7000 > input.su && setbhed dto=42 nso=9 < input.su && cat binary
+[exact] setbhed bfile=out jobid=0 lino=0 reno=0 ntrpr=0 hdt=0 nart=0 dto=0 hns=0 nso=0 format=0 fold=0 tsort=0 vscode=0 hsfs=0 hsfe=0 hslen=0 hstyp=0 schn=0 hstas=0 hstae=0 htatyp=0 hcorr=0 bgrcv=0 rcvm=0 mfeet=0 polyt=0 vpol=0 && cat out
+[exact] setbhed jobid=2147483647 lino=-2147483648 reno=-1 && cat binary
+[exact] setbhed ntrpr=32767 nart=32768 hdt=65535 dto=65536 hns=-32768 nso=-65537 && cat binary
+[exact] setbhed format=32768 fold=-32769 tsort=65535 vscode=65536 hsfs=-1 hsfe=-65536 && cat binary
+[exact] setbhed hslen=2147483647 hstyp=-2147483648 schn=65537 hstas=-65537 hstae=32768 && cat binary
+[exact] setbhed htatyp=65535 hcorr=65536 bgrcv=-32769 rcvm=32768 mfeet=-1 polyt=65537 vpol=-65537 && cat binary
+[exact] setbhed jobid=12tail lino=+34 reno=-56 ntrpr=abc hdt= && cat binary
+[exact] setbhed jobid=1 jobid=2 hns=10 hns=20 bfile=out && cat out
+[exact] printf 'jobid=31\nlino=-42\nhns=99\nformat=5\n' > params && setbhed par=params bfile=out lino=7 && cat out
+[exact] setbhed bfile=/dev/stdout jobid=0x10 hns=0042 format=3
+[stderr] setbhed verbose=1 jobid=17 hns=5 bfile=out && cat out
+[stderr] setbhed hns=2147483648
+[stderr] setbhed reno=-2147483649
+[stderr] setbhed bfile=/missing-dir/out jobid=3
+[stderr] setbhed par=no-such-params
+[exact] suplane ntr=1 nt=1 > input.su && setbhed bfile=out < input.su && cat out
+[exact] suspike ntr=1 nt=3 > input.su && setbhed format=-1 fold=-2 tsort=-3 vscode=-4 < input.su && cat binary
+[exact] sunull ntr=1 nt=5 > input.su && setbhed bfile=/dev/stdout jobid=42 hns=5 format=5 < input.su
+[exact] suspike ntr=1 nt=19 > input.su && setbhed jobid=-7 lino=8 reno=-9 hsfs=12 hsfe=18 < input.su && cat binary
+[exact] suplane ntr=1 nt=23 > input.su && setbhed htatyp=3 hcorr=2 bgrcv=1 rcvm=4 mfeet=2 polyt=1 vpol=8 < input.su && cat binary

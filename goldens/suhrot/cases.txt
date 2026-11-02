@@ -19,3 +19,30 @@ suspike nt=19 ntr=6 | suaddnoise sn=2 seed=5 | suhrot a=0.8 inv=1
 suplane nt=4 ntr=3 | suhrot afile=missing xfile=missing
 suplane nt=4 ntr=3 | suhrot afile=/dev/null xfile=/dev/null n=-1
 python3 -c 'import struct;open("a.bin","wb").write(struct.pack("=f",1));open("x.bin","wb").write(b"x")' && suplane nt=4 ntr=3 | suhrot afile=a.bin xfile=x.bin n=1
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=3 | suhrot angle=rad inv=0 a=0
+suspike nt=2 ntr=6 | suaddnoise seed=11 sn=3 | suhrot a=1.2
+suspike nt=3 ntr=4 | suaddnoise seed=12 sn=3 | suhrot a=-0.7 inv=1
+suspike nt=4 ntr=6 | suaddnoise seed=13 sn=3 | sushw key=gx,gy a=20,30 | suhrot
+suspike nt=31 ntr=9 | suaddnoise seed=14 sn=3 | sushw key=cdp a=-3 b=2 | suhrot key=cdp x=0,4,8 a=0,45,90 angle=deg
+suspike nt=31 ntr=12 | suaddnoise seed=15 sn=3 | sushw key=cdp a=-3 b=2 | suhrot key=cdp x=8,4,0 a=100,50,0 angle=gon inv=1
+[stderr] suspike nt=7 ntr=6 | suaddnoise seed=16 sn=3 | sushw key=gx,gy a=-4,-7 | suhrot verbose=1
+[stderr] suspike nt=7 ntr=6 | suaddnoise seed=17 sn=3 | sushw key=offset a=3 b=1 | suhrot key=offset x=0,6 a=-1,1 verbose=1
+suplane nt=4097 ntr=3 | suhrot a=0.35
+sunull nt=13 ntr=6 | sushw key=tracf a=2 b=1 | suhrot x=0,10 a=-0.5,0.5
+suplane nt=23 ntr=2 | suhrot a=0.5
+suplane nt=23 ntr=7 | sushw key=gx,gy a=1,-1 | suhrot inv=1
+python3 -c 'import struct;open("a.bin","wb").write(struct.pack("=3f",-45,0,90));open("x.bin","wb").write(struct.pack("=3f",0,3,6))' && suspike nt=17 ntr=9 | suaddnoise seed=18 sn=2 | sushw key=cdp a=0 b=1 | suhrot afile=a.bin xfile=x.bin n=3 key=cdp angle=deg inv=1
+[stderr] suplane nt=5 ntr=3 | suhrot angle=gon a=100 verbose=1
+suplane nt=5 ntr=3 | suhrot angle=degrees
+suplane nt=5 ntr=3 | suhrot x=1,2 a=1
+suplane nt=5 ntr=3 | suhrot afile=missing xfile=missing n=1
+python3 -c 'open("a.bin","wb").write(b"1234")' && suplane nt=5 ntr=3 | suhrot afile=a.bin xfile=missing n=1
+suspike nt=11 ntr=9 | suaddnoise seed=21 sn=2 | sushw key=tracf a=0 b=1 | suhrot x=0,3,6 a=0,1,2 angle=rad
+suspike nt=11 ntr=3 | suaddnoise seed=22 sn=2 | suhrot a=6.2831853 inv=2
+suspike nt=1 ntr=1 | suhrot a=0.25 key=tracf
+suspike nt=17 ntr=9 | suaddnoise seed=25 sn=2 | sushw key=gx,gy a=-10,20 b=3,-4 | suhrot inv=0
+suspike nt=17 ntr=9 | suaddnoise seed=26 sn=2 | sushw key=sx,sy,gx,gy a=-20,30,-10,10 b=1,-1,2,-2 | suhrot
+suspike nt=13 ntr=9 | suaddnoise seed=27 sn=2 | sushw key=d1 a=0.5 b=0.25 | suhrot key=d1 x=0,1,2 a=-1,0,1
+[stderr] suspike nt=13 ntr=6 | suaddnoise seed=28 sn=2 | sushw key=gx,gy a=0,-4 | suhrot inv=1 verbose=1
+suplane nt=19 ntr=3 | suhrot key=notakey a=1

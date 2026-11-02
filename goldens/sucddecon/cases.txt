@@ -13,3 +13,24 @@ sucddecon filter=1
 suplane nt=64 ntr=1 | sucddecon
 suplane nt=64 ntr=1 | sucddecon sufile=missing.su
 suplane nt=64 ntr=1 | sucddecon filter=1 panel=999999999999999999999
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sucddecon filter=1
+suspike nt=3 ntr=2 | sucddecon filter=1 pnoise=0.02
+suspike nt=4 ntr=3 | sucddecon filter=1 sym=1
+suplane nt=101 ntr=4 | sucddecon filter=1,-0.25,0.125 pnoise=0.03
+suspike nt=4097 ntr=2 | sucddecon filter=1,0.5
+sunull nt=128 ntr=2 | sucddecon filter=1,0.2 pnoise=0.001
+[stderr] suspike nt=90 ntr=3 | sucddecon filter=0.5,-0.3,0.2,0.1 panel=1 sym=1 verbose=1
+suspike nt=16 ntr=3 | sushw key=delrt a=11 b=4 > filt.su && suplane nt=96 ntr=3 | sushw key=delrt a=50 b=3 | sucddecon sufile=filt.su panel=1 pnoise=0.02 sym=1
+suspike nt=96 ntr=1 | sushw key=delrt a=7 > filt.su && suspike nt=96 ntr=2 | sushw key=delrt a=23 | sucddecon sufile=filt.su panel=0 verbose=1
+suplane nt=120 ntr=2 | sucddecon filter=1,0,0,0 pnoise=0 sym=0
+suplane nt=120 ntr=1 | sucddecon filter=1 sufile=missing.su
+suplane nt=120 ntr=1 | sucddecon pnoise=1e999 filter=1
+suspike nt=32769 ntr=1 | sucddecon filter=1,0.3,-0.1 sym=1
+suspike nt=65535 ntr=1 | sucddecon filter=1
+suspike nt=97 ntr=4 | suaddnoise sn=5 seed=12345 | sucddecon filter=1,-0.75,0.25 pnoise=0.2
+suspike nt=96 ntr=3 | suaddnoise sn=3 seed=14 > filt.su && suspike nt=96 ntr=3 | sucddecon sufile=filt.su panel=1 pnoise=0.1
+
+# ub-2026-11 (round 1)
+suspike nt=16 ntr=1 | sucddecon filter=

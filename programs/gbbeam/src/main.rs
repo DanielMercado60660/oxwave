@@ -158,11 +158,6 @@ fn main() {
     getparfloat("bw", &mut bw);
     getparint("krecord", &mut krecord);
     getparint("nt", &mut nt);
-    if nt < 0 {
-        // C converts nt to size_t in efwrite and reads beyond syn. Reject
-        // that undefined case before FFT allocation or output slicing.
-        err!("nt must be nonnegative");
-    }
     getparfloat("dt", &mut dt);
     getparfloat("ft", &mut ft);
     getparint("reftrans", &mut reftrans);
@@ -323,6 +318,11 @@ fn makesyn(
     natten: i32,
     infofp: Option<&CFile>,
 ) {
+    if nt < 0 {
+        // C converts nt to size_t in efwrite and reads beyond syn. Reject
+        // that undefined case here, after main's parameter diagnostics.
+        err!("nt must be nonnegative");
+    }
     let ntfft = npfaro(nt, nt.wrapping_mul(2)) as usize;
     let nw = ntfft / 2 + 1;
     let dw = (2.0 * PI / (ntfft as f32 * dt) as f64) as f32;

@@ -70,3 +70,63 @@
 # Coefficients are not parsed when no solver callback is needed.
 [exact] [stderr] lorenz stepmax=0 rho=1e999
 [exact] [stderr] lorenz stepmax=3 h=0 rho=1e999
+
+# diff-2026-11 (round 1)
+# lorenz is a raw-float generator: it never reads stdin or SU headers.
+# Drain the generator before invoking lorenz so large inputs cannot SIGPIPE.
+# Defaults and explicit defaults; every parameter is passed to lorenz itself.
+[f32] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz; }
+[f32] sunull nt=2 ntr=1 | { cat >/dev/null; lorenz stepmax=500 verbose=0 y0=1 y1=-1 y2=1 h=.01 tol=1e-8 mode=xy rho=28 sigma=10 eta=1.666666667; }
+# All seven modes, short output sizes, and distinct initial conditions.
+[exact] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | { cat >/dev/null; lorenz stepmax=1 mode=xyz y0=-0 y1=3.5 y2=-7.25; }
+[f32] sunull nt=2 ntr=1 | { cat >/dev/null; lorenz stepmax=2 mode=xy y0=-3 y1=2 y2=4; }
+[f32] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=yz rho=16 sigma=7 eta=2.5; }
+[f32] sunull nt=4 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xz h=.03 tol=1e-11; }
+[f32] suplane nt=17 ntr=3 npl=1 | { cat >/dev/null; lorenz stepmax=17 mode=xyz y0=2 y1=-3 y2=5 rho=35 sigma=12 eta=2 h=.015 tol=1e-9; }
+[f32] suspike nt=31 ntr=5 nspk=1 ix1=3 it1=7 | { cat >/dev/null; lorenz stepmax=31 mode=x sigma=0; }
+[f32] sunull nt=37 ntr=2 | { cat >/dev/null; lorenz stepmax=37 mode=y rho=-5 sigma=3 eta=.25 h=.005; }
+[f32] suplane nt=41 ntr=5 npl=1 | { cat >/dev/null; lorenz stepmax=41 mode=z eta=0 y0=-2 y1=3 y2=-1; }
+# Long trajectories and large, prime-length input; output stays below 100 KB.
+[f32] sunull nt=4097 ntr=1 | { cat >/dev/null; lorenz stepmax=4097 mode=xyz; }
+[f32] suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=2053 | { cat >/dev/null; lorenz stepmax=8191 mode=xyz h=.02; }
+# Identical lorenz arguments under different generators and header values.
+[f32] sunull nt=97 ntr=3 | { cat >/dev/null; lorenz stepmax=97 mode=xyz h=.003 rho=22 sigma=8 eta=2.25; }
+[f32] suspike nt=97 ntr=3 nspk=1 ix1=2 it1=47 | sushw key=dt,delrt,offset,tracl a=0,-123,-900,17 b=0,7,31,-2 | suchw key1=cdp key2=tracl key3=offset a=11 b=2 c=-1 d=1 | { cat >/dev/null; lorenz stepmax=97 mode=xyz h=.003 rho=22 sigma=8 eta=2.25; }
+# Half-minimum-step threshold, forward/backward integration, solver diagnostics.
+[f32] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xyz h=5e-7 verbose=1; }
+[f32] [stderr] sunull nt=2 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xyz h=5.000000001e-7 verbose=1; }
+[f32] [stderr] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xyz h=-5.000000001e-7 verbose=1; }
+[f32] [stderr] suplane nt=13 ntr=3 npl=1 | { cat >/dev/null; lorenz stepmax=13 mode=xyz h=-.015 tol=1e-13 verbose=2; }
+[f32] [stderr] sunull nt=7 ntr=1 | { cat >/dev/null; lorenz stepmax=7 mode=xyz h=.25 tol=1e-20 verbose=1 rho=45 sigma=17 eta=3; }
+[f32] [stderr] sunull nt=4 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xyz h=.2 tol=-1 verbose=1 y0=0 y1=0 y2=0; }
+# Large time increments at the zero equilibrium exercise solver step doubling.
+[exact] [stderr] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz h=3 y0=0 y1=0 y2=0 verbose=1; }
+[exact] [stderr] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz h=-3 y0=0 y1=0 y2=0 verbose=-1; }
+[exact] sunull nt=4 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=xyz h=-0 y0=-0 y1=0 y2=-0; }
+# Nonzero Lorenz equilibrium (rho=2, sigma=10, eta=1), plus coefficient extremes.
+[exact] sunull nt=11 ntr=1 | { cat >/dev/null; lorenz stepmax=11 mode=xyz rho=2 sigma=10 eta=1 y0=1 y1=1 y2=1 h=.5; }
+[f32] sunull nt=23 ntr=1 | { cat >/dev/null; lorenz stepmax=23 mode=xyz rho=100 sigma=1000 eta=8 h=.0001 tol=1e-12; }
+[f32] sunull nt=29 ntr=1 | { cat >/dev/null; lorenz stepmax=29 mode=xyz rho=-10 sigma=-2 eta=-1 h=-.001; }
+# getpar syntax, exact hex subnormals (accepted), NaN, and ignored arguments.
+[f32] [stderr] sunull nt=5 ntr=1 | { cat >/dev/null; lorenz stepmax=5 mode=xyz y0=0x1p-1074 rho=0x1.cp4 sigma=0x1.4p3 eta=0x1p1 h=0x1p-7 tol=0x1p-30 verbose=1; }
+[f32] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz y0=nan; }
+[f32] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz h=nan; }
+[f32] [stderr] sunull nt=5 ntr=1 | { cat >/dev/null; lorenz stepmax=2 stepmax=5 mode=invalid mode=xyz rho=11 rho=26 verbose=1 unused=ignored; }
+[f32] [stderr] sunull nt=3 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz y0= y1= y2= h= tol= rho= sigma= eta= verbose=; }
+# Zero/negative output sizes do not evaluate coefficient parameters.
+[exact] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=0 verbose=1 rho=1e999 sigma=1e999 eta=1e999; }
+[exact] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=-2147483648 verbose=1; }
+# No parameters are required; malformed modes, missing par file and range errors.
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=zy; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=4 mode=; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz par=missing-lorenz-parameters; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=-2147483649; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 h=0x1p1024; }
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 tol=1e-999; }
+# Coefficients are parsed inside the first solver callback, after output.
+[f32] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz rho=2 sigma=1e999; }
+[f32] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=yz rho=2 sigma=3 eta=-1e999; }
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz y0=0x1.1p-1074; }
+[f32] [stderr] sunull nt=1 ntr=1 | { cat >/dev/null; lorenz stepmax=3 mode=xyz rho=0x1.1p-1074; }

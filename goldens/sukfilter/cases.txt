@@ -81,3 +81,30 @@
 [stderr] printf 'd1=2 d2=3 k=0,0.03,0.08,0.2 amps=0,1,1,0 verbose=0\n' > filter.par; suspike nt=29 ntr=7 | sukfilter par=filter.par d2=1 verbose=1
 # Both explicit endpoint amplitudes default to zero for two breakpoints.
 [stderr] suspike nt=29 ntr=7 | sukfilter d1=1 d2=1 k=0,0.2
+
+# diff-2026-11 (round 1)
+# Nonzero inputs at every small fast-axis boundary; one output mode (SU panel).
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sukfilter d1=1 d2=1 k=0,0.1,0.3,0.5 amps=0,2,1,0 verbose=1
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sukfilter d1=1 d2=1 verbose=0
+[stderr] suspike nt=3 ntr=7 nspk=1 ix1=4 it1=2 | sukfilter d1=2 d2=3 k=0,0.02,0.08,0.2 amps=1,2,2,0
+[stderr] suspike nt=4 ntr=11 nspk=1 ix1=6 it1=3 | sukfilter d1=1 d2=1 k=0,0.1,0.1,0.5 amps=1,1,2,0 verbose=-1
+# Long, prime and padded axes with actual impulses, rather than empty panels.
+[stderr] suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=2049 | sukfilter d1=1 d2=1 k=0,0.02,0.15,0.45 amps=0,2,2,0 verbose=1
+[stderr] suspike nt=127 ntr=29 nspk=1 ix1=15 it1=64 | sukfilter d1=1 d2=1 k=0,1 amps=1,1
+# A different generator, defaults versus explicit default-equivalent settings.
+[stderr] suplane nt=97 ntr=19 npl=1 dip1=2 taper=1 | sukfilter
+[stderr] suplane nt=97 ntr=19 npl=1 dip1=2 taper=1 | sukfilter d1=1 d2=1 k=0.05,0.075,0.225,0.25 amps=0,1,1,0 verbose=1
+# First-trace spatial spacing is independent of dt and subsequent headers.
+[stderr] suplane nt=43 ntr=17 npl=1 dip1=4 | sushw key=trid,d1,d2,offset a=130,2,3,-80 b=0,0.25,0.5,10 | suchw key1=cdp key2=tracl a=100 b=2 | sukfilter verbose=1
+[stderr] suplane nt=43 ntr=17 npl=1 dip1=4 | sushw key=trid,d1,d2 a=130,9,12 | sukfilter d1=2 d2=3 k=0,0.02,0.06,0.15 amps=0,1,2,1 verbose=0
+# Seeded broadband input built from null traces exercises all taper directions.
+[stderr] sunull nt=67 ntr=13 | suaddnoise seed=90210 sn=1 | sukfilter d1=1 d2=1 k=0,0.03,0.09,0.2,0.4 amps=1,1,3,0,2 verbose=1
+# Repeated endpoints and the unassigned integerized bin of a single breakpoint.
+[stderr] suspike nt=61 ntr=17 nspk=1 ix1=9 it1=31 | sukfilter d1=1 d2=1 k=0,0,0,0 amps=0,1,2,0
+[stderr] suspike nt=61 ntr=17 nspk=1 ix1=9 it1=31 | sukfilter d1=1 d2=1 k=0.13 amps=2
+# Isolate error messages by setting valid headers and spacings first.
+[stderr] sunull nt=7 ntr=3 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter k=0,0.2,0.1 amps=1,1,1
+[stderr] sunull nt=7 ntr=3 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter k=0,0.2,0.4 amps=1,1
+[stderr] sunull nt=7 ntr=3 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter k=0,0.2 amps=1,-0.25
+[stderr] sunull nt=7 ntr=3 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter k=0,0.2,0.4 amps=0.75,0.75,0.75
+[stderr] sunull nt=7 ntr=3 | sushw key=trid,d1,d2 a=130,1,1 | sukfilter verbose=-2147483649

@@ -16,3 +16,21 @@ sustkvel v=2000 h=0 outpar=stkpar
 sustkvel v=2000 h=-10 outpar=stkpar
 sustkvel v=2000 h=100
 sustkvel v=2000 h=100 outpar=/no/such/directory/output
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 | (cat > trace; sustkvel v=1500 h=100 outpar=stkpar < trace) && cat stkpar
+sunull nt=2 ntr=1 | (cat > trace; sustkvel v=1800,2400 h=120,275 dip=0 outpar=stkpar < trace) && cat stkpar
+suplane nt=3 ntr=1 | (cat > trace; sustkvel v=1700,2300,3500 h=60,200,500 dip=23.5 outpar=stkpar < trace) && cat stkpar
+suspike nt=4 ntr=1 | (cat > trace; sustkvel v=1200,1800,2400,3000 h=10,20,30,40 dip=-45 outpar=stkpar < trace) && cat stkpar
+sunull nt=7 ntr=1 | sushw key=cdp,offset a=25,100 | (cat > trace; sustkvel v=1500,1800,2500,3100,4700 h=100,210,320,430,540 dip=60 outpar=stkpar < trace) && cat stkpar
+suspike nt=13 ntr=2 | (cat > trace; sustkvel v=0.125,100000,2.5 h=0.25,3000,10 dip=89 outpar=stkpar < trace) && cat stkpar
+sunull nt=4097 ntr=1 | (cat > trace; sustkvel v=1234.567,2345.678,3456.789 h=123.456,234.567,345.678 dip=12.345 outpar=stkpar < trace) && cat stkpar
+[stderr] suspike nt=5 ntr=1 | (cat > trace; sustkvel v=2000,2500 h=100,200 dip=5 outpar=stkpar verbose=1 extra=1 < trace) && cat stkpar
+sunull nt=1 ntr=1 | (cat > trace; sustkvel outpar=stkpar < trace)
+suspike nt=2 ntr=1 | (cat > trace; sustkvel v=2000,3000 h=100 outpar=stkpar < trace)
+sunull nt=3 ntr=1 | (cat > trace; sustkvel v=2000,-3000 h=100,200 outpar=stkpar < trace)
+sunull nt=4 ntr=1 | (cat > trace; sustkvel v=2000,3000 h=100,-200 outpar=stkpar < trace)
+suspike nt=7 ntr=1 | (cat > trace; sustkvel v=1e20,1e20 h=1e20,1e20 dip=10 outpar=stkpar < trace) && cat stkpar
+sunull nt=11 ntr=1 | (cat > trace; sustkvel v=1000,2000,3000 h=1,2,3 dip=180 outpar=stkpar < trace) && cat stkpar
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+sunull nt=1 ntr=1 | (cat > trace; sustkvel v=1.593925871371077,4943054.048753994,3.801867276402353e-05,26031464.254795417,256251.38085322507,0.053155118960600066,0.36835252000269003,1527500.532091228,34221.20546216884,27562440.212998703,63860709.32911287,0.0006561005336007851 h=0.16335214901682077,3349930.5993221276,308.5137263334555,0.0008868278286087161,1252193.6790733016,2.4147945230640664e-08,6.473541901065309e-07,0.15170092265558724,37836603.04464472,33.76132673500178,12168.994394624318,1194717.8857553313 dip=100.40126003292625 outpar=stkpar < trace) && cat stkpar

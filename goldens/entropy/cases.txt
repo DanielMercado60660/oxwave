@@ -54,3 +54,53 @@
 [exact] [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=1024f", *range(-512,512)))' | entropy n=1024 dev=28.8683605
 # Preserve signed-zero scale behavior for an odd-length all-zero signal.
 [exact] [stderr] sunull nt=5 ntr=1 | sustrip outpar=/dev/null | entropy n=5 dev=-0
+
+# diff-2026-11 (round 1)
+# Explicit spike positions make these tiny traces nonzero (the defaults do not).
+[exact] [stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | entropy n=1 verbose=1
+[exact] [stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | entropy n=2 dev=1
+[exact] [stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | entropy n=3
+[exact] [stderr] suspike nt=4 ntr=1 nspk=2 ix1=1 it1=1 ix2=1 it2=4 | sustrip outpar=/dev/null | entropy n=4 dev=-1
+# Entropy consumes raw samples, so changes to seismic headers must be irrelevant.
+[exact] [stderr] suspike nt=17 ntr=3 nspk=2 ix1=1 it1=2 ix2=3 it2=16 | sushw key=cdp,offset,dt a=101,-120,2000 b=3,40,0 | suchw key1=offset key2=cdp key3=cdp a=-1000 b=2 c=0 | sustrip outpar=/dev/null | entropy n=51 dev=1 verbose=1
+# Explicit dev keeps this sparse long trace inside the histogram's valid range.
+[exact] [stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | entropy n=4097 dev=1
+[exact] [stderr] suplane nt=19 ntr=5 | sustrip outpar=/dev/null | entropy n=95 dev=-2
+[exact] [stderr] susynlv nt=101 nxm=3 nxo=1 | sustrip outpar=/dev/null | entropy n=303
+# Both noise distributions use explicit seeds and a nonzero source signal.
+[exact] [stderr] suspike nt=257 ntr=3 nspk=1 ix1=2 it1=129 | suaddnoise seed=407 noise=flat sn=2 | sustrip outpar=/dev/null | entropy n=771
+[exact] [stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2049 | suaddnoise seed=4097 noise=gauss sn=1 | sustrip outpar=/dev/null | entropy n=4097 verbose=1
+# Native-float SU generators cover every histogram bin and both scale signs.
+[exact] [stderr] makevel nx=1 nz=1024 v000=-512 dvdz=1 | entropy n=1024 dev=28.8683605
+[exact] [stderr] makevel nx=1 nz=1024 v000=-511 dvdz=1 | entropy n=1024 dev=-28.8683605
+# Half-step ties round away from zero, including the two extreme valid bins.
+[exact] [stderr] makevel nx=1 nz=1023 v000=-511.5 dvdz=1 | entropy n=1023 dev=28.8683605
+[exact] [stderr] makevel nx=1 nz=2 v000=-512.49 dvdz=1023.98 | entropy n=2 dev=28.8683605
+# Float RMS overflow/underflow and a subnormal scale, with valid bin indices.
+[exact] [stderr] makevel nx=1 nz=4 v000=1e20 | entropy n=4
+[exact] [stderr] makevel nx=1 nz=4 v000=1e-30 | entropy n=4 dev=1
+[exact] [stderr] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | entropy n=3 dev=1e-45
+# Parameter failures with deterministic input; errors must precede output.
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | entropy
+[stderr] sunull nt=2 ntr=1 | sustrip outpar=/dev/null | entropy n= dev=1
+[stderr] makevel nx=1 nz=2 | entropy n=2 dev=1e309
+[stderr] makevel nx=1 nz=2 | entropy n=2147483648
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null | entropy n=0 dev=0 verbose=1
+
+# ub-2026-11 (round 1)
+# Refuted: entropy.c:66 writes hist[2360], but bounds checking leaves stdout,
+# stderr, and rc=0 identical to the original in five runs (scratch fix.patch).
+[exact] [stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | entropy n=4097
+# Refuted: entropy.c:66 writes hist[1089]; the same bounds check leaves the
+# all-zero histogram, stderr, and rc=0 identical in five runs.
+[exact] [stderr] makevel nx=1 nz=3 v000=20 | entropy n=3 dev=1
+# Refuted: entropy.c:66 writes hist[-65]; the same bounds check leaves the
+# all-zero histogram, stderr, and rc=0 identical in five runs.
+[exact] [stderr] makevel nx=1 nz=3 v000=-20 | entropy n=3 dev=1
+
+# ub-2026-11 (round 2)
+# Revalidated the three round 1 refutations with SU's flags: orig and fixed
+# match exactly. Case 60's 0/141 pipeline status races in SU and Rust alike;
+# entropy itself exits 0. Use a completed input file to test its n=0 output
+# independently of sustrip's SIGPIPE (round2-case60-stages.json in scratch).
+[exact] [stderr] sunull nt=1 ntr=1 | sustrip outpar=/dev/null > samples.bin; entropy n=0 dev=0 verbose=1 < samples.bin

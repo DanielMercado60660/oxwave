@@ -213,6 +213,11 @@ fn main() {
 
     if (xy as f64) < 99999.7 {
         offset = (xy / (2.0f32 * dx)) as i32;
+        // A negative half-offset reads tf[-1] and writes beyond the C arrays.
+        // Match the minimal C bounds check instead of panicking on indexing.
+        if offset < 0 {
+            err!("XY half-offset must be nonnegative");
+        }
         printf!("%s %5.1f \n", "XY Specified(m): ", xy);
         printf!(
             "%s %5.1f \n",

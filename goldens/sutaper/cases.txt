@@ -15,3 +15,27 @@ suplane nt=31 ntr=7 | sutaper
 suplane nt=31 ntr=7 | sutaper ntr=7 tbeg=200
 suplane nt=31 ntr=7 | sutaper ntr=7 tr1=2 taper=9
 suplane nt=31 ntr=7 | sutaper ntr=7 tbeg=8 taper=9
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | sutaper ntr=1 tr1=0 tr2=0
+suplane nt=3 ntr=1 | sutaper ntr=1 tbeg=4 taper=1
+suplane nt=4 ntr=1 | sutaper ntr=1 tbeg=4 tend=4 taper=2
+suspike nt=17 ntr=9 | sutaper ntr=9 tr1=4 tr2=4 min=0.25 taper=1
+suspike nt=17 ntr=9 | sutaper n2=9 tr1=3 tr2=0 taper=2
+suspike nt=17 ntr=9 | sutaper ntr=9 tr1=0 tr2=4 taper=3
+suspike nt=17 ntr=9 | sutaper ntr=9 tr1=4 tr2=2 min=0.4 taper=4
+suspike nt=17 ntr=9 | sutaper ntr=9 tr1=1 tr2=3 min=1 taper=5
+suplane nt=4097 ntr=3 | sutaper ntr=3 tr1=1 tr2=1 tbeg=400 tend=300 taper=3
+suplane nt=13 ntr=5 | sushw key=ntr,dt a=5,2000 | sutaper tr1=2 tr2=1 tbeg=5 tend=7 taper=2
+[stderr] suplane nt=19 ntr=7 | sutaper ntr=7 tr1=3 tr2=3 min=0.3 taper=1 verbose=1
+suplane nt=11 ntr=5 | sutaper n2=5 ntr=5 tr1=1 tr2=1
+suplane nt=11 ntr=5 | sutaper ntr=5 tr1=4 tr2=4 min=0.2
+suplane nt=11 ntr=5 | sutaper ntr=5 tbeg=40 taper=5
+suplane nt=11 ntr=5 | sutaper ntr=5 tend=40 taper=4
+sunull nt=7 ntr=4 | sutaper ntr=4 tr1=1 tr2=2 tbeg=4 tend=8 taper=5
+suplane nt=7 ntr=4 | sutaper ntr=4 min=1.01
+suplane nt=7 ntr=4 | sutaper ntr=4 tbeg=16 tend=12
+suplane nt=7 ntr=4 | sutaper ntr=4 tr1=1 taper=0
+suplane nt=7 ntr=4 | sutaper ntr=4 tbeg=4 taper=0
+suplane nt=7 ntr=4 | sushw key=ntr a=0 | sutaper tr1=1
+suspike nt=8 ntr=1 nspk=1 ix1=1 it1=1 | sutaper ntr=1 tbeg=3.9999998
+suspike nt=8 ntr=1 nspk=1 ix1=1 it1=8 | sutaper ntr=1 tend=3.9999998

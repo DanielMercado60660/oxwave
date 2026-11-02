@@ -316,6 +316,9 @@ fn main() {
             "tz" => dout.copy_from_slice(&tz),
             "othert" | "otherz" if other => {
                 let x = if outtype == "othert" { &tz } else { &zt };
+                if nin > x.len() || nout > x.len() {
+                    err!("other interpolation exceeds coordinate array");
+                }
                 intlin(
                     &x[..nin],
                     &otherin,

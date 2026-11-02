@@ -1,0 +1,2 @@
+# su/main/headers/sucountkey.c:61-62,75; par/lib/getpars.c:313,421-429: key= counts as one value but parses zero, leaving key[0] uninitialized before hdtype. The fix rejects a missing parsed key, changing the original garbage-key diagnostic into a clean invalid empty key error. OxWave does not match the fixed diagnostic but exits cleanly with an empty-key error.
+[stderr] sunull nt=3 ntr=3 | sucountkey key= verbose=1

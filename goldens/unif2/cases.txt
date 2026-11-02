@@ -12,3 +12,62 @@
 [stderr] unif2 npmax=3 < /dev/null
 [stderr] printf '0 10\n10 10\n1 -99999\n0 0\n10 0\n1 -99999\n' | unif2 ninf=1 nx=3 nz=3
 [f32] printf '0 0\n10 0\n1 -99999\n0 5\n10 5\n1 -99999\n' | unif2 ninf=1 nx=3 nz=7 dx=5 dz=2 v00=1000,2000
+# diff-2026-11 (round 1)
+[f32] unif2 tfile=model && unif2 nx=1 nz=4 fz=198 dz=2 < model
+[f32] unif2 tfile=model && unif2 nx=2 nz=1 fx=100 dx=250 fz=400 < model
+[f32] unif2 tfile=model && unif2 nx=3 nz=2 fx=-50 dx=550 fz=999 dz=1 < model
+[f32] unif2 tfile=model && unif2 nx=7 nz=3 dx=167 fz=199 dz=201 < model
+[f32] unif2 tfile=model && unif2 nx=11 nz=4097 dx=100 dz=0.25 < model
+[f32] unif2 tfile=model && unif2 nx=17 nz=37 fx=1000 dx=-55 dz=31 method=linear < model
+[f32] unif2 tfile=model && unif2 nx=23 nz=61 fx=-100 dx=55 dz=17 method=mono < model
+[f32] unif2 tfile=model && unif2 nx=23 nz=61 fx=-100 dx=55 dz=17 method=akima < model
+[f32] unif2 tfile=model && unif2 nx=23 nz=61 fx=-100 dx=55 dz=17 method=spline < model
+[f32] unif2 tfile=model && unif2 nx=9 nz=29 dx=125 fz=200 dz=25 ninf=5 npmax=8 x0=1,2,3,4,5,6 z0=6,5,4,3,2,1 v00=1200,1700,2200,2700,3200,3700 dvdx=-0.5,0.25,0.1,-0.2,0.3,0.4 dvdz=0.9,0.8,0.7,0.6,0.5,0.4 < model
+[f32] unif2 tfile=model && unif2 nx=3 nz=9 ninf=1 dx=500 dz=100 v00=1000,2500 x0=2,4 z0=5,6 dvdx=1,-1 dvdz=2,3 < model
+[f32] unif2 tfile=model && unif2 nx=5 nz=13 ninf=2 dx=250 dz=50 method=mono < model
+[f32] unif2 tfile=model && unif2 nx=5 nz=13 ninf=2 dx=250 dz=50 method=akima < model
+[f32] unif2 tfile=model && unif2 nx=5 nz=13 ninf=2 dx=250 dz=50 method=spline < model
+[f32] unif2 tfile=model && unif2 nx=1 nz=17 fx=500 fz=-100 dz=100 method=spline < model
+[f32] unif2 tfile=model && unif2 nx=4 nz=11 dx=0 dz=0 fx=300 fz=400 verbose=1 < model
+[f32] unif2 tfile=model && unif2 nx=13 nz=17 method=linear dx=10 dz=10 fx=0 fz=0 ninf=5 npmax=201 < model
+[f32] unif2 tfile=model && unif2 nx=4 nz=5 method=linearjunk fx=100 dx=200 fz=400 dz=100 < model
+[exact] unif2 tfile=example && cat example
+[stderr] unif2 tfile=model && unif2 nx=2 method=invalid < model
+[stderr] unif2 tfile=model && unif2 npmax=7 < model
+[stderr] unif2 tfile=model && unif2 nx=abc npmax=2 < model
+[f32] unif2 tfile=model && unif2 nx=0 nz=3 < model
+[f32] unif2 tfile=model && unif2 nx=3 nz=0 < model
+[f32] unif2 tfile=model && unif2 nx=11 nz=31 ninf=1 method=mono dx=100 dz=10 < model
+[f32] unif2 tfile=model && unif2 nx=11 nz=31 ninf=1 method=akima dx=100 dz=10 < model
+[f32] unif2 tfile=model && unif2 nx=11 nz=31 ninf=1 method=spline dx=100 dz=10 < model
+[f32] unif2 tfile=model && awk '{if ($2 > -9999) $1=1000-$1; print}' model | unif2 nx=21 nz=51 dx=50 dz=20 method=linear
+[f32] unif2 tfile=model && awk '{if ($2 > -9999) $1=1000-$1; print}' model | unif2 nx=21 nz=51 dx=50 dz=20 method=mono
+[f32] unif2 tfile=model && awk '{if ($2 > -9999) $1=1000-$1; print}' model | unif2 nx=21 nz=51 dx=50 dz=20 method=akima
+[f32] unif2 tfile=model && awk '{if ($2 > -9999) $1=1000-$1; print}' model | unif2 nx=21 nz=51 dx=50 dz=20 method=spline
+[stderr] unif2 tfile=model && unif2 nx=2 method= < model
+[f32] suplane ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 10+$1/3} END {print "1 -99999"}' | unif2 ninf=1 nx=7 nz=19 dx=5 dz=2 method=mono v00=1400,2400
+[f32] suspike ntr=5 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n40 0\n1 -99999"} {print $1, 20+$1/4} END {print "1 -99999"}' | unif2 ninf=1 nx=9 nz=17 dx=5 dz=2 method=akima v00=1500,3000
+# diff-2026-11 (round 2)
+[f32] suplane ntr=4 nt=1 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=1 nz=1 fx=5 fz=15 npmax=5 x0=2,4 z0=3,7 v00=1200,2400 dvdx=0.5,-0.25 dvdz=1,2
+[f32] suspike ntr=4 nt=2 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=2 nz=2 dx=10 dz=10 fx=0 fz=10
+[f32] suplane ntr=4 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=mono nx=3 nz=3 dx=10 dz=5 fx=-5 fz=15
+[f32] suspike ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=akima nx=4 nz=4 dx=10 dz=5 fz=19
+[f32] suplane ntr=4 nt=7 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=spline nx=7 nz=7 dx=5 dz=7 fz=0
+[f32] suspike ntr=4 nt=11 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=11 nz=13 dx=3 dz=3 fx=1 fz=1
+[f32] suplane ntr=4 nt=4097 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=mono nx=1 nz=4097 dx=1 dz=0.1 fx=7 fz=0
+[f32] suspike ntr=4 nt=5 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=akima nx=9 nz=17 dx=5 dz=2 fx=-10 fz=2 npmax=5
+[f32] suplane ntr=4 nt=5 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=spline nx=13 nz=19 dx=3 dz=2 fx=0 fz=10
+[f32] suspike ntr=4 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=9 nz=9 dx=5 dz=5 fx=0 fz=0 x0=100,-100 z0=10,30 v00=1400,2300 dvdx=0.1,-0.2 dvdz=0.3,0.4
+[f32] suplane ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=mono nx=9 nz=9 dx=5 dz=5 fx=0 fz=0 x0=-10,20 z0=-5,15 v00=1600,2600 dvdx=-1,1 dvdz=-0.5,0.75
+[f32] suspike ntr=4 nt=2 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=akima nx=5 nz=13 dx=10 dz=2 fx=0 fz=0 verbose=1
+[f32] suplane ntr=4 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=spline nx=5 nz=13 dx=0 dz=3 fx=15 fz=0
+[f32] suspike ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=5 nz=13 dx=-5 dz=2 fx=30 fz=0
+[f32] suplane ntr=4 nt=7 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=mono nx=7 nz=11 dx=5 dz=0 fx=0 fz=20
+[f32] suspike ntr=4 nt=11 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=akima nx=8 nz=23 dx=4 dz=1 fx=2 fz=12 v00=1800,2700
+[f32] suplane ntr=4 nt=2 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=spline nx=3 nz=31 dx=12 dz=1 fx=3 fz=-2 dvdx=0.2,0.4 dvdz=0.1,0.3
+[f32] suspike ntr=4 nt=1 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=2 nz=37 dx=20 dz=1 fx=0 fz=0 method=linearjunk
+[stderr] suplane ntr=4 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=bad nx=3 nz=3
+[stderr] suspike ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk 'BEGIN {print "0 0\n30 0\n1 -99999"} {print $1, 20+$1/3} END {print "1 -99999"}' | unif2 ninf=1 method=linear nx=3 nz=3 npmax=4
+[f32] suspike ntr=1 nt=1 | sushw key=cdp a=10 | sugethw key=cdp output=geom | awk '{print $1, 0; print "1 -99999"; print $1, 20; print "1 -99999"}' | unif2 ninf=1 nx=7 nz=11 fx=-10 dx=10 dz=5 method=linear
+[f32] suplane ntr=4 nt=3 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk '{print "0", $1; print "30", $1; print "1 -99999"}' | unif2 ninf=3 nx=7 nz=41 dx=5 dz=1 fx=0 fz=0 v00=1100,1500,2200,3000 x0=0,1,2,3 z0=0,10,20,30 dvdx=0,0.1,0.2,0.3 dvdz=1,2,3,4
+[f32] suspike ntr=4 nt=4 | sushw key=cdp a=0 b=10 | sugethw key=cdp output=geom | awk '{print "0", $1; print "30", $1; print "1 -99999"}' | unif2 ninf=3 nx=7 nz=15 dx=5 dz=2 fx=0 fz=29 v00=1100,1500,2200,3000 dvdz=1,2,3,4

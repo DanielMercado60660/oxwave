@@ -515,6 +515,11 @@ fn main() {
     let scal = (1.0 / (2.0 * PI).sqrt() * dxgo as f64) as f32;
     for io in 0..nxso as usize {
         for ixo in 0..ng[io] as usize {
+            // C indexes past dats when an input gather exceeds nxgo.
+            // Match the minimally bounds-checked C rather than panicking.
+            if ixo >= nxgo as usize {
+                err!("receiver count exceeds nxgo!\n");
+            }
             efread(tro.hdr.as_bytes_mut(), &hdrfp);
             tro.data[..nt as usize].copy_from_slice(&dats[io][ixo][..nt as usize]);
             for it in 0..nt as usize {
@@ -719,14 +724,24 @@ fn zcoor_surfaces(
     }
     let nx = nx as usize;
     let nxs = nxs as usize;
-    for is in 0..2 {
-        szif[0][is] = 2.0 * szif[1][is] - szif[2][is];
-        szif[nx - 1][is] = 2.0 * szif[nx - 2][is] - szif[nx - 3][is];
+    // Three-point endpoint extrapolation requires three samples. For a
+    // smaller grid retain the coordinates already interpolated above.
+    // The C ns=2 overreads do not affect the flat-surface golden output;
+    // its nxi=2 pointer overread crashes (fixed C uses these same guards).
+    if nx >= 3 {
+        for is in 0..2 {
+            szif[0][is] = 2.0 * szif[1][is] - szif[2][is];
+            szif[nx - 1][is] = 2.0 * szif[nx - 2][is] - szif[nx - 3][is];
+        }
     }
-    sz[0] = 2.0 * sz[1] - sz[2];
-    nangl[0] = 2.0 * nangl[1] - nangl[2];
-    sz[nxs - 1] = 2.0 * sz[nxs - 2] - sz[nxs - 3];
-    nangl[nx - 1] = 2.0 * nangl[nx - 2] - nangl[nx - 3];
+    if nxs >= 3 {
+        sz[0] = 2.0 * sz[1] - sz[2];
+        sz[nxs - 1] = 2.0 * sz[nxs - 2] - sz[nxs - 3];
+    }
+    if nx >= 3 {
+        nangl[0] = 2.0 * nangl[1] - nangl[2];
+        nangl[nx - 1] = 2.0 * nangl[nx - 2] - nangl[nx - 3];
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1048,16 +1063,23 @@ fn dat2d(
         if jz >= nzt - 1 {
             jz = nzt - 2;
         }
-        let sz = az - jz as f32;
+        // C's nzt=1 interpolation reads tzt[-1] (with zero weight).
+        // Use the sole depth sample; the minimal C fix gives identical
+        // output for the restored nzt=1 regression case.
+        if nzt == 1 {
+            jz = 0;
+        }
+        let sz = if nzt == 1 { 0.0 } else { az - jz as f32 };
         let sz0 = (1.0 - sz as f64) as f32;
         let jz = jz as usize;
-        let td = sz0 * tzt[jz] + sz * tzt[jz + 1];
+        let jz1 = min(jz + 1, (nzt - 1) as usize);
+        let td = sz0 * tzt[jz] + sz * tzt[jz1];
         let mut at = (sgn as f32 * td - ft) * odt;
         if iz < nzp && antiali != 0 {
             at += mtmax as f32;
             let jt = at as i32;
-            let ampd = sz0 * ampi[jz] + sz * ampi[jz + 1];
-            let mt = (0.5 + (sz0 * tm[jz]) as f64 + (sz * tm[jz + 1]) as f64) as i32;
+            let ampd = sz0 * ampi[jz] + sz * ampi[jz1];
+            let mt = (0.5 + (sz0 * tm[jz]) as f64 + (sz * tm[jz1]) as f64) as i32;
             let res = abs(at - jt as f32);
             let res0 = (1.0 - res as f64) as f32;
             for it in 0..nt {
@@ -1076,7 +1098,7 @@ fn dat2d(
             }
         } else {
             let jt = at as i32;
-            let ampd = sz0 * amp[jz] + sz * amp[jz + 1];
+            let ampd = sz0 * amp[jz] + sz * amp[jz1];
             let res = abs(at - jt as f32);
             let res0 = (1.0 - res as f64) as f32;
             for it in 0..nt {

@@ -190,12 +190,21 @@ fn main() {
         printf!("%d %d %d %d rectclip\ngsave 1 setgray %d %d %d %d rectfill grestore\n", llx, lly, urx-llx, ury-lly, llx, lly, urx-llx, ury-lly);
         printf!("userdict /_CWPPreviewSaveObject0 systemdict /save get exec put\n/showpage {\n\n} def\n%%%%BeginFile:\n");
     }
+    // fputs writes each input chunk to the tempfile; the subsequent fgets
+    // reads it again, so a truncated chunk can join the following line.
+    let contents: Vec<u8> = lines.concat();
+    let mut offset = 0;
     let mut count = 0;
-    for line in lines {
+    while offset < contents.len() {
+        let limit = (offset + 1023).min(contents.len());
+        let end = contents[offset..limit].iter().position(|&c| c == b'\n')
+            .map_or(limit, |i| offset + i + 1);
+        let line = &contents[offset..end];
         if pages != 1 && line.windows(7).any(|w| w == b"%%Page:") {
             count += 1; printf!("clear userdict /_CWPPreviewSaveObject0 known {\n   _CWPPreviewSaveObject0 systemdict /restore get exec\n} if\n");
-            fputs_bytes(&line, &stdout()); printf!("userdict /_CWPPreviewSaveObject0 systemdict /save get exec put\n%%Page: %d %d\n", count, count);
-        } else { fputs_bytes(&line, &stdout()); }
+            fputs_bytes(line, &stdout()); printf!("userdict /_CWPPreviewSaveObject0 systemdict /save get exec put\n%%Page: %d %d\n", count, count);
+        } else { fputs_bytes(line, &stdout()); }
+        offset = end;
     }
     if pages == 1 {
         printf!("%%%%EndFile\nclear userdict /_CWPPreviewSaveObject0 known {\n    _CWPPreviewSaveObject0 systemdict /restore get exec\n} if\ngrestore\ngrestore\nshowpage\n__CWPsheetsavetoken restore\n%%%%PageTrailer\n%%%%Trailer\n%%%%Pages: 1 1\n");

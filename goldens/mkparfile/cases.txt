@@ -14,3 +14,18 @@ printf '1 2\n3\n' | mkparfile
 printf '1 2\n\n' | mkparfile
 [stderr] printf '1 2\n' | mkparfile verbose=1
 [stderr] printf '1 2\n' | mkparfile unknown=1
+# diff-2026-11 (round 1)
+suspike ntr=1 nt=1 | sugethw key=tracl,ns output=geom | mkparfile string1=trace string2=samples
+sunull ntr=2 nt=2 | sugethw key=tracl,ns output=geom | mkparfile
+suplane ntr=3 nt=3 | sugethw key=tracl,ns output=geom | mkparfile string1=first string2=second
+suspike ntr=5 nt=4 | sushw key=offset a=-10 b=5 | sugethw key=offset,ns output=geom | mkparfile string1=offset string2=count
+sunull ntr=7 nt=7 | sushw key=cdp a=100 b=3 | sugethw key=cdp,tracl output=geom | mkparfile string1=cdps
+suspike ntr=1 nt=4097 | sugethw key=ns,dt output=geom | mkparfile string2=interval
+[stderr] suplane ntr=2 nt=3 | sugethw key=tracl,ns output=geom | mkparfile string1=x string2=y verbose=1
+sunull ntr=3 nt=2 | sugethw key=tracl,ns output=geom | awk '{print $1/10, -$2/3, 99}' | mkparfile string1=t string2=v
+suspike ntr=1 nt=2 | sugethw key=tracl,ns output=geom | awk '{printf "%.1020d 2\n", 1}' | mkparfile
+sunull ntr=2 nt=3 | sugethw key=tracl,ns output=geom | awk 'NR==2 {$2="bad"} {print}' | mkparfile
+sunull ntr=1 nt=1 | sugethw key=tracl,ns output=geom | awk '{print "bad", $2}' | mkparfile
+[stderr] sunull ntr=1 nt=1 | sugethw key=tracl,ns output=geom | awk '{printf "bad%cignored\n", 0}' | mkparfile
+[stderr] suspike ntr=1 nt=2 | sugethw key=tracl,ns output=geom | awk '{printf "%.1023d 2\n", 1}' | mkparfile
+suplane ntr=4 nt=5 | sugethw key=tracl,ns output=geom | awk 'NR==1 {print "-0 inf"; next} NR==2 {print "0x1.8p2 -1e-20"; next} {print $1, $2}' | mkparfile string1=old string1=new string2=values

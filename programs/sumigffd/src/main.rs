@@ -40,8 +40,8 @@ use oxwave_cwp::complex::*;
 use oxwave_cwp::cwp::PI;
 use oxwave_pfa_fft::{npfa, npfar, pfa2cc, pfa2rc};
 use oxwave_tempfile::temporary_filename;
-use std::ffi::CString;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::ffi::{c_char, CString};
+use std::sync::atomic::{AtomicPtr, Ordering};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -88,46 +88,29 @@ const SDOC: &[&str] = &[
     "\t\t\t\t\t\t\t\t\t",
 ];
 
-// Only this lock-free flag is accessed by the signal handler. CFile uses
-// RefCell internally, so closing files must wait until normal control flow.
-static INTERRUPTED: AtomicBool = AtomicBool::new(false);
-
-struct TempFiles {
-    tracefp: Option<CFile>,
-    headerfp: Option<CFile>,
-    tracefile: Option<String>,
-    headerfile: Option<String>,
-}
-
-impl TempFiles {
-    fn check_signal(&mut self) {
-        if INTERRUPTED.load(Ordering::Relaxed) {
-            // These calls run outside the callback, with no interrupted
-            // CFile borrow. A stream already closed by main is not closed twice.
-            if let Some(fp) = self.headerfp.take() {
-                efclose(&fp);
-            }
-            if let Some(fp) = self.tracefp.take() {
-                efclose(&fp);
-            }
-            if let Some(path) = self.headerfile.take() {
-                eremove(&path);
-            }
-            if let Some(path) = self.tracefile.take() {
-                eremove(&path);
-            }
-            exit(EXIT_FAILURE);
-        }
-    }
-}
+// Immutable C strings remain alive in main until exit. The callback only
+// reads their pointers and calls async-signal-safe Unix functions; CFile
+// cannot be borrowed while a signal has interrupted one of its operations.
+static TRACEFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
+static HEADERFILE: AtomicPtr<c_char> = AtomicPtr::new(std::ptr::null_mut());
 
 unsafe extern "C" {
-    fn access(path: *const std::ffi::c_char, mode: i32) -> i32;
+    fn access(path: *const c_char, mode: i32) -> i32;
     fn signal(sig: i32, handler: extern "C" fn(i32)) -> usize;
+    fn unlink(path: *const c_char) -> i32;
+    fn _exit(status: i32) -> !;
 }
 
 extern "C" fn closefiles(_sig: i32) {
-    INTERRUPTED.store(true, Ordering::Relaxed);
+    // C closes both storage streams, removes their names, and exits 1.
+    // Unlink the names immediately, even when gettr is blocked on a pipe.
+    // _exit closes the descriptors without reentering interrupted CFile
+    // buffers, whose temporary contents are discarded on this exit path.
+    unsafe {
+        unlink(HEADERFILE.load(Ordering::Acquire));
+        unlink(TRACEFILE.load(Ordering::Acquire));
+        _exit(EXIT_FAILURE);
+    }
 }
 
 fn main() {
@@ -201,6 +184,7 @@ fn main() {
     let mut tracefile = String::new();
     let mut headerfile = String::new();
     let istmpdir = !tmpdir.is_empty();
+    let (tracepath, headerpath);
     if !istmpdir {
         tracefp = etmpfile();
         headerfp = etmpfile();
@@ -215,6 +199,10 @@ fn main() {
         if tracefile == headerfile {
             headerfile.push_str(".headers");
         }
+        tracepath = CString::new(tracefile.as_bytes()).unwrap();
+        headerpath = CString::new(headerfile.as_bytes()).unwrap();
+        TRACEFILE.store(tracepath.as_ptr().cast_mut(), Ordering::Release);
+        HEADERFILE.store(headerpath.as_ptr().cast_mut(), Ordering::Release);
         unsafe {
             signal(2, closefiles); // SIGINT
             signal(3, closefiles); // SIGQUIT
@@ -227,26 +215,15 @@ fn main() {
             warn!("putting temporary files in %s", tmpdir);
         }
     }
-    let mut files = TempFiles {
-        tracefp: Some(tracefp.clone()),
-        headerfp: Some(headerfp.clone()),
-        tracefile: istmpdir.then_some(tracefile),
-        headerfile: istmpdir.then_some(headerfile),
-    };
-    files.check_signal();
-
     let mut nx = 0usize;
     loop {
-        files.check_signal();
         nx += 1;
         efwrite(std::slice::from_ref(&tr.hdr), &headerfp);
         efwrite(&tr.data[..nt], &tracefp);
-        files.check_signal();
         if gettr(&mut tr) == 0 {
             break;
         }
     }
-    files.check_signal();
     erewind(&tracefp);
     erewind(&headerfp);
 
@@ -268,16 +245,12 @@ fn main() {
     let mut cresult = vec![vec![0.0f32; nz]; nx];
     let mut v = vec![0.0f32; nx * nz];
     for ix in 0..nx {
-        files.check_signal();
         efread(&mut p[ix * ntfft..ix * ntfft + nt], &tracefp);
     }
     efclose(&tracefp);
-    files.tracefp = None;
-    files.check_signal();
     let vfp = efopen(&vfile, "r");
     efread(&mut v, &vfp);
     efclose(&vfp);
-    files.check_signal();
     for ix in 0..nx {
         for it in nt..ntfft {
             p[ix * ntfft + it] = 0.0;
@@ -288,7 +261,6 @@ fn main() {
     /* loop over depth */
     let mut tz = fz;
     for iz in 0..nz {
-        files.check_signal();
         for ix in 0..nx {
             cresult[ix][iz] = 0.0;
             for iw in 1..nw {
@@ -323,7 +295,6 @@ fn main() {
         let v1 = (vmin as f64 * 0.5) as f32;
         let mut k = fk;
         for ik in 0..nk {
-            files.check_signal();
             let mut w = fw + dw;
             for iw in 1..nw {
                 if w == 0.0 {
@@ -343,7 +314,6 @@ fn main() {
         }
         pfa2cc(1, 2, nw as i32, nk as i32, &mut cq);
         for ix in 0..nx {
-            files.check_signal();
             let mut w = fw + dw;
             for iw in 1..nw {
                 cq[ix * nw + iw] = crmul(cq[ix * nw + iw], (1.0 / nxfft as f64) as f32);
@@ -357,7 +327,6 @@ fn main() {
             let _ = w; // The C loop increments w but does not use it here.
         }
         for ix in 0..nx {
-            files.check_signal();
             let mut w = fw + dw;
             for iw in 1..nw {
                 let kz2 = (1.0 / v1 as f64 - 2.0 / v[iz * nx + ix] as f64) * w as f64 * dz as f64;
@@ -378,7 +347,6 @@ fn main() {
             dt,
             v1,
         );
-        files.check_signal();
         tz += dz;
     }
     // ft is read but unused; tz (from fz) and vmax are also unused in C.
@@ -386,7 +354,6 @@ fn main() {
 
     /* restore header fields and write output */
     for ix in 0..nx {
-        files.check_signal();
         efread(std::slice::from_mut(&mut tr.hdr), &headerfp);
         tr.ns = nz as u16;
         tr.d1 = dz;
@@ -394,15 +361,10 @@ fn main() {
         puttr(&mut tr);
     }
     efclose(&headerfp);
-    files.headerfp = None;
-    files.check_signal();
-    if let Some(path) = files.headerfile.take() {
-        eremove(&path);
+    if istmpdir {
+        eremove(&headerfile);
+        eremove(&tracefile);
     }
-    if let Some(path) = files.tracefile.take() {
-        eremove(&path);
-    }
-    files.check_signal();
     exit(CWP_Exit());
 }
 
@@ -439,10 +401,6 @@ fn fdmig(
     let vn = v[nx - 1];
     let mut w = fw + dw;
     for iw in 1..nw {
-        // Return to main for cleanup; no file operations occur in this solve.
-        if INTERRUPTED.load(Ordering::Relaxed) {
-            return;
-        }
         if w == 0.0 {
             w = (1.0e-10 / dt as f64) as f32;
         }

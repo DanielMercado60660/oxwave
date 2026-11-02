@@ -20,3 +20,22 @@ susimmat method=2 mt=1
 susimmat sufile=missing
 suplane nt=3 ntr=1 | susimmat mt=1
 suplane nt=3 ntr=1 | susimmat mt=1 sufile=missing
+
+# diff-2026-11 (round 1)
+suspike nt=1 ntr=1 > ref.su && suspike nt=1 ntr=1 | susimmat sufile=ref.su mt=1 method=1
+sunull nt=2 ntr=1 > ref.su && sunull nt=2 ntr=2 | susimmat sufile=ref.su mt=1
+suspike nt=3 ntr=1 > ref.su && suspike nt=3 ntr=1 | susimmat sufile=ref.su mt=1 taper=1
+suplane nt=4 ntr=1 > ref.su && suplane nt=4 ntr=2 | susimmat sufile=ref.su mt=1 method=4 eps=0.25
+suspike nt=11 ntr=1 > ref.su && suspike nt=11 ntr=2 | sushw key=dt a=2000 | susimmat sufile=ref.su mt=1 method=1
+sunull nt=13 ntr=1 > ref.su && sunull nt=13 ntr=1 | suaddnoise seed=31 | susimmat sufile=ref.su mt=1 method=4 taper=0 eps=0.1
+suspike nt=7 ntr=2 > ref.su && suplane nt=7 ntr=2 | susimmat sufile=ref.su mt=1 method=3
+[stderr] suspike nt=5 ntr=1 > ref.su && suspike nt=5 ntr=1 | susimmat sufile=ref.su mt=1 method=1 verbose=1 taper=1 eps=0.001
+suspike nt=17 ntr=1 > ref.su && suplane nt=17 ntr=1 | susimmat sufile=ref.su mt=1 taper=2
+sunull nt=4097 ntr=1 | susimmat mt=1 method=2
+suplane nt=4 ntr=1 | susimmat mt=1 sufile=
+suspike nt=11 ntr=1 > ref.su && suspike nt=11 ntr=1 | susimmat sufile=ref.su mt=1 method=4 eps=-0.5
+sunull nt=997 ntr=1 > ref.su && sunull nt=997 ntr=1 | susimmat sufile=ref.su mt=1
+suspike nt=3 ntr=1 > ref.su && suspike nt=11 ntr=1 | susimmat sufile=ref.su mt=1
+suspike nt=11 ntr=1 > ref.su && suspike nt=3 ntr=1 | susimmat sufile=ref.su mt=1
+sunull nt=3 ntr=1 > ref.su && sunull nt=3 ntr=1 | susimmat sufile=ref.su mt=-2
+sunull nt=3 ntr=1 > ref.su && sunull nt=3 ntr=1 | susimmat sufile=ref.su mt=0 verbose=1

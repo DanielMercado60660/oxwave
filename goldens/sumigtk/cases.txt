@@ -74,3 +74,35 @@
 [stderr] python3 -c 'import struct; open("vel.bin","wb").write(struct.pack("=33f",*([1300.0+i*50 for i in range(33)])))'; suspike nt=33 ntr=7 nspk=1 ix1=4 it1=17 | sumigtk dxcdp=10 vfile=vel.bin speed=0.6 nxpad=5
 # Temporary files must be gone after successful output.
 [stderr] mkdir scratch; suspike nt=17 ntr=3 nspk=1 ix1=2 it1=9 | sumigtk dxcdp=25 tmpdir=scratch > migrated.su; find scratch -type f; cat migrated.su
+
+# diff-2026-11 (round 1)
+# Minimal time grids, prime lengths, a larger spatial FFT, and a long trace.
+[stderr] suspike nt=1 ntr=2 nspk=1 ix1=1 it1=1 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=3 ntr=5 nspk=1 ix1=2 it1=1 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=4 ntr=7 nspk=1 ix1=3 it1=2 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=257 ntr=9 nspk=1 ix1=4 it1=128 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=509 ntr=3 nspk=1 ix1=1 it1=254 | sumigtk dxcdp=100 speed=8
+[stderr] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2048 | sumigtk dxcdp=100 speed=8
+# Independent generators, defaults versus explicit defaults, and header sampling.
+[stderr] suplane nt=41 ntr=7 | sumigtk dxcdp=25
+[stderr] suplane nt=41 ntr=7 | sumigtk dxcdp=25 fmax=125 nxpad=0 ltaper=0 speed=1 verbose=0 tmpdir= tmig=0 vmig=1500
+[stderr] susynlv nt=129 dt=0.004 nxm=7 dxm=0.0125 fxo=0 ref="1:-1,0.12;1,0.12" | sumigtk dxcdp=12.5 vmig=2000 ltaper=2
+[stderr] makevel nx=1 nz=43 v000=1200 dvdz=37 > vel.bin; suplane nt=43 ntr=9 npl=1 | sumigtk dxcdp=10 vfile=vel.bin speed=0.8 nxpad=3
+[stderr] mkdir scratch; suplane nt=29 ntr=7 npl=1 dip1=2 | sumigtk dxcdp=15 fmax=90 nxpad=3 ltaper=2 speed=0.7 verbose=1 tmpdir=scratch tmig=-0.01,0.04,0.1 vmig=1300,1800,2400
+[stderr] sunull nt=1009 ntr=3 dt=0.002 | sumigtk dxcdp=50 fmax=31 speed=2
+# Early validation with a second input generator.
+[stderr] suplane nt=23 ntr=3 | sumigtk
+[stderr] suplane nt=23 ntr=3 | sumigtk dxcdp=25 tmig=0,0.02 vmig=1500
+[stderr] suplane nt=23 ntr=3 | sumigtk dxcdp=25 tmig=0.02,0.01 vmig=1500,1700
+# Owner access must be checked even if group or other users have write bits.
+[stderr] mkdir scratch; chmod 502 scratch; trap "chmod 700 scratch" EXIT; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sumigtk dxcdp=25 tmpdir=scratch
+[stderr] mkdir scratch; chmod 520 scratch; trap "chmod 700 scratch" EXIT; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sumigtk dxcdp=25 tmpdir=scratch
+[stderr] mkdir scratch; chmod 500 scratch; trap "chmod 700 scratch" EXIT; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sumigtk dxcdp=25 tmpdir=scratch
+# Signal only after the temporary-file diagnostic: no timing race with setup.
+# Keep the generator open on a FIFO until after signalling; release it before wait.
+[stderr] mkdir scratch; mkfifo gate; { suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2; read token < gate; } | sumigtk dxcdp=25 tmpdir=scratch verbose=1 > migrated.su 2> diag & pid=$!; for i in {1..200}; do if rg -q "putting temporary" diag; then break; fi; sleep 0.01; done; kill -TERM "$pid"; printf "done\n" > gate; wait "$pid" 2>/dev/null; status=$?; find scratch -type f | wc -l; exit "$status"
+[stderr] mkdir scratch; mkfifo gate; { suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2; read token < gate; } | sumigtk dxcdp=25 tmpdir=scratch verbose=1 > migrated.su 2> diag & pid=$!; for i in {1..200}; do if rg -q "putting temporary" diag; then break; fi; sleep 0.01; done; kill -HUP "$pid"; printf "done\n" > gate; wait "$pid" 2>/dev/null; status=$?; find scratch -type f | wc -l; exit "$status"
+[stderr] mkdir scratch; mkfifo gate; { suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2; read token < gate; } | sumigtk dxcdp=25 tmpdir=scratch verbose=1 > migrated.su 2> diag & pid=$!; for i in {1..200}; do if rg -q "putting temporary" diag; then break; fi; sleep 0.01; done; kill -INT "$pid"; printf "done\n" > gate; wait "$pid" 2>/dev/null; status=$?; find scratch -type f | wc -l; exit "$status"
+[stderr] mkdir scratch; mkfifo gate; { suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2; read token < gate; } | sumigtk dxcdp=25 tmpdir=scratch verbose=1 > migrated.su 2> diag & pid=$!; for i in {1..200}; do if rg -q "putting temporary" diag; then break; fi; sleep 0.01; done; kill -QUIT "$pid"; printf "done\n" > gate; wait "$pid" 2>/dev/null; status=$?; find scratch -type f | wc -l; exit "$status"
+[stderr] suplane nt=37 ntr=5 dt=0.001333 | sushw key=cdp,dt,delrt a=200,1333,250 b=-3,0,0 | sumigtk dxcdp=17 fmax=111 speed=0.65

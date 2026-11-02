@@ -61,3 +61,69 @@ sunull nt=9 ntr=11 | sugain bias=2000 | sustrip outpar=/dev/null > velocity.bin 
 # fractional velocity resampling, with direct and interpolated midpoints.
 makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 > velocity.bin && susynvxz nx=21 nz=17 dx=50 dz=50 nxm=3 fxm=325 dxm=50 nxb=6 nt=137 dt=0.008 'ref=1:100,250;900,350' < velocity.bin
 makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 > velocity.bin && susynvxz nx=21 nz=17 dx=50 dz=50 nxm=5 fxm=300 dxm=50 nxd=2 nxb=6 nxo=2 fxo=-50 dxo=100 nt=137 dt=0.008 'ref=1:100,250;900,350' < velocity.bin
+# diff-2026-11 (round 1)
+# Defaults and every listed parameter explicitly supplied; both source-amplitude modes below.
+[stderr] sunull nt=7 ntr=51 | sugain bias=2000 | sustrip outpar=/dev/null | susynvxz nx=51 nz=7
+[stderr] sunull nt=7 ntr=51 | sugain bias=2000 | sustrip outpar=/dev/null | susynvxz nx=51 nz=7 nxb=51 nxd=1 dx=100 fx=0 dz=100 nt=101 dt=0.04 ft=0 nxo=1 dxo=50 fxo=0 nxm=101 dxm=50 fxm=0 fpeak=5 ls=0 tmin=0.4 ndpfz=5 smooth=0 verbose=0 'ref=1:1,2;4,2'
+# Short traces with arrivals inside or adjoining the time window, not merely zero output.
+makevel nx=9 nz=9 v000=2000 | susynvxz nx=9 nz=9 dx=1 dz=1 nxm=1 fxm=4 nt=1 dt=0.001 fpeak=80 'ref=1:1,2;7,2'
+makevel nx=9 nz=9 v000=2000 | susynvxz nx=9 nz=9 dx=1 dz=1 nxm=1 fxm=4 nt=2 dt=0.001 fpeak=80 'ref=1:1,2;7,2'
+makevel nx=9 nz=9 v000=2000 | susynvxz nx=9 nz=9 dx=1 dz=1 nxm=1 fxm=4 nt=3 dt=0.001 fpeak=80 'ref=1:1,2;7,2'
+makevel nx=9 nz=9 v000=2000 | susynvxz nx=9 nz=9 dx=1 dz=1 nxm=1 fxm=4 nt=4 dt=0.001 fpeak=80 'ref=1:1,2;7,2'
+makevel nx=9 nz=9 v000=2000 | susynvxz nx=9 nz=9 dx=1 dz=1 nxm=1 fxm=4 nt=29 dt=0.001 fpeak=80 'ref=1:1,2;7,2'
+# Long odd traces, including the maximum legal ns, with nonzero reflected arrivals.
+makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.2 dvdz=0.7 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=2 fxm=450 dxm=50 nt=4097 dt=0.0005 fpeak=30 'ref=0.8:100,250;900,400'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=65535 dt=0.0005 fpeak=25 'ref=1:100,200;900,300'
+# One input trace, reinterpreted as an 11 by 9 raw velocity grid; input headers are discarded.
+[stderr] sunull nt=99 ntr=1 | sugain bias=1900 | sushw key=offset,sx,gx,delrt a=-77,123,456,-120 | suchw key1=cdp key2=tracl a=100 b=-3 | sustrip outpar=/dev/null | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=97 dt=0.01 verbose=1 'ref=1:100,200;900,300'
+# Different deterministic SU generators produce positive, nonconstant velocity arrays.
+suspike nt=17 ntr=21 nspk=1 ix1=11 it1=9 | sugain scale=100 bias=2000 | sustrip outpar=/dev/null | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=2 fxm=475 dxm=50 nt=257 dt=0.004 'ref=1:100,300;900,300'
+suplane nt=17 ntr=21 npl=1 dip1=0 ct1=9 cx1=11 len1=17 | sugain scale=50 bias=1800 | sustrip outpar=/dev/null | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=3 fxm=400 dxm=50 nt=263 dt=0.004 ls=1 'ref=1:100,300;900,300'
+# Fractional positive and negative grid origins, interpolation weights and negative offsets.
+makevel nx=23 nz=19 dx=37.5 dz=42.5 fx=-125.25 v000=1900 dvdx=0.3 dvdz=0.4 | susynvxz nx=23 nz=19 dx=37.5 dz=42.5 fx=-125.25 nxb=5 nxm=4 fxm=131.25 dxm=37.5 nxo=3 fxo=-75 dxo=75 nxd=2 nt=251 dt=0.004 'ref=0.8:-80,210;640,350'
+makevel nx=23 nz=19 dx=37.5 dz=42.5 fx=125.25 v000=1900 dvdx=0.3 dvdz=0.4 | susynvxz nx=23 nz=19 dx=37.5 dz=42.5 fx=125.25 nxb=5 nxm=4 fxm=381.75 dxm=37.5 nxo=2 fxo=37.5 dxo=37.5 nxd=3 nt=251 dt=0.004 ls=1 'ref=0.8:170,210;890,350'
+# Reverse midpoint and offset order, repeated midpoint coordinates, and shortened skip intervals.
+[stderr] makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=6 fxm=750 dxm=-50 nxo=3 fxo=100 dxo=-100 nxd=2 nt=257 dt=0.004 'ref=1:100,250;900,350'
+makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=6 fxm=750 dxm=-50 nxd=3 nt=257 dt=0.004 'ref=1:100,250;900,350'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=4 fxm=500 dxm=0 nxd=2 nxo=2 fxo=-100 dxo=200 nt=103 dt=0.01 'ref=1:100,200;900,300'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=2 fxm=450 dxm=100 nxd=9 nt=103 dt=0.01 'ref=1:100,200;900,300'
+# Minimum useful finite-difference band, one lateral velocity column, and a 2 by 2 model.
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxb=1 nxm=1 fxm=500 nt=103 dt=0.01 'ref=1:420,200;580,300'
+sunull nt=9 ntr=1 | sugain bias=2000 | sustrip outpar=/dev/null | susynvxz nx=1 nz=9 nxb=2 nxm=1 fxm=0 nt=17
+makevel nx=2 nz=2 v000=2000 | susynvxz nx=2 nz=2 nxm=1 fxm=0 nt=31 dt=0.004 'ref=1:1,20;99,20'
+# Diffractor density, smooth multi-point/vertical/reversed reflectors, signed amplitudes.
+makevel nx=21 nz=17 dx=50 dz=50 v000=2000 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=1 fxm=500 nt=257 dt=0.004 ndpfz=1 tmin=0.008 'ref=1:100,250;900,350'
+[stderr] makevel nx=21 nz=17 dx=50 dz=50 v000=2000 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=1 fxm=500 nt=257 dt=0.004 ndpfz=20 tmin=0 verbose=1 smooth=1 'ref=-0.4:100,250;350,400;650,200;900,350'
+makevel nx=21 nz=17 dx=50 dz=50 v000=2000 | susynvxz nx=21 nz=17 dx=50 dz=50 nxm=1 fxm=500 nt=257 dt=0.004 ls=1 'ref=1:500,100;500,700' 'ref=-0.7:900,450;100,300'
+# Negative time origin is valid; positive ft below all reflected arrivals is also valid.
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=127 dt=0.004 ft=-0.025 'ref=1:100,200;900,300'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=127 dt=0.004 ft=0.1 fpeak=35 'ref=1:100,300;900,400'
+# Curved velocity lens and reflected events near the final time sample.
+makevel nx=31 nz=25 dx=40 dz=40 v000=2000 vlens=150 xlens=600 zlens=400 dlens=500 tlens=400 | susynvxz nx=31 nz=25 dx=40 dz=40 nxm=3 fxm=500 dxm=100 nxb=10 nt=509 dt=0.002 'ref=1:100,600;1100,650'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=23 dt=0.01 fpeak=15 'ref=1:400,200;600,200'
+# Malformed reflectors, integer parsing, range and late band checks.
+[stderr] susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=0
+[stderr] susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=-1
+[stderr] susynvxz nx=11 nz=9 nxm=1 fxm=500 'ref=1:100,200;900'
+[stderr] susynvxz nx=11 nz=9 nxm=1 fxm=500 'ref=100,200:900,200'
+[stderr] susynvxz nx=11 nz=9 nxm=1 fxm=500 nxd=2147483648
+[stderr] susynvxz nx=11 nz=9 nxm=2 fxm=500 dxm=-600
+[stderr] makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nxb=1 fxo=-200
+# C alloc2float uses one flat allocation. These negative-z accesses stay inside
+# that allocation and read initialized earlier columns, not out-of-allocation data.
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 'ref=1:100,-100;900,-100'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=257 dt=0.01 'ref=1:100,-150;900,-150'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=257 dt=0.01 ls=1 'ref=1:100,-200;900,-200'
+makevel nx=21 nz=17 dx=50 dz=50 v000=1800 dvdx=0.1 dvdz=0.5 | susynvxz nx=21 nz=17 dx=50 dz=50 nxb=8 nxm=2 fxm=500 dxm=50 nt=257 dt=0.01 'ref=1:200,-100;800,-100'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=257 dt=0.01 smooth=1 'ref=-0.4:100,-100;400,-200;900,-100'
+
+# ub-2026-11 (round 1)
+# Refuted: cwp/lib/polar.c:131,140 reads p[0][-1] with zero weight when nz=1.
+# Singleton interpolation fixes that read but leaves rc=0 and all 644 stdout bytes unchanged.
+makevel nx=11 nz=1 v000=2000 | susynvxz nx=11 nz=1 nxm=1 fxm=500 nt=101
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 'ref=1:100,,200;900,200'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 'ref=1:100,200;;900,200'
+[stderr] makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 'ref=:100,200;900,200'
+makevel nx=11 nz=9 v000=2000 | susynvxz nx=11 nz=9 nxm=1 fxm=500 nt=101 dz=-100

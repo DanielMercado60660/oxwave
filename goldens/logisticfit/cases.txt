@@ -55,3 +55,47 @@ printf '%s\n' 0 1 2 1 2 3 | a2b n1=1 outpar=/dev/null | logisticfit n=3 outpar=/
 [stderr] logisticfit n=3 outpar=missing/fit.par
 [stderr] logisticfit n=3 outpar=
 [stderr] logisticfit n=bogus nstart=1 outpar=fit.par
+
+# diff-2026-11 (round 1)
+# logisticfit consumes native floats, not SU traces. Extract header values or
+# strip trace headers first. All windows below contain at least two points,
+# and shortened windows receive only n+nend floats (C has no upper p bound).
+# nt=1 with four traces: time=[1,2], population=[1,2], from a float header.
+[stderr] sunull nt=1 ntr=4 | sushw key=d1 a=1 b=1 j=2 | sugethw key=d1 output=binary | logisticfit n=2 outpar=fit.par && cat fit.par
+# nt=2,3,4: two trace-local cumulative sums supply t followed by P(t).
+[stderr] sunull nt=2 ntr=2 | suhtmath op=add key=tracl | suop op=sum | sustrip outpar=/dev/null | logisticfit n=2 nstart=0 nend=2 outpar=fit.par && cat fit.par
+[stderr] sunull nt=3 ntr=2 | suhtmath op=add key=tracl | suop op=sum | sustrip outpar=/dev/null | logisticfit n=3 outpar=fit.par && cat fit.par
+[stderr] sunull nt=4 ntr=2 | suhtmath op=add key=tracl | suop op=sum | sustrip outpar=/dev/null | logisticfit n=4 outpar=fit.par && cat fit.par
+# Single-trace spike and plane generators; two integrations create ramps.
+[stderr] (suspike nt=7 ntr=1 nspk=1 ix1=1 it1=1 | suop op=sum | suop op=sum | sustrip outpar=/dev/null; makevel nx=1 nz=7 v000=2 dvdz=2) | logisticfit n=7 outpar=fit.par && cat fit.par
+[stderr] (suplane nt=31 ntr=1 npl=1 len1=1 cx1=1 ct1=1 | suop op=sum | suop op=sum | sustrip outpar=/dev/null; makevel nx=1 nz=31 v000=32 dvdz=-1) | logisticfit n=31 outpar=fit.par && cat fit.par
+# Analytic logistic population, generated with raw SU arithmetic. Exercise
+# defaults, explicit defaults, start only, end only, and a two-sided window.
+[stderr] (makevel nx=1 nz=17 v000=0 dvdz=0.5; makevel nx=1 nz=17 v000=0 dvdz=-0.2 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=17 outpar=fit.par && cat fit.par
+[stderr] (makevel nx=1 nz=17 v000=0 dvdz=0.5; makevel nx=1 nz=17 v000=0 dvdz=-0.2 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=17 nstart=0 nend=17 outpar=fit.par && cat fit.par
+[stderr] (makevel nx=1 nz=17 v000=0 dvdz=0.5; makevel nx=1 nz=17 v000=0 dvdz=-0.2 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=17 nstart=3 outpar=fit.par && cat fit.par
+[stderr] (makevel nx=1 nz=17 v000=0 dvdz=0.5; makevel nx=1 nz=13 v000=0 dvdz=-0.2 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=17 nend=13 outpar=fit.par && cat fit.par
+[stderr] (makevel nx=1 nz=17 v000=0 dvdz=0.5; makevel nx=1 nz=11 v000=0 dvdz=-0.2 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=17 nstart=4 nend=11 outpar=fit.par && cat fit.par
+# Last two points of a longer input exercise a nonzero start and nwindow=2.
+[stderr] makevel nx=2 nz=17 v000=1 dvdz=1 | logisticfit n=17 nstart=15 outpar=fit.par && cat fit.par
+# Large, non-power-of-two trace; finite logistic fit rather than all-zero data.
+[stderr] (sunull nt=4097 ntr=1 | suhtmath op=add key=tracl | suop op=sum | sugain scale=0.001953125 | sustrip outpar=/dev/null; makevel nx=1 nz=4097 v000=0 dvdz=-0.00078125 | farith op=exp | farith op=scale scale=19 | farith op=bias bias=1 | farith op=pinv | farith op=scale scale=100) | logisticfit n=4097 outpar=fit.par && cat fit.par
+# Header arithmetic drives nonuniform time samples (squared offsets).
+[stderr] (sunull nt=1 ntr=17 | sushw key=offset a=1 b=1 | suchw key1=d1 key2=offset key3=offset b=1 c=0 | suhtmath op=add key=d1 | suop op=sqr | sustrip outpar=/dev/null; makevel nx=1 nz=17 v000=2 dvdz=0.25) | logisticfit n=17 outpar=fit.par && cat fit.par
+# Decreasing times and large time origins probe ordering and cancellation.
+[stderr] (makevel nx=1 nz=19 v000=9 dvdz=-0.5; makevel nx=1 nz=19 v000=20 dvdz=-0.5) | logisticfit n=19 outpar=fit.par && cat fit.par
+[stderr] (makevel nx=1 nz=67 v000=100000 dvdz=0.125; makevel nx=1 nz=67 v000=1 dvdz=0.03125) | logisticfit n=67 outpar=fit.par && cat fit.par
+# verbose is ignored: C deliberately has no checkpars call.
+[stderr] makevel nx=2 nz=5 v000=1 dvdz=1 | logisticfit n=5 verbose=1 outpar=fit.par && cat fit.par
+# Suppressed output is also an exit-zero mode; verify exact empty stdout.
+[exact] makevel nx=2 nz=5 v000=1 dvdz=1 | logisticfit n=5 outpar=/dev/null
+# Preserve error status by draining generator output before invoking the
+# failing program. This avoids a race between the error and upstream SIGPIPE.
+[stderr] makevel nx=2 nz=3 v000=1 dvdz=1 | { cat > input; logisticfit outpar=fit.par < input; }
+[stderr] makevel nx=2 nz=3 v000=1 dvdz=1 | { cat > input; logisticfit n=3 nstart=2147483648 outpar=fit.par < input; }
+[stderr] makevel nx=2 nz=3 v000=1 dvdz=1 | { cat > input; logisticfit n=3 nend=4 outpar=fit.par < input; }
+[stderr] makevel nx=2 nz=3 v000=1 dvdz=1 | { cat > input; logisticfit n=3 nstart=2 nend=1 outpar=fit.par < input; }
+# Smallest SU trace supplies a complete two-point fit through four headers.
+[stderr] sunull nt=1 ntr=1 | sushw key=f1,d1,f2,d2 a=1,2,1,2 | sugethw key=f1,d1,f2,d2 output=binary | logisticfit n=2 outpar=fit.par && cat fit.par
+# Raw input can exceed the SU sample limit: n is not a trace-header field.
+[stderr] makevel nx=2 nz=65537 v000=1 dvdz=0.0000152587890625 | logisticfit n=65537 outpar=fit.par && cat fit.par

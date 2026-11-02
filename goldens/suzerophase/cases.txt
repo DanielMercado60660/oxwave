@@ -15,3 +15,23 @@ suzerophase </dev/null
 suplane nt=32 ntr=1 | suzerophase t0=1e999
 suplane nt=32 ntr=1 | sushw key=dt a=0 | suzerophase dt=-0.002 t0=0.01
 sunull nt=65535 ntr=1 | suzerophase
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suzerophase t0=0
+suspike nt=3 ntr=1 | suzerophase t0=0.003
+suspike nt=4 ntr=2 | suzerophase t0=-0.002
+suspike nt=127 ntr=3 k1=12,40,90 mag=1,-2,0.5 | suzerophase t0=0.016
+suplane nt=4097 ntr=2 | suzerophase t0=0.032
+sunull nt=17 ntr=2 | suzerophase t0=0
+suplane nt=53 ntr=2 | sushw key=dt a=2000 | suzerophase dt=0.01 t0=0.006
+suspike nt=29 ntr=1 | sushw key=trid,d1 a=110,0 | suzerophase dt=0.002 t0=-0.004
+suplane nt=37 ntr=1 | suzerophase verbose=0 t0=1.0
+suplane nt=37 ntr=1 | suzerophase t0=abc
+suplane nt=31 ntr=1 | suzerophase verbose=999999999999999999999
+suspike nt=31 ntr=1 | suzerophase t0=1.001
+suspike nt=31 ntr=1 | suzerophase t0=-1.001
+suplane nt=73 ntr=2 | sushw key=trid,dt,d1 a=18,1000,0.003 | suzerophase t0=0.009
+suspike nt=97 ntr=2 | sushw key=trid,dt,d1 a=109,2000,0.003 | suzerophase t0=0.007
+suplane nt=257 ntr=3 | suaddnoise seed=12345 sn=2 noise=flat | suzerophase t0=0.037
+suspike nt=8191 ntr=1 k1=1,111,7000 mag=1,-0.3,0.6 | suzerophase t0=0.111
+suspike nt=60000 ntr=1 k1=100,30000 mag=1,0.4 | suzerophase t0=0.04

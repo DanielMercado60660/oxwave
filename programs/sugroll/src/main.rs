@@ -40,6 +40,11 @@
 
 use oxwave_core::prelude::*;
 use oxwave_tempfile::temporary_filename;
+use std::ffi::{c_char, c_int, CString};
+
+unsafe extern "C" {
+    fn access(path: *const c_char, mode: c_int) -> c_int;
+}
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
@@ -90,9 +95,9 @@ fn main() {
         tmpdir = std::env::var("CWP_TMPDIR").unwrap_or_default();
     }
     if !tmpdir.is_empty() {
-        // Rust's permission query covers missing paths and read-only mode
-        // bits. A faithful access(WRITE_OK) including ACLs needs a core API.
-        if !std::fs::metadata(&tmpdir).is_ok_and(|m| !m.permissions().readonly()) {
+        let path = CString::new(tmpdir.as_str()).unwrap();
+        // WRITE_OK is 2; access checks this user's permissions, including ACLs.
+        if unsafe { access(path.as_ptr(), 2) } != 0 {
             err!("you can't write in %s (or it doesn't exist)", tmpdir);
         }
     }

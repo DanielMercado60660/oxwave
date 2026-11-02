@@ -87,9 +87,13 @@ fn main() {
 
     // Match fdopen(fd, "r"): reject invalid/write-only descriptors, then
     // wrap the existing descriptor, preserving sockets, flags and position.
+    // Darwin's FILE stores its descriptor in a signed short, so fdopen also
+    // rejects valid descriptors above SHRT_MAX; File::from_raw_fd does not.
     // SAFETY: F_GETFL only inspects the descriptor and takes no third argument.
     let flags = unsafe { fcntl(fd, F_GETFL) };
-    if flags == -1 || flags & O_ACCMODE == O_WRONLY {
+    if flags == -1 || flags & O_ACCMODE == O_WRONLY
+        || (cfg!(target_os = "macos") && fd > i16::MAX as i32)
+    {
         err!("Bad file descriptor");
     }
     // SAFETY: F_GETFL validated fd. This stream owns it until process exit;

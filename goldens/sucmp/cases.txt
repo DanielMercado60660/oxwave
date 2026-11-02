@@ -62,3 +62,45 @@ sucmp a b limit=1e999
 [stderr] sunull nt=5 ntr=1 > b && touch a && sucmp a b
 [stderr] sunull nt=5 ntr=1 > a && dd if=a of=b bs=1 count=239 2>/dev/null && sucmp a b
 [stderr] sunull nt=5 ntr=1 > a && dd if=a of=b bs=1 count=250 2>/dev/null && sucmp a b
+
+# diff-2026-11 (round 1)
+# Small traces with real nonzero samples, default and explicit limits.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 > a && sucmp a a
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 > a && sucmp a a limit=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 > a && sugain < a scale=1.00005 > b && sucmp a b limit=0.0001
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 > a && suop < a op=neg > b && sucmp a b
+# Prime, long, and maximum supported sizes; force a difference at the final sample.
+[stderr] suspike nt=31 ntr=3 nspk=1 ix1=3 it1=31 > a && suop < a op=neg > b && sucmp a b limit=0
+[stderr] suspike nt=4097 ntr=3 nspk=1 ix1=3 it1=4097 > a && sucmp a a limit=0 verbose=1
+[stderr] suspike nt=4097 ntr=3 nspk=1 ix1=3 it1=4097 > a && suop < a op=neg > b && sucmp a b
+[stderr] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 > a && sucmp a a limit=0
+[stderr] suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 > a && suop < a op=neg > b && sucmp a b limit=0
+# Header bytes: late mismatch, rarely used short fields, floats, and derived geometry.
+[stderr] sunull nt=2 ntr=3 > a && sushw < a key=mark a=0 c=1 j=2 > b && sucmp a b
+[stderr] sunull nt=3 ntr=1 > a && sushw < a key=shortpad a=-32768 > b && sucmp a b
+[stderr] sunull nt=4 ntr=1 > a && sushw < a key=d1 a=0.125 > b && sucmp a b limit=1
+[stderr] suplane nt=31 ntr=3 | sushw key=sx,offset a=-100,20 b=10,-10 | suchw key1=gx key2=sx key3=offset b=1 c=1 > a && sucmp a a limit=0
+# Tiny nonzero data, NaNs, and infinities retain the C comparison semantics.
+[stderr] sunull nt=4 ntr=1 | sugain bias=1e-40 > a && sugain < a scale=2 > b && sucmp a b limit=0.5
+[stderr] sunull nt=4 ntr=1 | sugain bias=-1e-40 > a && sugain < a scale=2 > b && sucmp a b limit=0
+[stderr] sunull nt=3 ntr=1 > b && sugain < b bias=nan > a && sucmp a b limit=0
+[stderr] sunull nt=3 ntr=1 | sugain bias=100 | suop op=exp > a && sucmp a a limit=1
+# Special and boundary limits, including bounds that round back to one.
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sugain < a scale=-1 > b && sucmp a b limit=nan
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sucmp a a limit=1e-8
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sugain < a bias=0.00000011920928955078125 > b && sucmp a b limit=1e-8
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sucmp a a limit=-0.0001
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sugain < a scale=2 > b && sucmp a b limit=0x1p-1
+[stderr] sunull nt=2 ntr=1 | sugain bias=1 > a && sugain < a scale=2 > b && printf 'limit=0.5\n' > params && sucmp a b par=params
+[stderr] sunull nt=2 ntr=1 > a && sucmp a a limit=1e39
+[stderr] sunull nt=2 ntr=1 > a && sucmp a a limit=1e-999
+# Alternate input paths and packed shorts, with small odd traces.
+[stderr] sunull nt=4 ntr=3 > a && cat a | sucmp /dev/stdin a limit=0
+[stderr] sunull nt=4 ntr=3 > a && cat a | sucmp a /dev/stdin limit=0
+[stderr] suspike nt=17 ntr=3 nspk=1 ix1=3 it1=17 | supack2 > a && sucmp a a limit=0
+# First header is valid but contains no data; malformed second trace sizes.
+[stderr] sunull nt=4 ntr=1 > a && dd if=a of=b bs=1 count=240 2>/dev/null && sucmp a b
+[stderr] sunull nt=4 ntr=1 > first && sunull nt=3 ntr=1 > last && cat first last > a && sucmp a a
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[stderr] sunull nt=2 ntr=1 > a && sucmp a a limit=0x1.8p-1074

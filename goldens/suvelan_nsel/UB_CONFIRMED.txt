@@ -1,0 +1,2 @@
+# suvelan_nsel.c:190, 226-228, 245, 212-219: uninitialized aoff is read for a partial gather and ix is left at nx, causing out-of-bounds writes. Zero offsets and check ix before writing: original rc 139, fixed rc 1 with a clean error after 648 output bytes; OxWave matches fixed output and error.
+suplane nt=41 ntr=6 | sushw key=cdp,offset a=1,0 b=0,20 c=1,0 j=3,0 | suvelan_nsel nx=8 dx=20 nv=2 tau=0.2 dtratio=2 nsmooth=5

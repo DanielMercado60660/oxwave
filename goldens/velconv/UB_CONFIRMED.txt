@@ -1,0 +1,4 @@
+# velconv.c:271 (allocation velconv.c:218; intlin.c:92,110): zt has nt=5 but nout=9 coordinates are read; bounds check yields a clean error instead of nine floats; OxWave matches fixed.
+[f32] makevel nx=1 nz=5 v000=2000 dvdz=10 > in && makevel nx=1 nz=5 v000=5 dvdz=1 > other && velconv < in intype=othert outtype=otherz nt=5 nz=9 dt=0.004 dz=4 otherfile=other
+# velconv.c:265 (allocation velconv.c:217; intlin.c:92,110): tz has nz=5 but nout=9 coordinates are read; bounds check yields a clean error instead of nine floats; OxWave matches fixed.
+[f32] makevel nx=1 nz=5 v000=2000 dvdz=10 > in && makevel nx=1 nz=5 v000=5 dvdz=1 > other && velconv < in intype=otherz outtype=othert nz=5 nt=9 dt=0.004 dz=4 otherfile=other

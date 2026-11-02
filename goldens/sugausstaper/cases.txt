@@ -12,3 +12,16 @@ suspike nt=7 ntr=1 | sugausstaper x0=1 xw=0
 sugausstaper key=notakey
 sugausstaper x0=1
 sugausstaper xw=1e999
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=offset a=300 | sugausstaper key=offset x0=300 xw=50
+suspike nt=3 ntr=2 nspk=1 ix1=2 it1=2 | sushw key=offset a=-75 b=150 | sugausstaper x0=0 xw=75
+suspike nt=4 ntr=4 | sushw key=cdp a=1 b=1 | sugausstaper key=cdp x0=2.5 xw=1.25
+suplane nt=23 ntr=7 | sushw key=offset a=-300 b=100 | sugausstaper key=offset x0=-25.5 xw=125.25
+suplane nt=4097 ntr=2 | sushw key=trid a=1 b=1 | sugausstaper key=trid x0=1.5 xw=2
+sunull nt=13 ntr=3 | sushw key=offset a=275 b=25 | sugausstaper x0=300 xw=50
+suspike nt=17 ntr=5 | sushw key=f1 a=-2 b=1 | sugausstaper key=f1 x0=-0.5 xw=0.8
+suplane nt=11 ntr=4 | sushw key=ns a=11 | sugausstaper key=ns x0=11 xw=2
+[stderr] suspike nt=5 ntr=2 | sushw key=offset a=300 b=50 | sugausstaper key=offset x0=300 xw=-50 verbose=1
+suspike nt=7 ntr=1 | sugausstaper x0=1e999
+suspike nt=7 ntr=1 | sugausstaper key=badheader
+suspike nt=7 ntr=1 | sugausstaper xw=1e999

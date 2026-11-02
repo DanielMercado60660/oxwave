@@ -78,3 +78,58 @@
 [stderr] awk 'BEGIN {for(x=0;x<13;x++) for(z=0;z<9;z++) print 2000+12*x+30*z}' | a2b n1=9 > vel; sunull nt=129 ntr=5 | suaddnoise seed=97 | suinvvxzco nx=13 nz=9 nxm=5 vfile=vel dx=25 dz=20 dxm=5 fxm=220 offs=10 nxb=4 nxd=3 fxo=200 dxo=15 nxo=9 fzo=5 dzo=12 nzo=17 verbose=1
 # Abrupt velocity jump must retain the upweik curvature error and exit status.
 [stderr] awk 'BEGIN {for(x=0;x<9;x++) for(z=0;z<9;z++) print (z<4 ? 1500 : 8000)}' | a2b n1=9 > vel; sunull nt=129 ntr=1 | suinvvxzco nx=9 nz=9 nxm=1 vfile=vel dxm=10 fxm=200 nxo=5 nzo=11 verbose=1
+
+# diff-2026-11 (round 1)
+# Short nonzero impulses: nt=1..4, including a last-sample impulse.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0
+# Large/prime time lengths; impulses at early and late samples.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=17 ntr=1 nspk=1 ix1=1 it1=2 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxd=1 nxo=5 dxo=9 nzo=11 dzo=4 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=20 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxd=1 nxo=5 dxo=9 nzo=11 dzo=4 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=4099 ntr=1 nspk=1 ix1=1 it1=4099 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxd=1 nxo=5 dxo=9 nzo=11 dzo=4 verbose=0
+# One case passes every parameter to the inversion, using explicit defaults and correction mode.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; makevel nx=2 nz=2 v000=.00001 > vp; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=7 offset=0 | suinvvxzco dt=.004 offs=0 dxm=10 nx=2 nz=2 nxm=1 vfile=vel fxm=0 nxd=5 dx=50 fx=0 dz=50 nxb=1 nxc=0 nzc=0 fxo=0 dxo=15 nxo=3 fzo=0 dzo=5 nzo=9 ls=0 pert=1 verbose=1 fmax=62.5 ang=180 vpfile=vp
+# Header-driven dt/d2/offset; extra coordinate headers must not alter geometry.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=11 offset=0 | sushw key=dt,d2,offset,delrt,sx,gx,scalco a=2000,7.5,-12,31,10000,20000,-100 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel fxm=20 fxo=5 dxo=7.5 nxo=5 dzo=5 nzo=9 verbose=1
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=11 offset=0 | sushw key=dt,d2,offset a=0,-1,900 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dt=.002 dxm=7.5 offs=-12 fxm=20 fxo=5 dxo=7.5 nxo=5 dzo=5 nzo=9 verbose=0
+# The first header fixes sampling and offset even when later headers vary.
+[stderr] makevel nx=5 nz=5 v000=2000 > vel; suplane nt=97 ntr=4 npl=1 len1=4 cx1=2 ct1=17 dip1=4 offset=0 | sushw key=dt,d2,offset a=2000,5,10 b=100,3,100 | suinvvxzco nx=5 nz=5 nxm=4 vfile=vel fxm=50 nxd=2 nxo=7 fxo=25 dxo=10 nzo=13 dzo=10 verbose=1
+# Point/line source and perturbation modes on a sloping plane and unequal model spacing.
+[stderr] makevel nx=9 nz=7 dx=25 dz=20 v000=1900 dvdx=.3 dvdz=.5 > vel; makevel nx=9 nz=7 v000=.00001 > vp; suplane nt=257 ntr=6 npl=2 len1=6 len2=6 cx1=3 cx2=3 ct1=25 ct2=41 dip1=4 dip2=-4 offset=10 | suinvvxzco nx=9 nz=7 nxm=6 vfile=vel dx=25 dz=20 dxm=5 fxm=60 nxb=3 nxd=2 nxc=2 nzc=4 fxo=25 dxo=7.5 nxo=13 fzo=5 dzo=7.5 nzo=15 ang=80 fmax=45 verbose=0 ls=0 pert=0
+[stderr] makevel nx=9 nz=7 dx=25 dz=20 v000=1900 dvdx=.3 dvdz=.5 > vel; makevel nx=9 nz=7 v000=.00001 > vp; suplane nt=257 ntr=6 npl=2 len1=6 len2=6 cx1=3 cx2=3 ct1=25 ct2=41 dip1=4 dip2=-4 offset=10 | suinvvxzco nx=9 nz=7 nxm=6 vfile=vel dx=25 dz=20 dxm=5 fxm=60 nxb=3 nxd=2 nxc=2 nzc=4 fxo=25 dxo=7.5 nxo=13 fzo=5 dzo=7.5 nzo=15 ang=80 fmax=45 verbose=0 ls=1 pert=0
+[stderr] makevel nx=9 nz=7 dx=25 dz=20 v000=1900 dvdx=.3 dvdz=.5 > vel; makevel nx=9 nz=7 v000=.00001 > vp; suplane nt=257 ntr=6 npl=2 len1=6 len2=6 cx1=3 cx2=3 ct1=25 ct2=41 dip1=4 dip2=-4 offset=10 | suinvvxzco nx=9 nz=7 nxm=6 vfile=vel dx=25 dz=20 dxm=5 fxm=60 nxb=3 nxd=2 nxc=2 nzc=4 fxo=25 dxo=7.5 nxo=13 fzo=5 dzo=7.5 nzo=15 ang=80 fmax=45 verbose=0 ls=0 pert=1 vpfile=vp
+[stderr] makevel nx=9 nz=7 dx=25 dz=20 v000=1900 dvdx=.3 dvdz=.5 > vel; makevel nx=9 nz=7 v000=.00001 > vp; suplane nt=257 ntr=6 npl=2 len1=6 len2=6 cx1=3 cx2=3 ct1=25 ct2=41 dip1=4 dip2=-4 offset=10 | suinvvxzco nx=9 nz=7 nxm=6 vfile=vel dx=25 dz=20 dxm=5 fxm=60 nxb=3 nxd=2 nxc=2 nzc=4 fxo=25 dxo=7.5 nxo=13 fzo=5 dzo=7.5 nzo=15 ang=80 fmax=45 verbose=0 ls=1 pert=1 vpfile=vp
+# A reflector generator supplies its native midpoint/offset headers.
+[stderr] makevel nx=9 nz=7 v000=2000 > vel; susynlv nt=257 dt=.002 nxm=3 dxm=.01 fxm=.1 nxo=1 fxo=.02 v00=2 ref="1:0,.1;1,.1" | suinvvxzco nx=9 nz=7 nxm=3 vfile=vel fxm=100 nxd=1 nxo=9 fxo=50 dxo=15 nzo=17 dzo=12.5 verbose=1
+# Born line scatterer input with explicit inversion geometry.
+[stderr] makevel nx=7 nz=7 v000=2000 > vel; suimp2d nt=257 dt=.002 c=2000 nshot=1 nrec=3 sxmin=100 gxmin=100 dgx=5 x0=100 z0=100 | suinvvxzco nx=7 nz=7 nxm=3 vfile=vel dxm=2.5 fxm=100 offs=0 nxd=1 nxo=7 fxo=50 dxo=15 nzo=17 dzo=12.5 ls=1 verbose=0
+# Shifted shallow model with defaults; repeated output locations; nonzero boolean flags.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=5 offset=0 | sushw key=d2 a=5 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel fx=-25 fxm=-10 fxo=-25
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=5 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 fxm=20 fxo=20 dxo=0 nxo=4 fzo=5 dzo=0 nzo=4 ls=2 verbose=-1
+# Small negative depths keep both depth and time indices at zero after truncation.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=3 dxo=7 fzo=-.5 dzo=.1 nzo=9 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=3 dxo=7 fzo=0 dzo=-.1 nzo=9 verbose=0
+# Antialias/dip edge values and empty output, without invalid model indices.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=5 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0 fmax=-20 ang=-90 ls=1
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=5 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0 fmax=100000 ang=360
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=5 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0 fmax=0 ang=0 nxo=0
+# Largest supported input trace; output remains small.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=3 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0
+# Geometry/parameter errors are checked before opening the model.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=unused offs=-1000
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=unused fxm=-1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco dxm=10 nx=2 nz=2 nxm=1 vfile=unused fx=10 fxo=9
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco dxm=10 nx=2 nz=2 nxm=
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco dxm=10 nx=2 nz=
+# Short correction file has a deterministic read error.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; makevel nx=1 nz=2 v000=.00001 > vp; suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 offs=0 nxo=3 dxo=10 nzo=7 dzo=.1 verbose=0 pert=1 vpfile=vp
+# Long traces with output times interpolating the last two input samples.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 dt=.00001 nxo=1 nzo=2 dzo=40.955 verbose=0
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=65535 ntr=1 nspk=1 ix1=1 it1=65535 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 dt=.000001 dx=100 dz=100 nxo=1 nzo=2 dzo=65.5335 verbose=0
+
+# ub-2026-11 (round 1)
+# Refuted: suinvvxzco.c:360,367 (also 467,474): skipping nsamp<0 leaves stdout/stderr/rc identical to the original.
+# The adjacent endpoint note at C:304,308 does not apply: xs=xg=0, ex=50, ixd=0, nx=2.
+[stderr] makevel nx=2 nz=2 v000=2000 > vel; suspike nt=97 ntr=1 nspk=1 ix1=1 it1=7 offset=0 | suinvvxzco nx=2 nz=2 nxm=1 vfile=vel dxm=10 nxo=3 nzo=9 verbose=0 fxm=0 nxb=1 fzo=5 dzo=-1 nzo=10

@@ -89,7 +89,11 @@ fn main() {
     if getparfloat("d1r", &mut d1r) == 0 { d1r = d1; }
     if getparfloat("f1r", &mut f1r) == 0 { f1r = f1; }
     checkpars();
+    // C's ealloc1float converts negative dimensions to an allocation size
+    // that malloc rejects; avoid a Rust capacity-overflow panic instead.
+    if n1 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut p = vec![0.0f32; n1 as usize];
+    if n1r < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut pr = vec![0.0f32; n1r as usize];
     let mut xr = vec![0.0f32; n1r as usize];
     let mut x1r = f1r;

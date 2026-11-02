@@ -17,3 +17,23 @@ regrid3 no1=-1
 regrid3 no2=0
 regrid3 no3=-1
 printf '3\n' | a2b n1=1 | regrid3 ni1=2
+# diff-2026-11 (round 1)
+[f32] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | regrid3 ni1=1 ni2=1 ni3=1 no1=1 no2=1 no3=1
+[f32] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | regrid3 ni1=2 no1=5 no2=2 no3=2
+[f32] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | regrid3 ni1=3 no1=7
+[f32] suspike nt=4 ntr=2 nspk=1 ix1=2 it1=3 | sustrip outpar=/dev/null | regrid3 ni1=4 ni2=2 no1=3 no2=5 no3=2
+[f32] suspike nt=7 ntr=3 nspk=1 ix1=2 it1=4 | sustrip outpar=/dev/null | regrid3 ni1=7 ni2=3 no1=11 no2=4 no3=3
+[f32] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=2049 | sustrip outpar=/dev/null | regrid3 ni1=4097 no1=4103
+[f32] suplane nt=31 ntr=8 npl=1 dip1=2 len1=8 ct1=15 cx1=4 | sustrip outpar=/dev/null | regrid3 ni1=31 ni2=4 ni3=2 no1=19 no2=7 no3=5
+[f32] suplane nt=17 ntr=6 npl=1 dip1=3 len1=6 ct1=8 cx1=3 | sustrip outpar=/dev/null | regrid3 ni1=17 ni2=3 ni3=2 no1=23 no2=2 no3=3
+[f32] sunull nt=4 ntr=3 | sushw key=offset a=100 b=20 | sustrip outpar=/dev/null | regrid3 ni1=4 ni2=3 no1=9 no2=2
+[f32] suspike nt=5 ntr=4 nspk=1 ix1=3 it1=2 | sushw key=cdp a=11 b=3 | sustrip outpar=/dev/null | regrid3 ni1=5 ni2=2 ni3=2 no1=5 no2=2 no3=2
+[f32] sunull nt=3 ntr=1 | sustrip outpar=/dev/null | regrid3
+[f32] suspike nt=4 ntr=2 nspk=1 ix1=1 it1=1 | sustrip outpar=/dev/null | regrid3 ni1=4 ni2=2 no1=0 no2=3 no3=2
+[f32] [stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 | sustrip outpar=/dev/null | regrid3 ni1=3 ni2=2 ni3=1 no1=4 no2=3 no3=2 verbose=1
+sunull nt=2 ntr=1 | sustrip outpar=/dev/null | regrid3 ni1=3
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | regrid3 no2=0
+sunull nt=1 ntr=1 | sustrip outpar=/dev/null | regrid3 ni1=abc
+[f32] makevel nz=7 ny=3 nx=2 v000=3.5 dvdz=0.25 dvdy=-0.7 dvdx=2 | regrid3 ni1=7 ni2=3 ni3=2 no1=13 no2=5 no3=4
+[f32] makevel nz=11 ny=4 nx=3 v000=-5 dvdz=0.7 dvdy=1.3 dvdx=-2.1 | regrid3 ni1=11 ni2=4 ni3=3 no1=3 no2=2 no3=2
+[f32] makevel nz=13 ny=1 nx=1 v000=2 dvdz=0.1 | regrid3 ni1=13 no1=1 no2=7 no3=3

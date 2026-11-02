@@ -94,3 +94,51 @@ sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml n
 [stderr] sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=4,4,4 zs=3,3,3 hsfile=h vsfile=v ssfile=s verbose=1 pml_thick=1 > w && cat w h v s
 # Source endpoints on model boundaries with all absorbing sides disabled.
 sunull nt=7 ntr=9 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.02 xs=0,4,8 zs=0,6,0 fmax=200 mt=5 abs=0,0,0,0
+
+# diff-2026-11 (round 1)
+# Minimum grids: disabled boundaries avoid the C absorber's neighbour reads.
+sunull nt=1 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=1 nz=1 tmax=0 nt=1 xs=0 zs=0 abs=0,0,0,0
+sunull nt=2 ntr=1 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=1 nz=2 tmax=0.01 nt=2 xs=0 zs=0 abs=0,0,0,0
+sunull nt=1 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=3 nz=1 tmax=0.01 nt=3 xs=1 zs=0 abs=0,0,0,0
+sunull nt=2 ntr=2 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=2 nz=2 tmax=0.01 nt=4 xs=0.5 zs=0.5 hsfile=h vsfile=v ssfile=s > w && cat h v s
+# Defaults versus explicit defaults on a different model and source geometry.
+makevel nx=11 nz=13 v000=1800 | sufdmod2_pml nx=11 nz=13 tmax=0.001 xs=4.5 zs=6.5
+makevel nx=11 nz=13 v000=1800 | sufdmod2_pml nx=11 nz=13 tmax=0.001 xs=4.5 zs=6.5 abs=1,1,1,1 nt=0 mt=1 dx=1 fx=0 dz=1 fz=0 pml_max=1000 pml_thick=0 hsz=0 vsx=0 verbose=0 fmax=180 fpeak=90
+# Every parameter together; all output traces have ns=17 for sample comparison.
+[stderr] makevel nx=11 nz=17 v000=2 dvdx=0.1 dvdz=0.2 > d; makevel nx=11 nz=17 v000=1450 dvdx=31 dvdz=17 | sufdmod2_pml nx=11 nz=17 tmax=0.02 xs=2.75 zs=3.25 abs=0,1,1,0 nt=17 mt=3 dx=1.5 fx=-4 dz=0.75 fz=-2 pml_max=175 pml_thick=2 hsz=1 vsx=3.5 verbose=2 dfile=d hsfile=h vsfile=v ssfile=s fmax=190 fpeak=80 > w && cat w h v s
+# Long temporal receiver records, independently observed for all three modes.
+makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0.01 nt=4097 mt=4097 xs=2 zs=3 hsfile=h hsz=3 > w && cat h
+makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0.01 nt=4097 mt=4097 xs=2 zs=3 vsfile=v vsx=2 pml_thick=1 > w && cat v
+makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0.01 nt=4097 mt=4097 xs=1,3 zs=2,4 ssfile=s fmax=300 > w && cat s
+# Long spatial traces and large trace counts, while keeping output below 5 MB.
+sunull nt=4097 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=3 nz=4097 tmax=0 nt=3 xs=1 zs=2048 mt=2
+sunull nt=65535 ntr=3 | sugain bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=3 nz=65535 tmax=0 nt=2 xs=1 zs=32767
+makevel nx=4097 nz=3 v000=1500 | sufdmod2_pml nx=4097 nz=3 tmax=0 nt=4 mt=4 xs=4094 zs=1
+# Header changes are stripped before modeling; header values can supply raw velocities.
+sunull nt=63 ntr=1 | sugain bias=1700 | sushw key=sx,offset,d1,d2 a=-17,123,4,9 | suchw key1=gx key2=sx key3=offset b=1 c=1 | sustrip outpar=/dev/null | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=3 zs=4
+sunull nt=1 ntr=63 | sushw key=d1 a=1500 b=5 | suchw key1=d1 key2=d1 a=100 b=1 | sugethw key=d1 output=binary | sufdmod2_pml nx=9 nz=7 tmax=0.002 xs=3 zs=4
+# Small/prime time counts with nonuniform velocity and density: both star branches.
+makevel nx=7 nz=11 v000=2 dvdx=0.15 dvdz=0.05 > d; makevel nx=7 nz=11 v000=1400 dvdx=50 dvdz=20 | sufdmod2_pml nx=7 nz=11 tmax=0 nt=2 xs=2.3 zs=5.4 dfile=d
+makevel nx=7 nz=11 v000=2 dvdx=0.15 dvdz=0.05 > d; makevel nx=7 nz=11 v000=1400 dvdx=50 dvdz=20 | sufdmod2_pml nx=7 nz=11 tmax=0 nt=3 xs=2.3 zs=5.4 dx=0.7 dz=1.1 dfile=d
+makevel nx=7 nz=11 v000=2 dvdx=0.15 dvdz=0.05 > d; makevel nx=7 nz=11 v000=1400 dvdx=50 dvdz=20 | sufdmod2_pml nx=7 nz=11 tmax=0 nt=17 xs=2.3 zs=5.4 dfile=d pml_thick=1
+makevel nx=7 nz=11 v000=2 dvdx=0.15 dvdz=0.05 > d; makevel nx=7 nz=11 v000=1400 dvdx=50 dvdz=20 | sufdmod2_pml nx=7 nz=11 tmax=0 nt=17 xs=2.3 zs=5.4 dx=0.7 dz=1.1 dfile=d pml_thick=5 pml_max=20
+# Boundary receivers, non-Boolean absorber flags, and negative spacing.
+suspike nt=13 ntr=11 | sugain scale=300 bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=11 nz=13 tmax=0 nt=13 xs=0 zs=12 abs=-1,2,-3,4 hsz=12 hsfile=h > w && cat h
+suplane nt=13 ntr=11 | sugain scale=200 bias=1500 | sustrip outpar=/dev/null | sufdmod2_pml nx=11 nz=13 tmax=0 nt=13 xs=10 zs=0 vsx=10 vsfile=v pml_thick=3 > w && cat v
+makevel nx=7 nz=11 v000=1500 | sufdmod2_pml nx=7 nz=11 tmax=0 nt=19 xs=-2.5 zs=4.5 dx=-1 dz=1 abs=1,0,1,0 mt=-3
+# Wavelet limits and extended curves outside the source cutoff.
+makevel nx=17 nz=19 v000=1500 | sufdmod2_pml nx=17 nz=19 tmax=0 nt=4 xs=6,9 zs=7,10 fmax=nan
+makevel nx=17 nz=19 v000=1500 | sufdmod2_pml nx=17 nz=19 tmax=0 nt=4 xs=6,9 zs=7,10 fmax=0
+makevel nx=17 nz=19 v000=1500 | sufdmod2_pml nx=17 nz=19 tmax=0 nt=4 xs=6 zs=7 fpeak=-20
+makevel nx=17 nz=19 v000=1500 | sufdmod2_pml nx=17 nz=19 tmax=0 nt=4 xs=6 zs=7 fpeak=0
+makevel nx=17 nz=19 v000=1500 | sufdmod2_pml nx=17 nz=19 tmax=0 nt=4 xs=6 zs=7 fpeak=nan
+makevel nx=13 nz=17 v000=1500 | sufdmod2_pml nx=13 nz=17 tmax=0 nt=257 mt=32 xs=-2,3,8,15 zs=8,1,15,8 fmax=600 pml_thick=1
+# Parser defaults, repeated names, and a wrong absorber count remain successful.
+[stderr] makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0 nt=3 xs=2 zs=3 abs=0,0,0,0,0 verbose=2 mt=2
+makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0 nt=3 xs=2 zs=3 mt=2 mt=1 dx= dz= fmax= fpeak= pml_thick= pml_max=
+# More required-value/parser errors and a fully populated but short density file.
+[stderr] sunull nt=1 ntr=1 | sufdmod2_pml nx= nz=7 tmax=0 xs=2 zs=3
+[stderr] sunull nt=1 ntr=1 | sufdmod2_pml nx=5 nz= tmax=0 xs=2 zs=3
+[stderr] sunull nt=1 ntr=1 | sufdmod2_pml nx=5 nz=7 tmax= xs=2 zs=3
+[stderr] makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0 xs=2 zs=3 dx=inf
+[stderr] makevel nx=1 nz=1 v000=2 > d; makevel nx=5 nz=7 v000=1500 | sufdmod2_pml nx=5 nz=7 tmax=0 xs=2 zs=3 dfile=d

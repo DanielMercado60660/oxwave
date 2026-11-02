@@ -95,9 +95,9 @@ fn weights(tr1: i32, tr2: i32, min: f32, kind: i32, w: &mut [f32]) {
 }
 
 fn taper(t1: f32, t2: f32, kind: i32, t: f32, dt: f32, trace: &mut [f32]) {
-    let nt = ((t / dt) as f64 + 1.0) as i32;
-    let nt1 = ((t1 / dt) as f64 + 1.0) as i32;
-    let nt2 = ((t2 / dt) as f64 + 1.0) as i32;
+    let nt = (t / dt + 1.0f32) as i32;
+    let nt1 = (t1 / dt + 1.0f32) as i32;
+    let nt2 = (t2 / dt + 1.0f32) as i32;
     if nt1 > 1 {
         for i in 0..nt1 {
             let f = i as f32 / nt1 as f32;

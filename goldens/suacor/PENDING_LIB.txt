@@ -1,0 +1,3 @@
+# diff-2026-11 (round 1)
+sunull nt=31 ntr=1 | sugain bias=1e30 | sugain scale=1e30 | suacor ntout=3 norm=0 sym=0
+# oxwave-correlation, xcor -> convolve (crates/oxwave-correlation/src/lib.rs:53-89): the scalar overlap sum omits the paired rolling-off path's initial xa*yb with yb=0.0 in vendor/su-original/src/cwp/lib/convolution.c:274-278. Infinite input therefore gives Inf at output sample/lag 2 instead of C's NaN (Inf*0). With sym=0 and ntout=3 this executes only zero lag and the first rolling-off pair, whose input accesses are in bounds; no rolling-on out-of-bounds read is involved. Both exit 0; stable in the original. Shared crate edits are prohibited.

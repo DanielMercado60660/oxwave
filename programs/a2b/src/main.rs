@@ -74,6 +74,8 @@ fn main() {
     let outparfp = efopen(&outpar, "w");
     let mut n1 = 0i32;
     if getparint("n1", &mut n1) == 0 { n1 = N1_DEFAULT; }
+    // ealloc1float receives a huge size_t for a negative n1 and fails malloc.
+    if n1 < 0 { err!("ealloc.c: malloc failed (Cannot allocate memory)"); }
     let mut x = vec![0.0f32; n1 as usize];
     checkpars();
     let mut vnum = 0usize;

@@ -71,3 +71,49 @@ suspike nt=105 ntr=2 it1=53 | suaddnoise seed=427 | succepstrum mode=ouphase sig
 # UB-removed: suspike nt=48 ntr=2 it1=23 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1
 # UB-removed: suspike nt=121 ntr=1 it1=2 | succepstrum
 # UB-removed: suspike nt=126 ntr=2 it1=63 | suaddnoise seed=427 | succepstrum mode=suphase sign1=-1 sign2=1
+
+# diff-2026-11 (round 1)
+# Explicit spike locations keep ntr=1 and tiny traces nonzero.
+suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | succepstrum mode=suphase trend=0
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | succepstrum sign1=-1 sign2=1 mode=ouphase trend=0 zeromean=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=3 | succepstrum mode=suphase unwrap=0.5 trend=1 zeromean=1
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | succepstrum
+# The default/explicit pair exercises real data, rather than an empty spike gather.
+suspike nt=64 ntr=1 nspk=1 ix1=1 it1=21 | succepstrum
+suspike nt=64 ntr=1 nspk=1 ix1=1 it1=21 | succepstrum sign1=1 sign2=-1 mode=ouphase unwrap=1 trend=1 zeromean=0
+# Prime lengths, both unwrappers, and a multi-trace dipping-plane input.
+suspike nt=17 ntr=1 nspk=1 ix1=1 it1=6 | succepstrum mode=suphase unwrap=2 trend=0 zeromean=1 sign1=-1 sign2=1
+suspike nt=37 ntr=3 nspk=1 ix1=2 it1=19 | suaddnoise seed=725 sn=4 | succepstrum mode=ouphase trend=1 zeromean=1
+suplane nt=257 ntr=4 npl=2 dip1=-3 dip2=7 ct1=35 ct2=60 | succepstrum mode=suphase unwrap=3 trend=0 sign2=1
+# Long traces stay small on stdout; exercise composite nf and the size guard.
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=1365 | suaddnoise seed=725 sn=4 | succepstrum mode=ouphase trend=0 zeromean=1 sign1=-1
+suspike nt=4097 ntr=2 nspk=1 ix1=1 it1=1365 | suaddnoise seed=725 sn=4 | succepstrum mode=suphase unwrap=1.5 trend=1 zeromean=1 sign2=1
+suspike nt=60001 ntr=1 nspk=1 ix1=1 it1=20000 | succepstrum mode=suphase trend=0
+[stderr] sunull nt=65534 ntr=1 | succepstrum mode=suphase
+# Two other deterministic seismic generators.
+suimp2d nt=257 nshot=1 nrec=2 | succepstrum mode=ouphase trend=0
+susynlv nt=257 dt=0.016 nxm=2 nxo=1 | succepstrum mode=suphase unwrap=3 trend=0
+# dt comes from the first trace; preserve unrelated headers and replace trid.
+sunull nt=257 ntr=4 | suaddnoise seed=71 | sushw key=dt,trid,delrt a=1,11,-100 b=100,1,25 | succepstrum mode=ouphase zeromean=1
+sunull nt=257 ntr=4 | suaddnoise seed=71 | suchw key1=dt key2=tracl a=0 b=700 | succepstrum mode=suphase sign1=-1 trend=0
+suspike nt=140 ntr=1 nspk=1 ix1=1 it1=37 | sushw key=dt a=0 | succepstrum mode=ouphase trend=0
+# Packed trace headers and stale data across multiple traces.
+suspike nt=128 ntr=3 nspk=1 ix1=1 it1=37 | supack1 | succepstrum mode=suphase trend=0 unwrap=-1
+sunull nt=257 ntr=4 | suaddnoise seed=71 | supack2 | succepstrum mode=ouphase trend=0
+# Amplitude extremes and a negative input waveform.
+sunull nt=140 ntr=2 | suaddnoise seed=113 | sugain scale=1e-30 | succepstrum mode=ouphase trend=0
+sunull nt=140 ntr=2 | suaddnoise seed=113 | sugain scale=1e30 | succepstrum mode=suphase trend=1 zeromean=1
+suspike nt=140 ntr=1 nspk=1 ix1=1 it1=37 | sugain scale=-1 | succepstrum mode=suphase unwrap=1 trend=0
+# Numeric edge values and last-occurrence parameter precedence.
+sunull nt=140 ntr=2 | suaddnoise seed=113 | succepstrum mode=suphase unwrap=nan
+sunull nt=140 ntr=2 | suaddnoise seed=113 | succepstrum mode=suphase unwrap=inf
+sunull nt=140 ntr=2 | suaddnoise seed=113 | succepstrum mode=suphase unwrap=-inf trend=0
+sunull nt=140 ntr=2 | suaddnoise seed=113 | succepstrum sign1=-2147483648 sign2=2147483647 trend=2 zeromean=2
+suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | succepstrum mode=invalid mode=suphase unwrap=0 unwrap=2 trend=0
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | succepstrum mode=suphase verbose=1
+# No required parameters exist; empty/invalid mode and numeric overflows fail.
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | succepstrum mode=
+[stderr] suspike nt=37 ntr=1 nspk=1 ix1=1 it1=13 | succepstrum mode=SUPHASE
+[stderr] sunull nt=37 ntr=1 | succepstrum trend=-2147483649
+[stderr] sunull nt=37 ntr=1 | succepstrum sign2=2147483648
+[stderr] sunull nt=37 ntr=1 | succepstrum mode=suphase unwrap=0

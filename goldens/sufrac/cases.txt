@@ -11,3 +11,18 @@ suplane nt=32 ntr=1 dt=0.004 | sushw key=trid,d1 a=30,0 | sufrac
 sufrac power=1
 suplane nt=32 ntr=1 dt=0.004 | sufrac power=1e999
 suplane nt=65535 ntr=1 dt=0.004 | sufrac
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 dt=0.004 nspk=1 ix1=1 it1=1 | sufrac power=0 sign=-1 phasefac=0
+suspike nt=3 ntr=1 dt=0.002 nspk=1 ix1=1 it1=2 | sufrac power=0.5 sign=1 phasefac=0.25
+suspike nt=4 ntr=2 dt=0.001 nspk=1 ix1=1 it1=2 | sufrac power=-1 sign=-1 phasefac=-0.5
+suplane nt=17 ntr=8 dt=0.004 | sufrac power=2 sign=1
+suspike nt=257 ntr=3 dt=0.002 nspk=1 ix1=2 it1=37 | sufrac power=-0.25 sign=0 phasefac=0.75
+suspike nt=4097 ntr=2 dt=0.004 nspk=1 ix1=1 it1=2000 | sufrac power=0.5 sign=-1
+[stderr] suspike nt=31 ntr=2 dt=0.004 nspk=1 ix1=1 it1=8 | sushw key=trid,d1 a=30,0.003 | sufrac power=1 sign=1 phasefac=0.125 verbose=1
+sunull nt=13 ntr=2 dt=0.004 | sufrac power=-0.5 phasefac=0.25
+suplane nt=19 ntr=1 dt=0.004 | sushw key=trid,dt,d1 a=1,0,0.004 | sufrac power=0.5
+suspike nt=23 ntr=1 dt=0.004 | sufrac sign=1e999
+suspike nt=1 ntr=1 dt=0.004 nspk=1 ix1=1 it1=1 | sufrac power=0 phasefac=0.25
+[stderr] suspike nt=41 ntr=2 nspk=1 ix1=1 it1=10 | sushw key=trid,d1 a=109,0.01 | sufrac power=0.5 verbose=1
+suspike nt=41 ntr=2 nspk=1 ix1=1 it1=10 | sushw key=trid,d1 a=18,0.01 | sufrac power=-0.5
+suspike nt=129 ntr=3 nspk=1 ix1=1 it1=20 | sushw key=dt a=1000 b=2000 | sufrac power=1 sign=1

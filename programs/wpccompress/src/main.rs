@@ -39,6 +39,8 @@ use oxwave_core::cio::as_bytes_mut;
 use oxwave_core::prelude::*;
 use oxwave_lib_wpc2::*;
 
+mod compress;
+
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
 #[rustfmt::skip]
 const SDOC: &[&str] = &[
@@ -128,10 +130,11 @@ fn main() {
         );
     }
 
-    // The supplied library retains the valid code buffer after realloc. C's
-    // wpcCompress leaves wpc->code stale at both growth and final shrink.
-    // Affected cases are excluded in goldens/wpccompress/EXCLUDE.txt.
-    let wpc = wpcCompress(&f, n1 as usize, n2 as usize, error).unwrap();
+    // Retain the live output allocation and match C's transformed-block retries.
+    let wpc = match compress::compress(&f, n1 as usize, n2 as usize, error) {
+        Some(wpc) => wpc,
+        None => err!("compression failed"),
+    };
     let nbytes = wpcSize(&wpc);
 
     let mut data = Vec::new();

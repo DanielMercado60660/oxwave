@@ -160,9 +160,16 @@ fn main() {
     let mut ix = 0usize;
     let mut m = 0i32;
     loop {
-        // Output uses tr as scratch, so retain the incoming trace at a boundary.
+        let incoming_cdp = tr.cdp;
         let boundary = gottrace && tr.cdp != cdpprev;
-        let incoming = if boundary { Some(tr.clone()) } else { None };
+        if gottrace {
+            if ix >= nx as usize {
+                err!("more than nx traces in gather");
+            }
+            aoff[ix] = tr.offset as f32;
+            datm[ix].copy_from_slice(&tr.data[..nt as usize]);
+            ix += 1;
+        }
         if boundary || !gottrace {
             let mut ol = (aoff[0] as f64).abs().floor() as i32;
             for i in 1..nx as usize {
@@ -277,7 +284,8 @@ fn main() {
                 tr.offset = 0;
                 tr.cdp = cdpprev;
                 tr.ns = ntout as u16;
-                tr.dt = (dtout as f64 * 1000000.0) as u16;
+                // Convert through u32 before narrowing, as in the defined C fix.
+                tr.dt = (dtout as f64 * 1000000.0) as u32 as u16;
                 tr.data[..ntout as usize].copy_from_slice(&sem);
                 puttr(&mut tr);
                 v += dv;
@@ -288,20 +296,9 @@ fn main() {
             if !gottrace {
                 break;
             }
-            tr = incoming.unwrap();
-            cdpprev = tr.cdp;
-            ix = 0;
-            aoff.fill(0.0);
-            for row in &mut datm { row.fill(0.0); }
-            for row in &mut datn { row.fill(0.0); }
-        }
-        if gottrace {
-            if ix >= nx as usize {
-                err!("more than nx traces in cdp=%d", cdpprev);
-            }
-            aoff[ix] = tr.offset as f32;
-            datm[ix].copy_from_slice(&tr.data[..nt as usize]);
-            ix += 1;
+            cdpprev = incoming_cdp;
+            // The C correlation loops leave ix at the end of the allocation.
+            ix = if nv > 0 { nx as usize } else { nx as usize + 1 };
         }
         if gettr(&mut tr) == 0 {
             gottrace = false;

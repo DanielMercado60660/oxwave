@@ -8,3 +8,13 @@ suspike nt=3 ntr=1 | segyclean verbose=1 unexpected=42
 # Empty and incomplete input.
 segyclean
 printf '\001\002\003' | segyclean
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | segyclean
+suspike nt=4 ntr=3 | segyclean
+suspike nt=4097 ntr=2 | sushw key=f1,d1,f2,d2,ungpow,unscale,ntr,mark a=-1,2,-3,4,-5,6,99,-7 | segyclean
+sunull nt=17 ntr=4 | sushw key=tracl,cdp,offset,mark a=100,200,-300,12 b=1,2,3,1 | segyclean
+suplane nt=31 ntr=5 | segyclean
+suspike nt=11 ntr=4 | sushw key=ns a=11 b=1 | segyclean
+suspike nt=3 ntr=2 | segyclean verbose=1
+suspike nt=29 ntr=1 | sushw key=f1,d1,f2,d2,ungpow,unscale,ntr,mark a=1,2,3,4,5,6,7,8 | segyclean ignored=1

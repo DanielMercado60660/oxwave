@@ -73,3 +73,47 @@ suplane nt=257 ntr=3 | suaddnoise seed=31 | sucepstrum verbose=0 mode=ouphase sm
 [stderr] python3 -c 'import os,pty,subprocess,sys; master,slave=pty.openpty(); p=subprocess.Popen(sys.argv[1:],stdin=slave,stdout=slave,stderr=subprocess.PIPE,start_new_session=True); os.close(slave); _,err=p.communicate(timeout=5); os.close(master); sys.stderr.buffer.write(err); sys.exit(p.returncode)' sucepstrum verbose=0
 # No arguments with nonterminal empty input follows the trace error path.
 [stderr] sucepstrum
+# diff-2026-11 (round 1)
+# Nonzero impulses at each of the smallest sizes; explicit locations avoid
+# suspike's ntr=1 defaults, which otherwise produce entirely zero traces.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sucepstrum
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=1 mode=ouphase trend=1 zeromean=0 smooth=0 r=10 sign1=1 sign2=-1 unwrap=1
+suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 mode=suphase trend=0 zeromean=1 smooth=1 r=0.625 sign1=-1 sign2=1 unwrap=0.3
+suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | sucepstrum verbose=0 mode=suphase unwrap=0 smooth=1 r=25 sign1=1 sign2=1
+# Odd/prime lengths, nonzero sparse impulses and seeded broadband spectra.
+suspike nt=97 ntr=3 nspk=2 ix1=1 it1=2 ix2=3 it2=89 | sucepstrum verbose=0 mode=suphase trend=1 zeromean=1 sign1=-1 sign2=-1
+suplane nt=509 ntr=3 | suaddnoise seed=43 | sucepstrum verbose=0
+suplane nt=1009 ntr=2 | suaddnoise seed=47 | sucepstrum verbose=0 mode=ouphase trend=0 zeromean=1 smooth=1 r=0.625 sign1=-1 sign2=1
+# Long transforms, well below the output-size and time limits.
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=1367 | sucepstrum verbose=0
+suplane nt=4097 ntr=3 | suaddnoise seed=53 | sucepstrum verbose=0 mode=suphase smooth=1 r=15.3 trend=1 zeromean=1 unwrap=0.3 sign1=-1 sign2=1
+suplane nt=8191 ntr=2 | suaddnoise seed=59 | sucepstrum verbose=0 mode=ouphase trend=0 zeromean=1 sign1=-1 sign2=-1
+suplane nt=32749 ntr=1 | suaddnoise seed=61 | sucepstrum verbose=0 mode=suphase unwrap=0 sign1=-1 sign2=1
+# Independent generators: constant spectra, causal/asymmetric wavelets and
+# physical reflection synthetics, including retained delrt and geometry.
+suwaveform type=unit ns=7 | sucepstrum verbose=0 mode=suphase smooth=1 r=3.1415926
+suwaveform type=berlage ns=101 ipa=35 | sucepstrum verbose=0 mode=ouphase smooth=1 r=0.625 trend=0 zeromean=1
+suwaveform type=gaussd ns=257 | sucepstrum verbose=0 mode=suphase smooth=1 r=500 trend=1 zeromean=1 unwrap=0.8
+suwaveform type=ricker1 ns=509 | sucepstrum verbose=0 mode=ouphase sign1=-1 sign2=1
+susynlv nt=257 nxm=2 nxo=2 dt=0.012 | sucepstrum verbose=0 mode=suphase trend=0 smooth=1 r=5
+# First-trace sampling is retained for the transform while output d1 is
+# recalculated from each trace; f1 resets while other headers survive.
+[stderr] suplane nt=97 ntr=3 | suaddnoise seed=67 | sushw key=trid,dt,d1,f1 a=17,0,0.002,42 b=1,1000,0.001,2 | sucepstrum verbose=1 mode=ouphase smooth=1 r=0.625
+[stderr] suplane nt=97 ntr=3 | suaddnoise seed=71 | sushw key=trid,dt,d1,f1,delrt a=130,0,0.002,99,-25 b=-1,1000,-0.001,3,10 | sucepstrum verbose=1 mode=suphase sign1=-1 sign2=1 trend=1 zeromean=1
+[stderr] suwaveform type=berlage ns=101 | sushw key=trid,dt,d1 a=-1,0,0 | sucepstrum verbose=1
+# Underflowing and large amplitudes, reversed polarity, and nonboolean flags.
+suwaveform type=gaussd ns=257 | sugain scale=1e-20 | sucepstrum verbose=0 mode=ouphase
+suwaveform type=berlage ns=101 | sugain scale=1e18 | sucepstrum verbose=0 mode=suphase trend=-1 zeromean=-3 smooth=-2 r=-0.625 unwrap=-1
+suwaveform type=berlage ns=101 | sugain scale=-1 | sucepstrum verbose=0 mode=suphase trend=0 unwrap=1e-40
+sunull nt=4097 ntr=2 | sucepstrum verbose=0 mode=ouphase smooth=1 r=10
+# Missing numeric values retain defaults on a nonzero input.
+[stderr] suwaveform type=berlage ns=101 | sucepstrum verbose= trend= zeromean= mode=suphase smooth= r= sign1= sign2= unwrap=
+# No required parameters exist; malformed mode/signs, conversion overflow,
+# and an overlarge padded transform cover the program's error paths.
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 mode=SUPHASE
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 sign1=-2
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 sign2=3
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 sign1=abc
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 sign2=-2147483649
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=2 | sucepstrum verbose=0 r=1e309
+[stderr] sunull nt=65534 ntr=1 | sucepstrum verbose=0

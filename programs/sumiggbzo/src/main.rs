@@ -154,8 +154,13 @@ fn main() {
             break;
         }
     }
-    let nz = nz as usize;
     let mut fflat = vec![0.0f32; nt * nx];
+    // ealloc2float(nz,nx) converts a negative nz to size_t; its malloc
+    // fails before the velocity file is opened. Do not panic in Vec instead.
+    if nz < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    let nz = nz as usize;
     let mut vflat = vec![0.0f32; nz * nx];
     let mut g = vec![vec![0.0f32; nz]; nx];
     erewind(&tracefp);

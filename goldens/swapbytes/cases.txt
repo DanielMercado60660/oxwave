@@ -17,3 +17,35 @@
 [stderr] swapbytes in=short outpar=/dev/stderr
 [exact] printf '\001\002\003\004\005\006\007\010' | swapbytes in=long outpar=count; cat count
 [exact] printf '\001\002\003\004\005' | swapbytes in=short outpar=count; cat count
+# diff-2026-11 (round 1)
+[exact] suspike nt=1 ntr=1 | sustrip outpar=stripcount | swapbytes outpar=count && cat count
+[exact] suspike nt=2 ntr=1 | sustrip outpar=stripcount | swapbytes in=float outpar=count && cat count
+[exact] suspike nt=3 ntr=2 | sustrip outpar=stripcount | swapbytes in=short outpar=count && cat count
+[exact] suspike nt=4 ntr=1 | sustrip outpar=stripcount | swapbytes in=ushort outpar=count && cat count
+[exact] suplane nt=17 ntr=3 | sustrip outpar=stripcount | swapbytes in=double outpar=count && cat count
+[exact] suspike nt=4097 ntr=1 | sustrip outpar=stripcount | swapbytes in=long outpar=count && cat count
+[exact] suplane nt=19 ntr=2 | sustrip outpar=stripcount | swapbytes in=ulong outpar=count && cat count
+[exact] suspike nt=7 ntr=3 | sushw key=offset a=123 b=7 | swapbytes in=int outpar=count && cat count
+[stderr] suspike nt=3 ntr=1 | sustrip outpar=stripcount | swapbytes in=int outpar=/dev/stderr verbose=1
+[stderr] sunull nt=1 ntr=1 | swapbytes in=invalid outpar=count
+[stderr] sunull nt=1 ntr=1 | swapbytes in=float
+[stderr] suspike nt=3 ntr=1 | sustrip outpar=stripcount | swapbytes in=int outpar=count verbose=1
+[exact] suspike nt=3 ntr=1 | sustrip outpar=stripcount | dd bs=1 count=11 2>/dev/null | swapbytes in=double outpar=count && cat count
+[exact] sunull nt=1 ntr=1 | sushw key=tracl,offset a=-1,-123456 | swapbytes in=double outpar=count && cat count
+[exact] suplane nt=31 ntr=3 | sustrip outpar=stripcount | swapbytes in=float outpar=count | swapbytes in=float outpar=count2 && cat count count2
+[stderr] suspike nt=1 ntr=1 | sustrip outpar=stripcount | swapbytes in= outpar=count
+# diff-2026-11 (round 2)
+[exact] sunull nt=1 ntr=1 | swapbytes outpar=count && cat count
+[exact] suspike nt=2 ntr=2 | sustrip outpar=stripcount | swapbytes in=float outpar=count && cat count
+[exact] suplane nt=3 ntr=1 | swapbytes in=short outpar=count && cat count
+[exact] sunull nt=4 ntr=2 | sushw key=tracl,offset a=123,-99 b=2,3 | swapbytes in=ushort outpar=count && cat count
+[exact] suspike nt=17 ntr=1 | sustrip outpar=stripcount | swapbytes in=int outpar=count && cat count
+[exact] suplane nt=19 ntr=2 | swapbytes in=double outpar=count && cat count
+[exact] suspike nt=4097 ntr=2 | sustrip outpar=stripcount | swapbytes in=long outpar=count && cat count
+[exact] sunull nt=7 ntr=3 | sushw key=cdp a=13 b=5 | swapbytes in=ulong outpar=count && cat count
+[stderr] sunull nt=1 ntr=1 | swapbytes in=int outpar=/dev/stderr verbose=1
+[stderr] sunull nt=1 ntr=1 | swapbytes in=badtype outpar=count
+[exact] suspike nt=5 ntr=1 | sustrip outpar=stripcount | dd bs=1 count=19 2>/dev/null | swapbytes in=double outpar=count && cat count
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] sunull nt=3 ntr=1 | swapbytes in=float outpar=/dev/stdout

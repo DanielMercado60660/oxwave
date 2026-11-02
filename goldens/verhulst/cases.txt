@@ -72,3 +72,48 @@
 [f32] verhulst stepmax=3 y0= h= tol= a1= a2= mode=xy
 [f32] [stderr] verhulst stepmax=3 unknown=42
 [f32] printf 'stepmax=7 a1=.3 a2=700 y0=12 h=.03 mode=xy\n' > params && verhulst par=params y0=15
+
+# diff-2026-11 (round 1)
+# This generator ignores stdin: tiny traces and changed headers must not affect
+# its output. Drain stdin after it exits, preserving its status, to avoid SIGPIPE.
+[f32] sunull nt=1 ntr=1 | { verhulst; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=2 ntr=1 | { verhulst stepmax=4 verbose=0 y0=10 h=.01 tol=1e-8 mode=x a1=1 a2=2000 toutfile=times.bin > population.bin && cat population.bin times.bin; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+
+# y0 points into a three-double C array: two/three list entries are valid.
+# Cover every accepted mode, initial derivative, and persistent third component.
+[f32] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | { verhulst stepmax=1 mode=xy y0=3,7; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] suplane nt=4 ntr=1 npl=0 | { verhulst stepmax=2 mode=y y0=3,7; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=17 ntr=3 | { verhulst stepmax=3 mode=z y0=3,7,-11; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] suspike nt=31 ntr=2 nspk=1 ix1=1 it1=17 | { verhulst stepmax=4 mode=xz y0=3,7,-11; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=3 ntr=1 | { verhulst stepmax=17 mode=yz y0=10,-2,19 h=.125 a1=.8 a2=500 tol=1e-10; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] suplane nt=7 ntr=1 npl=0 | { verhulst stepmax=7 mode=x y0=10,-2,19; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=4097 ntr=1 | { verhulst stepmax=4097 mode=yz y0=10,12,14; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+
+# Zero step and steps around half the minimum exercise callback/no-callback paths.
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=xy y0=5,-9,17 h=0; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=2 ntr=1 | { verhulst stepmax=7 mode=yz y0=5,-9,17 h=4.999999e-7; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=3 ntr=1 | { verhulst stepmax=7 mode=yz y0=5,-9,17 h=5e-7; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] [stderr] sunull nt=4 ntr=1 | { verhulst stepmax=4 mode=yz y0=5,-9,17 h=-5.000001e-7 verbose=1; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] [stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=1 | { verhulst stepmax=7 mode=xy y0=10,23,42 a1=0 h=-2 verbose=2; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+
+# Empty fields, trailing comma, last occurrence, hex floats, signed zero.
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=10,,37; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=10,23,; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=10,23,37 y0=20; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=20 y0=10,23,37; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=xz y0=0x1.8p3,0x1.2p2,0x1.cp4 h=0x1p-4; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[exact] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=-0,-0,-0 h=0; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+
+# Header changes have no effect on this non-trace program; solver failure keeps z.
+[f32] sunull nt=17 ntr=3 | sushw key=dt,delrt,offset,tracl a=1000,-123,-777,8 b=0,1,19,-1 | { verhulst stepmax=17 mode=yz y0=5,9,-17 h=-.125; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { verhulst stepmax=4 mode=yz y0=5,9,-17 h=2 tol=-1 verbose=-1; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+
+# No required values exist. Exercise invalid/empty modes and parse/file errors.
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 mode=xyz; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 mode=; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 mode=YX; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 toutfile=.; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=2147483648; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 y0=10,20,1e999; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 a1=1e999; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }
+[stderr] sunull nt=1 ntr=1 | { verhulst stepmax=1 a2=1e999; verhulst_status=$?; cat > /dev/null; exit "$verhulst_status"; }

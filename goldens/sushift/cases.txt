@@ -21,3 +21,23 @@ suspike nt=17 ntr=1 | sushift dt=-1 tmin=0 tmax=0.01
 suspike nt=17 ntr=1 | sushift dt=1 tmin=0 tmax=0.1
 suspike nt=17 ntr=1 | sushift dt=0
 [stderr] suspike nt=17 ntr=1 | sushift unused=1 verbose=1
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | sushift tmin=-0.004 tmax=0.008 fill=3
+suspike nt=3 ntr=1 | sushift tmin=0.004 tmax=0.012
+suspike nt=4 ntr=2 | sushift tmin=0 tmax=0.016 dt=4000 fill=0 verbose=1
+suspike nt=19 ntr=2 | sushift tmin=0.005 tmax=0.061 fill=-2.25
+suspike nt=4097 ntr=1 | sushift tmin=0.004 tmax=16.384
+sunull nt=7 ntr=3 | sushw key=dt a=2000 | sushw key=delrt a=-4 b=2 | sushift tmin=-0.004 tmax=0.016 fill=1.25
+suplane nt=101 ntr=4 | sushift tmin=-0.008 tmax=0.2 fill=-0.75
+[stderr] suplane nt=101 ntr=3 | sushw key=delrt a=4 b=-4 | sushift dt=4000 tmin=-0.008 tmax=0.404 verbose=1
+suspike nt=11 ntr=1 | sushw key=delrt a=-12 | sushift
+suspike nt=11 ntr=1 | sushw key=dt a=1000 | sushift tmin=-0.002 tmax=0.015 fill=7
+suspike nt=5 ntr=1 | sushift tmin=-0.0015 tmax=0.0145 fill=4
+suspike nt=13 ntr=1 | sushift tmin=0.012 tmax=0.008
+suspike nt=13 ntr=1 | sushift tmin=-32.769 tmax=-32.76
+suspike nt=13 ntr=1 | sushift dt=1 tmin=0 tmax=0.065536
+sunull nt=1 ntr=1 | sushift dt=1 tmin=0 tmax=0.065535 fill=1
+suspike nt=7 ntr=3 | sushw key=delrt a=0 b=4 | sushift fill=5
+suspike nt=7 ntr=3 | sushw key=dt a=2000 b=1000 | sushift tmin=-0.002 tmax=0.014 fill=-1
+suspike nt=9 ntr=1 | sushw key=delrt a=-20 | sushift tmax=-0.004
+suspike nt=9 ntr=1 | sushift tmin=0.0005 tmax=0.0205 fill=0.5

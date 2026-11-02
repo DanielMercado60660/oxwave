@@ -57,3 +57,42 @@ printf abc | wpcuncompress
 [f32] [stderr] suplane nt=257 ntr=259 | suaddnoise seed=41 sn=10 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=257 n2=259 error=0.05 | wpcuncompress
 [f32] [stderr] suplane nt=301 ntr=267 | suaddnoise seed=43 sn=10 | sugain bias=-0.25 | sustrip outpar=/dev/null | wpccompress n1=301 n2=267 error=0.2 | wpcuncompress
 [f32] [stderr] susynlv nt=255 nxm=253 | suaddnoise seed=47 sn=10 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=255 n2=253 error=0.02 | wpcuncompress
+
+# diff-2026-11 (round 1)
+# No getpar calls, required parameters, or alternate output modes in the C.
+# Decode 2/3/4-sample sections and one-row input from a genuine encoded tile.
+# Cropping the native WPC dimensions avoids the small-input compressor's
+# stale-pointer realloc defect, while exercising decoder boundary sizes.
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,2,1); sys.stdout.buffer.write(b)' | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,3,2); sys.stdout.buffer.write(b)' | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("2i",b,4,4,3); sys.stdout.buffer.write(b)' | wpcuncompress
+
+# Prime and long dimensions in both directions, crossing many tile/strip
+# boundaries. Bias keeps every edge tile nonzero. error=0.8 controls only
+# the input compressor; decoder comparisons retain the default rtol=1e-5.
+# Encoded lengths stay below n1*n2, avoiding the compressor's growth path.
+# The largest decoded output is 4,211,716 bytes (under 5 MB).
+[f32] [stderr] sunull nt=509 ntr=257 | suaddnoise seed=178 sn=1 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=509 n2=257 error=0.8 | wpcuncompress
+[f32] [stderr] sunull nt=4097 ntr=17 | suaddnoise seed=178 sn=1 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=17 error=0.8 | wpcuncompress
+[f32] [stderr] sunull nt=17 ntr=4097 | suaddnoise seed=178 sn=1 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=17 n2=4097 error=0.8 | wpcuncompress
+[f32] [stderr] sunull nt=4097 ntr=257 | suaddnoise seed=178 sn=1 | sugain bias=0.5 | sustrip outpar=/dev/null | wpccompress n1=4097 n2=257 error=0.8 | wpcuncompress
+[f32] [stderr] susynlv nt=263 nxm=269 | suaddnoise seed=73 sn=10 | sugain bias=-0.25 | sustrip outpar=/dev/null | wpccompress n1=263 n2=269 error=0.2 | wpcuncompress
+
+# SU headers are discarded upstream; WPC header dimensions govern decoding.
+# Even verbose, malformed dimensions, and a missing par file are ignored:
+# this program never initializes the getpar table or calls checkpars.
+[f32] [stderr] suplane nt=256 ntr=256 | sushw key=dt,delrt,cdp a=2000,-12,901 b=0,0,-3 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 error=0.03 | wpcuncompress verbose=1 par=does-not-exist n1=abc n2=-99
+
+# Finite small and large signed data, with the compressor's default error.
+[f32] [stderr] suspike nt=256 ntr=256 k1=193 k2=251 | sugain scale=1e-12 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress
+[f32] [stderr] suspike nt=256 ntr=256 k1=193 k2=251 | sugain scale=-1e12 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | wpcuncompress
+
+# Version is stored but never checked. Zero width and zero code length
+# take the consistency-warning path and still return success; keep a
+# positive row count so C alloc2float's row-pointer array contains f[0].
+[f32] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("i",b,0,-7); sys.stdout.buffer.write(b)' | wpcuncompress
+[exact] [stderr] suspike nt=256 ntr=256 k1=1 k2=1 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("i",b,4,0); struct.pack_into("i",b,12,0); sys.stdout.buffer.write(b[:160])' | wpcuncompress
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[f32] [stderr] suspike nt=256 ntr=256 k1=7 k2=3 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("i",b,12,struct.unpack_from("i",b,12)[0]+17); sys.stdout.buffer.write(b)' | wpcuncompress
+[exact] [stderr] suspike nt=256 ntr=256 k1=7 k2=3 | sustrip outpar=/dev/null | wpccompress n1=256 n2=256 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("i",b,4,0); struct.pack_into("i",b,12,0); sys.stdout.buffer.write(b[:16])' | wpcuncompress

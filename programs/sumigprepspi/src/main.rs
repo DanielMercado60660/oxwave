@@ -197,6 +197,11 @@ fn main() {
         let oldsx = sx;
         let oldgx = gx;
         loop {
+            // The C reads p[igx] out of bounds when remapped receivers exceed nxo.
+            // Match the minimal C fix by reporting a clean error before the copy.
+            if igx < 0 || igx >= nxo {
+                err!("igx=%d outside output grid [0,%d)", igx, nxo);
+            }
             // copy before updating igx, exactly as in the C source
             let off = (igx * ntfft) as usize;
             p[off..off + nt as usize].copy_from_slice(&tr.data[..nt as usize]);

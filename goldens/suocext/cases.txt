@@ -68,3 +68,48 @@ suplane nt=129 ntr=7 | sushw key=cdp,offset a=1,250 b=1,0 | suocext cdpmin=1 cdp
 sunull nt=131 ntr=5 | suaddnoise sn=1 seed=161803 | sushw key=cdp,offset,delrt a=1,200,-20 b=1,0,0 | suocext cdpmin=1 cdpmax=5 dxcdp=20 noffmix=1 offextr=50 tdmo=0.04,0.15,0.4 vdmo=1500,1700,1800 sdmo=0.6 fmax=80
 # Multi-knot interpolation with multiple gathers and complete verbose stderr.
 [stderr] suplane nt=133 ntr=15 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 dxcdp=25 noffmix=2 offextr=50 tdmo=0,0.1,0.25,0.4 vdmo=1500,1800,1750,2100 verbose=1 tmpdir=.
+# diff-2026-11 (round 1)
+# Short records: nt=1 stays on the defined all-zero fast path; nt=2..5 contain spikes.
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp a=8 | suocext cdpmin=8 cdpmax=8 offextr=4 dxcdp=25 noffmix=1 verbose=1 tmpdir=.
+suspike nt=2 ntr=1 nspk=1 ix1=1 it1=2 offset=20 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=1 offextr=0 dxcdp=25 noffmix=1
+suspike nt=3 ntr=5 dt=0.002 nspk=1 ix1=3 it1=2 offset=600 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 offextr=0 dxcdp=25 noffmix=1
+suspike nt=4 ntr=3 nspk=2 ix1=1 it1=1 ix2=3 it2=4 offset=100 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=3 offextr=20 dxcdp=12.5 noffmix=1
+suspike nt=5 ntr=7 nspk=1 ix1=4 it1=3 offset=175 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=7 offextr=50 dxcdp=20 noffmix=1
+# Seeded noise on a NONZERO source exercises the numerical path at every time.
+suspike nt=127 ntr=7 nspk=1 ix1=4 it1=25 offset=250 | suaddnoise seed=111 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=7 offextr=50 dxcdp=25 noffmix=1
+suspike nt=127 ntr=7 nspk=1 ix1=4 it1=25 offset=250 | suaddnoise seed=111 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=7 offextr=50 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500 sdmo=1 fmax=125 verbose=0 tmpdir=
+suspike nt=257 ntr=9 nspk=1 ix1=5 it1=60 offset=333 | suaddnoise seed=122 sn=1 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=9 offextr=30 dxcdp=12.3 noffmix=1 tdmo=0,0.03,0.2,0.7 vdmo=1500,1700,1600,2500 sdmo=0.6 fmax=70
+suspike nt=251 ntr=5 dt=0.007 nspk=1 ix1=3 it1=17 offset=70 | suaddnoise seed=133 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 offextr=0 dxcdp=37.5 noffmix=1 tdmo=0.02,0.1 vdmo=1800,2400 fmax=40 sdmo=1.5
+# Long and near-maximum SU records; output remains below 300 KB per case.
+suspike nt=4097 ntr=3 nspk=1 ix1=2 it1=11 offset=600 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=50
+suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=30 offset=150 | suaddnoise seed=37 sn=1 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=1 offextr=0 dxcdp=25 noffmix=1 tdmo=0,0.5,2,10 vdmo=1500,1900,2300,3000
+suspike nt=65521 ntr=1 nspk=1 ix1=1 it1=11 offset=600 | suaddnoise seed=11 sn=2 | sushw key=cdp a=1 | suocext cdpmin=1 cdpmax=1 offextr=0 dxcdp=25 noffmix=1 tdmo=0,0.1,10,300 vdmo=1500,1700,2500,3000
+# Distinct physical generators and equal-offset extrapolation.
+susynlv nt=257 dt=0.004 nxm=5 nxo=2 fxo=0.2 dxo=0.1 ref='1:-1,0.2;1,0.2' | suocext cdpmin=1 cdpmax=5 offextr=0 dxcdp=50 noffmix=2
+suimp2d nt=257 nrec=5 x0=200 z0=300 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=5 offextr=50 dxcdp=25 noffmix=1
+suplane nt=257 ntr=11 | sushw key=cdp,offset a=1,350 b=1,0 | suocext cdpmin=1 cdpmax=11 offextr=350 dxcdp=17.5 noffmix=1 fmax=60
+# Header-driven descending/sparse CDPs and growing/shrinking offset padding.
+[stderr] suspike nt=193 ntr=21 nspk=1 ix1=8 it1=25 | suaddnoise seed=144 sn=2 | sushw key=cdp,offset a=7,400 b=-1,0 c=0,-100 j=7,7 | suocext cdpmin=1 cdpmax=7 offextr=50 dxcdp=25 noffmix=2 verbose=2
+[stderr] suspike nt=197 ntr=20 nspk=1 ix1=11 it1=80 | suaddnoise seed=155 sn=2 | sushw key=cdp,offset a=1,100 b=1,0 c=0,175 j=5,5 | suocext cdpmin=1 cdpmax=5 offextr=30 dxcdp=12.5 noffmix=3 verbose=1 tmpdir=.
+suspike nt=131 ntr=5 nspk=1 ix1=3 it1=15 | suaddnoise seed=166 sn=2 | suchw key1=cdp key2=tracl a=4 b=-2 | sushw key=offset a=233 | suocext cdpmin=-6 cdpmax=2 offextr=20 dxcdp=25 noffmix=1
+suspike nt=137 ntr=7 nspk=1 ix1=6 it1=40 offset=175 | suaddnoise seed=177 sn=2 | sushw key=cdp a=4 | suocext cdpmin=1 cdpmax=7 offextr=50 dxcdp=25 noffmix=1
+suspike nt=139 ntr=11 nspk=1 ix1=6 it1=60 offset=200 | suaddnoise seed=188 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=4 cdpmax=8 offextr=20 dxcdp=25 noffmix=1
+[stderr] suspike nt=149 ntr=3 nspk=1 ix1=2 it1=20 offset=200 | sushw key=cdp a=1 b=1 | suocext cdpmin=10 cdpmax=12 offextr=0 dxcdp=25 noffmix=1 verbose=1
+suspike nt=151 ntr=5 nspk=1 ix1=3 it1=25 offset=175 | suaddnoise seed=199 sn=2 | sushw key=cdp,delrt a=1,13 b=1,0 | suocext cdpmin=1 cdpmax=5 offextr=20 dxcdp=25 noffmix=1 tdmo=0.05,0.2,0.4 vdmo=1500,1700,1800
+suspike nt=157 ntr=15 nspk=1 ix1=8 it1=25 | suaddnoise seed=211 sn=2 | sushw key=cdp,offset a=1,100 b=1,0 c=0,100 j=5,5 | suocext cdpmin=1 cdpmax=5 offextr=25 dxcdp=25 noffmix=0
+suspike nt=163 ntr=7 nspk=1 ix1=4 it1=30 offset=-233 | suaddnoise seed=222 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=7 offextr=-33.9 dxcdp=-25 noffmix=1
+# Frequency/stretch degeneracies with real input, plus zero-data dt=0 fast path.
+suspike nt=167 ntr=3 nspk=1 ix1=2 it1=30 offset=200 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=3 offextr=20 dxcdp=25 noffmix=1 sdmo=0
+suspike nt=173 ntr=5 nspk=1 ix1=3 it1=20 offset=200 | suaddnoise seed=233 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 offextr=0 dxcdp=25 noffmix=1 fmax=0
+suspike nt=179 ntr=5 dt=0.001 nspk=1 ix1=3 it1=20 offset=25 | suaddnoise seed=244 sn=2 | sushw key=cdp a=1 b=1 | suocext cdpmin=1 cdpmax=5 offextr=0 dxcdp=25 noffmix=1 fmax=1
+sunull nt=4 ntr=1 | sushw key=cdp,dt a=1,0 | suocext cdpmin=1 cdpmax=1 offextr=0 dxcdp=25 noffmix=1
+# Required/invalid values and parameter-read order, including complete stderr.
+[stderr] sunull nt=4 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=
+[stderr] sunull nt=4 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 vdmo=1500,1800
+[stderr] sunull nt=4 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tdmo=0,0.2,0.2,0.5 vdmo=1500,1600,1700,1800
+[stderr] sunull nt=4 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=25 noffmix=1 tmpdir=/oxwave-no-such-suocext-directory
+[stderr] sunull nt=4 ntr=1 | suocext cdpmin=1 cdpmax=2 offextr=0 dxcdp=1e309 noffmix=1
+
+# ub-2026-11 (round 1)
+# Refuted: suocext.c:429 allocation enlarged to MAX(nu,nufft); output stays byte-identical (12 NaNs).
+suspike nt=4 ntr=3 nspk=1 ix1=2 it1=2 | sushw key=cdp,offset a=1,200 b=1,0 | suocext cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 offextr=0 sdmo=-0.6

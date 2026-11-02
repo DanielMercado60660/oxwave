@@ -25,3 +25,34 @@ suspike nt=1 ntr=1 > in.su && suget fd=3 3< in.su
 # An explicitly closed or out-of-range descriptor fails without a Rust panic.
 [stderr] suget fd=3 3<&-
 [stderr] suget fd=2147483647
+# diff-2026-11 (round 1)
+# Small trace boundaries, explicit defaults, and a descriptor independent of stdin.
+[exact] [stderr] sunull nt=1 ntr=1 | suget fd=0
+[exact] [stderr] sunull nt=2 ntr=1 | suget fd=0 verbose=0
+[exact] [stderr] suspike nt=3 ntr=2 nspk=1 ix1=1 it1=2 | suget fd=3 verbose=2 3<&0 0</dev/null
+[exact] [stderr] sunull nt=4 ntr=3 | sushw key=tracl,cdp,offset a=17,100,-500 b=-2,3,25 | suget fd=0 verbose=1
+# Prime and large sample counts; preserve geometry and signed header fields.
+[exact] [stderr] suspike nt=17 ntr=5 | sushw key=sx,offset,scalco,delrt a=1000,-200,-10,-12 b=50,25,0,3 | suchw key1=gx key2=sx key3=offset c=1 | suget fd=0 verbose=1
+[exact] [stderr] suplane nt=4097 ntr=3 | suget fd=0 verbose=1
+[exact] [stderr] sunull nt=65535 ntr=1 | suget fd=0 verbose=1
+# The input trid selects packed sample I/O; suget has no output-mode parameter.
+[exact] [stderr] suspike nt=3 ntr=2 | supack1 | suget fd=0 verbose=1
+[exact] [stderr] suspike nt=3 ntr=2 | supack2 | suget fd=0 verbose=1
+# Empty/malformed parameter values and last-occurrence precedence.
+[exact] [stderr] suspike nt=2 ntr=3 | suget fd=123 fd=0 verbose=1 verbose=0
+[exact] [stderr] suspike nt=4 ntr=1 | suget fd=0 verbose=
+[exact] [stderr] suspike nt=4 ntr=1 | suget fd=abc verbose=0
+[stderr] sunull nt=1 ntr=1 | suget fd=
+[stderr] sunull nt=1 ntr=1 | suget fd=2147483648
+[stderr] sunull nt=1 ntr=1 | suget fd=0 verbose=2147483648
+# Read errors, zero ns, changing ns, and truncated first/later traces.
+[stderr] sunull nt=1 ntr=1 | suget fd=3 3< .
+[stderr] sunull nt=0 ntr=1 | suget fd=0 verbose=1
+[exact] [stderr] suspike nt=4 ntr=2 | sushw key=ns a=4 b=-1 | suget fd=0 verbose=1
+[stderr] suspike nt=4 ntr=1 | dd bs=1 count=252 2>/dev/null | suget fd=0 verbose=1
+[exact] [stderr] suspike nt=4 ntr=2 | dd bs=1 count=495 2>/dev/null | suget fd=0 verbose=1
+[exact] [stderr] suspike nt=4 ntr=2 | dd bs=1 count=510 2>/dev/null | suget fd=0 verbose=1
+# Darwin fdopen's signed-short descriptor boundary, using valid inherited fds.
+[exact] [stderr] suspike nt=3 ntr=1 | python3 -c 'import os,sys; os.dup2(0,32767,inheritable=True); os.execvp(sys.argv[1],sys.argv[1:])' suget fd=32767 verbose=1
+[stderr] suspike nt=3 ntr=1 | python3 -c 'import os,sys; os.dup2(0,32768,inheritable=True); os.execvp(sys.argv[1],sys.argv[1:])' suget fd=32768 verbose=1
+[stderr] suspike nt=3 ntr=1 | python3 -c 'import os,sys; os.dup2(0,65535,inheritable=True); os.execvp(sys.argv[1],sys.argv[1:])' suget fd=65535

@@ -12,3 +12,22 @@ sunull nt=37 ntr=2 | suhilb
 [stderr] suspike nt=17 ntr=1 | suhilb verbose=1 unknown=-1
 # Empty input is an error.
 suhilb </dev/null
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suhilb
+suspike nt=3 ntr=2 | suhilb
+suspike nt=4 ntr=1 | suhilb
+sunull nt=29 ntr=2 | suaddnoise seed=17 | suhilb
+sunull nt=32 ntr=2 | suaddnoise seed=19 | suhilb
+sunull nt=60 ntr=2 | suaddnoise seed=21 | suhilb
+sunull nt=62 ntr=2 | suaddnoise seed=23 | suhilb
+sunull nt=127 ntr=3 | suaddnoise seed=25 | suhilb
+sunull nt=4097 ntr=1 | suaddnoise seed=27 | suhilb
+suplane nt=151 ntr=4 | suhilb
+[stderr] suspike nt=41 ntr=3 | sushw key=trid a=17 b=1 | suhilb
+[stderr] suspike nt=41 ntr=3 | sushw key=trid a=18 b=-1 | suhilb
+[stderr] suspike nt=41 ntr=1 | sushw key=trid a=108 | suhilb verbose=1
+sunull nt=65535 ntr=1 | suaddnoise seed=29 | suhilb
+suspike nt=64 ntr=1 | dd bs=1 count=250 2>/dev/null | suhilb
+suspike nt=64 ntr=1 | dd bs=1 count=100 2>/dev/null | suhilb
+suspike nt=8 ntr=1 | sushw key=ns a=0 | suhilb

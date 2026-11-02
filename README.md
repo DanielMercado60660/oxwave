@@ -32,6 +32,14 @@ It is not free of `unsafe`: 91 programs and 8 library crates use it, mostly for 
   See [`integrations/demo_flows/REPORT.md`](integrations/demo_flows/REPORT.md).
 - After every program and crate had passed, independent audits fixed what golden tests missed (for example,
   `suprofcsv` had been a stub): [`audits/README.md`](audits/README.md).
+- **Differential testing round (November 2026):** 10,971 more golden cases, so that every parameter a
+  program reads is exercised (boundary sizes, header-driven paths, error exits). They found 291 places where
+  OxWave still differed from SU in 70 programs (most often a panic where SU exits cleanly, a different exit
+  code or diagnostic, or edge-case numerics); all but one were fixed in the ports. Shared-library fixes
+  followed (C-style scanf/strtod/printf, stdio buffering and flush order, mixed packed trace output, and a
+  heap use-after-free in the triangulation library that SU's C also has). Cases whose SU output depends on
+  undefined behaviour are listed with evidence in `goldens/<prog>/UB_CONFIRMED.txt`; the 14 cases still
+  known to differ are in `goldens/<prog>/PENDING_LIB.txt`.
 - **Intentional differences** are all in [`DEVIATIONS.md`](DEVIATIONS.md): one SU bug fixed on
   purpose (`wpccompress`); the rest are places where SU has undefined behaviour.
 

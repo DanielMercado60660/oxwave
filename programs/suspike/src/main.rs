@@ -128,7 +128,9 @@ fn main() {
 
 // Reproduce the C assignment relative to tr.data, including positions beyond
 // nt and writes into the preceding header (e.g. the default it1=0 for nt=1).
-// Reject only accesses outside the whole C segy object, whose effects are undefined.
+// Discard writes outside the whole C segy object. In UB round 1, guarding
+// it=65536 and it=-60 in the original C left stdout, stderr and status unchanged;
+// those cases must therefore generate the original trace instead of an error.
 fn set_spike(tr: &mut Trace, it: i32) {
     let index = it.wrapping_sub(1);
     if index >= 0 && (index as usize) < SU_NFLTS {
@@ -136,7 +138,5 @@ fn set_spike(tr: &mut Trace, it: i32) {
     } else if index < 0 && index >= -(HDRBYTES as i32 / 4) {
         let offset = (HDRBYTES as i32 + index * 4) as usize;
         tr.hdr.as_bytes_mut()[offset..offset + 4].copy_from_slice(&1.0f32.to_ne_bytes());
-    } else {
-        err!("spike sample %d is outside trace storage", it);
     }
 }

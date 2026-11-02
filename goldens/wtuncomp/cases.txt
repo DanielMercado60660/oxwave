@@ -11,3 +11,24 @@
 # Invalid filter is only dereferenced after successful decoding.
 [stderr] suplane nt=128 ntr=16 | sustrip outpar=/dev/null | wtcomp n1=128 n2=16 | python3 -c 'import struct,sys; b=bytearray(sys.stdin.buffer.read()); struct.pack_into("=i",b,12,99); sys.stdout.buffer.write(b)' | python3 -c 'import subprocess,sys; r=subprocess.run([sys.argv[1]],input=sys.stdin.buffer.read()); sys.exit(128-r.returncode if r.returncode < 0 else r.returncode)' wtuncomp
 [stderr] python3 -c 'import struct,sys; sys.stdout.buffer.write(struct.pack("=6i2f",0,8,8,99,3,3,0,1))' | wtuncomp
+# diff-2026-11 (round 1)
+[f32] suspike nt=2 ntr=64 | sustrip outpar=/dev/null | wtcomp n1=2 n2=64 nstage1=0 nstage2=3 | wtuncomp
+[f32] suspike nt=3 ntr=33 | sustrip outpar=/dev/null | wtcomp n1=3 n2=33 nstage1=1 nstage2=2 | wtuncomp
+[f32] suspike nt=4 ntr=32 | sustrip outpar=/dev/null | wtcomp n1=4 n2=32 nstage1=2 nstage2=3 | wtuncomp
+[f32] suplane nt=127 ntr=7 | sustrip outpar=/dev/null | wtcomp n1=127 n2=7 nfilter=1 nstage1=3 nstage2=2 error=0.05 | wtuncomp
+[f32] suplane nt=257 ntr=3 | sustrip outpar=/dev/null | wtcomp n1=257 n2=3 nfilter=2 nstage1=4 nstage2=1 | wtuncomp
+[f32] suspike nt=4097 ntr=1 | sustrip outpar=/dev/null | wtcomp n1=4097 n2=1 nstage1=4 error=0.05 | wtuncomp
+[f32] sunull nt=64 ntr=8 | sushw key=offset a=100 b=25 | sustrip outpar=/dev/null | wtcomp n1=64 n2=8 nstage1=0 nstage2=0 | wtuncomp verbose=1
+[f32] suspike nt=101 ntr=5 | sustrip outpar=/dev/null | wtcomp n1=101 n2=5 nfilter=11 nstage1=1 nstage2=0 error=0.1 | wtuncomp ignored=abc
+[f32] suplane nt=64 ntr=4 | sustrip outpar=/dev/null | wtcomp n1=64 n2=4 nfilter=0 nstage1=2 nstage2=1 error=0.05 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=3 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=4 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=5 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=6 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=7 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=8 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=9 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=10 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=12 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=13 nstage1=3 nstage2=2 error=0.1 | wtuncomp
+[f32] sunull nt=128 ntr=9 | suaddnoise seed=17 | sustrip outpar=/dev/null | wtcomp n1=128 n2=9 nfilter=14 nstage1=3 nstage2=2 error=0.1 | wtuncomp

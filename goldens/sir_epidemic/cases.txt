@@ -67,3 +67,50 @@
 # Redirected outputs must be read back for comparison.
 [f32] sir_epidemic stepmax=32 h=0.25 N=200 i0=2 b=0.6 k=0.2 gamma=5 xi=0.01 scale=1 mode=SIR > sir_all.bin; cat sir_all.bin
 [f32] sir_epidemic stepmax=32 h=0.1 normalize=0 N=10 s0=9 i0=1 b=0.02 k=0.3 mode=R > sir_r.bin; cat sir_r.bin
+
+# diff-2026-11 (round 1)
+# stdin is unused by this ODE generator. Drain it after execution so large
+# generator/header pipelines cannot race an early close and receive SIGPIPE.
+# Preserve sir_epidemic's exit status through that drain, including error cases.
+# Default/explicit defaults and input nt=1..4, ntr=1; output stepmax=1..4.
+[f32] sunull nt=1 ntr=1 | { sir_epidemic; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=2 ntr=1 | { sir_epidemic stepmax=40 verbose=0 normalize=1 N=1000 s0=1000 i0=1 r0=0 scale=0 h=1 tol=1e-8 mode=SIR b=0.5 k=0.333 xi=0 mu=0 gamma=0; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=3 ntr=1 | { sir_epidemic stepmax=1 N=17 s0=13 i0=3 r0=1 scale=2 mode=SIR; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=4 ntr=1 | { sir_epidemic stepmax=2 normalize=0 N=17 s0=13 i0=3 r0=1 b=0.03 k=0.2 h=0.125 mode=S; status=$?; cat >/dev/null; exit "$status"; }
+[f32] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=2 | { sir_epidemic stepmax=3 N=17 s0=13 i0=3 r0=1 b=0.8 k=0.2 h=0.125 scale=1 mode=R; status=$?; cat >/dev/null; exit "$status"; }
+[f32] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=4 | { sir_epidemic stepmax=4 normalize=0 N=17 s0=13 i0=3 r0=1 b=0.03 k=0.2 h=0.125 scale=2 mode=SIR; status=$?; cat >/dev/null; exit "$status"; }
+# Prime and large sizes; all three accepted modes; header values are ignored.
+[f32] suplane nt=17 ntr=7 npl=1 dip1=0 | { sir_epidemic stepmax=101 h=0.0625 N=762 s0=750 i0=10 r0=2 b=2 k=0.5 xi=0.04 mu=0.002 gamma=20 scale=1; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=4097 ntr=1 | { sir_epidemic stepmax=4097 h=0.01 mode=SIR; status=$?; cat >/dev/null; exit "$status"; }
+[f32] suspike nt=4097 ntr=1 nspk=1 ix1=1 it1=4097 | { sir_epidemic stepmax=4097 h=0.025 mode=S scale=2 s0=900; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=17 ntr=3 | sushw key=dt,delrt,offset,trid a=0,-123,-456,2 | { sir_epidemic stepmax=4097 h=0.005 mode=R xi=0.1 r0=50 scale=1; status=$?; cat >/dev/null; exit "$status"; }
+[f32] suplane nt=31 ntr=5 npl=1 | sushw key=cdp,dt,delrt a=101,65000,32767 b=-7,0,0 | suchw key1=offset key2=cdp a=17 b=-3 | { sir_epidemic stepmax=31 h=0.25 N=200 s0=175 i0=20 r0=5 scale=2 mode=SIR; status=$?; cat >/dev/null; exit "$status"; }
+# Solver's half-minimum-step stopping boundary, both directions; exact stderr.
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=4 verbose=1 h=0.0000005; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=4 verbose=1 h=0.00000050001; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=4 verbose=-1 h=-0.00000050001; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=11 verbose=1 h=-0.125 N=10 s0=8 i0=1 r0=1 b=0.3 k=0.2 xi=0.03 mu=0.002 gamma=4 tol=1e-12 mode=R; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=13 verbose=1 h=4 N=100 s0=90 i0=8 r0=2 b=8 k=0.75 xi=0.2 mu=0.01 gamma=0.5 tol=1e-12; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=4 verbose=1 tol=-1 h=0.01; status=$?; cat >/dev/null; exit "$status"; }
+# Double initial conditions, float scalar rounding, non-boolean flags.
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=17 N=16777217 s0=16777215 i0=0.125 r0=0.375 scale=1 h=0.5 mode=R; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=17 normalize=-3 N=31 s0=23.123456789 i0=2.123456789 r0=5.987654321 scale=2 h=0.25; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=7 normalize=0 N=0 s0=9 i0=1 r0=2 b=0.01 k=0.3 xi=0.07 mu=0.04 gamma=2 h=0.5 scale=1; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=7 N=100 s0=0 i0=0 r0=100 xi=0.5 mu=0.1 gamma=20 h=0.25 mode=S; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=7 normalize=0 s0=0.75 i0=0.25 r0=0 b=0 k=0.4 xi=0 mu=0 gamma=0 h=0.5 mode=R; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=7 normalize=0 s0=0.75 i0=0.25 r0=0 b=0.4 k=0 xi=0 mu=0 gamma=0 h=0.5 mode=S; status=$?; cat >/dev/null; exit "$status"; }
+# No required parameters. Empty numeric arguments fall back to defaults;
+# callback parameters are not parsed if the solver never takes a step.
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=2 normalize= N= s0= i0= r0= scale= h= tol= verbose= b= k= xi= mu= gamma=; status=$?; cat >/dev/null; exit "$status"; }
+[f32] [stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 h=0.0000004 verbose=1 b=1e999 k=1e999 xi=1e999 mu=1e999 gamma=1e999; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=11 b=9 b=0.3 k=9 k=0.2 xi=9 xi=0.03 mu=9 mu=0.002 gamma=9 gamma=20 mode=R mode=S h=0.25; status=$?; cat >/dev/null; exit "$status"; }
+# Invalid modes (including the documented I mode) and conversion errors.
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 mode=I; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 mode=; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 mode=sir; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 h=0.0000006 b=1e999; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 h=1e-310; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 gamma=1e-310; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=-2; status=$?; cat >/dev/null; exit "$status"; }
+[stderr] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 tol=1e999 mode=I; status=$?; cat >/dev/null; exit "$status"; }
+[f32] sunull nt=1 ntr=1 | { sir_epidemic stepmax=3 h=0.125 N=0x100 s0=0xc0 i0=0x8 r0=0x38 b=0x1p-1 k=0x1p-2 gamma=0x1p+2; status=$?; cat >/dev/null; exit "$status"; }

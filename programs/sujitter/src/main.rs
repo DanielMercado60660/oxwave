@@ -153,12 +153,18 @@ fn main() {
             let mut it = 0i32;
             // Preserve the C loop's access past ns, including stale samples
             // in the full SU_NFLTS allocation. The C does not zero the edges.
-            while it < nt.wrapping_sub(its) {
+            // Stop before the C's out-of-allocation read. For the verified
+            // nt=65534, its=-1 case, only the un-emitted data[65534] is skipped;
+            // the minimal C bounds fix leaves stdout byte-identical.
+            while it < nt.wrapping_sub(its) && it.wrapping_sub(its) < SU_NFLTS as i32 {
                 tr.data[it as usize] = tr.data[it.wrapping_sub(its) as usize];
                 it += 1;
             }
         } else {
-            let mut it = nt;
+            // The C starts at nt, even though puttr emits only indices < nt.
+            // At nt=SU_NFLTS its first write is out of allocation; skipping
+            // that write, as in the minimal C fix, does not change stdout.
+            let mut it = nt.min(SU_NFLTS as i32 - 1);
             while it > its {
                 tr.data[it as usize] = tr.data[it.wrapping_sub(its) as usize];
                 it -= 1;

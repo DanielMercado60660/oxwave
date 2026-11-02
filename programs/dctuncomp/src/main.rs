@@ -137,6 +137,22 @@ fn main() {
     let pos = ibuff.pos;
     buffRealloc1(&mut ibuff, pos);
     ibuff.pos = 0; // buffRewind
+    // pcoding.c:166,179,183 writes qx before checking the decoded count.
+    // A smaller header allocation still yields C's "Inconsistent data" error.
+    // Check prefix framing before calling the library, whose output slice
+    // must fit every coefficient. The library still performs the decoding.
+    let mut codes = ibuff.code.iter();
+    let mut count = 0usize;
+    while let Some(&code) = codes.next() {
+        if count == qx.len() {
+            err!("Inconsistent data \n");
+        }
+        count += 1;
+        if code as i8 == 127 || code as i8 == -127 {
+            codes.next();
+            codes.next();
+        }
+    }
     if pDecode(&mut ibuff, &mut qx) == -1 {
         err!("Inconsistent data \n");
     }

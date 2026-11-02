@@ -153,9 +153,9 @@ fn main() {
     let mut ix = 0usize;
     let mut m = 0i32;
     loop {
-        if gottrace && tr.cdp == cdpprev {
+        if gottrace {
             if ix >= nx as usize {
-                err!("gather has more than nx traces");
+                err!("number of traces exceeds nx");
             }
             aoff[ix] = tr.offset as f32;
             datm[ix].copy_from_slice(&tr.data[..nt as usize]);
@@ -165,8 +165,6 @@ fn main() {
             cdp = tr.cdp;
         }
         if cdp != cdpprev || !gottrace {
-            // The next CDP's trace must survive output header and sample edits.
-            let pending = if gottrace { Some(tr.clone()) } else { None };
             let mut ol = (aoff[0] as f64).abs().floor() as i32;
             for x in 1..nx as usize {
                 let oaux = (aoff[x] as f64).abs().floor() as i32;
@@ -274,13 +272,9 @@ fn main() {
                 break;
             }
             cdpprev = cdp;
-            tr = pending.unwrap();
+            // The C calculation loops reuse ix and leave it outside the gather.
+            // Restart input at row zero, as in the minimal C cursor repair.
             ix = 0;
-            aoff.fill(0.0);
-            for row in &mut datm { row.fill(0.0); }
-            for row in &mut datn { row.fill(0.0); }
-            // Store the trace that triggered the boundary on the next iteration.
-            continue;
         }
         if gettr(&mut tr) == 0 {
             gottrace = false;

@@ -13,3 +13,19 @@ susorty noff=-1
 [stderr] susorty nshot=0 unknown=1
 susorty nt=65536
 susorty nt=2147483648
+# diff-2026-11 (round 1)
+susorty nt=3 nshot=1 noff=1 dt=0.003 dshot=2.5 doff=3.25
+susorty nt=4 nshot=2 noff=2 dt=0.000001 dshot=1.25 doff=2.75
+susorty nt=11 nshot=3 noff=4 dt=0.0065535 dshot=-0.75 doff=1.125
+susorty nt=4097 nshot=2 noff=3 dt=0.000125 dshot=100.5 doff=-12.25
+susorty nt=17 nshot=4 noff=1 dshot=0.1 doff=0.3
+susorty nt=31 nshot=1 noff=7 dshot=42 doff=-0.5
+susorty nt=8 nshot=2 noff=3 dt=0.065535 dshot=5 doff=9
+[stderr] susorty nt=4 nshot=1 noff=2 verbose=1 dt=0.002 dshot=7 doff=3
+susorty nt=65535 nshot=1 noff=1
+susorty nt=65536 nshot=2 noff=2
+susorty nshot=abc noff=2
+susorty nt=9 nshot=3 noff=2 dt=0.0009999999 dshot=123.456 doff=78.901
+susorty nt=5 nshot=2 noff=5 dshot=-2.3 doff=0.7 | sugethw key=tracl,sx,gx,offset,cdp output=ascii
+sunull nt=1 ntr=1 | sushw key=sx,gx a=17,33 | susorty nt=6 nshot=1 noff=2 dshot=2 doff=4
+suspike nt=2 ntr=1 | susorty nt=19 nshot=2 noff=2 dt=0.004 dshot=10 doff=20

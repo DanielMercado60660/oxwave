@@ -79,3 +79,50 @@
 [exact] [stderr] cellauto n1=15 n1=17 rule= fill= ic= tc= nc= f0= f1= seed=123
 [exact] [stderr] cellauto n1=abc seed=123
 [exact] [stderr] cellauto par=missing.par
+
+# diff-2026-11 (round 1)
+# cellauto generates native floats and ignores stdin, including SU headers.
+# Keep upstream inputs small, except the explicitly drained long-input case.
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=1 ic=1 fill=1 f0=-2.5 f1=7.25 seed=7
+[exact] [stderr] sunull nt=2 ntr=1 | cellauto n1=2 rule=225 ic=2 nc=5 tc=2 seed=7
+[exact] [stderr] sunull nt=3 ntr=1 | cellauto n1=3 rule=260 ic=2 nc=30 tc=2 seed=0
+[exact] [stderr] sunull nt=4 ntr=1 | cellauto n1=4 rule=226 ic=2 nc=30 tc=2 seed=7 fill=1 f0=-0.0 f1=2.5
+[exact] [stderr] suspike nt=17 ntr=1 nspk=1 ix1=1 it1=9 | cellauto n1=7 rule=54 ic=2 nc=101 tc=2 seed=17431
+[exact] [stderr] suplane nt=19 ntr=1 npl=1 len1=1 cx1=1 ct1=10 | cellauto n1=11 rule=60 ic=2 nc=101 tc=2 seed=17431
+# Same automaton with/without altered headers: neither headers nor samples matter.
+[exact] [stderr] sunull nt=3 ntr=1 | cellauto n1=13 rule=110 ic=2 nc=41 tc=2 seed=20261102 verbose=1
+[exact] [stderr] sunull nt=3 ntr=1 | sushw key=dt,delrt,trid,offset a=2000,-12,1,-17 | suchw key1=cdp key2=tracl key3=tracl a=101 b=1 c=0 | cellauto n1=13 rule=110 ic=2 nc=41 tc=2 seed=20261102 verbose=1
+# Full defaults versus every parameter set explicitly (the ic=1 seed is unused).
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=500 rule=30 ic=1 nc=20 tc=1 fill=0 f0=330 f1=3000 seed=20261102 verbose=0
+# Prime/even sizes, repeated seed collisions, early and scattered initialization.
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=97 rule=90 ic=2 nc=501 tc=1 seed=12345
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=98 rule=102 ic=2 nc=501 tc=2 seed=12345
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=101 rule=150 ic=2 nc=3000 tc=2 seed=991 fill=1 f0=-12.75 f1=0.125
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=127 rule=225 ic=0 fill=0 seed=991
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=128 rule=260 ic=2 nc=1000 tc=2 seed=991
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=257 rule=182 ic=2 nc=0 tc=2 seed=991 fill=-5 f0=0.1 f1=-0.2
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=512 rule=222 ic=2 nc=2000 tc=2 seed=991 fill=2 f0=-1.25 f1=0
+# Drain the unused 4097-sample input; checksum consumes the complete 67 MB image
+# without SIGPIPE or a large golden. Both programs must match every output byte.
+[exact] [stderr] sunull nt=4097 ntr=1 | { cat >/dev/null; cellauto n1=4097 rule=30 ic=2 nc=1200 tc=2 seed=20261102; } | cksum
+# Empty parameters, duplicates, numeric prefixes, zero and negative nc/tc.
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=29 n1=31 rule=54 rule=62 ic=2 nc=120 nc=31 tc=1 tc=2 seed=7 seed=19 fill=1 fill=0
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=31 rule= ic= nc= tc= fill= f0= f1= seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=31tail rule=110tail ic=2tail nc=21tail tc=2tail fill=1tail f0=-.25tail f1=2.5tail seed=19tail
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=37 rule=225 ic=2 nc=-1 tc=-2 fill=1 f0=0 f1=-1 seed=19
+# Floating point boundaries: exact subnormal input, float max, and narrowing to zero.
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=41 fill=1 f0=0x1p-1074 f1=0x1.fffffep127 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=43 fill=1 f0=-1e-50 f1=1.401298464324817e-45 seed=19
+# Errors occur during parsing or evolution; no required parameters exist.
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=2 rule=999 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=1 rule=999 seed=19 fill=1 f1=-3
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 fill=1 f1=1e39 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 ic=2147483648 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 nc=-2147483649 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 tc=2147483648 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 fill=-2147483649 seed=19
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 seed=-4294967295
+
+# lib-fix-2026-11 (moved from PENDING_LIB after shared-library fixes)
+[exact] [stderr] sunull nt=1 ntr=1 | cellauto n1=9 seed=123 fill=1 f0=0x1.8p-1074

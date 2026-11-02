@@ -136,6 +136,11 @@ fn main() {
 
     let mut n3 = 1i32;
     getparint("n3", &mut n3);
+    // Reject an empty input grid before alloc3float's zero-sized pointer
+    // tables and the unconditional vorig sample read (the repaired C does so).
+    if n3 <= 0 {
+        err!("sample number of 3rd dimension invalid");
+    }
     let mut mode = 1i32;
     getparint("mode", &mut mode);
     if mode < 1 || mode > 2 {
@@ -231,7 +236,14 @@ fn main() {
         let nn1 = i1end - i1beg;
         let nn2 = i2end - i2beg;
         let nn3 = i3end - i3beg;
-        let mut v2 = vec![0.0f32; (nn1 * nn2 * nn3) as usize];
+        // A reversed bound makes the corresponding signed C loops empty.
+        // alloc3float then fails its enormous size_t allocation; when the
+        // signed loops skip the buffer, its NULL result is never dereferenced.
+        let mut v2 = if nn1 < 0 || nn2 < 0 || nn3 < 0 {
+            Vec::new()
+        } else {
+            vec![0.0f32; (nn1 * nn2 * nn3) as usize]
+        };
         for i3 in 0..nn3 {
             for i2 in 0..nn2 {
                 for i1 in 0..nn1 {
@@ -331,27 +343,35 @@ fn vsm3d(
     vmin: f32,
     vmax: f32,
 ) {
-    let (n3, n2, n1) = (n3 as usize, n2 as usize, n1 as usize);
-    let ix = |i3: usize, i2: usize, i1: usize| (i3 * n2 + i2) * n1 + i1;
+    // Keep the dimensions signed: C's loops do not run for reversed bounds.
+    let ix = |i3: i32, i2: i32, i1: i32| ((i3 * n2 + i2) * n1 + i1) as usize;
     let mut ww = 1.0f32;
-    let mut w = vec![0.0f32; n1 + n2 + n3 - 2];
+    // C's n1+n2+n3-2 underallocates when two layer axes are empty. Reserve
+    // enough for each weight loop, as in the repaired C. For the empty layer
+    // no velocity samples use these weights, so the original output is kept.
+    let nw = (n1 + n2 + n3 - 2).max(n1).max(n2).max(n3);
+    let mut w = if nw < 0 {
+        Vec::new()
+    } else {
+        vec![0.0f32; nw as usize]
+    };
     // Compute the weight function.
     if depth == 1 {
         mu = (((mu * mu) as f64 - 1.0) / (n1 * n1) as f64) as f32;
         for i1 in 0..n1 {
-            w[i1] = (1.0 / (1.0f32 + (i1 * i1) as f32 * mu) as f64) as f32;
+            w[i1 as usize] = (1.0 / (1.0f32 + (i1 * i1) as f32 * mu) as f64) as f32;
         }
     }
     if depth == 2 {
         mu = (((mu * mu) as f64 - 1.0) / (n2 * n2) as f64) as f32;
         for i2 in 0..n2 {
-            w[i2] = (1.0 / (1.0f32 + (i2 * i2) as f32 * mu) as f64) as f32;
+            w[i2 as usize] = (1.0 / (1.0f32 + (i2 * i2) as f32 * mu) as f64) as f32;
         }
     }
     if depth == 3 {
         mu = (((mu * mu) as f64 - 1.0) / (n3 * n3) as f64) as f32;
         for i3 in 0..n3 {
-            w[i3] = (1.0 / (1.0f32 + (i3 * i3) as f32 * mu) as f64) as f32;
+            w[i3 as usize] = (1.0 / (1.0f32 + (i3 * i3) as f32 * mu) as f64) as f32;
         }
     }
     // Scale smoothing parameters according to the iteration number.
@@ -395,155 +415,155 @@ fn vsm3d(
 
     if r2 > 0.0 {
         // Smoothing velocity in the second direction.
-        let mut d = vec![0.0f32; n1 * n2];
-        let mut e = vec![0.0f32; n1 * n2];
-        let mut f = vec![0.0f32; n1 * n2];
+        let mut d = vec![0.0f32; (n1 * n2) as usize];
+        let mut e = vec![0.0f32; (n1 * n2) as usize];
+        let mut f = vec![0.0f32; (n1 * n2) as usize];
         for i3 in 0..n3 {
             if depth == 3 {
-                ww = w[i3];
+                ww = w[i3 as usize];
             }
             for i2 in 0..n2 - 1 {
                 if depth == 2 {
-                    ww = w[i2 + 1];
+                    ww = w[(i2 + 1) as usize];
                 }
                 for i1 in 0..n1 {
                     if depth == 1 {
-                        ww = w[i1];
+                        ww = w[i1 as usize];
                     }
                     let k = i2 * n1 + i1;
-                    d[k] = (ww as f64 + r2 as f64 * 2.0) as f32;
-                    e[k] = -r2;
-                    f[k] = ww * v[ix(i3, i2 + 1, i1)];
+                    d[k as usize] = (ww as f64 + r2 as f64 * 2.0) as f32;
+                    e[k as usize] = -r2;
+                    f[k as usize] = ww * v[ix(i3, i2 + 1, i1)];
                 }
             }
             for i1 in 0..n1 {
-                d[(n2 - 2) * n1 + i1] -= r2;
-                f[i1] += r2 * v[ix(i3, 0, i1)];
+                d[((n2 - 2) * n1 + i1) as usize] -= r2;
+                f[i1 as usize] += r2 * v[ix(i3, 0, i1)];
             }
             tripd2(&mut d, &mut e, &mut f, n2 - 1, n1);
             for _i in 1..iter {
                 for i2 in 0..n2 - 1 {
                     if depth == 2 {
-                        ww = w[i2 + 1];
+                        ww = w[(i2 + 1) as usize];
                     }
                     for i1 in 0..n1 {
                         if depth == 1 {
-                            ww = w[i1];
+                            ww = w[i1 as usize];
                         }
                         let k = i2 * n1 + i1;
-                        d[k] = (ww as f64 + r2 as f64 * 2.0) as f32;
-                        e[k] = -r2;
-                        f[k] *= ww;
+                        d[k as usize] = (ww as f64 + r2 as f64 * 2.0) as f32;
+                        e[k as usize] = -r2;
+                        f[k as usize] *= ww;
                     }
                 }
                 for i1 in 0..n1 {
-                    d[(n2 - 2) * n1 + i1] -= r2;
-                    f[i1] += r2 * v[ix(i3, 0, i1)];
+                    d[((n2 - 2) * n1 + i1) as usize] -= r2;
+                    f[i1 as usize] += r2 * v[ix(i3, 0, i1)];
                 }
                 tripd2(&mut d, &mut e, &mut f, n2 - 1, n1);
             }
             for i2 in 0..n2 - 1 {
                 for i1 in 0..n1 {
-                    v[ix(i3, i2 + 1, i1)] = f[i2 * n1 + i1];
+                    v[ix(i3, i2 + 1, i1)] = f[(i2 * n1 + i1) as usize];
                 }
             }
         }
     }
     if r3 > 0.0 {
         // Smoothing velocity in the third direction.
-        let mut d = vec![0.0f32; n1 * n3];
-        let mut e = vec![0.0f32; n1 * n3];
-        let mut f = vec![0.0f32; n1 * n3];
+        let mut d = vec![0.0f32; (n1 * n3) as usize];
+        let mut e = vec![0.0f32; (n1 * n3) as usize];
+        let mut f = vec![0.0f32; (n1 * n3) as usize];
         for i2 in 0..n2 {
             if depth == 2 {
-                ww = w[i2];
+                ww = w[i2 as usize];
             }
             for i3 in 0..n3 - 1 {
                 if depth == 3 {
-                    ww = w[i3 + 1];
+                    ww = w[(i3 + 1) as usize];
                 }
                 for i1 in 0..n1 {
                     if depth == 1 {
-                        ww = w[i1];
+                        ww = w[i1 as usize];
                     }
                     let k = i3 * n1 + i1;
-                    d[k] = (ww as f64 + 2.0 * r3 as f64) as f32;
-                    e[k] = -r3;
-                    f[k] = ww * v[ix(i3 + 1, i2, i1)];
+                    d[k as usize] = (ww as f64 + 2.0 * r3 as f64) as f32;
+                    e[k as usize] = -r3;
+                    f[k as usize] = ww * v[ix(i3 + 1, i2, i1)];
                 }
             }
             for i1 in 0..n1 {
-                d[(n3 - 2) * n1 + i1] -= r3;
-                f[i1] += r3 * v[ix(0, i2, i1)];
+                d[((n3 - 2) * n1 + i1) as usize] -= r3;
+                f[i1 as usize] += r3 * v[ix(0, i2, i1)];
             }
             tripd2(&mut d, &mut e, &mut f, n3 - 1, n1);
             for _i in 1..iter {
                 for i3 in 0..n3 - 1 {
                     if depth == 3 {
-                        ww = w[i3 + 1];
+                        ww = w[(i3 + 1) as usize];
                     }
                     for i1 in 0..n1 {
                         if depth == 1 {
-                            ww = w[i1];
+                            ww = w[i1 as usize];
                         }
                         let k = i3 * n1 + i1;
-                        d[k] = (ww as f64 + 2.0 * r3 as f64) as f32;
-                        e[k] = -r3;
-                        f[k] *= ww;
+                        d[k as usize] = (ww as f64 + 2.0 * r3 as f64) as f32;
+                        e[k as usize] = -r3;
+                        f[k as usize] *= ww;
                     }
                 }
                 for i1 in 0..n1 {
-                    d[(n3 - 2) * n1 + i1] -= r3;
-                    f[i1] += r3 * v[ix(0, i2, i1)];
+                    d[((n3 - 2) * n1 + i1) as usize] -= r3;
+                    f[i1 as usize] += r3 * v[ix(0, i2, i1)];
                 }
                 tripd2(&mut d, &mut e, &mut f, n3 - 1, n1);
             }
             for i3 in 0..n3 - 1 {
                 for i1 in 0..n1 {
-                    v[ix(i3 + 1, i2, i1)] = f[i3 * n1 + i1];
+                    v[ix(i3 + 1, i2, i1)] = f[(i3 * n1 + i1) as usize];
                 }
             }
         }
     }
     if r1 > 0.0 {
         // Smoothing velocity in the first direction.
-        let mut d = vec![0.0f32; n1];
-        let mut e = vec![0.0f32; n1];
-        let mut f = vec![0.0f32; n1];
+        let mut d = vec![0.0f32; n1 as usize];
+        let mut e = vec![0.0f32; n1 as usize];
+        let mut f = vec![0.0f32; n1 as usize];
         for i3 in 0..n3 {
             if depth == 3 {
-                ww = w[i3];
+                ww = w[i3 as usize];
             }
             for i2 in 0..n2 {
                 if depth == 2 {
-                    ww = w[i2];
+                    ww = w[i2 as usize];
                 }
                 for i1 in 0..n1 - 1 {
                     if depth == 1 {
-                        ww = w[i1 + 1];
+                        ww = w[(i1 + 1) as usize];
                     }
-                    d[i1] = (ww as f64 + r1 as f64 * 2.0) as f32;
-                    e[i1] = -r1;
-                    f[i1] = ww * v[ix(i3, i2, i1 + 1)];
+                    d[i1 as usize] = (ww as f64 + r1 as f64 * 2.0) as f32;
+                    e[i1 as usize] = -r1;
+                    f[i1 as usize] = ww * v[ix(i3, i2, i1 + 1)];
                 }
-                d[n1 - 2] -= r1;
+                d[(n1 - 2) as usize] -= r1;
                 f[0] += r1 * v[ix(i3, i2, 0)];
                 tripd2(&mut d, &mut e, &mut f, n1 - 1, 1);
                 for _i in 1..iter {
                     for i1 in 0..n1 - 1 {
                         if depth == 1 {
-                            ww = w[i1 + 1];
+                            ww = w[(i1 + 1) as usize];
                         }
-                        d[i1] = (ww as f64 + r1 as f64 * 2.0) as f32;
-                        e[i1] = -r1;
-                        f[i1] *= ww;
+                        d[i1 as usize] = (ww as f64 + r1 as f64 * 2.0) as f32;
+                        e[i1 as usize] = -r1;
+                        f[i1 as usize] *= ww;
                     }
-                    d[n1 - 2] -= r1;
+                    d[(n1 - 2) as usize] -= r1;
                     f[0] += r1 * v[ix(i3, i2, 0)];
                     tripd2(&mut d, &mut e, &mut f, n1 - 1, 1);
                 }
                 for i1 in 0..n1 - 1 {
-                    v[ix(i3, i2, i1 + 1)] = f[i1];
+                    v[ix(i3, i2, i1 + 1)] = f[i1 as usize];
                 }
             }
         }
@@ -561,28 +581,30 @@ fn vsm3d(
 }
 
 /// Overwrite b with the solutions of m symmetric tridiagonal systems.
-fn tripd2(d: &mut [f32], e: &mut [f32], b: &mut [f32], n: usize, m: usize) {
+fn tripd2(d: &mut [f32], e: &mut [f32], b: &mut [f32], n: i32, m: i32) {
     // Decomposition.
     for k in 1..n {
         for i in 0..m {
-            let temp = e[(k - 1) * m + i];
-            e[(k - 1) * m + i] = temp / d[(k - 1) * m + i];
-            d[k * m + i] -= temp * e[(k - 1) * m + i];
+            let temp = e[((k - 1) * m + i) as usize];
+            e[((k - 1) * m + i) as usize] = temp / d[((k - 1) * m + i) as usize];
+            d[(k * m + i) as usize] -= temp * e[((k - 1) * m + i) as usize];
         }
     }
     // Substitution.
     for k in 1..n {
         for i in 0..m {
-            b[k * m + i] -= e[(k - 1) * m + i] * b[(k - 1) * m + i];
+            b[(k * m + i) as usize] -=
+                e[((k - 1) * m + i) as usize] * b[((k - 1) * m + i) as usize];
         }
     }
     for i in 0..m {
-        b[(n - 1) * m + i] /= d[(n - 1) * m + i];
+        b[((n - 1) * m + i) as usize] /= d[((n - 1) * m + i) as usize];
     }
     for k in (1..n).rev() {
         for i in 0..m {
-            b[(k - 1) * m + i] =
-                b[(k - 1) * m + i] / d[(k - 1) * m + i] - e[(k - 1) * m + i] * b[k * m + i];
+            b[((k - 1) * m + i) as usize] = b[((k - 1) * m + i) as usize]
+                / d[((k - 1) * m + i) as usize]
+                - e[((k - 1) * m + i) as usize] * b[(k * m + i) as usize];
         }
     }
 }

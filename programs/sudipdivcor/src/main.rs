@@ -175,6 +175,14 @@ fn main() {
     // Separate buffers permit safe slices for the same C transforms.
     let mut ptk = vec![Complex::default(); nt * nk as usize];
     let mut ptx = vec![0.0f32; nt * nxfft as usize];
+    // Reject the zero-row table before C's alloc2/divcor accesses go out of bounds.
+    if np == 0 {
+        err!("np must be positive");
+    }
+    // C converts np to size_t in ealloc2float; negative counts fail allocation.
+    if np < 0 {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
     let mut divcor = vec![vec![0.0f32; nt.max(2)]; np as usize];
     // C reads divcor[0][1] even when nt=1; reserve the allocator padding.
     divcortable(nt, np, dt, &tt, &mut vt, &mut divcor, trans, norm);

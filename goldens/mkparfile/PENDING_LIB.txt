@@ -1,0 +1,2 @@
+[stderr] sunull ntr=1 nt=1 | sugethw key=tracl,ns output=geom | awk '{printf "bad%c\n", 255}' | mkparfile
+# oxwave-core, cio::fgets: invalid UTF-8 bytes are replaced when converting the input buffer to a String, changing the scan-error message.

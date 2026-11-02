@@ -483,6 +483,10 @@ pub fn damp(nbw: usize, abso: f32) -> Vec<f32> {
 }
 
 pub fn tbc2d(a: &mut [f32], wbx: &[f32], wbz: &[f32], nwbx: i32, nwbz: i32, nx: i32, nz: i32) {
+    // suremac2d.c:1853 writes before a when nwbx > nx; match fixed C.
+    if nwbx > nx {
+        err!("Error: nbwx must be <= nx!\n");
+    }
     let mut ist = vec![0i32; nz as usize];
     let mut ng1 = nwbx;
     let mut ng2 = nwbz;

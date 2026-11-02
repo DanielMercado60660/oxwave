@@ -1,0 +1,7 @@
+# ub-2026-11 (round 1)
+# Confirmed: vendor/su-original/src/su/main/statics/sustaticB.c:199 reads sou_statics[ns] beyond alloc1float(ns) at :152 (cwp/lib/alloc.c:522-524,226).
+# Minimal is <= ns -> is < ns skips the read and retains tsd: trace 2 (sstat,gstat,tstat) changes (0,0,0) -> (1,0,1); both rc=0 and 536 bytes, differing stdout. OxWave matches fixed after the exclusive-bound repair.
+python3 -c 'import struct; open("s","wb").write(struct.pack("f",1)); open("r","wb").write(struct.pack("f",2))' && suspike ntr=2 nt=7 nspk=1 ix1=1 it1=4 | sushw key=scalel a=1 | sustaticB hdrs=2 ns=1 nr=0 no=1 sou_file=s rec_file=r
+# Confirmed: vendor/su-original/src/su/main/statics/sustaticB.c:210 reads sou_statics[-1] before alloc1float(ns) at :152 (cwp/lib/alloc.c:522-524,226).
+# Minimal header-index bounds checks reject fldr=-1: original rc=0/268 stdout bytes becomes fixed rc=1/0 stdout bytes, source static index -1 out of range for ns=1. OxWave matches fixed, including stderr.
+python3 -c 'import struct; open("s","wb").write(struct.pack("f",1)); open("r","wb").write(struct.pack("f",2))' && suspike ntr=1 nt=7 nspk=1 ix1=1 it1=4 | sushw key=scalel,fldr,tracf a=1,-1,0 | sustaticB hdrs=3 ns=1 nr=1 sou_file=s rec_file=r

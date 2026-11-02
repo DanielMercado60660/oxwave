@@ -13,3 +13,15 @@ bhedtopar outpar=result swap=99999999999999999999 </dev/null
 bhedtopar outpar=/missing/directory/result </dev/null
 bhedtopar </dev/null
 [stderr] bhedtopar outpar=result unknown=1 verbose=1 </dev/null && cat result
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=0 < binary && cat result
+suspike nt=3 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=1 < binary && cat result
+suplane nt=4 ntr=2 | sushw key=dt a=12345 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result < binary && cat result
+sunull nt=17 ntr=3 | sushw key=dt a=65000 | segyhdrs bfile=binary hfile=header jobid=-123456 lino=2147483647 reno=-2147483648 ntrpr=-32768 nart=32767 fold=-123 tsort=2 > /dev/null && bhedtopar outpar=result swap=0 < binary && cat result
+suspike nt=17 ntr=2 | segyhdrs bfile=binary hfile=header jobid=16909060 lino=-12345 reno=987654321 ntrpr=-32768 nart=32767 fold=-123 > /dev/null && bhedtopar outpar=result swap=1 < binary && cat result
+sunull nt=4097 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=2 < binary && cat result
+[stderr] suplane nt=7 ntr=2 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=0 verbose=1 < binary && cat result
+sunull nt=1 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=/missing/directory/result swap=0 < binary
+sunull nt=4 ntr=1 | segyhdrs bfile=binary hfile=header > /dev/null && bhedtopar outpar=result swap=99999999999999999999 < binary
+suspike nt=5 ntr=1 | segyhdrs bfile=binary hfile=header ntrpr=1234 nart=-2345 > /dev/null && head -c 17 binary | bhedtopar outpar=result swap=0 && cat result
+sunull nt=19 ntr=1 | segyhdrs bfile=binary hfile=header jobid=-42 ntrpr=257 nart=-1 > /dev/null && head -c 399 binary | bhedtopar outpar=result swap=1 && cat result

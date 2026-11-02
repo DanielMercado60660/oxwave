@@ -36,7 +36,7 @@
 
 use oxwave_core::prelude::*;
 use oxwave_grid_geometry::*;
-use oxwave_header_case::{fromhead, GetCase};
+use oxwave_header_case::{fromhead, GetCase as header_case};
 use oxwave_k_file::{readkfile, writekfile};
 
 /// Self-documentation, byte-identical to the C `sdoc[]` array.
@@ -508,9 +508,10 @@ fn main() {
                 tx /= s;
                 ty /= s;
             }
+            // C lrint returns long before assignment narrows to the int header.
             tr.offset = ((dx - tx) * (dx - tx) + (dy - ty) * (dy - ty))
                 .sqrt()
-                .round_ties_even() as i32;
+                .round_ties_even() as i64 as i32;
         }
         if bt == 30 {
             dx = 0.5 * tr.sx.wrapping_add(tr.gx) as f64;
@@ -557,7 +558,7 @@ fn main() {
         } else {
             tx = fromhead(&tr, rp) * g[2] + g[1];
             ty = fromhead(&tr, sp) * g[4] + g[3];
-            tr.cdp = ((tx + ty) / 2.).round_ties_even() as i32;
+            tr.cdp = ((tx + ty) / 2.).round_ties_even() as i64 as i32;
         }
         if bt == -30 || bt == -32 {
             gridicrawxy(&g, i, j, &mut dx, &mut dy);
@@ -588,4 +589,15 @@ fn main() {
     }
     warn!("Number of traces %d ", n);
     exit(CWP_Exit());
+}
+
+// This program's private C GetCase omits shortpad and comments out the
+// numb-prefix branch; the general headcase.c library supports both.
+#[allow(non_snake_case)]
+fn GetCase(cbuf: &str) -> i32 {
+    if cbuf == "shortpad" || cbuf.starts_with("numb") {
+        -1
+    } else {
+        header_case(cbuf)
+    }
 }

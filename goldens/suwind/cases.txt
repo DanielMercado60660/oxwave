@@ -34,3 +34,42 @@ sunull nt=9 ntr=1 dt=0.004 | suwind key=bogus
 sunull nt=9 ntr=2 dt=0.004 | suwind itmin=2 tmin=0.024 itmax=5 tmax=0.032 nt=1
 sunull nt=9 ntr=2 dt=0.004 | sushw key=trid,dt,d1 a=130,0,0 | suwind
 sunull nt=9 ntr=2 dt=0.004 | suwind nt=0
+# diff-2026-11 (round 1)
+sunull nt=2 ntr=1 dt=0.004 | suwind key=tracl min=1 max=1 j=1 s=0 count=1 abs=0 ordered=0
+sunull nt=3 ntr=2 dt=0.004 | suwind itmin=1 itmax=2
+suspike nt=4 ntr=3 dt=0.004 | suwind tmin=0.004 tmax=0.008
+suspike nt=17 ntr=2 dt=0.004 | suwind itmin=3 nt=7
+suspike nt=4097 ntr=1 dt=0.004 | suwind itmin=1 itmax=4095
+sunull nt=2 ntr=8 dt=0.004 | sushw key=offset a=-4 b=1 | suwind key=offset min=-3 max=2 j=2 s=-1
+sunull nt=3 ntr=8 dt=0.004 | sushw key=offset a=-4 b=1 | suwind key=offset abs=1 min=2 max=3 reject=-3 accept=0
+sunull nt=4 ntr=8 dt=0.004 | suwind min=99 accept=2,4,7 reject=4 count=2
+sunull nt=5 ntr=8 dt=0.004 | suwind min=2 max=6 reject=2,3,6
+sunull nt=7 ntr=8 dt=0.004 | suwind min=3 max=5 ordered=1
+sunull nt=7 ntr=8 dt=0.004 | sushw key=tracl a=8 b=-1 | suwind min=3 max=5 ordered=-1
+sunull nt=7 ntr=6 dt=0.004 > in.su; suwind skip=2 count=2 < in.su
+[stderr] sunull nt=7 ntr=5 dt=0.004 | suwind verbose=1 key=tracl min=2 max=4 accept=5 reject=3
+[stderr] sunull nt=7 ntr=2 dt=0.004 | sushw key=trid,d1,f1 a=130,2,10 | suwind verbose=1 tmin=12 tmax=18
+sunull nt=7 ntr=2 dt=0.004 | sushw key=dt a=0 | suwind dt=0.002 f1=0.01 tmin=0.012 nt=3
+suspike nt=7 ntr=2 dt=0.004 | suwind nt=10
+suspike nt=7 ntr=2 dt=0.004 | suwind itmin=2 nt=9
+suspike nt=11 ntr=2 dt=0.004 | suwind tmin=0.006 tmax=0.022
+sunull nt=11 ntr=2 dt=0.004 | sushw key=delrt a=100 | suwind tmin=0.108 tmax=0.12
+sunull nt=5 ntr=5 dt=0.004 | sushw key=cdp a=10 b=2 | suwind key=cdp min=12 max=16 j=4 s=0
+sunull nt=5 ntr=5 dt=0.004 | sushw key=trid a=2 b=1 | suwind key=trid accept=3,5 max=0
+sunull nt=5 ntr=5 dt=0.004 | sushw key=d1 a=1 b=1 | suwind key=d1 min=2 max=4 reject=3
+suplane ntr=3 nt=17 | suwind itmin=2 itmax=14
+suspike nt=13 ntr=3 dt=0.002 | suwind dt=0.002 f1=0 itmin=0 itmax=12
+sunull nt=4 ntr=2 dt=0.004 | suwind nt=1
+sunull nt=4 ntr=2 dt=0.004 | suwind nt=2
+sunull nt=4 ntr=2 dt=0.004 | suwind nt=3
+sunull nt=4 ntr=2 dt=0.004 | suwind nt=4
+sunull nt=9 ntr=2 dt=0.004 | suwind dt=0
+sunull nt=9 ntr=2 dt=0.004 | suwind tmin=-0.01
+sunull nt=9 ntr=2 dt=0.004 | suwind itmin=4 itmax=3
+sunull nt=9 ntr=2 dt=0.004 | suwind nt=65536
+sunull nt=1 ntr=1 dt=0.004 | suwind nt=1 count=1
+suspike nt=65535 ntr=1 dt=0.004 | suwind itmin=65530 itmax=65534
+[stderr] sunull nt=5 ntr=2 dt=0.004 | sushw key=trid,d1,f1 a=18,2,10 | suwind verbose=1 itmin=1 nt=3
+[stderr] sunull nt=5 ntr=2 dt=0.004 | sushw key=trid,delrt a=109,10 | suwind verbose=1 itmin=1 nt=3
+sunull nt=5 ntr=5 dt=0.004 | sushw key=d1 a=-2 b=1 | suwind key=d1 abs=1 min=1 max=2 accept=0 reject=-1
+sunull nt=5 ntr=3 dt=0.004 | suwind count=1 accept=3 min=2

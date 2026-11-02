@@ -111,3 +111,47 @@ suspike nt=5 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack out
 suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase  outdip=d.su > main.su && cat main.su d.su
 suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase dipuse=0 outdip=d.su > main.su && cat main.su d.su
 suspike nt=6 ntr=3 it1=1 | sushw key=cdp a=1 b=1 | susembase sumopt=dadstack outdip=d.su > main.su && cat main.su d.su
+
+# diff-2026-11 (round 1)
+# Short traces use zero extension: avoid uninitialised endpoints in C wsmooth.
+[stderr] suspike nt=1 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | susembase dipext=0 scanmin=0 scanmax=0 scanstep=1 dipuse=1
+[stderr] suspike nt=2 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | susembase dipext=0 scanmin=0 scanmax=0 scanstep=1 dipuse=0
+[stderr] suspike nt=3 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | susembase dipext=0 scanmin=0 scanmax=0 scanstep=1 dipuse=1
+[stderr] suspike nt=4 ntr=1 nspk=1 ix1=1 it1=1 | sushw key=cdp a=1 | susembase dipext=0 scanmin=0 scanmax=0 scanstep=1 dipuse=0
+# Long traces and a separate synthetic generator; defaults versus explicit defaults.
+[stderr] suplane nt=4097 ntr=7 | sushw key=cdp a=1 b=1 | susembase
+[stderr] suplane nt=4097 ntr=7 | sushw key=cdp a=1 b=1 | susembase lockey=cdp locmaxscan=3 locmaxsum=3 dipuse=1 bypass=0 dipext=12 scanstep=1 scanmax=12 scanmin=-12 numrolling=17 outputinc=1 outputalign=0 outputshift=0 sumopt=stack
+[stderr] susynlv nt=127 nxm=7 dxm=0.025 dt=0.004 ref="1:0,0.15;1,0.2" | sushw key=cdp a=2 b=1 | susembase dipuse=0 scanstep=0.75 scanmin=-3 scanmax=4.5 dipext=4 outputinc=0.5
+# All sum modes with fractional floating headers and a nonintegral scan count.
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=0 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=stack
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=1 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=sum
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=0 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=one
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=1 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=two
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=0 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=twolinear
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=1 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=dadstack dadext=0 dadscale=1.17 dadnoise=0.001
+[stderr] suspike nt=97 ntr=13 dt=0.0025 nspk=1 ix1=7 it1=49 | suaddnoise seed=71 sn=2 | sushw key=f2 a=-0.75 b=0.5 | susembase lockey=f2 locmaxscan=2 locmaxsum=2 dipuse=0 scanmin=-3 scanmax=5 scanstep=1.3 dipext=0 outputinc=0.6 outputalign=0.1 outputshift=2.5 sumopt=dadsum dadext=0 dadscale=1.17 dadnoise=0.001
+# Rolling-buffer wrap, decreasing groups, duplicates, short integer headers.
+[stderr] suplane nt=47 ntr=35 | suaddnoise seed=511 sn=2 | sushw key=cdp a=-10 b=1 j=7 | sushw key=fldr a=7 b=0 c=-2 j=7 | susembase groupkey=fldr locmaxscan=0 locmaxsum=2 numrolling=5 dipuse=0 outputinc=0.75 sumopt=twolinear
+[stderr] suplane nt=47 ntr=35 | sushw key=cdp a=0 b=0 j=7 | sushw key=f2 a=7 b=0 c=-2 j=7 | susembase groupkey=f2 numrolling=40 dipuse=1 bypass=1 outputinc=0.5
+[stderr] suspike nt=103 ntr=19 nspk=1 ix1=7 it1=53 | sushw key=trwf a=-10 b=2 | susembase lockey=trwf numrolling=6 locmaxscan=2 locmaxsum=2 dipext=0 bypass=-1 outputinc=2 outputalign=4 outputshift=32768 verbose=1
+[stderr] sunull nt=17 ntr=7 | sushw key=d2 a=0.25 b=1 | susembase lockey=d2 locmaxscan=0.5 locmaxsum=0.5 outputinc=0.25 dipext=0 sumopt=one
+[stderr] suplane nt=101 ntr=17 | sushw key=cdp a=-9 b=2 | susembase locmaxscan=0 locmaxsum=3 sumopt=dadsum dadext=4 dadscale=-0.5 dadnoise=0 dipuse=0 outputinc=1.5 outputalign=5.75
+# Compare the main trace stream and all three auxiliary output streams.
+suplane nt=131 ntr=9 dt=0.0025 | suaddnoise seed=137 sn=4 | sushw key=cdp a=-2 b=1 | susembase dipuse=0 scanstep=1.25 scanmin=-5 scanmax=7 dipext=5 outputinc=0.5 outdip=d.su outpow=p.su outsem=s.su > main.su && cat main.su d.su p.su s.su
+suplane nt=131 ntr=9 dt=0.0025 | suaddnoise seed=137 sn=4 | sushw key=cdp a=-2 b=1 | susembase dipuse=1 scanstep=1.25 scanmin=-5 scanmax=7 dipext=5 outputinc=0.5 outdip=d.su outpow=p.su outsem=s.su > main.su && cat main.su d.su p.su s.su
+# Dip input at input/output locations, with nonzero dip samples.
+suplane nt=127 ntr=7 | sushw key=cdp a=1 b=1 | tee in.su | susembase dipuse=0 outputinc=0.5 outputshift=20 outdip=d.su > first.su && susembase dipuse=0 indip=d.su locmaxsum=3 outputinc=0.5 outputshift=20 sumopt=two < in.su
+suspike nt=31 ntr=9 nspk=1 ix1=5 it1=16 | sushw key=offset a=10 b=2 | tee in.su | susembase lockey=offset outdip=d.su > first.su && susembase lockey=offset indip=d.su locmaxsum=2 sumopt=one < in.su
+# Independent dip trace ns differs from seismic ns (fgettr state per stream).
+sunull nt=3 ntr=9 | sushw key=cdp a=1 b=1 > dips.su && suspike nt=31 ntr=9 nspk=1 ix1=5 it1=16 | sushw key=cdp a=1 b=1 | susembase indip=dips.su locmaxsum=2
+# Invalid or omitted values, using small deterministic inputs.
+sunull nt=11 ntr=1 | susembase locmaxscan=0 locmaxsum=
+sunull nt=11 ntr=1 | susembase scanmax=-3 scanmin=4
+sunull nt=11 ntr=1 | susembase sumopt=dadstack dadext=-0.1
+sunull nt=11 ntr=1 | susembase lockey=null
+sunull nt=11 ntr=1 | susembase groupkey=unknown
+sunull nt=11 ntr=1 | susembase indip=missing.su locmaxsum=1
+sunull nt=11 ntr=1 | susembase numrolling=3
+sunull nt=11 ntr=1 | susembase outputinc=-0.5
+sunull nt=11 ntr=1 | susembase sumopt=dadstack dadnoise=-0.1
+sunull nt=11 ntr=1 | susembase sumopt=stack dadscale=0.9

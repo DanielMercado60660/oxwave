@@ -524,8 +524,16 @@ fn maketu(
                     - gammam as f64 * ((t - dt) as f64 / (t as f64 - 0.5 * dt as f64)).ln()))
                 as f32;
             let dumin = (0.1 * dt as f64 * t1 as f64 / t as f64) as f32;
+            // Match the bounds-checked C: negative delrt can start this
+            // recurrence before any previous u(t) sample exists.
+            if it < 1 {
+                err!("maketu: u(t) requires a previous sample");
+            }
             uoft[it] = uoft[it - 1] + max(dumin, du);
         } else if t > t2 {
+            if it < 2 {
+                err!("maketu: u(t) requires two previous samples");
+            }
             uoft[it] = (2.0 * uoft[it - 1] as f64 - uoft[it - 2] as f64) as f32;
         }
         t += dt;
@@ -542,7 +550,14 @@ fn maketu(
         nu = numax;
         du = (eu - fu) / (nu - 1) as f32;
     }
-    let mut tofu = vec![0.0f32; nu as usize];
+    // C passes nu to ealloc1float(size_t). A negative stretched length
+    // (e.g. a positive delrt longer than a short trace) fails with ENOMEM;
+    // use a fallible allocation so this path reports SU's error, not a panic.
+    let mut tofu = Vec::<f32>::new();
+    if tofu.try_reserve_exact(nu as usize).is_err() {
+        err!("ealloc.c: malloc failed (Cannot allocate memory)");
+    }
+    tofu.resize(nu as usize, 0.0);
     yxtoxy(dt, ft, &uoft, du, fu, ft, et, &mut tofu);
     (uoft, nu as usize, du, fu, tofu, t1)
 }

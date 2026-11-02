@@ -66,3 +66,43 @@ sunull nt=113 ntr=5 | suaddnoise seed=508 | sushw key=cdp,offset,delrt a=1,0,-12
 [stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp= noffmix=1
 [stderr] sunull nt=9 ntr=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=
 [stderr] sunull nt=9 ntr=1 | sushw key=cdp a=1 | sudmofk cdpmin=1 cdpmax=2 dxcdp=25 noffmix=1 unknown=1 verbose=1
+
+# diff-2026-11 (round 1)
+# Explicit defaults, minimum trace length, and a real writable temporary directory.
+[stderr] sunull nt=1 ntr=1 | sushw key=cdp a=17 | sudmofk cdpmin=17 cdpmax=17 dxcdp=25 noffmix=1 tdmo=0 vdmo=1500 sdmo=1 fmax=125 verbose=1 tmpdir=.
+# Nonzero short traces exercise stretch, FFT, and compression rather than the zero shortcut.
+sunull nt=2 ntr=3 | suaddnoise seed=617 | sushw key=cdp,offset a=1,50 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+sunull nt=3 ntr=3 | suaddnoise seed=617 | sushw key=cdp,offset a=1,500 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+sunull nt=4 ntr=3 | suaddnoise seed=617 | sushw key=cdp,offset a=1,0 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+# Prime dimensions, descending midpoint headers, and tapered dipping planes.
+suplane nt=257 ntr=17 taper=1 npl=2 dip1=-3 dip2=9 | sushw key=cdp a=17 b=-1 | sudmofk cdpmin=1 cdpmax=17 dxcdp=25 noffmix=1 sdmo=0.6 fmax=90
+# Long traces through the numerical path, including the largest unsigned-short ns.
+sunull nt=4097 ntr=3 | suaddnoise seed=617 | sushw key=cdp,offset a=1,500 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1
+suspike nt=65535 ntr=1 nspk=1 it1=2 ix1=1 | sushw key=cdp,offset a=1,100 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# One midpoint and a much wider spatial FFT, with nonconstant velocity picks.
+sunull nt=127 ntr=1 | suaddnoise seed=618 | sushw key=cdp,offset a=1,300 b=1,0 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1 tdmo=0,0.2,0.5 vdmo=1500,2200,1800
+sunull nt=127 ntr=127 | suaddnoise seed=618 | sushw key=cdp,offset a=1,300 b=1,0 | sudmofk cdpmin=1 cdpmax=127 dxcdp=25 noffmix=1 tdmo=0,0.2,0.5 vdmo=1500,2200,1800
+# A physical synthetic generator supplies its own midpoint and offset headers.
+susynlv nt=257 dt=0.004 nxm=7 nxo=3 fxo=0.1 dxo=0.1 ref="1:0,0.15;1,0.2" | sudmofk cdpmin=1 cdpmax=7 dxcdp=50 noffmix=2
+# Descending CDPs, partial mixes, zero/negative mix counts, and excluded headers.
+[stderr] sunull nt=83 ntr=15 | suaddnoise seed=620 | sushw key=cdp,offset a=3,200 b=-1,0 c=0,100 j=3,3 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=3 verbose=1
+[stderr] sunull nt=83 ntr=15 | suaddnoise seed=620 | sushw key=cdp,offset a=1,200 b=1,0 c=0,-100 j=3,3 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=0 verbose=1
+[stderr] sunull nt=83 ntr=15 | suaddnoise seed=620 | sushw key=cdp,offset a=1,200 b=1,0 c=0,-100 j=3,3 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=-1 verbose=1
+[stderr] sunull nt=83 ntr=15 | suaddnoise seed=620 | sushw key=cdp,offset a=1,200 b=1,0 c=0,100 j=3,3 | sudmofk cdpmin=2 cdpmax=2 dxcdp=25 noffmix=2 verbose=1
+# Duplicate midpoint data are overwritten, while each input header is emitted.
+sunull nt=73 ntr=9 | suaddnoise seed=621 | sushw key=cdp,offset a=-1,125 b=1,0 j=3,3 | sudmofk cdpmin=-1 cdpmax=1 dxcdp=12.5 noffmix=1
+# Sampling and delay come from the first header; subsequent headers survive output.
+sunull nt=89 ntr=5 | suaddnoise seed=622 | sushw key=cdp,offset,dt,delrt a=1,200,4000,0 b=1,0,1000,3 | sudmofk cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1
+# Delays at the boundary of a zero-length stretched time axis are still accepted.
+suspike nt=4 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset,delrt a=1,0,8 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+suspike nt=4 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset,delrt a=1,0,12 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+# Optional zero values on nonzero input, and a signed constant velocity.
+sunull nt=129 ntr=3 | suaddnoise seed=619 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 sdmo=0
+sunull nt=129 ntr=3 | suaddnoise seed=619 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 fmax=0
+sunull nt=129 ntr=3 | suaddnoise seed=619 | sushw key=cdp,offset a=1,100 b=1,0 | sudmofk cdpmin=1 cdpmax=3 dxcdp=25 noffmix=1 vdmo=-1
+# Regression: negative stretched sample counts must report SU's allocation error.
+[stderr] suspike nt=4 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset,delrt a=1,0,16 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] suspike nt=4 ntr=1 nspk=1 it1=1 ix1=1 | sushw key=cdp,offset,delrt a=1,100,100 | sudmofk cdpmin=1 cdpmax=1 dxcdp=25 noffmix=1
+[stderr] suspike nt=127 ntr=5 nspk=1 ix1=3 it1=11 | sushw key=cdp,offset a=1,250 b=1,0 | sudmofk cdpmin=1 cdpmax=5 dxcdp=25 noffmix=1 fmax=-20
+# Additional required-parameter error with a different generator.
+[stderr] suspike nt=4 ntr=1 nspk=1 it1=1 ix1=1 | sudmofk cdpmin=1 cdpmax=1 noffmix=1

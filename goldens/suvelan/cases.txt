@@ -17,3 +17,30 @@ suplane nt=16 ntr=1 | suvelan nv=0
 suplane nt=16 ntr=1 | sushw key=offset a=100 | suvelan anis2=-0.001
 # Varied samples across a gather exercise interpolation and accumulation.
 suplane nt=129 ntr=9 | suaddnoise seed=17 sn=3 | sushw key=offset a=10 b=35 | suvelan nv=7 fv=1100 dv=175 smute=1.8 dtratio=2 nsmooth=5 pwr=1.7
+
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=1 | suvelan nv=1 dtratio=1 nsmooth=2
+suplane nt=3 ntr=2 | suvelan nv=2 dtratio=1 nsmooth=3
+suplane nt=4 ntr=3 | suvelan nv=3 dtratio=2 nsmooth=4
+suspike nt=31 ntr=5 | sushw key=offset a=0 b=10 | suvelan nv=4 dtratio=1 nsmooth=3
+sunull nt=43 ntr=3 | suvelan nv=2 dtratio=3
+suplane nt=4097 ntr=3 | sushw key=offset a=0 b=35 | suvelan nv=3 dtratio=7 nsmooth=9
+suplane nt=101 ntr=6 | sushw key=offset,cdp,delrt a=-30,5,25 b=12,0,0 | suvelan nv=4 fv=1000 dv=200 anis1=1e-10 anis2=1e-5 smute=2 dtratio=2 nsmooth=6 pwr=2 verbose=1
+[stderr] suplane nt=79 ntr=5 | sushw key=cdp,offset a=7,0 b=1,10 | suvelan nv=2 verbose=1 dtratio=4
+suplane nt=53 ntr=4 | suaddnoise seed=42 sn=2 | sushw key=offset a=-50 b=30 | suvelan nv=5 fv=1700 dv=-100 smute=1.01 dtratio=1 nsmooth=11 pwr=0.7
+suspike nt=97 ntr=7 | sushw key=offset,delrt a=5,-20 b=5,0 | suvelan nv=4 fv=900 dv=300 dtratio=3 nsmooth=2
+suplane nt=67 ntr=8 | sushw key=cdp,offset a=3,0 b=-1,12 | suvelan nv=2 dtratio=4 nsmooth=1
+suplane nt=37 ntr=3 | suvelan nv=50 dv=50 fv=1500 anis1=0 anis2=0 smute=1.5 dtratio=5 nsmooth=11 verbose=0 pwr=1
+sunull nt=17 ntr=2 | sushw key=dt,delrt a=2000,100 | suvelan nv=2 dtratio=20 nsmooth=50
+suspike nt=127 ntr=4 | suaddnoise seed=23 sn=5 | sushw key=offset a=0 b=15 | suvelan nv=6 fv=1400 dv=75 anis1=1e-11 anis2=0 dtratio=2 nsmooth=7 pwr=1.5
+suplane nt=23 ntr=1 | suvelan smute=0.9
+suplane nt=23 ntr=1 | suvelan pwr=-0.1
+suplane nt=23 ntr=1 | sushw key=offset a=100 | suvelan anis2=-0.0001
+suplane nt=89 ntr=4 | sushw key=dt,delrt,offset a=1000,10,0 b=0,0,7 | suvelan nv=3 dtratio=3 nsmooth=8
+suplane nt=201 ntr=5 | suaddnoise seed=81 sn=2 | sushw key=offset,delrt a=0,300 b=20,0 | suvelan nv=5 fv=500 dv=800 dtratio=1 nsmooth=13
+suplane nt=4097 ntr=6 | suaddnoise seed=9 sn=4 | sushw key=offset a=10 b=20 | suvelan nv=4 fv=1000 dv=400 dtratio=3 nsmooth=7
+suplane nt=31 ntr=4 | sushw key=cdp,offset a=16777217,0 b=1,5 | suvelan nv=2 dtratio=1
+suspike nt=59 ntr=3 | suvelan nv=2 nsmooth=-5 dtratio=2
+suspike nt=47 ntr=5 | sushw key=offset a=0 b=12 | suvelan nv=3 fv=1200 dv=0 dtratio=1 nsmooth=47
+suspike nt=1 ntr=1 | suvelan nv=1 dtratio=1 nsmooth=2
+suplane nt=101 ntr=5 | suaddnoise seed=55 sn=2 | sushw key=offset,cdp a=10,1 b=5,1 j=1,2 | suvelan nv=3 fv=1000 dv=200 dtratio=2 nsmooth=5

@@ -12,3 +12,37 @@
 [stderr] kaperture
 [stderr] kaperture unknown=1 nstep=0 outpar=params > /dev/null
 kaperture nshot=2 ngeo=3 nfreq=2 both=1 nstep=0 outpar=params > /dev/null && cat params
+# diff-2026-11 (round 1)
+[f32] sunull nt=1 ntr=1 | kaperture outpar=params
+[f32] suspike nt=2 ntr=1 | kaperture nfreq=1 nshot=1 ngeo=1 c=5000 x0=1000 z0=1000 sxmin=0 szmin=0 gxmin=0 gzmin=0 dsx=100 dsz=0 dgx=100 dgz=0 fnyq=125 fmax=125 fmin=125 nstep=60 both=0 outpar=params
+[f32] sunull nt=3 ntr=1 | kaperture nstep=0 outpar=params
+[f32] suspike nt=4 ntr=1 | kaperture nfreq=3 fmin=10 fmax=90 nstep=3 outpar=params
+[f32] sunull nt=7 ntr=2 | kaperture nshot=3 ngeo=4 nfreq=4 both=1 nstep=11 outpar=params
+[f32] suspike nt=13 ntr=2 | kaperture x0=0 z0=0 sxmin=0 szmin=0 gxmin=0 gzmin=0 nstep=1 outpar=params
+[f32] sunull nt=17 ntr=1 | kaperture x0=-25 z0=43 sxmin=17 szmin=-4 gxmin=-61 gzmin=89 nstep=5 outpar=params
+[f32] suspike nt=31 ntr=1 | kaperture nshot=4 ngeo=3 dsx=-13 dsz=8 dgx=7 dgz=-19 both=1 nstep=0 outpar=params
+[f32] sunull nt=1 ntr=1 | kaperture nfreq=1 fmin=7 fmax=99 fnyq=42 c=1500 nstep=4 outpar=params
+[f32] suspike nt=2 ntr=1 | kaperture nfreq=5 fmin=100 fmax=0 nstep=7 outpar=params
+[f32] sunull nt=3 ntr=1 | kaperture nfreq=2 fmin=-20 fmax=30 both=1 nstep=2 outpar=params
+[f32] suspike nt=4 ntr=1 | kaperture nfreq=0 nshot=2 ngeo=3 nstep=13 outpar=params
+[f32] sunull nt=5 ntr=1 | kaperture nshot=0 ngeo=2 nfreq=3 both=1 nstep=9 outpar=params
+[f32] suspike nt=7 ntr=1 | kaperture nshot=2 ngeo=0 nstep=0 outpar=params
+[f32] sunull nt=11 ntr=1 | kaperture nstep=-1 nfreq=2 fmin=1 fmax=2 outpar=params
+[f32] suspike nt=17 ntr=1 | kaperture both=-2 nshot=2 ngeo=2 nfreq=3 nstep=0 outpar=params
+[f32] sunull nt=19 ntr=1 | kaperture fnyq=-30 c=2100 nstep=8 outpar=params
+[f32] suspike nt=23 ntr=1 | kaperture c=-2200 fmin=12 fmax=56 nfreq=4 nstep=6 outpar=params
+[f32] sunull nt=29 ntr=1 | kaperture x0=0.000000000000000000001 z0=0 sxmin=0 szmin=0 gxmin=0 gzmin=0 nstep=0 outpar=params
+[f32] suspike nt=37 ntr=1 | kaperture nshot=7 ngeo=11 nfreq=7 fmin=1.25 fmax=37.75 both=1 nstep=17 outpar=params
+[f32] sunull nt=3 ntr=1 | sushw key=sx,gx a=100,-30 | kaperture nshot=2 ngeo=2 sxmin=10 gxmin=20 nstep=3 outpar=params
+[f32] sunull nt=4097 ntr=1 | kaperture nfreq=3 nstep=19 outpar=params
+[f32] suspike nt=2 ntr=1 | kaperture nfreq=1 fmin=0 fnyq=0 nstep=2 outpar=params
+sunull nt=1 ntr=1 | kaperture nshot=2 ngeo=3 nfreq=4 both=1 nstep=7 fnyq=62.5 c=2400 outpar=params > /dev/null && cat params
+sunull nt=2 ntr=1 | kaperture nfreq=0 nstep=0 outpar=/dev/stdout
+[stderr] sunull nt=1 ntr=1 | kaperture nstep=0 outpar=/no/such/directory/params
+[stderr] sunull nt=1 ntr=1 | kaperture nfreq=999999999999999999 outpar=params
+[stderr] sunull nt=1 ntr=1 | kaperture nshot=-1 outpar=params
+[stderr] [f32] sunull nt=2 ntr=1 | kaperture nfreq=3 fmin=3 fmax=11 nstep=5 verbose=1 outpar=params
+sunull nt=1 ntr=1 | kaperture c=0 fnyq=0 nfreq=0 nstep=0 outpar=params > /dev/null && cat params
+sunull nt=1 ntr=1 | kaperture c=0 fnyq=25 nfreq=0 nstep=0 outpar=params > /dev/null && cat params
+sunull nt=1 ntr=1 | kaperture c=-5000 fnyq=0 nfreq=0 nstep=0 outpar=params > /dev/null && cat params
+[f32] suspike nt=1 ntr=1 | kaperture nshot=19 ngeo=23 x0=123.25 z0=-56.75 sxmin=-999.5 szmin=88.1 gxmin=13.2 gzmin=-4.3 dsx=2.3 dsz=-3.7 dgx=-4.9 dgz=5.1 nfreq=11 fmin=-18.7 fmax=99.4 both=1 nstep=101 c=4321.2 fnyq=101.1 outpar=params

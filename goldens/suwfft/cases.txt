@@ -12,3 +12,18 @@ suplane nt=64 ntr=1 | suwfft verbose=0 w0=-1 w1=2 w2=0
 suplane nt=32 ntr=1 | suwfft sign=0 verbose=0
 suplane nt=32 ntr=1 | suwfft sign=2 verbose=0
 suwfft verbose=0
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suwfft verbose=0 w0=0 w1=1 w2=0
+suspike nt=3 ntr=1 | suwfft verbose=0 sign=-1 w0=0 w1=1 w2=0
+suspike nt=4 ntr=2 | suwfft verbose=0 w0=0 w1=1 w2=0
+suplane nt=31 ntr=3 | suwfft verbose=0 sign=1 w0=0 w1=1 w2=0
+suspike nt=4097 ntr=1 | suwfft verbose=0 w0=0 w1=1 w2=0
+suplane nt=101 ntr=2 | sushw key=trid,d1 a=130,0.003 | suwfft verbose=0 w0=0 w1=1 w2=0
+[stderr] suspike nt=13 ntr=2 | sushw key=dt a=2000 | suwfft verbose=1 sign=-1 w0=0 w1=1 w2=0
+sunull nt=16 ntr=2 | suwfft verbose=0 w0=0 w1=1 w2=0
+suspike nt=64 ntr=1 | suwfft verbose=0 w0=0.25 w1=1.5 w2=0
+suplane nt=29 ntr=1 | suwfft verbose=0 sign=3
+suspike nt=2 ntr=1 | suwfft verbose=0 w0=0.5 w1=2 w2=4
+suplane nt=127 ntr=2 | suwfft verbose=0 sign=-1 w0=0.4 w1=1.3 w2=2
+suspike nt=65535 ntr=1 | suwfft verbose=0

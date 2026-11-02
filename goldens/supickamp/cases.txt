@@ -26,3 +26,28 @@ supickamp d2=1 arg2=no outpar=/dev/null
 supickamp d2=1 format=no outpar=/dev/null
 supickamp d2=1 outpar=/dev/null
 sunull nt=4 ntr=1 | sushw key=dt a=0 | supickamp d2=1 outpar=/dev/null
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 dt=0.004 it=1 | supickamp d2=1 x_above=0 t_above=0 wl=0.001 verbose=0 outpar=/dev/null
+suspike nt=3 ntr=2 dt=0.004 it=2 | supickamp d2=2 x_above=0 t_above=0 wl=0.004 verbose=0 arg1=tmax arg2=abs outpar=/dev/null
+suspike nt=4 ntr=2 dt=0.004 it=3 | supickamp d2=1 x_above=0 t_above=0 wl=0.008 verbose=0 arg1=tabs arg2=energy outpar=/dev/null
+suspike nt=17 ntr=3 dt=0.004 it=5 | supickamp d2=1 x_above=0 t_above=0 wl=0.04 dt_resamp=0.002 verbose=0 arg1=max arg2=tmax outpar=/dev/null
+suspike nt=31 ntr=4 dt=0.004 it=8 | supickamp d2=-2 x2beg=6 x_above=6,0 t_above=0.004,0.012 wl=0.04 dt_resamp=0.003 verbose=0 arg1=min arg2=tmin outpar=/dev/null
+suplane nt=101 ntr=5 | supickamp d2=2 x2beg=-4 x_above=-4,4 t_above=0.01,0.03 wl=0.08 dt_resamp=0.001 verbose=0 arg1=abs arg2=tabs outpar=/dev/null
+suplane nt=127 ntr=4 | supickamp d2=1 x_above=0,3 t_above=0.02,0.04 wl=0.1 verbose=0 arg1=energy arg2=i2 outpar=/dev/null
+sunull nt=4097 ntr=1 dt=0.004 | supickamp d2=1 x_above=0 t_above=0 wl=0.1 verbose=0 arg1=x2 arg2=max outpar=/dev/null
+suspike nt=97 ntr=3 dt=0.002 it=20 | sushw key=offset a=-10 b=10 | supickamp key=offset d2=9 x_above=-10,10 t_above=0.01,0.02 wl=0.05 verbose=0 arg1=x2 arg2=i2 outpar=/dev/null
+suspike nt=81 ntr=3 dt=0.004 it=9 | sushw key=cdp,delrt a=100,20 b=5,0 | supickamp key=cdp tmin=0.1 x_above=100,110 t_above=0.02,0.03 wl=0.08 verbose=0 arg1=tmax arg2=x2 outpar=/dev/null
+suspike nt=65 ntr=3 dt=0.004 it=12 | supickamp d2=1 tmin=0.02 x_above=0 t_above=0.03 wl=0.08 verbose=0 format=ascii arg1=energy arg2=tmax outpar=/dev/null
+[f32] suspike nt=65 ntr=3 dt=0.004 it=12 | supickamp d2=1 x_above=0 t_above=0 wl=0.1 verbose=0 format=binary arg1=energy arg2=tmax outpar=/dev/null
+suspike nt=51 ntr=3 dt=0.004 it=7 | supickamp d2=1 x_above=0,2 t_above=0.005,0.015 wl=0.04 verbose=1 outpar=report > /dev/null; cat report
+suplane nt=51 ntr=3 | supickamp d2=1 x_above=0,2 t_above=0.005,0.015 wl=0.04 verbose=2 outpar=report > /dev/null; cat report
+printf '0.004 0\n0.012 2\n' > above; printf '0.040 0\n0.060 2\n' > below; suplane nt=61 ntr=3 | supickamp d2=1 t_xabove=above t_xbelow=below verbose=0 arg1=tmin arg2=tmax outpar=/dev/null
+printf '0.012 2\n0.004 0\n' > above; suplane nt=61 ntr=3 | supickamp d2=1 t_xabove=above wl=0.04 verbose=0 arg1=abs arg2=x2 outpar=/dev/null
+suplane nt=53 ntr=3 | supickamp d2=1 x_above=2,0 t_above=0.03,0.01 verbose=0 arg1=tmax arg2=tmin outpar=/dev/null
+sunull nt=41 ntr=2 dt=0.002 | supickamp d2=1 x_above=0 t_above=0 wl=0.02 verbose=0 arg1=min arg2=abs outpar=/dev/null
+suspike nt=43 ntr=2 dt=0.004 it=5 | supickamp d2=1 x_above=0 t_above=0 wl=0.04 dt_resamp=0.008 verbose=0 arg1=max arg2=energy outpar=/dev/null
+suspike nt=73 ntr=3 dt=0.004 it=10 | supickamp d2=1 x_above=0,1,2 t_above=0.01,0.02,0.03 wl=0.06 verbose=0 arg1=i2 arg2=tabs outpar=/dev/null
+supickamp key=offset t_xbelow=missing outpar=/dev/null
+supickamp d2=1 x_above=1,2,3 t_above=1,2 outpar=/dev/null
+supickamp d2=1 x_above=0 t_above=0 wl=0.1 arg1=bad outpar=/dev/null
+supickamp d2=1 x_above=0 t_above=0 wl=0.1 format=bad outpar=/dev/null

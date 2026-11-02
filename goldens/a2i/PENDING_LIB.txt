@@ -1,0 +1,2 @@
+[stderr] sunull nt=1 ntr=1 | sugethw key=ns output=geom | LC_ALL=C awk '{printf "%c\n", 255}' | a2i n1=1 outpar=/dev/null
+# oxwave-core, cio::fgets: String::from_utf8_lossy replaces invalid input bytes, changing the scan error diagnostic.

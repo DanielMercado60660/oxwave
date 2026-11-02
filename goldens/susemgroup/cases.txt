@@ -21,3 +21,62 @@ suplane nt=64 ntr=4 | susemgroup groupkey=none maxfold=2
 # Scanning nonzero, irregular data and short traces with zero smoothing window
 suplane nt=73 ntr=7 | suaddnoise seed=42 | sushw key=offset a=-3 b=1 | susemgroup groupkey=none locmaxscan=3 scanstep=0.2 scanmin=-0.8 scanmax=1 dipext=4 dipuse=1
 suplane nt=1 ntr=1 | susemgroup dipext=0
+# diff-2026-11 (round 1)
+suplane nt=2 ntr=3 | sushw key=offset a=-1 b=1 | susemgroup groupkey=none dipext=0
+suplane nt=3 ntr=4 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0
+suplane nt=4 ntr=2 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0
+suspike nt=31 ntr=5 k1=7 k2=3 | sushw key=offset a=-2 b=1 | susemgroup groupkey=none dipext=0 scanstep=0.25 scanmin=-1 scanmax=1
+suspike nt=67 ntr=5 k1=20 k2=2 | sushw key=offset a=4 b=-2 | susemgroup groupkey=none locmaxscan=3 locmaxsum=4 dipuse=0 dipext=4
+sunull nt=23 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0 outsem=sem > /dev/null && cat sem
+suplane nt=4097 ntr=2 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=0 locmaxsum=2
+suplane nt=97 ntr=4 | sushw key=cdp a=5 b=1 | susemgroup lockey=cdp groupkey=none locmaxscan=2 locmaxsum=1 scanstep=0.5 scanmin=-2 scanmax=2 dipext=0 maxfold=4
+suplane nt=71 ntr=6 | sushw key=offset,cdp a=-2,1 b=1,0 c=0,1 j=1,3 | susemgroup locmaxscan=2 locmaxsum=3 dipext=0
+suplane nt=53 ntr=4 | sushw key=offset a=0 b=2 | susemgroup groupkey=none locmaxscan=1 locmaxsum=5 dipext=0 outpow=pow > /dev/null && cat pow
+suplane nt=53 ntr=4 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=3 dipext=0 outdip=dip > /dev/null && cat dip
+suplane nt=53 ntr=4 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=3 dipext=0 outsem=sem > /dev/null && cat sem
+suspike nt=79 ntr=4 k1=20 k2=2 | sushw key=offset a=0 b=1 > input && susemgroup groupkey=none dipext=0 outdip=dip < input > /dev/null && susemgroup groupkey=none indip=dip locmaxsum=3 dipuse=0 < input
+suplane nt=101 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=2 locmaxsum=2 scanstep=0.1 scanmin=-0.3 scanmax=0.7 dipext=8 verbose=1
+suplane nt=41 ntr=1 | susemgroup groupkey=none locmaxscan=1 locmaxsum=1 dipext=0 outpow=p > /dev/null && cat p
+suspike nt=101 ntr=6 k1=30 k2=4 | sushw key=offset a=-3 b=1 | susemgroup groupkey=none locmaxscan=0 locmaxsum=2 dipuse=0
+suplane nt=127 ntr=5 | suaddnoise seed=123 | sushw key=offset a=-4 b=2 | susemgroup groupkey=none locmaxscan=5 locmaxsum=4 dipext=0 dipuse=1
+suplane nt=83 ntr=4 | sushw key=offset a=1 b=0 | susemgroup groupkey=none locmaxscan=1 locmaxsum=1 dipext=0
+suplane nt=59 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none scanmin=0 scanmax=0 scanstep=1 dipext=0
+suplane nt=89 ntr=4 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=2 locmaxsum=2 dipext=0 maxfold=4
+susemgroup locmaxscan=0 dipext=0 locmaxsum=2
+susemgroup dipuse=-1
+susemgroup indip=missing locmaxsum=2
+suplane nt=32 ntr=3 | susemgroup groupkey=none maxfold=2
+suplane nt=257 ntr=7 | suaddnoise seed=81 | sushw key=offset a=-30 b=10 | susemgroup groupkey=none locmaxscan=30 locmaxsum=25 scanstep=0.3 scanmin=-2 scanmax=3 dipext=0 dipuse=0 outdip=d > /dev/null && cat d
+suplane nt=251 ntr=6 | suaddnoise seed=99 | sushw key=offset a=25 b=-10 | susemgroup groupkey=none locmaxscan=35 locmaxsum=20 scanstep=0.2 scanmin=-1.5 scanmax=2 dipext=8 dipuse=1
+suplane nt=257 ntr=5 | suaddnoise seed=17 | sushw key=offset a=-20 b=10 | susemgroup groupkey=none locmaxscan=40 locmaxsum=40 scanstep=0.5 scanmin=-3 scanmax=3 dipext=0 outsem=s > /dev/null && cat s
+suplane nt=257 ntr=5 | suaddnoise seed=17 | sushw key=offset a=-20 b=10 | susemgroup groupkey=none locmaxscan=40 locmaxsum=40 scanstep=0.5 scanmin=-3 scanmax=3 dipext=0 outpow=p > /dev/null && cat p
+suplane nt=257 ntr=5 | suaddnoise seed=17 | sushw key=offset a=-20 b=10 | susemgroup groupkey=none locmaxscan=40 locmaxsum=40 scanstep=0.5 scanmin=-3 scanmax=3 dipext=0 dipuse=0
+suplane nt=1 ntr=2 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0
+suplane nt=4097 ntr=3 | suaddnoise seed=7 | sushw key=offset a=-2 b=2 | susemgroup groupkey=none locmaxscan=4 scanstep=1 scanmin=-2 scanmax=2 dipext=0
+[stderr] suplane nt=128 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=2 dipext=0 verbose=1
+suplane nt=128 ntr=6 | suaddnoise seed=22 | sushw key=offset,cdp a=0,1 b=1,0 c=0,1 j=1,3 > input && susemgroup dipext=0 outdip=d < input > /dev/null && susemgroup indip=d locmaxsum=3 < input
+# diff-2026-11 (round 2)
+sunull nt=37 ntr=4 | sushw key=offset a=-2 b=2 > dips && suspike nt=37 ntr=4 k1=10 k2=2 | sushw key=offset a=-2 b=2 | susemgroup groupkey=none indip=dips locmaxsum=4 dipuse=0
+sunull nt=53 ntr=5 | sushw key=cdp a=10 b=1 > dips && suplane nt=53 ntr=5 | sushw key=cdp a=10 b=1 | susemgroup lockey=cdp groupkey=none indip=dips locmaxsum=2 dipuse=1
+suplane nt=1 ntr=1 | susemgroup groupkey=none dipext=0 locmaxscan=1 locmaxsum=1
+suspike nt=2 ntr=2 k1=1 k2=1 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0 locmaxscan=1 locmaxsum=1
+sunull nt=3 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0 locmaxscan=2 outsem=s > /dev/null && cat s
+suspike nt=4 ntr=2 k1=2 k2=1 | sushw key=offset a=0 b=1 | susemgroup groupkey=none dipext=0 scanmin=-1 scanmax=1 scanstep=0.5
+suplane nt=4097 ntr=2 | sushw key=offset a=-1 b=2 | susemgroup groupkey=none dipext=0 scanmin=-1 scanmax=1 scanstep=0.5
+suplane nt=103 ntr=5 | sushw key=offset a=8 b=-3 | susemgroup groupkey=none locmaxscan=4 locmaxsum=3 scanmin=-2 scanmax=1 scanstep=0.25 dipext=4 dipuse=0 maxfold=5
+suspike nt=97 ntr=6 k1=30 k2=3 | sushw key=offset,cdp a=-2,1 b=1,0 c=0,1 j=1,2 | susemgroup locmaxscan=3 locmaxsum=2 dipext=0 outdip=d > /dev/null && cat d
+suplane nt=113 ntr=4 | sushw key=offset a=0 b=2 | susemgroup groupkey=none locmaxscan=3 locmaxsum=6 scanstep=0.3 scanmin=-0.9 scanmax=1.2 dipext=4 outpow=p > /dev/null && cat p
+suplane nt=107 ntr=4 | suaddnoise seed=31 | sushw key=offset a=-3 b=2 | susemgroup groupkey=none locmaxscan=5 locmaxsum=4 dipext=4 outsem=s > /dev/null && cat s
+[stderr] suspike nt=43 ntr=3 k1=12 k2=2 | sushw key=offset a=1 b=1 | susemgroup groupkey=none locmaxscan=2 locmaxsum=1 dipext=0 verbose=1
+suplane nt=61 ntr=5 | sushw key=tracf a=5 b=-1 | susemgroup lockey=tracf groupkey=none locmaxscan=2 locmaxsum=3 dipext=0
+suplane nt=67 ntr=4 | sushw key=offset a=2 b=0 | susemgroup groupkey=none locmaxscan=0 locmaxsum=1 dipuse=0
+suspike nt=73 ntr=5 k1=15 k2=4 | sushw key=offset a=-4 b=2 | susemgroup groupkey=none scanmin=0 scanmax=0 scanstep=1 locmaxscan=4 locmaxsum=2 dipext=0
+suplane nt=79 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none locmaxscan=2 locmaxsum=2 dipext=0 outdip=d outpow=p outsem=s > /dev/null && cat d p s
+suplane nt=89 ntr=4 | sushw key=offset a=-3 b=2 | susemgroup groupkey=none locmaxscan=3 locmaxsum=3 dipext=0 scanmin=-1 scanmax=1 scanstep=0.25
+susemgroup locmaxscan=0 scanmax=1 locmaxsum=2
+susemgroup indip=dips dipext=0 locmaxsum=2
+susemgroup scanmin=3 scanmax=-3
+suspike nt=83 ntr=4 k1=20 k2=2 | sushw key=offset a=-3 b=2 > dips && suplane nt=83 ntr=4 | suaddnoise seed=11 | sushw key=offset a=-3 b=2 | susemgroup groupkey=none indip=dips locmaxsum=4 dipuse=1
+suspike nt=83 ntr=4 k1=20 k2=2 | sushw key=offset a=-3 b=2 > dips && suplane nt=83 ntr=4 | suaddnoise seed=11 | sushw key=offset a=-3 b=2 | susemgroup groupkey=none indip=dips locmaxsum=4 dipuse=0
+sunull nt=51 ntr=2 | sushw key=offset a=0 b=1 > dips && suplane nt=51 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none indip=dips locmaxsum=2
+sunull nt=51 ntr=3 | sushw key=offset a=1 b=1 > dips && suplane nt=51 ntr=3 | sushw key=offset a=0 b=1 | susemgroup groupkey=none indip=dips locmaxsum=2

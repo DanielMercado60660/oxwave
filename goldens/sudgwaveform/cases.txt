@@ -18,3 +18,34 @@ sudgwaveform nt=37 n=3 fpeak=27.5 nfpeak=5 shift=-0.001 sign=-1
 [stderr] sudgwaveform nfpeak=-1 nt=10
 [stderr] sudgwaveform n=999999999999999999999
 [stderr] sudgwaveform nt=15 unknown=1
+# diff-2026-11 (round 1)
+sudgwaveform n=1 fpeak=35 nfpeak=1 shift=0 sign=1 nt=2 verbose=0
+sudgwaveform n=2 nt=3
+sudgwaveform n=3 nt=4
+sudgwaveform n=4 nt=17
+sudgwaveform n=5 fpeak=17.25 nfpeak=3 nt=97 shift=0.012 sign=-1
+sudgwaveform n=10 fpeak=300 nt=257
+sudgwaveform n=1 nt=4097 fpeak=20 nfpeak=10
+sudgwaveform n=8 fpeak=80 nfpeak=9 shift=-0.005 nt=127 sign=2
+sudgwaveform n=2 fpeak=35 nfpeak=4 shift=0 sign=1
+[stderr] sudgwaveform n=1 fpeak=15 nfpeak=4 shift=0.02 nt=31 sign=-1 verbose=1
+sudgwaveform n=6 fpeak=60 nfpeak=2 nt=101 shift=0.001
+sudgwaveform n=12 fpeak=10 nfpeak=30 nt=211
+sudgwaveform n=2 fpeak=1 nfpeak=1 nt=7
+sudgwaveform n=2 fpeak=499999 nfpeak=1 nt=13
+[stderr] sudgwaveform n=0 nt=2 verbose=1
+[stderr] sudgwaveform n=3 fpeak=500000 nfpeak=2 nt=4
+[stderr] sudgwaveform n=abc nt=4
+sudgwaveform n=3 n=4 nt=23 sign=-2
+sudgwaveform n=1 shift=-0.05 nt=53
+sudgwaveform n=7 fpeak=42.125 nfpeak=11 nt=103 shift=0.00037
+sudgwaveform n=2 fpeak=-35 nfpeak=-4 nt=23
+sudgwaveform n=20 fpeak=30 nfpeak=10 nt=251
+sudgwaveform n=50 fpeak=5 nfpeak=10 nt=149
+sudgwaveform n=2 fpeak=3 nfpeak=1 nt=19
+sudgwaveform n=4 fpeak=20 nfpeak=1 nt=97 sign=0
+[stderr] sudgwaveform n=4 fpeak=21 nfpeak=3 nt=11 verbose=-1
+sudgwaveform n=3 fpeak=23.7 nfpeak=7 shift=0.1
+sudgwaveform n=2 fpeak=35 nfpeak=4 nt=65535
+sunull ntr=1 nt=3 | sushw key=dt a=2000 | sudgwaveform n=3 nt=13
+suspike ntr=1 nt=4 | sudgwaveform n=2 nt=19 fpeak=45

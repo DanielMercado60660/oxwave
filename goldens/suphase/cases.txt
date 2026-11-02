@@ -12,3 +12,20 @@ suspike nt=17 ntr=1 | suphase dt=0.001 a=-30 b=0 c=0.5
 suphase
 suplane nt=16 ntr=1 | suphase a=1e999
 sunull nt=65535 ntr=1 | suphase
+
+# diff-2026-11 (round 1)
+suspike nt=2 ntr=1 | suphase a=90 b=0 c=0
+suspike nt=3 ntr=1 | suphase a=-45 b=180 c=0.3 dt=0.002
+suspike nt=4 ntr=2 | suphase a=0 b=57.2957795 c=0
+suplane nt=257 ntr=3 | suphase a=135 b=-120 c=-0.07
+suspike nt=4097 ntr=1 | suphase a=37 b=80 c=0.025
+[stderr] suplane nt=73 ntr=2 | sushw key=dt a=0 | suphase dt=0.003 verbose=1
+sunull nt=31 ntr=2 | sushw key=offset a=123 b=7 | suphase a=10 b=30 c=0.2
+suplane nt=64 ntr=2 | suphase a=1e999
+suspike nt=101 ntr=2 | suphase a=360 b=0 c=1.5
+suplane nt=127 ntr=1 | suphase b=0 c=0.75
+suplane nt=509 ntr=4 | suaddnoise seed=123 sn=2 | suphase a=12.5 b=137 c=0.0123
+suspike nt=8191 ntr=1 | suphase a=-89 b=-43 c=-0.003
+[stderr] suspike nt=11 ntr=1 | sushw key=dt a=0 | suphase dt=0 a=0 b=0 c=0 verbose=1
+suplane nt=19 ntr=2 | suphase a=720 b=360 c=8
+suspike nt=23 ntr=1 | suphase b=1e999

@@ -324,12 +324,25 @@ fn zcoor_surfaces(
     }
     let nx = nx as usize;
     let nxs = nxs as usize;
-    szif[0] = 2.0 * szif[1] - szif[2];
-    szif[nx - 1] = 2.0 * szif[nx - 2] - szif[nx - 3];
-    sz[0] = 2.0 * sz[1] - sz[2];
-    nangl[0] = 2.0 * nangl[1] - nangl[2];
-    sz[nxs - 1] = 2.0 * sz[nxs - 2] - sz[nxs - 3];
-    nangl[nx - 1] = 2.0 * nangl[nx - 2] - nangl[nx - 3];
+    // C lines 728-733 extrapolate using three points even for shorter arrays.
+    // Retain the interpolated values when extrapolation lacks enough points.
+    // This bounds fix leaves the four round-1 surface cases byte-identical to SU.
+    if nx >= 3 {
+        szif[0] = 2.0 * szif[1] - szif[2];
+        szif[nx - 1] = 2.0 * szif[nx - 2] - szif[nx - 3];
+    }
+    if nxs >= 3 {
+        sz[0] = 2.0 * sz[1] - sz[2];
+    }
+    if nx >= 3 {
+        nangl[0] = 2.0 * nangl[1] - nangl[2];
+    }
+    if nxs >= 3 {
+        sz[nxs - 1] = 2.0 * sz[nxs - 2] - sz[nxs - 3];
+    }
+    if nx >= 3 {
+        nangl[nx - 1] = 2.0 * nangl[nx - 2] - nangl[nx - 3];
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -490,6 +503,10 @@ fn mig2d(
     sigbg: &Table,
     filter: &mut Option<Filter>,
 ) {
+    // Match the fixed C: depth interpolation needs two table samples.
+    if nzt < 2 {
+        err!("nzt must be at least 2 for depth interpolation");
+    }
     let mut tmt = table(nzt, nxt);
     let mut ampt = table(nzt, nxt);
     let mut ampti = table(nzt, nxt);
@@ -811,7 +828,9 @@ fn filt(
     let mut ct = vec![Complex::default(); f.nw as usize];
     rt[..nt as usize].copy_from_slice(&trace[..nt as usize]);
     pfarc(1, &rt, &mut ct);
-    for iw in f.nwf - f.itaper..=f.nwf + f.itaper {
+    // C filt() can start before ct[0] for a wide taper. The minimal C fix
+    // skips those invalid writes while preserving the taper's original index.
+    for iw in max(0, f.nwf - f.itaper)..=f.nwf + f.itaper {
         let itemp = iw - (f.nwf - f.itaper);
         ct[iw as usize].r = f.taper[itemp as usize] * ct[iw as usize].r;
         ct[iw as usize].i = f.taper[itemp as usize] * ct[iw as usize].i;
